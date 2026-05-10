@@ -1,6 +1,7 @@
 import type { GroundedAnswer, UiRenderStatus } from "./types.js";
 
 export const WIDGET_URI = "ui://hvdc/answer-card-v6.html";
+export const LEGACY_WIDGET_URI = "ui://hvdc/answer-card-v5.html";
 export const TEMPLATE_VERSION = "answer-card-v6";
 export const UI_SCHEMA_VERSION = "1.0.0";
 export const UI_RENDER_ERROR_CODE = "CARD_TEMPLATE_RENDER_FAILED";
