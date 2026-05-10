@@ -290,7 +290,7 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
       details: [
         "날짜, site, owner, activity type, shipment key, risk status 기준으로 daily report 행을 정규화합니다.",
         "Delivery/Collection, Customs Clearance, ETA/New ETA, SR/Lifting Inspection, vessel movement, packing list, return/rectification, scrap activity를 각각 KPI bucket으로 집계합니다.",
-        "DET/DEM은 invoice approval이 아니라 operations delay/cost exposure watchlist로 표시하고, 실제 청구 검토가 필요할 때만 CostGuard evidence pack으로 넘깁니다."
+        "DET/DEM은 invoice approval이 아니라 operations delay/cost exposure watchlist로 표시하고, 별도 비용 감사 질문이 들어올 때만 invoice/cost 검토로 분리합니다."
       ],
       actions: [
         {

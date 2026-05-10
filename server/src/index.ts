@@ -265,6 +265,7 @@ function buildRenderResultMeta(answer: GroundedAnswer): Record<string, unknown> 
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
   const legacyWidgetUri = "ui://hvdc/answer-card-v5.html";
+  const renderToolWidgetAliasUri = "ui://hvdc/render_hvdc_answer_card.html";
   const widgetResourceMeta = {
     ui: {
       prefersBorder: true,
@@ -297,6 +298,13 @@ export function createHvdcServer(): McpServer {
 
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => createWidgetResource(WIDGET_URI));
   registerAppResource(server, "hvdc-answer-widget-legacy", legacyWidgetUri, {}, async () => createWidgetResource(legacyWidgetUri));
+  registerAppResource(
+    server,
+    "render_hvdc_answer_card",
+    renderToolWidgetAliasUri,
+    {},
+    async () => createWidgetResource(renderToolWidgetAliasUri)
+  );
 
   registerAppTool(
     server,

@@ -78,6 +78,7 @@ describe("HVDC ontology grounded answer pipeline", () => {
 
     expect(answer.summary).toContain("Daily logistics KPI");
     expect(answer.summary).not.toContain("CostGuard evidence pack");
+    expect(answer.details.join(" ")).not.toContain("CostGuard evidence pack");
     expect(answer.route.domains).toEqual(expect.arrayContaining(["master", "document", "operations", "port", "marine"]));
     expect(answer.route.domains).not.toContain("cost");
     expect(answer.route.requiredDocs).toEqual(
@@ -99,6 +100,7 @@ describe("HVDC ontology grounded answer pipeline", () => {
 
     expect(answer.summary).toContain("Daily logistics KPI");
     expect(answer.summary).not.toContain("CostGuard evidence pack");
+    expect(answer.details.join(" ")).not.toContain("CostGuard evidence pack");
     expect(answer.route.domains).toEqual(expect.arrayContaining(["master", "document", "operations"]));
     expect(answer.route.domains).not.toContain("cost");
     expect(answer.route.domains).not.toContain("material");

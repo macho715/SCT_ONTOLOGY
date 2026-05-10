@@ -72,7 +72,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     expect((HVDC_TOOL_DESCRIPTORS.search_ontology_corpus._meta as Record<string, unknown>).ui).toBeUndefined();
     expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toContain("render_hvdc_answer_card");
     expect(serverSource).toContain('const legacyWidgetUri = "ui://hvdc/answer-card-v5.html"');
+    expect(serverSource).toContain('const renderToolWidgetAliasUri = "ui://hvdc/render_hvdc_answer_card.html"');
     expect(serverSource).toContain('"hvdc-answer-widget-legacy"');
+    expect(serverSource).toContain('"render_hvdc_answer_card"');
   });
 
   it("keeps active Codex guidance aligned with the versioned widget resource", () => {
@@ -98,7 +100,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("serves the canonical v6 widget and the legacy v5 fetch alias with identical HTML", async () => {
+  it("serves the canonical v6 widget, legacy v5 alias, and render tool alias with identical HTML", async () => {
     const mcpServer = createHvdcServer();
     const client = new Client({ name: "descriptor-resource-test", version: "0.0.1" });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -108,16 +110,22 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     try {
       const canonical = await client.readResource({ uri: "ui://hvdc/answer-card-v6.html" });
       const legacy = await client.readResource({ uri: "ui://hvdc/answer-card-v5.html" });
+      const renderAlias = await client.readResource({ uri: "ui://hvdc/render_hvdc_answer_card.html" });
       const canonicalContent = canonical.contents[0];
       const legacyContent = legacy.contents[0];
+      const renderAliasContent = renderAlias.contents[0];
 
       expect(canonicalContent?.uri).toBe("ui://hvdc/answer-card-v6.html");
       expect(legacyContent?.uri).toBe("ui://hvdc/answer-card-v5.html");
+      expect(renderAliasContent?.uri).toBe("ui://hvdc/render_hvdc_answer_card.html");
       expect(canonicalContent?.mimeType).toBe("text/html;profile=mcp-app");
       expect(legacyContent?.mimeType).toBe(canonicalContent?.mimeType);
+      expect(renderAliasContent?.mimeType).toBe(canonicalContent?.mimeType);
       expect(canonicalContent && "text" in canonicalContent).toBe(true);
       expect(legacyContent && "text" in legacyContent).toBe(true);
+      expect(renderAliasContent && "text" in renderAliasContent).toBe(true);
       expect((legacyContent as { text: string }).text).toBe((canonicalContent as { text: string }).text);
+      expect((renderAliasContent as { text: string }).text).toBe((canonicalContent as { text: string }).text);
     } finally {
       await client.close();
       await mcpServer.close();
