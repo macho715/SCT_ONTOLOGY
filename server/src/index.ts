@@ -254,11 +254,43 @@ export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
 
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
+  const legacyWidgetUri = "ui://hvdc/answer-card-v5.html";
 
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => ({
     contents: [
       {
         uri: WIDGET_URI,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: widgetHtml,
+        _meta: {
+          ui: {
+            prefersBorder: true,
+            domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+            csp: {
+              connectDomains: [],
+              resourceDomains: []
+            }
+          },
+          "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+          "openai/widgetCSP": {
+            connect_domains: [],
+            resource_domains: [],
+            frame_domains: [],
+            redirect_domains: []
+          }
+        }
+      }
+    ]
+  }));
+
+  // Backward-compatibility alias: older clients may still request v5.
+  // Serve the same static widget so template fetch does not fail.
+  registerAppResource(server, "hvdc-answer-widget-legacy", legacyWidgetUri, {}, async () => ({
+    contents: [
+      {
+        uri: legacyWidgetUri,
         mimeType: RESOURCE_MIME_TYPE,
         text: widgetHtml,
         _meta: {
