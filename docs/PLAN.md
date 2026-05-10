@@ -16,6 +16,19 @@
 
 ---
 
+## Current Runtime Note - 2026-05-11
+
+현재 production MCP는 corpus-only MVP로 운영합니다.
+
+- 현재 서버 tool은 `ask_hvdc_ontology`, `render_hvdc_answer_card`, `route_question`, `search_ontology_corpus`, `resolve_any_key`, `validate_answer` 6개입니다.
+- `ask_hvdc_ontology`는 데이터 전용입니다. 이 tool은 `openai/outputTemplate`, `_meta.ui.resourceUri`, `structuredContent.ui`를 반환하지 않습니다.
+- `render_hvdc_answer_card`만 ChatGPT 카드 template를 소유합니다. 출력 template는 `ui://hvdc/answer-card-v6.html`입니다.
+- `ui://hvdc/answer-card-v5.html`와 `ui://hvdc/render_hvdc_answer_card.html`는 같은 HTML을 반환하는 호환 alias입니다.
+- Daily KPI Dashboard 질문은 operations KPI로 우선 라우팅합니다. DET/DEM은 invoice audit이 아니라 operations delay/cost exposure risk KPI입니다.
+- `query_knowledge_graph`, `compose_grounded_answer`, `create_action_request`, `export_answer_report`는 이 계획의 확장 tool이며 현재 production MCP tool이 아닙니다.
+
+---
+
 ## 1. Overview
 
 ### 1.1 관찰한 사실

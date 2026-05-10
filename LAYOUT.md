@@ -94,7 +94,7 @@ flowchart TD
 
 `public/`은 ChatGPT 앱에서 표시할 정적 UI 파일을 담는다.
 
-- `public/hvdc-answer-widget.html`: HVDC 답변 위젯 화면이다.
+- `public/hvdc-answer-widget.html`: HVDC 답변 위젯 화면이다. 현재 v6 answer card resource, v5 legacy alias, render tool alias가 모두 같은 HTML을 사용한다. 긴 action명과 protected-field 목록은 카드 안에서 줄바꿈되도록 CSS가 들어 있다.
 
 ## tests
 
@@ -103,7 +103,7 @@ flowchart TD
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
 - `tests/descriptor.test.ts`: 앱 descriptor 관련 동작을 검증한다.
 - `tests/evals.test.ts`: 평가 시나리오를 검증한다.
-- `tests/widget.test.ts`: 공개 위젯 HTML의 기대 요소를 검증한다.
+- `tests/widget.test.ts`: 공개 위젯 HTML의 기대 요소, bridge fallback, 외부 fetch 금지, overflow-safe CSS를 검증한다.
 - `tests/golden_prompts.json`: HVDC 도메인 질문과 기대 판정 데이터를 담는다.
 
 ## scripts

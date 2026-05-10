@@ -78,11 +78,16 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
   });
 
   it("keeps active Codex guidance aligned with the versioned widget resource", () => {
-    for (const guidance of [rootAgentGuidance, systemArchitecture, codexAgentGuidance]) {
+    for (const guidance of [rootAgentGuidance, codexAgentGuidance]) {
       expect(guidance).toContain("ui://hvdc/answer-card-v6.html");
       expect(guidance).not.toContain("ui://hvdc/answer-card-v4.html");
       expect(guidance).not.toContain("ui://hvdc/answer-card-v5.html");
     }
+
+    expect(systemArchitecture).toContain("ui://hvdc/answer-card-v6.html");
+    expect(systemArchitecture).toContain("ui://hvdc/answer-card-v5.html");
+    expect(systemArchitecture).toContain("ui://hvdc/render_hvdc_answer_card.html");
+    expect(systemArchitecture).not.toContain("ui://hvdc/answer-card-v4.html");
   });
 
   it("declares review-facing widget metadata and a narrow CSP", () => {

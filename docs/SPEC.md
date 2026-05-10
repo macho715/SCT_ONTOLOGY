@@ -141,7 +141,7 @@ Acceptance Scenarios:
 - EC3: CONSOLIDATED-00은 hit되었으나 target extension이 없음 -> App은 limited answer 또는 NO_TARGET_EXTENSION 상태를 반환한다.
 - EC4: userRole 권한이 부족함 -> App은 restricted fields를 mask하고 role-level answer만 반환한다.
 - EC5: KG/SPARQL timeout 발생 -> App은 corpus-only fallback 가능 여부를 표시하고 status claim은 제한한다.
-- EC6: UI component load 실패 -> App은 업무 결과 JSON을 유지하고 `uiRenderStatus=TEMPLATE_FETCH_FAILED`와 structuredContent text fallback을 표시한다.
+- EC6: UI component load 실패 -> App은 업무 결과 JSON을 유지한다. `ask_hvdc_ontology` 결과에는 `ui`를 붙이지 않고, render 단계에서만 `uiRenderStatus=TEMPLATE_FETCH_FAILED` 또는 `FALLBACK_RENDERED`와 text fallback을 표시한다.
 - EC7: MCP tool unavailable -> App은 answer generation을 중단하고 TOOL_UNAVAILABLE 상태를 반환한다.
 - EC8: Prompt injection이 retrieved document에 포함됨 -> server-side validation은 instruction-like text를 무시하고 evidence text로만 처리한다.
 - EC9: PII redaction 실패 감지 -> App은 report/export/action을 중단하고 REDACTION_FAILED를 반환한다.
@@ -182,6 +182,10 @@ Acceptance Scenarios:
 - FR-027: System MUST include fallback text output when UI components cannot render.
 - FR-028: System MUST provide Open Questions and [NEEDS CLARIFICATION] markers for unresolved product, deployment, auth, or data source decisions.
 - FR-029: System MUST keep UI render failures separate from business validation; `verdict`, `validationStatus`, `evidenceIds`, and `actions` MUST NOT change because the card template failed to load.
+- FR-030: `ask_hvdc_ontology` MUST remain data-only and MUST NOT return `structuredContent.ui`.
+- FR-031: `render_hvdc_answer_card` MUST be the only answer-card tool that attaches `ui://hvdc/answer-card-v6.html`.
+- FR-032: Daily KPI Dashboard lock requests MUST route to operations KPI with Human-gate, not to the default invoice/cost audit summary.
+- FR-033: The answer card MUST wrap long action ids, protected-field lists, route reasons, and validation messages inside the iframe.
 
 ### Non-Functional Requirements
 
@@ -274,7 +278,16 @@ Acceptance Scenarios:
       "ownerRole": "string",
       "humanGateRequired": true
     }
-  ],
+  ]
+}
+```
+
+`ask_hvdc_ontology` is the data tool: it returns grounded answer JSON and text fallback without attaching a widget template and without returning `structuredContent.ui`.
+
+`render_hvdc_answer_card` is the render tool: it accepts the complete `GroundedAnswer`, attaches `_meta["openai/outputTemplate"]` and `_meta.ui.resourceUri` for `ui://hvdc/answer-card-v6.html`, and adds the render-only `ui` state:
+
+```json
+{
   "ui": {
     "dataStatus": "OK",
     "uiRenderStatus": "READY|RESOURCE_REGISTERED|RESOURCE_LOADED|TOOL_RESULT_RECEIVED|RENDERED|RESOURCE_NOT_REGISTERED|RESOURCE_MIME_INVALID|RESOURCE_CSP_BLOCKED|SCHEMA_MISMATCH|WIDGET_RENDER_ERROR|FALLBACK_RENDERED|TEMPLATE_FETCH_FAILED",
@@ -289,7 +302,9 @@ Acceptance Scenarios:
 }
 ```
 
-`ask_hvdc_ontology` is the data tool: it returns the grounded answer JSON and text fallback without attaching a widget template. `render_hvdc_answer_card` is the render tool: it attaches `_meta["openai/outputTemplate"]` and `_meta.ui.resourceUri` for the versioned `ui://hvdc/answer-card-v6.html` resource. The business result stays visible as text fallback when the card template cannot load.
+The app also serves compatibility aliases `ui://hvdc/answer-card-v5.html` and `ui://hvdc/render_hvdc_answer_card.html`, both returning the same widget HTML as v6. The business result stays visible as text fallback when the card template cannot load.
+
+Daily KPI Dashboard questions are routed as operations dashboard questions. `DET/DEM` is handled as an operations delay/cost-exposure KPI, not as the default Invoice/CostGuard audit path. Owner/Risk/Next Action lock requests require Human-gate review before locked confirmed operational use.
 
 ### Files
 

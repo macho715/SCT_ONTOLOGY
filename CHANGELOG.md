@@ -7,16 +7,60 @@
 ```mermaid
 flowchart TD
   A["Initial app upload<br/>Commit 48d606d"] --> B["Plan/spec goal commit<br/>Commit 0c629f7"]
-  B --> C["Unreleased Option B local implementation<br/>현재 로컬 미커밋 / 미푸시 상태"]
-  C --> D["Next action<br/>commit"]
-  D --> E["Next action<br/>push"]
-  E --> F["Next action<br/>GitHub Actions 확인"]
+  B --> C["Option B implementation"]
+  C --> D["Decoupled render pattern<br/>Commit cfea296"]
+  D --> E["Render alias hardening<br/>Commit e98cb56"]
+  E --> F["Card overflow CSS<br/>Commit 0090286"]
+  F --> G["Next action<br/>push / GitHub Actions 확인"]
 ```
 
-## Unreleased - Option B local implementation
+## Unreleased - 2026-05-11 documentation refresh
 
-현재 작업 트리에만 있는 로컬 구현이다.
-아직 push 또는 GitHub Actions 통과로 확인하지 않았다.
+현재 문서 갱신 작업은 로컬 변경이다.
+런타임 코드는 이미 이전 커밋으로 배포되었고, 이번 섹션은 README, QA, 연결, UI/UX, render plan/spec 문서를 최신 상태로 맞추는 작업을 기록한다.
+
+### Changed
+
+- README의 stale direct-template 설명을 decoupled data/render 설명으로 수정했다.
+- QA 문서에 production MCP smoke, Daily KPI Dashboard lock, widget overflow 확인 기준을 추가했다.
+- ChatGPT 연결 문서에 production URL, refresh/reconnect 절차, Daily KPI 카드 확인 절차를 추가했다.
+- UI/UX 사양에 `ask_hvdc_ontology` data-only와 `render_hvdc_answer_card` render-only 계약을 반영했다.
+
+### Verification target
+
+- `npm run verify`
+- production MCP resource smoke
+- ChatGPT 새 대화에서 카드 overflow 수동 확인
+
+## 2026-05-11 - Decoupled render and card overflow hardening
+
+Commits: `ce02ae3`, `e98cb56`, `cfea296`, `0090286`
+
+### Changed
+
+- `ask_hvdc_ontology`를 데이터 전용 tool로 전환했다.
+- `ask_hvdc_ontology` 결과에서 `openai/outputTemplate`, `_meta.ui.resourceUri`, `structuredContent.ui`를 제거했다.
+- `render_hvdc_answer_card`만 `ui://hvdc/answer-card-v6.html` template metadata를 소유하도록 했다.
+- stale client 방어를 위해 `ui://hvdc/answer-card-v5.html`와 `ui://hvdc/render_hvdc_answer_card.html` alias resource를 유지한다.
+- Daily KPI Dashboard lock 질문은 operations KPI summary와 Human-gate `WARN`으로 처리한다.
+- 카드 CSS에서 긴 action명, protected fields, route reason, validation text가 잘리지 않도록 줄바꿈과 responsive grid를 보강했다.
+
+### Verified
+
+- 로컬에서 `npm run verify`를 실행했다.
+- 결과: TypeScript typecheck 통과, 활성 Vitest 4개 파일 / 43개 테스트 통과.
+- Railway production 배포 후 MCP smoke로 tool descriptor, resource alias, render-only template, ask data-only payload를 확인했다.
+- ChatGPT 관리 화면에서 `render_hvdc_answer_card`와 `ui://hvdc/answer-card-v6.html` template 노출을 확인했다.
+- ChatGPT 화면에서 `Failed to fetch template` 없이 Daily KPI 카드가 표시되는 것을 확인했다.
+
+### Risks
+
+- ChatGPT client cache가 남아 있으면 앱 refresh 또는 reconnect 후 새 대화에서 확인해야 한다.
+- 카드 overflow 개선은 CSS와 production resource smoke로 검증했지만, 실제 화면 폭별 최종 캡처 확인은 별도 수동 확인이 필요하다.
+
+## 2026-05-10 - Option B local implementation
+
+초기 Option B 구현이다.
 
 ### Added
 
@@ -35,15 +79,13 @@ flowchart TD
 ### Verified
 
 - 로컬에서 `npm run verify`를 실행했다.
-- 결과: TypeScript typecheck 통과, 활성 Vitest 4개 파일 / 23개 테스트 통과.
+- 결과: TypeScript typecheck 통과, 당시 활성 Vitest 4개 파일 / 23개 테스트 통과.
 - 로컬에서 `python scripts/check_index_drift.py`를 실행했다.
 - 결과: corpus index는 최신 상태이고 `source_role_map.json`은 유효한 JSON으로 확인됐다.
 
 ### Risks
 
-- 이 Option B 구현은 현재 커밋되지 않은 로컬 변경이다.
-- GitHub Actions 실행 결과는 현재 세션에서 확인하지 않았다.
-- GitHub에 push된 상태도 현재 세션에서 확인하지 않았다.
+- GitHub Actions 실행 결과는 이 문서 작성 시점에 별도로 확인해야 한다.
 - security 문서 기준으로 Dependabot security updates와 code scanning은 아직 owner action이 필요하다.
 
 ## 2026-05-10 - Plan/spec goal commit

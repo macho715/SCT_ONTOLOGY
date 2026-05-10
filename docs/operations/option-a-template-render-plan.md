@@ -4,17 +4,20 @@
 
 This plan changes the ChatGPT App rendering strategy to the OpenAI Apps SDK decoupled pattern.
 
-Current state:
+Historical problem:
 
 - `ask_hvdc_ontology` creates the HVDC answer data.
 - `ask_hvdc_ontology` has been tried as a direct-template tool.
 - ChatGPT still shows intermittent `Failed to fetch template` in some client sessions.
 
-Target state:
+Implemented state:
 
 - `ask_hvdc_ontology` creates the answer data only.
+- `ask_hvdc_ontology` does not return `structuredContent.ui`.
 - `render_hvdc_answer_card` is the only tool that links the UI template.
 - The card resource remains registered as the reusable HTML component.
+- `ui://hvdc/answer-card-v5.html` and `ui://hvdc/render_hvdc_answer_card.html` serve the same widget HTML as compatibility aliases.
+- The widget wraps long action names, protected fields, route reasons, and validation text inside the card.
 
 Assumption: The stable runtime behavior we want is official Apps SDK separation: data first, render second.
 
@@ -34,10 +37,11 @@ Assumption: The stable runtime behavior we want is official Apps SDK separation:
 - Update `server/src/index.ts` tool descriptors.
 - Keep `registerAppResource` for `ui://hvdc/answer-card-v6.html`.
 - Remove answer-card resource metadata from `ask_hvdc_ontology`.
+- Remove render-only `ui` payload from `ask_hvdc_ontology` structured output.
 - Keep answer-card resource metadata on `render_hvdc_answer_card`.
 - Keep `chatgpt-app-submission.json` aligned with 6 exposed tools.
 - Update descriptor and widget tests.
-- Update root docs that still describe the failed direct-template experiment.
+- Update root docs that still describe the previous direct-render experiment.
 - Run local and production MCP smoke checks after deployment.
 
 ### Out of Scope
@@ -74,14 +78,15 @@ Expected result:
 
 ### Phase 2: Widget Simplification
 
-Remove render-tool-specific recovery code from the iframe.
+Keep the iframe focused on host-delivered render output and compatibility fallbacks.
 
 Expected result:
 
 - Widget reads the render-tool output.
 - Widget handles `ui/notifications/tool-result`.
 - Widget keeps `openai:set_globals` compatibility.
-- Widget does not require a second callable render tool.
+- Widget does not fetch external resources.
+- Widget wraps long text and prevents column overflow.
 
 ### Phase 3: Submission And Docs Alignment
 
@@ -109,7 +114,7 @@ Expected result:
 | No | Task | Output |
 |---:|---|---|
 | 1 | Patch `server/src/index.ts` descriptor and registration | Decoupled data/render template link |
-| 2 | Patch `public/hvdc-answer-widget.html` | No render-tool dependency |
+| 2 | Patch `public/hvdc-answer-widget.html` | Host-delivered render output, no external fetch, overflow-safe card |
 | 3 | Patch descriptor/widget tests | Tests enforce 6 tools and render-only template link |
 | 4 | Check `chatgpt-app-submission.json` | Submission matches runtime tools |
 | 5 | Patch docs | User-facing docs match implementation |
@@ -130,6 +135,7 @@ Expected result:
 - `render_hvdc_answer_card` is listed by `tools/list`.
 - `ask_hvdc_ontology` has no `_meta.ui.resourceUri`.
 - `ask_hvdc_ontology` has no `_meta["openai/outputTemplate"]`.
+- `ask_hvdc_ontology` result has no `structuredContent.ui`.
 - `render_hvdc_answer_card` has `_meta.ui.resourceUri`.
 - `render_hvdc_answer_card` has `_meta["openai/outputTemplate"]`.
 - `search_ontology_corpus` has no UI resource.
@@ -137,10 +143,14 @@ Expected result:
 - The resource MIME type is `text/html;profile=mcp-app`.
 - `npm run verify` passes.
 - Production MCP returns `verdict`, `validationStatus`, `reasonCode`, and evidence for the sample ambiguity prompt.
+- ChatGPT UI loads the Daily KPI answer card without `Failed to fetch template`.
+- Long card text wraps inside the card columns.
 
 ## Deliverables
 
 - Runtime patch for decoupled answer-card rendering.
+- Runtime patch for compatibility resource aliases.
+- Runtime patch for overflow-safe card CSS.
 - Updated submission JSON.
 - Updated tests.
 - Updated docs.

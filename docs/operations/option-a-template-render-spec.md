@@ -4,7 +4,7 @@
 
 The HVDC ChatGPT App follows the OpenAI Apps SDK decoupled pattern.
 
-`ask_hvdc_ontology` is the data tool. It returns grounded answer JSON and text fallback without `_meta.ui.resourceUri` or `_meta["openai/outputTemplate"]`.
+`ask_hvdc_ontology` is the data tool. It returns grounded answer JSON and text fallback without `_meta.ui.resourceUri`, `_meta["openai/outputTemplate"]`, or `structuredContent.ui`.
 
 `render_hvdc_answer_card` is the render tool. It accepts the complete `GroundedAnswer` and attaches `_meta.ui.resourceUri` plus `_meta["openai/outputTemplate"]` for `ui://hvdc/answer-card-v6.html`.
 
@@ -14,6 +14,8 @@ Primary objective:
 - ChatGPT calls `ask_hvdc_ontology`.
 - ChatGPT may then call `render_hvdc_answer_card` with the answer object when a visual card is useful.
 - The card resource renders the same business result while text fallback remains available.
+- Compatibility aliases `ui://hvdc/answer-card-v5.html` and `ui://hvdc/render_hvdc_answer_card.html` return the same HTML as v6 for stale client/session fetches.
+- The card CSS wraps long actions, protected-field lists, route reasons, and validation text inside the available iframe width.
 
 ## User Scenarios & Testing
 
@@ -28,6 +30,7 @@ Independent test:
 - Run `tools/list` against the MCP server.
 - Confirm `ask_hvdc_ontology._meta.ui` is absent.
 - Confirm `ask_hvdc_ontology._meta["openai/outputTemplate"]` is absent.
+- Confirm `ask_hvdc_ontology` result has no `structuredContent.ui`.
 
 ### US-002: Render Tool Owns The Answer Card Template
 
@@ -77,13 +80,25 @@ Independent test:
 - Confirm it handles `ui/notifications/tool-result` and `openai:set_globals`.
 - Confirm it does not fetch external resources.
 
+### US-006: Daily KPI Card Text Does Not Overflow
+
+Given a Daily KPI Dashboard lock answer with long action ids and protected-field lists
+When ChatGPT renders the answer card
+Then the values must wrap inside their panels instead of clipping or overflowing.
+
+Independent test:
+
+- Inspect `public/hvdc-answer-widget.html`.
+- Confirm responsive grid, `overflow-wrap:anywhere`, `word-break:break-word`, and mobile one-column metadata CSS exist.
+- Confirm the production MCP v6 resource returns those CSS rules.
+
 ## Requirements
 
 ### Functional Requirements
 
 - FR-001: `ask_hvdc_ontology` MUST NOT attach `_meta.ui.resourceUri`.
 - FR-002: `ask_hvdc_ontology` MUST NOT attach `_meta["openai/outputTemplate"]`.
-- FR-003: `ask_hvdc_ontology` MUST return `structuredContent` that conforms to its declared `outputSchema`.
+- FR-003: `ask_hvdc_ontology` MUST return `structuredContent` that conforms to its declared `outputSchema` and MUST NOT include `ui`.
 - FR-004: `ask_hvdc_ontology` MUST keep `_meta["openai/toolInvocation/invoking"]` and `_meta["openai/toolInvocation/invoked"]` user-facing status strings.
 - FR-005: `render_hvdc_answer_card` MUST be registered as a callable MCP tool.
 - FR-006: `render_hvdc_answer_card` MUST set `_meta.ui.resourceUri` to `ui://hvdc/answer-card-v6.html`.
@@ -93,6 +108,8 @@ Independent test:
 - FR-010: The widget MUST render `WARN`, `BLOCK`, `NO_EVIDENCE`, `HUMAN_GATE_REQUIRED`, and `AMBIGUOUS_ANY_KEY` states instead of treating them as render failures.
 - FR-011: `chatgpt-app-submission.json` MUST list the same exposed tool names as the server descriptor.
 - FR-012: Documentation that describes tool count or render flow MUST match the 6-tool decoupled design.
+- FR-013: The widget MUST wrap long action ids, protected-field lists, route reasons, and validation text.
+- FR-014: The server SHOULD keep v5 and render-tool-name resource aliases while stale ChatGPT sessions exist.
 
 ### Non-Functional Requirements
 
@@ -107,7 +124,7 @@ Independent test:
 
 - Assumption: OpenAI Apps SDK decoupled behavior is the target behavior because direct-template `ask_hvdc_ontology` still produced intermittent ChatGPT `Failed to fetch template` errors.
 - Assumption: `ui://hvdc/answer-card-v6.html` remains the canonical resource URI.
-- Assumption: `ui://hvdc/answer-card-v5.html` remains a legacy fetch alias only.
+- Assumption: `ui://hvdc/answer-card-v5.html` remains a legacy fetch alias, and `ui://hvdc/render_hvdc_answer_card.html` remains a render-name compatibility alias.
 - Assumption: Existing `ask_hvdc_ontology` private audit hash logging remains in scope, so `readOnlyHint` may remain `false`.
 - Dependency: `@modelcontextprotocol/ext-apps` provides `registerAppResource`, `registerAppTool`, and `RESOURCE_MIME_TYPE`.
 - Dependency: Railway production MCP URL remains `https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp`.
@@ -120,15 +137,19 @@ Independent test:
 - SC-003: Local MCP `tools/list` returns exactly 6 tools.
 - SC-004: Local MCP confirms `ask_hvdc_ontology` has no `_meta.ui.resourceUri`.
 - SC-005: Local MCP confirms `ask_hvdc_ontology` has no `_meta["openai/outputTemplate"]`.
+- SC-005a: Local MCP confirms `ask_hvdc_ontology` result has no `structuredContent.ui`.
 - SC-006: Local MCP confirms `render_hvdc_answer_card` has `_meta.ui.resourceUri`.
 - SC-007: Local MCP confirms `render_hvdc_answer_card` has `_meta["openai/outputTemplate"]`.
 - SC-008: Local MCP confirms `search_ontology_corpus` has no UI resource.
 - SC-009: Production MCP confirms the same decoupled contract after Railway deploy.
 - SC-010: Production `ask_hvdc_ontology` daily KPI prompt returns operations KPI routing, not CostGuard summary.
+- SC-011: Production MCP v6 widget resource contains overflow-safe CSS.
+- SC-012: ChatGPT UI confirms the Daily KPI card loads without `Failed to fetch template`.
+- SC-013: ChatGPT UI confirms the Daily KPI card text is not clipped in the action/status panels.
 
 ## Open Questions
 
-- Whether ChatGPT will automatically choose `render_hvdc_answer_card` after `ask_hvdc_ontology` for all target prompts must be verified in the ChatGPT UI.
+- Whether every target prompt will automatically choose `render_hvdc_answer_card` after `ask_hvdc_ontology` remains an operational monitoring item. The Daily KPI Dashboard lock prompt has been verified in ChatGPT UI.
 
 ## Clarifications Log
 
@@ -136,12 +157,17 @@ Independent test:
 |---|---|
 | 2026-05-10 | Direct-template rendering was tried with `ask_hvdc_ontology`. |
 | 2026-05-10 | Because ChatGPT still showed `Failed to fetch template`, the runtime contract returns to the official decoupled pattern. |
+| 2026-05-11 | `ask_hvdc_ontology` result no longer includes `ui`; `render_hvdc_answer_card` adds render-only UI state. |
+| 2026-05-11 | The widget CSS was hardened for long action ids, protected fields, route reasons, and validation text. |
 
 ## Reviewer Checklist
 
-- [ ] Tool list remains 6 exposed tools.
-- [ ] `ask_hvdc_ontology` is data-only.
-- [ ] `render_hvdc_answer_card` owns the answer-card resource.
-- [ ] Submission JSON matches server tool descriptors.
-- [ ] Widget fallback still handles host delivery paths.
-- [ ] Production smoke evidence is recorded after deployment.
+- [x] Tool list remains 6 exposed tools.
+- [x] `ask_hvdc_ontology` is data-only.
+- [x] `ask_hvdc_ontology` result has no `ui`.
+- [x] `render_hvdc_answer_card` owns the answer-card resource.
+- [x] Submission JSON matches server tool descriptors.
+- [x] Widget fallback still handles host delivery paths.
+- [x] Production smoke evidence is recorded after deployment.
+- [x] ChatGPT UI screenshot confirms no template fetch error for the Daily KPI card.
+- [ ] ChatGPT UI screenshot confirms no clipped long text after the latest overflow CSS deploy.

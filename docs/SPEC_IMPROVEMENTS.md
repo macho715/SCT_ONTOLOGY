@@ -1,12 +1,12 @@
 # Feature Specification: HVDC Ontology App Operational Improvements
 
-Feature ID/Branch: 002-hvdc-ontology-operational-improvements  
-Created: 2026-05-10  
-Status: Draft  
-Owner: HVDC Logistics / App Platform Team  
+Feature ID/Branch: 002-hvdc-ontology-operational-improvements
+Created: 2026-05-10
+Status: Draft
+Owner: HVDC Logistics / App Platform Team
 Input: `docs/operations/plan.md` Phase 1 Business Review
-Last Updated: 2026-05-10  
-Version: v0.1.0  
+Last Updated: 2026-05-11
+Version: v0.1.1
 
 ## Summary
 
@@ -22,6 +22,7 @@ The HVDC Ontology ChatGPT App is published to GitHub and has a baseline verifica
 - G4: Build a repeatable golden evaluation set for high-risk prompts such as AGI M130 closure, Flow Code misuse, stale-source compliance, and NO_EVIDENCE behavior.
 - G5: Add repository security monitoring for secrets, dependencies, and code scanning where supported by the GitHub plan and repository settings.
 - G6: Define lightweight tracking fields for ontology change work, verification status, and release readiness without requiring GitHub Projects automation in Option B.
+- G7: Keep ChatGPT card rendering decoupled from grounded data answers: `ask_hvdc_ontology` stays data-only, and `render_hvdc_answer_card` owns the `ui://hvdc/answer-card-v6.html` template.
 
 ### Non-Goals
 
@@ -117,6 +118,20 @@ Acceptance Scenarios:
 1. Given an ontology change is proposed, When a tracking item is created, Then it includes source file, reason, owner, and expected verification.
 2. Given CI passes, When the item is updated, Then the Actions run link is recorded.
 3. Given deployment is not approved, When the item is reviewed, Then release status remains blocked or pending.
+
+### User Story 7 - Decoupled Answer Card Rendering (Priority: P1)
+
+The app should render the answer card through `render_hvdc_answer_card`, not through the initial data answer tool.
+
+Why this priority: ChatGPT template fetch failures previously made users think the business answer failed even when the JSON result was valid.
+
+Independent Test: Run the MCP smoke test and confirm `ask_hvdc_ontology` has no output template while `render_hvdc_answer_card` returns `ui://hvdc/answer-card-v6.html`.
+
+Acceptance Scenarios:
+
+1. Given `ask_hvdc_ontology` returns a grounded answer, When the tool result is inspected, Then it contains no `openai/outputTemplate`, no `_meta.ui.resourceUri`, and no `structuredContent.ui`.
+2. Given the same answer is passed to `render_hvdc_answer_card`, When the tool result is inspected, Then it exposes `openai/outputTemplate` and `_meta.ui.resourceUri` as `ui://hvdc/answer-card-v6.html`.
+3. Given a Daily KPI Dashboard answer contains long route, validation, action, or protected-field text, When the card renders, Then the text wraps inside the card columns instead of overflowing.
 
 ### Edge Cases
 
