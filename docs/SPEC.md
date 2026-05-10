@@ -289,7 +289,7 @@ Acceptance Scenarios:
 }
 ```
 
-`render_hvdc_answer_card` owns the UI template metadata. `ask_hvdc_ontology` remains data-primary and returns text fallback content so the business result stays visible when the card template cannot load.
+`ask_hvdc_ontology` owns the UI template metadata because it is the exposed ChatGPT app answer tool. `render_hvdc_answer_card` remains available for MCP clients that can call it directly. Both use the same versioned `ui://hvdc/answer-card-v6.html` resource, and the business result stays visible as text fallback when the card template cannot load.
 
 ### Files
 

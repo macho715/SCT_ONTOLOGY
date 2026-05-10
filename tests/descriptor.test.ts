@@ -53,14 +53,14 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("keeps the answer tool data-only and links the render tool to the versioned Apps SDK widget resource", () => {
+  it("links the exposed answer tool and render tool to the versioned Apps SDK widget resource", () => {
     const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
     const askMetaRecord = askMeta as Record<string, unknown>;
     const renderMeta = HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card._meta;
     const renderMetaRecord = renderMeta as Record<string, unknown>;
 
-    expect(askMetaRecord.ui).toBeUndefined();
-    expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
+    expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
+    expect(askMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
     expect(askMetaRecord["openai/widgetAccessible"]).toBe(true);
     expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
     expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");

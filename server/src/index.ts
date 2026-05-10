@@ -149,6 +149,8 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerOutputSchema,
     _meta: {
+      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
+      "openai/outputTemplate": WIDGET_URI,
       "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
@@ -288,10 +290,11 @@ export function createHvdcServer(): McpServer {
     HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology,
     async ({ question, userRole, language }) => {
       const answer = answerQuestion({ question, userRole, language });
+      const groundedAnswer = withUiState(answer);
       return {
-        structuredContent: answer,
-        content: [{ type: "text", text: answerToText(answer) }],
-        _meta: { piiMasked: answer.piiMasked }
+        structuredContent: groundedAnswer,
+        content: [{ type: "text", text: answerToText(groundedAnswer) }],
+        _meta: { uiTemplate: WIDGET_URI, piiMasked: groundedAnswer.piiMasked, ui: groundedAnswer.ui }
       };
     }
   );
