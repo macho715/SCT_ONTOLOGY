@@ -41,6 +41,7 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("ui/notifications/initialized");
     expect(widgetHtml).toContain("ui/notifications/tool-input");
     expect(widgetHtml).toContain("ui/notifications/tool-result");
+    expect(widgetHtml).toContain("window.openai.callTool");
     expect(widgetHtml).toContain("tools/call");
     expect(widgetHtml).toContain("ask_hvdc_ontology");
   });

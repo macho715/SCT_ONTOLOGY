@@ -18,7 +18,7 @@ import type { DomainHint } from "./types.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
 const widgetHtml = readFileSync(path.join(ROOT_DIR, "public", "hvdc-answer-widget.html"), "utf8");
-const WIDGET_URI = "ui://hvdc/answer-card-v3.html";
+const WIDGET_URI = "ui://hvdc/answer-card-v4.html";
 
 const domainEnum = z.enum([
   "master",

@@ -9,7 +9,7 @@
 - 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
 - MCP 구현은 `@modelcontextprotocol/sdk`의 `McpServer`와 `StreamableHTTPServerTransport`를 사용한다.
 - ChatGPT App UI resource는 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
-- UI resource URI는 `ui://hvdc/answer-card-v3.html`이다.
+- UI resource URI는 `ui://hvdc/answer-card-v4.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
 - 답변 근거는 런타임에 `data/corpus/*.md`를 직접 읽어서 만든다.
 - `data/index` 파일은 생성/검토용 artifact이며, 현재 검색 런타임의 직접 입력은 `data/corpus`이다.
@@ -33,7 +33,7 @@ flowchart TD
   App --> Endpoint["Node HTTP server<br/>server/src/index.ts<br/>/mcp"]
   Endpoint --> Mcp["McpServer + StreamableHTTPServerTransport<br/>@modelcontextprotocol/sdk"]
   Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
-  ExtApps --> WidgetResource["ui://hvdc/answer-card-v3.html"]
+  ExtApps --> WidgetResource["ui://hvdc/answer-card-v4.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
   Mcp --> AskTool["ask_hvdc_ontology"]
@@ -91,11 +91,11 @@ flowchart TD
 
 ## UI resource와 public widget
 
-`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v3.html` resource로 등록한다.
+`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v4.html` resource로 등록한다.
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- tool descriptor의 `_meta.openai/outputTemplate`도 `ui://hvdc/answer-card-v3.html`을 가리킨다.
+- tool descriptor의 `_meta.openai/outputTemplate`도 `ui://hvdc/answer-card-v4.html`을 가리킨다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget은 자체 fallback text를 가진다.
 - widget test는 외부 `fetch()`와 `http(s)://` resource 사용이 없는지 확인한다.
@@ -360,5 +360,5 @@ classDiagram
 이 저장소의 현재 아키텍처는 corpus-only MCP ChatGPT App MVP다.
 
 Node HTTP 서버가 `/mcp`를 열고, MCP/App tool descriptor를 등록하고, `data/corpus` Markdown 문서를 런타임에 읽어 evidence 기반 답변을 만든다.
-public widget은 `ui://hvdc/answer-card-v3.html` resource로 연결된다.
+public widget은 `ui://hvdc/answer-card-v4.html` resource로 연결된다.
 GitHub Actions와 Railway는 같은 `npm run verify` 검증 경계를 공유한다.

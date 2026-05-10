@@ -54,8 +54,8 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
   it("links the primary answer tool to the versioned Apps SDK widget resource", () => {
     const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
 
-    expect(askMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v3.html");
-    expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v3.html");
+    expect(askMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v4.html");
+    expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v4.html");
     expect(askMeta["openai/widgetAccessible"]).toBe(true);
   });
 

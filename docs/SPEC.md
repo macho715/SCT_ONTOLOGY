@@ -270,7 +270,7 @@ Acceptance Scenarios:
     }
   ],
   "_meta": {
-    "uiTemplate": "ui://hvdc/answer-card-v3.html",
+    "uiTemplate": "ui://hvdc/answer-card-v4.html",
     "piiMasked": true
   }
 }
