@@ -13,7 +13,6 @@ import type {
 import { loadCorpus, searchCorpus } from "./corpus.js";
 import { isDailyLogisticsKpiQuestion, resolveAnyKey, routeQuestion } from "./router.js";
 import { maskPii, sha256 } from "./redact.js";
-import { buildUiState } from "./ui.js";
 
 const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
@@ -404,7 +403,6 @@ export function answerQuestion(args: {
     validation,
     actions,
     graphPath,
-    ui: buildUiState(),
     piiMasked: maskedQuestion.piiMasked,
     generatedAt
   };

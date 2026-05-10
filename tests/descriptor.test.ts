@@ -153,6 +153,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       expect(askMeta["openai/outputTemplate"]).toBeUndefined();
       expect(askMeta.ui?.resourceUri).toBeUndefined();
       expect(askMeta.piiMasked).toBe(false);
+      expect((askResult.structuredContent as { ui?: unknown }).ui).toBeUndefined();
 
       const renderResult = await client.callTool({
         name: "render_hvdc_answer_card",
@@ -163,6 +164,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       expect(renderMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
       expect(renderMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
       expect(renderMeta.ui?.visibility).toEqual(["model", "app"]);
+      expect((renderResult.structuredContent as { ui?: { templateUrl?: string } }).ui?.templateUrl).toBe(
+        "ui://hvdc/answer-card-v6.html"
+      );
     } finally {
       await client.close();
       await mcpServer.close();

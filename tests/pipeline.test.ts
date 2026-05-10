@@ -119,16 +119,19 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.actions.some((action) => action.actionType === "REQUEST_HUMAN_GATE_REVIEW")).toBe(true);
   });
 
-  it("keeps business result status separate from optional card UI status", () => {
+  it("keeps business result status separate from render-only card UI status", () => {
     const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
     expect(answer.dataStatus).toBe("OK");
     expect(answer.businessResultVisible).toBe(true);
     expect(answer.fallbackUsed).toBe(false);
-    expect(answer.ui?.dataStatus).toBe("OK");
-    expect(answer.ui?.uiRenderStatus).toBe("READY");
-    expect(answer.ui?.businessResultVisible).toBe(true);
-    expect(answer.ui?.fallbackUsed).toBe(false);
-    expect(answer.ui?.doNotChange).toEqual(["verdict", "validationStatus", "evidenceIds", "actions"]);
+    expect(answer.ui).toBeUndefined();
+
+    const rendered = withUiState(answer);
+    expect(rendered.ui?.dataStatus).toBe("OK");
+    expect(rendered.ui?.uiRenderStatus).toBe("READY");
+    expect(rendered.ui?.businessResultVisible).toBe(true);
+    expect(rendered.ui?.fallbackUsed).toBe(false);
+    expect(rendered.ui?.doNotChange).toEqual(["verdict", "validationStatus", "evidenceIds", "actions"]);
   });
 
   it("marks card fallback without mutating the business result", () => {
