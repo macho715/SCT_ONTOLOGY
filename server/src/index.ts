@@ -14,7 +14,7 @@ import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import type { DomainHint, GroundedAnswer } from "./types.js";
-import { logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
+import { LEGACY_WIDGET_URI, logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
@@ -255,34 +255,38 @@ export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
 
-  registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => ({
-    contents: [
-      {
-        uri: WIDGET_URI,
-        mimeType: RESOURCE_MIME_TYPE,
-        text: widgetHtml,
-        _meta: {
-          ui: {
-            prefersBorder: true,
-            domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
-            csp: {
-              connectDomains: [],
-              resourceDomains: []
-            }
-          },
-          "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
-          "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
-          "openai/widgetCSP": {
-            connect_domains: [],
-            resource_domains: [],
-            frame_domains: [],
-            redirect_domains: []
-          }
-        }
+  const widgetMeta = {
+    ui: {
+      prefersBorder: true,
+      domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+      csp: {
+        connectDomains: [],
+        resourceDomains: []
       }
-    ]
-  }));
+    },
+    "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
+    "openai/widgetPrefersBorder": true,
+    "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+    "openai/widgetCSP": {
+      connect_domains: [],
+      resource_domains: [],
+      frame_domains: [],
+      redirect_domains: []
+    }
+  };
+
+  for (const uri of [WIDGET_URI, LEGACY_WIDGET_URI]) {
+    registerAppResource(server, "hvdc-answer-widget", uri, {}, async () => ({
+      contents: [
+        {
+          uri,
+          mimeType: RESOURCE_MIME_TYPE,
+          text: widgetHtml,
+          _meta: widgetMeta
+        }
+      ]
+    }));
+  }
 
   registerAppTool(
     server,
