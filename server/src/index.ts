@@ -252,6 +252,19 @@ export const HVDC_TOOL_DESCRIPTORS = {
 
 export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
 
+function buildAnswerResultMeta(answer: GroundedAnswer): Record<string, unknown> {
+  return {
+    "openai/outputTemplate": WIDGET_URI,
+    uiTemplate: WIDGET_URI,
+    piiMasked: answer.piiMasked,
+    ui: {
+      ...answer.ui,
+      resourceUri: WIDGET_URI,
+      visibility: ["model", "app"]
+    }
+  };
+}
+
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
   const legacyWidgetUri = "ui://hvdc/answer-card-v5.html";
@@ -298,7 +311,7 @@ export function createHvdcServer(): McpServer {
       return {
         structuredContent: groundedAnswer,
         content: [{ type: "text", text: answerToText(groundedAnswer) }],
-        _meta: { uiTemplate: WIDGET_URI, piiMasked: groundedAnswer.piiMasked, ui: groundedAnswer.ui }
+        _meta: buildAnswerResultMeta(groundedAnswer)
       };
     }
   );
@@ -313,7 +326,7 @@ export function createHvdcServer(): McpServer {
         return {
           structuredContent: groundedAnswer,
           content: [{ type: "text", text: answerToText(groundedAnswer) }],
-          _meta: { uiTemplate: WIDGET_URI, piiMasked: groundedAnswer.piiMasked, ui: groundedAnswer.ui }
+          _meta: buildAnswerResultMeta(groundedAnswer)
         };
       } catch (error) {
         const renderError = error instanceof Error ? error : new Error(String(error));
@@ -322,7 +335,7 @@ export function createHvdcServer(): McpServer {
         return {
           structuredContent: fallbackAnswer,
           content: [{ type: "text", text: answerToText(fallbackAnswer) }],
-          _meta: { uiTemplate: WIDGET_URI, piiMasked: fallbackAnswer.piiMasked, ui: fallbackAnswer.ui }
+          _meta: buildAnswerResultMeta(fallbackAnswer)
         };
       }
     }

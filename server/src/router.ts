@@ -58,10 +58,24 @@ const DOMAIN_RULES: Array<{ domain: DomainHint; docs: string[]; patterns: RegExp
   }
 ];
 
+const DAILY_LOGISTICS_KPI =
+  /daily report|daily logistics|delivery\/collection|delivery|collection|customs clearance|new eta|\bETA\b|det\/dem|dem\/det|sr\b|lifting inspection|vessel movement|packing list|return\/rectification|rectification|scrap|일일|데일리|날짜별|물류\s*kpi|운영\s*kpi/i;
+const EXPLICIT_INVOICE_COST_AUDIT =
+  /invoice audit|costguard|overcharge|과청구|invoice line|rateref|rate ref|tariffref|tariff ref|line amount|invoice total|청구서\s*검토|비용\s*감사|정산\s*승인/i;
+
+export function isDailyLogisticsKpiQuestion(question: string): boolean {
+  return DAILY_LOGISTICS_KPI.test(question) && /kpi|dashboard|report|보고서|대시보드|관점|추출|정리/i.test(question);
+}
+
+function isExplicitInvoiceCostAuditQuestion(question: string): boolean {
+  return EXPLICIT_INVOICE_COST_AUDIT.test(question);
+}
+
 export function routeQuestion(question: string, userRole = "ops_user", language = "auto"): IntentRoute {
   const domains = new Set<DomainHint>(["master"]);
   const docs = new Set<string>(["CONSOLIDATED-00-master-ontology"]);
   const reasons: string[] = [];
+  const dailyKpiQuestion = isDailyLogisticsKpiQuestion(question);
 
   for (const rule of DOMAIN_RULES) {
     if (rule.patterns.some((pattern) => pattern.test(question))) {
@@ -69,6 +83,20 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
       rule.docs.forEach((doc) => docs.add(doc));
       reasons.push(rule.reason);
     }
+  }
+
+  if (dailyKpiQuestion && !isExplicitInvoiceCostAuditQuestion(question)) {
+    domains.delete("cost");
+    docs.delete("CONSOLIDATED-05-invoice-cost");
+    domains.add("document");
+    domains.add("operations");
+    domains.add("port");
+    domains.add("marine");
+    docs.add("CONSOLIDATED-03-document-ocr");
+    docs.add("CONSOLIDATED-09-operations");
+    docs.add("CONSOLIDATED-07-port-operations");
+    docs.add("CONSOLIDATED-04-barge-bulk-cargo");
+    reasons.push("daily logistics KPI override: DET/DEM treated as operations risk, not CostGuard audit");
   }
 
   if (domains.size === 1) {

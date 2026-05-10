@@ -71,6 +71,27 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.validation.some((item) => item.reasonCode === "AMBIGUOUS_ANY_KEY")).toBe(true);
   });
 
+  it("routes daily logistics KPI questions to operations instead of CostGuard audit", () => {
+    const answer = ask(
+      "업로드된 daily report(2).pdf에서 HVDC daily logistics KPI를 추출한다. 날짜별 Delivery/Collection, Customs Clearance, ETA/New ETA, DET/DEM risk, SR/Lifting Inspection, vessel movement, packing list, return/rectification, scrap activity를 KPI 관점으로 정리하는 기준과 next action을 제시해줘."
+    );
+
+    expect(answer.summary).toContain("Daily logistics KPI");
+    expect(answer.summary).not.toContain("CostGuard evidence pack");
+    expect(answer.route.domains).toEqual(expect.arrayContaining(["master", "document", "operations", "port", "marine"]));
+    expect(answer.route.domains).not.toContain("cost");
+    expect(answer.route.requiredDocs).toEqual(
+      expect.arrayContaining([
+        "CONSOLIDATED-00-master-ontology",
+        "CONSOLIDATED-03-document-ocr",
+        "CONSOLIDATED-09-operations"
+      ])
+    );
+    expect(answer.route.requiredDocs).not.toContain("CONSOLIDATED-05-invoice-cost");
+    expect(answer.details.join(" ")).toMatch(/operations delay\/cost exposure watchlist|운영 리스크 KPI/);
+    expect(answer.actions[0]?.actionType).toBe("BUILD_DAILY_LOGISTICS_KPI_DASHBOARD");
+  });
+
   it("keeps business result status separate from optional card UI status", () => {
     const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
     expect(answer.dataStatus).toBe("OK");

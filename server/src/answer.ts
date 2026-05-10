@@ -11,7 +11,7 @@ import type {
   Verdict
 } from "./types.js";
 import { loadCorpus, searchCorpus } from "./corpus.js";
-import { resolveAnyKey, routeQuestion } from "./router.js";
+import { isDailyLogisticsKpiQuestion, resolveAnyKey, routeQuestion } from "./router.js";
 import { maskPii, sha256 } from "./redact.js";
 import { buildUiState } from "./ui.js";
 
@@ -283,7 +283,31 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
     };
   }
 
-  if (/invoice|cost|rate|tariff|dem|det|청구|정산/i.test(question)) {
+  if (isDailyLogisticsKpiQuestion(question)) {
+    return {
+      summary: "Daily logistics KPI 질문은 operations dashboard 기준으로 정리합니다. DET/DEM은 CostGuard audit이 아니라 지연·비용 노출 운영 리스크 KPI로 집계합니다.",
+      businessImpact: "Delivery, customs, ETA, vessel, packing, return, scrap 활동을 날짜별 KPI로 분리하면 지연 원인과 follow-up owner를 빠르게 확인할 수 있습니다.",
+      details: [
+        "날짜, site, owner, activity type, shipment key, risk status 기준으로 daily report 행을 정규화합니다.",
+        "Delivery/Collection, Customs Clearance, ETA/New ETA, SR/Lifting Inspection, vessel movement, packing list, return/rectification, scrap activity를 각각 KPI bucket으로 집계합니다.",
+        "DET/DEM은 invoice approval이 아니라 operations delay/cost exposure watchlist로 표시하고, 실제 청구 검토가 필요할 때만 CostGuard evidence pack으로 넘깁니다."
+      ],
+      actions: [
+        {
+          actionType: "BUILD_DAILY_LOGISTICS_KPI_DASHBOARD",
+          ownerRole: "Operations Analyst",
+          parameters: {
+            primaryDocs: "CONSOLIDATED-00, CONSOLIDATED-03, CONSOLIDATED-09",
+            detDemHandling: "operations risk KPI only"
+          },
+          humanGateRequired: false,
+          dueAt: null
+        }
+      ]
+    };
+  }
+
+  if (/invoice|cost|rate|tariff|청구|정산/i.test(question)) {
     return {
       summary: "Invoice/Cost 질문은 CostGuard evidence pack 기준으로 검토해야 하며, 금액·요율·TariffRef 근거가 없으면 최종 판단을 보류합니다.",
       businessImpact: "RateRef/TariffRef/InvoiceLine 정합성 없이 과청구 판단을 확정하면 정산 dispute 또는 recovery 누락이 발생할 수 있습니다.",

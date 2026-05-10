@@ -123,4 +123,41 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       await mcpServer.close();
     }
   });
+
+  it("returns result-level Apps SDK template metadata from answer and render tools", async () => {
+    const mcpServer = createHvdcServer();
+    const client = new Client({ name: "descriptor-result-meta-test", version: "0.0.1" });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+
+    await Promise.all([mcpServer.connect(serverTransport), client.connect(clientTransport)]);
+
+    try {
+      const askResult = await client.callTool({
+        name: "ask_hvdc_ontology",
+        arguments: {
+          question: "SCT_ONTOLOGY result-level template metadata smoke",
+          userRole: "ops_user",
+          language: "ko"
+        }
+      });
+      const askMeta = askResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
+
+      expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
+      expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
+      expect(askMeta.ui?.visibility).toEqual(["model", "app"]);
+
+      const renderResult = await client.callTool({
+        name: "render_hvdc_answer_card",
+        arguments: askResult.structuredContent as Record<string, unknown>
+      });
+      const renderMeta = renderResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
+
+      expect(renderMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
+      expect(renderMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
+      expect(renderMeta.ui?.visibility).toEqual(["model", "app"]);
+    } finally {
+      await client.close();
+      await mcpServer.close();
+    }
+  });
 });
