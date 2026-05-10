@@ -33,7 +33,7 @@ Assumption: The stable runtime behavior we want is one tool call from ChatGPT fo
 
 - Update `server/src/index.ts` tool descriptors.
 - Remove the `render_hvdc_answer_card` callable tool registration.
-- Keep `registerAppResource` for `ui://hvdc/answer-card-v4.html`.
+- Keep `registerAppResource` for `ui://hvdc/answer-card-v6.html`.
 - Attach the answer card resource directly to `ask_hvdc_ontology`.
 - Remove widget self-heal logic that tries to call `render_hvdc_answer_card`.
 - Update `chatgpt-app-submission.json` back to 5 exposed tools.
@@ -68,8 +68,8 @@ Move UI template metadata from `render_hvdc_answer_card` to `ask_hvdc_ontology`.
 
 Expected result:
 
-- `ask_hvdc_ontology._meta.ui.resourceUri = ui://hvdc/answer-card-v4.html`
-- `ask_hvdc_ontology._meta["openai/outputTemplate"] = ui://hvdc/answer-card-v4.html`
+- `ask_hvdc_ontology._meta.ui.resourceUri = ui://hvdc/answer-card-v6.html`
+- `ask_hvdc_ontology._meta["openai/outputTemplate"] = ui://hvdc/answer-card-v6.html`
 - `render_hvdc_answer_card` no longer appears in `HVDC_TOOL_DESCRIPTORS`.
 
 ### Phase 2: Widget Simplification

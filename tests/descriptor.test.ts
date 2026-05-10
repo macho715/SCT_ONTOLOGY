@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { describe, expect, it } from "vitest";
-import { HVDC_TOOL_DESCRIPTORS } from "../server/src/index.js";
+import { createHvdcServer, HVDC_TOOL_DESCRIPTORS } from "../server/src/index.js";
 
 type SubmissionTool = {
   annotations: {
@@ -19,6 +21,8 @@ const submission = JSON.parse(
   readFileSync(path.resolve("chatgpt-app-submission.json"), "utf8")
 ) as Submission;
 const serverSource = readFileSync(path.resolve("server", "src", "index.ts"), "utf8");
+const rootAgentGuidance = readFileSync(path.resolve("AGENTS.md"), "utf8");
+const systemArchitecture = readFileSync(path.resolve("SYSTEM_ARCHITECTURE.md"), "utf8");
 const codexAgentGuidance = readFileSync(path.resolve("docs", "codex", "AGENTS.patched.md"), "utf8");
 
 describe("Apps SDK/MCP descriptor contract parity", () => {
@@ -67,11 +71,16 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     expect(renderMetaRecord["openai/widgetAccessible"]).toBe(true);
     expect((HVDC_TOOL_DESCRIPTORS.search_ontology_corpus._meta as Record<string, unknown>).ui).toBeUndefined();
     expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toContain("render_hvdc_answer_card");
+    expect(serverSource).toContain('const legacyWidgetUri = "ui://hvdc/answer-card-v5.html"');
+    expect(serverSource).toContain('"hvdc-answer-widget-legacy"');
   });
 
   it("keeps active Codex guidance aligned with the versioned widget resource", () => {
-    expect(codexAgentGuidance).toContain("ui://hvdc/answer-card-v6.html");
-    expect(codexAgentGuidance).not.toContain("ui://hvdc/answer-card-v5.html");
+    for (const guidance of [rootAgentGuidance, systemArchitecture, codexAgentGuidance]) {
+      expect(guidance).toContain("ui://hvdc/answer-card-v6.html");
+      expect(guidance).not.toContain("ui://hvdc/answer-card-v4.html");
+      expect(guidance).not.toContain("ui://hvdc/answer-card-v5.html");
+    }
   });
 
   it("declares review-facing widget metadata and a narrow CSP", () => {
@@ -86,6 +95,32 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       "redirect_domains: []"
     ]) {
       expect(serverSource).toContain(expected);
+    }
+  });
+
+  it("serves the canonical v6 widget and the legacy v5 fetch alias with identical HTML", async () => {
+    const mcpServer = createHvdcServer();
+    const client = new Client({ name: "descriptor-resource-test", version: "0.0.1" });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+
+    await Promise.all([mcpServer.connect(serverTransport), client.connect(clientTransport)]);
+
+    try {
+      const canonical = await client.readResource({ uri: "ui://hvdc/answer-card-v6.html" });
+      const legacy = await client.readResource({ uri: "ui://hvdc/answer-card-v5.html" });
+      const canonicalContent = canonical.contents[0];
+      const legacyContent = legacy.contents[0];
+
+      expect(canonicalContent?.uri).toBe("ui://hvdc/answer-card-v6.html");
+      expect(legacyContent?.uri).toBe("ui://hvdc/answer-card-v5.html");
+      expect(canonicalContent?.mimeType).toBe("text/html;profile=mcp-app");
+      expect(legacyContent?.mimeType).toBe(canonicalContent?.mimeType);
+      expect(canonicalContent && "text" in canonicalContent).toBe(true);
+      expect(legacyContent && "text" in legacyContent).toBe(true);
+      expect((legacyContent as { text: string }).text).toBe((canonicalContent as { text: string }).text);
+    } finally {
+      await client.close();
+      await mcpServer.close();
     }
   });
 });

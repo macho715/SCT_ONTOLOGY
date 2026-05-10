@@ -26,8 +26,8 @@ Then the tool result must include grounded `structuredContent` and direct answer
 Independent test:
 
 - Run `tools/list` against the MCP server.
-- Confirm `ask_hvdc_ontology._meta.ui.resourceUri` equals `ui://hvdc/answer-card-v4.html`.
-- Confirm `ask_hvdc_ontology._meta["openai/outputTemplate"]` equals `ui://hvdc/answer-card-v4.html`.
+- Confirm `ask_hvdc_ontology._meta.ui.resourceUri` equals `ui://hvdc/answer-card-v6.html`.
+- Confirm `ask_hvdc_ontology._meta["openai/outputTemplate"]` equals `ui://hvdc/answer-card-v6.html`.
 
 ### US-002: Ambiguous Any-key Result Still Renders
 
@@ -87,8 +87,8 @@ Independent test:
 ### Functional Requirements
 
 - FR-001: `ask_hvdc_ontology` MUST be the only tool that attaches the answer-card UI template.
-- FR-002: `ask_hvdc_ontology` MUST set `_meta.ui.resourceUri` to `ui://hvdc/answer-card-v4.html`.
-- FR-003: `ask_hvdc_ontology` MUST also set `_meta["openai/outputTemplate"]` to `ui://hvdc/answer-card-v4.html` as a ChatGPT compatibility alias.
+- FR-002: `ask_hvdc_ontology` MUST set `_meta.ui.resourceUri` to `ui://hvdc/answer-card-v6.html`.
+- FR-003: `ask_hvdc_ontology` MUST also set `_meta["openai/outputTemplate"]` to `ui://hvdc/answer-card-v6.html` as a ChatGPT compatibility alias.
 - FR-004: `ask_hvdc_ontology` MUST return `structuredContent` that conforms to its declared `outputSchema`.
 - FR-005: `ask_hvdc_ontology` MUST keep `_meta["openai/toolInvocation/invoking"]` and `_meta["openai/toolInvocation/invoked"]` user-facing status strings.
 - FR-006: `render_hvdc_answer_card` MUST NOT be registered as a callable MCP tool.
@@ -111,7 +111,7 @@ Independent test:
 ## Assumptions & Dependencies
 
 - Assumption: OpenAI Apps SDK direct-template behavior is the target behavior for this app because the user wants the card to render from the main ontology answer call.
-- Assumption: `ui://hvdc/answer-card-v4.html` remains the correct resource URI for cache-busting current ChatGPT sessions.
+- Assumption: `ui://hvdc/answer-card-v6.html` remains the correct resource URI for cache-busting current ChatGPT sessions.
 - Assumption: Existing `ask_hvdc_ontology` private audit hash logging remains in scope, so `readOnlyHint` may remain `false`.
 - Dependency: `@modelcontextprotocol/ext-apps` provides `registerAppResource`, `registerAppTool`, and `RESOURCE_MIME_TYPE`.
 - Dependency: Railway production MCP URL remains `https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp`.

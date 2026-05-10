@@ -9,7 +9,7 @@
 - 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
 - MCP 구현은 `@modelcontextprotocol/sdk`의 `McpServer`와 `StreamableHTTPServerTransport`를 사용한다.
 - ChatGPT App UI resource는 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
-- UI resource URI는 `ui://hvdc/answer-card-v4.html`이다.
+- UI resource URI는 `ui://hvdc/answer-card-v6.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
 - 답변 근거는 런타임에 `data/corpus/*.md`를 직접 읽어서 만든다.
 - `data/index` 파일은 생성/검토용 artifact이며, 현재 검색 런타임의 직접 입력은 `data/corpus`이다.
@@ -33,7 +33,7 @@ flowchart TD
   App --> Endpoint["Node HTTP server<br/>server/src/index.ts<br/>/mcp"]
   Endpoint --> Mcp["McpServer + StreamableHTTPServerTransport<br/>@modelcontextprotocol/sdk"]
   Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
-  ExtApps --> WidgetResource["ui://hvdc/answer-card-v4.html"]
+  ExtApps --> WidgetResource["ui://hvdc/answer-card-v6.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
   Mcp --> AskTool["ask_hvdc_ontology"]
@@ -79,11 +79,12 @@ flowchart TD
 
 ## 등록된 App tool
 
-`server/src/index.ts`의 `HVDC_TOOL_DESCRIPTORS`와 `registerAppTool` 기준으로 현재 tool은 5개다.
+`server/src/index.ts`의 `HVDC_TOOL_DESCRIPTORS`와 `registerAppTool` 기준으로 현재 server tool은 6개다.
 
 | Tool | 구현 파일 | 역할 |
 | --- | --- | --- |
 | `ask_hvdc_ontology` | `server/src/answer.ts` | 질문을 route, corpus search, validation, answer composition 흐름으로 처리한다. |
+| `render_hvdc_answer_card` | `server/src/index.ts` | 직접 MCP 호출이 가능한 클라이언트에서 이미 생성된 answer object를 같은 카드 UI resource로 렌더링한다. |
 | `route_question` | `server/src/router.ts` | 질문을 ontology domain과 required document로 분류한다. |
 | `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` Markdown 문서에서 EvidenceSnippet을 검색한다. |
 | `resolve_any_key` | `server/src/router.ts` | BL, BOE, DO, Invoice, HVDC_CODE, Site, Milestone 같은 식별자를 후보로 추출한다. |
@@ -91,11 +92,12 @@ flowchart TD
 
 ## UI resource와 public widget
 
-`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v4.html` resource로 등록한다.
+`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v6.html` resource로 등록한다.
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- `ask_hvdc_ontology` descriptor의 `_meta.ui.resourceUri`와 `_meta.openai/outputTemplate`이 `ui://hvdc/answer-card-v4.html`을 가리킨다.
+- `ask_hvdc_ontology` descriptor의 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`이 `ui://hvdc/answer-card-v6.html`을 가리킨다.
+- `render_hvdc_answer_card` descriptor도 직접 MCP 호출을 위해 같은 UI resource를 가리킨다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget은 자체 fallback text를 가진다.
 - widget test는 외부 `fetch()`와 `http(s)://` resource 사용이 없는지 확인한다.
@@ -360,5 +362,5 @@ classDiagram
 이 저장소의 현재 아키텍처는 corpus-only MCP ChatGPT App MVP다.
 
 Node HTTP 서버가 `/mcp`를 열고, MCP/App tool descriptor를 등록하고, `data/corpus` Markdown 문서를 런타임에 읽어 evidence 기반 답변을 만든다.
-public widget은 `ui://hvdc/answer-card-v4.html` resource로 연결된다.
+public widget은 `ui://hvdc/answer-card-v6.html` resource로 연결된다.
 GitHub Actions와 Railway는 같은 `npm run verify` 검증 경계를 공유한다.

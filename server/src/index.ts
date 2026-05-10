@@ -254,35 +254,39 @@ export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
 
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
-
-  registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => ({
+  const legacyWidgetUri = "ui://hvdc/answer-card-v5.html";
+  const widgetResourceMeta = {
+    ui: {
+      prefersBorder: true,
+      domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+      csp: {
+        connectDomains: [],
+        resourceDomains: []
+      }
+    },
+    "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
+    "openai/widgetPrefersBorder": true,
+    "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+    "openai/widgetCSP": {
+      connect_domains: [],
+      resource_domains: [],
+      frame_domains: [],
+      redirect_domains: []
+    }
+  };
+  const createWidgetResource = (uri: string) => ({
     contents: [
       {
-        uri: WIDGET_URI,
+        uri,
         mimeType: RESOURCE_MIME_TYPE,
         text: widgetHtml,
-        _meta: {
-          ui: {
-            prefersBorder: true,
-            domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
-            csp: {
-              connectDomains: [],
-              resourceDomains: []
-            }
-          },
-          "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
-          "openai/widgetPrefersBorder": true,
-          "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
-          "openai/widgetCSP": {
-            connect_domains: [],
-            resource_domains: [],
-            frame_domains: [],
-            redirect_domains: []
-          }
-        }
+        _meta: widgetResourceMeta
       }
     ]
-  }));
+  });
+
+  registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => createWidgetResource(WIDGET_URI));
+  registerAppResource(server, "hvdc-answer-widget-legacy", legacyWidgetUri, {}, async () => createWidgetResource(legacyWidgetUri));
 
   registerAppTool(
     server,
