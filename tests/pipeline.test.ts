@@ -92,6 +92,31 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.actions[0]?.actionType).toBe("BUILD_DAILY_LOGISTICS_KPI_DASHBOARD");
   });
 
+  it("keeps Daily KPI Dashboard lock requests in operations with a human gate", () => {
+    const answer = ask(
+      "Daily KPI Dashboard 원장에서 Owner / Risk / Next Action 컬럼만 현장 확인 후 확정값으로 잠금 처리한다. 원본 근거는 26-30 Apr 2026 daily report PDF이며 Date / Site / Activity / Shipment No는 원장 기준으로 유지한다. Owner, Risk, Next Action은 draft에서 locked confirmed 상태로 전환한다."
+    );
+
+    expect(answer.summary).toContain("Daily logistics KPI");
+    expect(answer.summary).not.toContain("CostGuard evidence pack");
+    expect(answer.route.domains).toEqual(expect.arrayContaining(["master", "document", "operations"]));
+    expect(answer.route.domains).not.toContain("cost");
+    expect(answer.route.domains).not.toContain("material");
+    expect(answer.route.domains).not.toContain("communication");
+    expect(answer.route.requiredDocs).toEqual(
+      expect.arrayContaining([
+        "CONSOLIDATED-00-master-ontology",
+        "CONSOLIDATED-03-document-ocr",
+        "CONSOLIDATED-09-operations"
+      ])
+    );
+    expect(answer.route.requiredDocs).not.toContain("CONSOLIDATED-05-invoice-cost");
+    expect(answer.route.requiredDocs).not.toContain("CONSOLIDATED-06-material-chain");
+    expect(answer.route.requiredDocs).not.toContain("CONSOLIDATED-08-communication");
+    expect(answer.validation.some((item) => item.reasonCode === "HUMAN_GATE_REQUIRED")).toBe(true);
+    expect(answer.actions.some((action) => action.actionType === "REQUEST_HUMAN_GATE_REVIEW")).toBe(true);
+  });
+
   it("keeps business result status separate from optional card UI status", () => {
     const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
     expect(answer.dataStatus).toBe("OK");

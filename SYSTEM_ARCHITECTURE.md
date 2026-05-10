@@ -96,8 +96,8 @@ flowchart TD
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- `ask_hvdc_ontology` descriptor의 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`이 `ui://hvdc/answer-card-v6.html`을 가리킨다.
-- `render_hvdc_answer_card` descriptor도 직접 MCP 호출을 위해 같은 UI resource를 가리킨다.
+- `ask_hvdc_ontology`는 데이터 전용 tool이다. 답변 JSON과 텍스트 fallback을 반환하지만 UI template metadata를 붙이지 않는다.
+- `render_hvdc_answer_card` descriptor만 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v6.html`을 가리킨다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget은 자체 fallback text를 가진다.
 - widget test는 외부 `fetch()`와 `http(s)://` resource 사용이 없는지 확인한다.

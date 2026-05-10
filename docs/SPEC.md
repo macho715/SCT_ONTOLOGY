@@ -289,7 +289,7 @@ Acceptance Scenarios:
 }
 ```
 
-`ask_hvdc_ontology` owns the UI template metadata because it is the exposed ChatGPT app answer tool. `render_hvdc_answer_card` remains available for MCP clients that can call it directly. Both use the same versioned `ui://hvdc/answer-card-v6.html` resource, and the business result stays visible as text fallback when the card template cannot load.
+`ask_hvdc_ontology` is the data tool: it returns the grounded answer JSON and text fallback without attaching a widget template. `render_hvdc_answer_card` is the render tool: it attaches `_meta["openai/outputTemplate"]` and `_meta.ui.resourceUri` for the versioned `ui://hvdc/answer-card-v6.html` resource. The business result stays visible as text fallback when the card template cannot load.
 
 ### Files
 

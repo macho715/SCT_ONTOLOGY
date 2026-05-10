@@ -1,30 +1,30 @@
-# Option A Template Render Plan
+# Decoupled Template Render Plan
 
 ## Overview
 
-This plan changes the ChatGPT App rendering strategy back to the OpenAI Apps SDK direct-template pattern.
+This plan changes the ChatGPT App rendering strategy to the OpenAI Apps SDK decoupled pattern.
 
 Current state:
 
 - `ask_hvdc_ontology` creates the HVDC answer data.
-- `render_hvdc_answer_card` is a separate callable tool that renders the card.
-- ChatGPT must call a second tool for the visual card to appear.
+- `ask_hvdc_ontology` has been tried as a direct-template tool.
+- ChatGPT still shows intermittent `Failed to fetch template` in some client sessions.
 
 Target state:
 
-- `ask_hvdc_ontology` creates the answer and directly links the UI template.
-- `render_hvdc_answer_card` is removed as a callable tool.
+- `ask_hvdc_ontology` creates the answer data only.
+- `render_hvdc_answer_card` is the only tool that links the UI template.
 - The card resource remains registered as the reusable HTML component.
 
-Assumption: The stable runtime behavior we want is one tool call from ChatGPT for the main HVDC answer and automatic inline component rendering from that same tool result.
+Assumption: The stable runtime behavior we want is official Apps SDK separation: data first, render second.
 
 ## Goals
 
-- Make `ask_hvdc_ontology` the single primary answer tool.
-- Attach `_meta.ui.resourceUri` and `_meta["openai/outputTemplate"]` directly to `ask_hvdc_ontology`.
+- Keep `ask_hvdc_ontology` as the primary answer data tool.
+- Attach `_meta.ui.resourceUri` and `_meta["openai/outputTemplate"]` only to `render_hvdc_answer_card`.
 - Keep `structuredContent` aligned with `outputSchema`.
-- Keep the answer card hydrated from `window.openai.toolOutput` and tool result metadata.
-- Remove `render_hvdc_answer_card` from the exposed callable tool list.
+- Keep the answer card hydrated from render-tool `structuredContent` and tool result metadata.
+- Keep `render_hvdc_answer_card` in the exposed callable tool list.
 - Keep submission metadata, tests, and docs aligned with the runtime tool surface.
 
 ## Scope
@@ -32,13 +32,12 @@ Assumption: The stable runtime behavior we want is one tool call from ChatGPT fo
 ### In Scope
 
 - Update `server/src/index.ts` tool descriptors.
-- Remove the `render_hvdc_answer_card` callable tool registration.
 - Keep `registerAppResource` for `ui://hvdc/answer-card-v6.html`.
-- Attach the answer card resource directly to `ask_hvdc_ontology`.
-- Remove widget self-heal logic that tries to call `render_hvdc_answer_card`.
-- Update `chatgpt-app-submission.json` back to 5 exposed tools.
+- Remove answer-card resource metadata from `ask_hvdc_ontology`.
+- Keep answer-card resource metadata on `render_hvdc_answer_card`.
+- Keep `chatgpt-app-submission.json` aligned with 6 exposed tools.
 - Update descriptor and widget tests.
-- Update root docs that mention 6 tools or render-tool separation.
+- Update root docs that still describe the failed direct-template experiment.
 - Run local and production MCP smoke checks after deployment.
 
 ### Out of Scope
@@ -64,13 +63,14 @@ Assumption: The stable runtime behavior we want is one tool call from ChatGPT fo
 
 ### Phase 1: Runtime Contract Patch
 
-Move UI template metadata from `render_hvdc_answer_card` to `ask_hvdc_ontology`.
+Move UI template metadata from `ask_hvdc_ontology` back to `render_hvdc_answer_card` only.
 
 Expected result:
 
-- `ask_hvdc_ontology._meta.ui.resourceUri = ui://hvdc/answer-card-v6.html`
-- `ask_hvdc_ontology._meta["openai/outputTemplate"] = ui://hvdc/answer-card-v6.html`
-- `render_hvdc_answer_card` no longer appears in `HVDC_TOOL_DESCRIPTORS`.
+- `ask_hvdc_ontology._meta.ui` is absent.
+- `ask_hvdc_ontology._meta["openai/outputTemplate"]` is absent.
+- `render_hvdc_answer_card._meta.ui.resourceUri = ui://hvdc/answer-card-v6.html`.
+- `render_hvdc_answer_card._meta["openai/outputTemplate"] = ui://hvdc/answer-card-v6.html`.
 
 ### Phase 2: Widget Simplification
 
@@ -78,20 +78,20 @@ Remove render-tool-specific recovery code from the iframe.
 
 Expected result:
 
-- Widget reads `window.openai.toolOutput`.
+- Widget reads the render-tool output.
 - Widget handles `ui/notifications/tool-result`.
 - Widget keeps `openai:set_globals` compatibility.
 - Widget does not require a second callable render tool.
 
 ### Phase 3: Submission And Docs Alignment
 
-Return the app submission and docs to a 5-tool surface.
+Keep the app submission and docs on the 6-tool data/render surface.
 
 Expected result:
 
-- `chatgpt-app-submission.json` lists 5 tools.
-- README, AGENTS, SYSTEM_ARCHITECTURE, and SPEC no longer claim 6 tools.
-- Docs explain that `ask_hvdc_ontology` directly renders the answer card.
+- `chatgpt-app-submission.json` lists 6 tools.
+- README, AGENTS, SYSTEM_ARCHITECTURE, and SPEC describe the 6-tool decoupled surface consistently.
+- Docs explain that `render_hvdc_answer_card` renders the answer card after `ask_hvdc_ontology`.
 
 ### Phase 4: Verification And Deploy
 
@@ -100,17 +100,18 @@ Run automated tests, local MCP smoke, GitHub Actions, Railway deployment, and pr
 Expected result:
 
 - `npm run verify` passes.
-- Local MCP shows `ask_hvdc_ontology` has the UI template.
+- Local MCP shows `ask_hvdc_ontology` has no UI template.
+- Local MCP shows `render_hvdc_answer_card` has the UI template.
 - Production MCP shows the same contract after Railway deploy.
 
 ## Tasks
 
 | No | Task | Output |
 |---:|---|---|
-| 1 | Patch `server/src/index.ts` descriptor and registration | Direct `ask_hvdc_ontology` template link |
+| 1 | Patch `server/src/index.ts` descriptor and registration | Decoupled data/render template link |
 | 2 | Patch `public/hvdc-answer-widget.html` | No render-tool dependency |
-| 3 | Patch descriptor/widget tests | Tests enforce 5 tools and direct template link |
-| 4 | Patch `chatgpt-app-submission.json` | Submission matches runtime tools |
+| 3 | Patch descriptor/widget tests | Tests enforce 6 tools and render-only template link |
+| 4 | Check `chatgpt-app-submission.json` | Submission matches runtime tools |
 | 5 | Patch docs | User-facing docs match implementation |
 | 6 | Run local checks | `npm run verify`, JSON validation, MCP smoke |
 | 7 | Commit and push | One focused commit |
@@ -126,9 +127,11 @@ Expected result:
 
 ## Review Criteria
 
-- `render_hvdc_answer_card` is not listed by `tools/list`.
-- `ask_hvdc_ontology` has `_meta.ui.resourceUri`.
-- `ask_hvdc_ontology` has `_meta["openai/outputTemplate"]`.
+- `render_hvdc_answer_card` is listed by `tools/list`.
+- `ask_hvdc_ontology` has no `_meta.ui.resourceUri`.
+- `ask_hvdc_ontology` has no `_meta["openai/outputTemplate"]`.
+- `render_hvdc_answer_card` has `_meta.ui.resourceUri`.
+- `render_hvdc_answer_card` has `_meta["openai/outputTemplate"]`.
 - `search_ontology_corpus` has no UI resource.
 - The registered resource URI exactly matches the tool descriptor URI.
 - The resource MIME type is `text/html;profile=mcp-app`.
@@ -137,7 +140,7 @@ Expected result:
 
 ## Deliverables
 
-- Runtime patch for direct answer-card rendering.
+- Runtime patch for decoupled answer-card rendering.
 - Updated submission JSON.
 - Updated tests.
 - Updated docs.

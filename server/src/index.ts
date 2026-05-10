@@ -149,9 +149,6 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerOutputSchema,
     _meta: {
-      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
-      "openai/outputTemplate": WIDGET_URI,
-      "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
     },
@@ -252,7 +249,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
 
 export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
 
-function buildAnswerResultMeta(answer: GroundedAnswer): Record<string, unknown> {
+function buildRenderResultMeta(answer: GroundedAnswer): Record<string, unknown> {
   return {
     "openai/outputTemplate": WIDGET_URI,
     uiTemplate: WIDGET_URI,
@@ -311,7 +308,7 @@ export function createHvdcServer(): McpServer {
       return {
         structuredContent: groundedAnswer,
         content: [{ type: "text", text: answerToText(groundedAnswer) }],
-        _meta: buildAnswerResultMeta(groundedAnswer)
+        _meta: { piiMasked: groundedAnswer.piiMasked }
       };
     }
   );
@@ -326,7 +323,7 @@ export function createHvdcServer(): McpServer {
         return {
           structuredContent: groundedAnswer,
           content: [{ type: "text", text: answerToText(groundedAnswer) }],
-          _meta: buildAnswerResultMeta(groundedAnswer)
+          _meta: buildRenderResultMeta(groundedAnswer)
         };
       } catch (error) {
         const renderError = error instanceof Error ? error : new Error(String(error));
@@ -335,7 +332,7 @@ export function createHvdcServer(): McpServer {
         return {
           structuredContent: fallbackAnswer,
           content: [{ type: "text", text: answerToText(fallbackAnswer) }],
-          _meta: buildAnswerResultMeta(fallbackAnswer)
+          _meta: buildRenderResultMeta(fallbackAnswer)
         };
       }
     }

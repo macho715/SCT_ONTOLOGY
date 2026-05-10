@@ -59,7 +59,7 @@ const DOMAIN_RULES: Array<{ domain: DomainHint; docs: string[]; patterns: RegExp
 ];
 
 const DAILY_LOGISTICS_KPI =
-  /daily report|daily logistics|delivery\/collection|delivery|collection|customs clearance|new eta|\bETA\b|det\/dem|dem\/det|sr\b|lifting inspection|vessel movement|packing list|return\/rectification|rectification|scrap|일일|데일리|날짜별|물류\s*kpi|운영\s*kpi/i;
+  /daily report|daily logistics|daily kpi|kpi dashboard|delivery\/collection|delivery|collection|customs clearance|new eta|\bETA\b|det\/dem|dem\/det|sr\b|lifting inspection|vessel movement|packing list|return\/rectification|rectification|scrap|owner|next action|risk|locked|confirmed|원장|확정|잠금|일일|데일리|날짜별|물류\s*kpi|운영\s*kpi/i;
 const EXPLICIT_INVOICE_COST_AUDIT =
   /invoice audit|costguard|overcharge|과청구|invoice line|rateref|rate ref|tariffref|tariff ref|line amount|invoice total|청구서\s*검토|비용\s*감사|정산\s*승인/i;
 
@@ -87,7 +87,11 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
 
   if (dailyKpiQuestion && !isExplicitInvoiceCostAuditQuestion(question)) {
     domains.delete("cost");
+    domains.delete("material");
+    domains.delete("communication");
     docs.delete("CONSOLIDATED-05-invoice-cost");
+    docs.delete("CONSOLIDATED-06-material-chain");
+    docs.delete("CONSOLIDATED-08-communication");
     domains.add("document");
     domains.add("operations");
     domains.add("port");

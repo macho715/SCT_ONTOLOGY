@@ -57,15 +57,15 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("links the exposed answer tool and render tool to the versioned Apps SDK widget resource", () => {
+  it("keeps ask data-only while linking only the render tool to the widget resource", () => {
     const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
     const askMetaRecord = askMeta as Record<string, unknown>;
     const renderMeta = HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card._meta;
     const renderMetaRecord = renderMeta as Record<string, unknown>;
 
-    expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
-    expect(askMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
-    expect(askMetaRecord["openai/widgetAccessible"]).toBe(true);
+    expect((askMetaRecord.ui as unknown) ?? undefined).toBeUndefined();
+    expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
+    expect(askMetaRecord["openai/widgetAccessible"]).toBeUndefined();
     expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
     expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
     expect(renderMetaRecord["openai/widgetAccessible"]).toBe(true);
@@ -124,7 +124,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("returns result-level Apps SDK template metadata from answer and render tools", async () => {
+  it("returns data-only answer results and render-only Apps SDK template metadata", async () => {
     const mcpServer = createHvdcServer();
     const client = new Client({ name: "descriptor-result-meta-test", version: "0.0.1" });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -142,9 +142,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       });
       const askMeta = askResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
 
-      expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v6.html");
-      expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v6.html");
-      expect(askMeta.ui?.visibility).toEqual(["model", "app"]);
+      expect(askMeta["openai/outputTemplate"]).toBeUndefined();
+      expect(askMeta.ui?.resourceUri).toBeUndefined();
+      expect(askMeta.piiMasked).toBe(false);
 
       const renderResult = await client.callTool({
         name: "render_hvdc_answer_card",

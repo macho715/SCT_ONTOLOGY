@@ -22,7 +22,7 @@ const FLOW_CODE = /flow code|confirmedflowcode|confirmed flow code/i;
 const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classification|분류|경로|통관|비용|청구|지표/i;
 const ANY_KEY_AMBIGUITY = /ambiguous|ambiguity|unclear|multiple|duplicate|same|which|모호|중복|여러|둘 다|같은|어느|하나만/i;
 const HUMAN_GATE_TERMS =
-  /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|whatsapp|email|청구|정산|승인|보고서|전송|발송|내보내기/i;
+  /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|lock|locked|confirm|confirmed|whatsapp|email|청구|정산|승인|보고서|확정|잠금|전송|발송|내보내기/i;
 const GENERIC_QUERY_TERMS = new Set([
   "the",
   "and",
