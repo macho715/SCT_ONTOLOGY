@@ -62,7 +62,11 @@ def main() -> None:
 
     (INDEX_DIR / "corpus_index.json").write_text(json.dumps({"docs": docs, "chunks": chunks}, indent=2, ensure_ascii=False), encoding="utf-8")
     with (INDEX_DIR / "corpus_inventory.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["docId", "file", "title", "version", "docHash", "sizeBytes"])
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["docId", "file", "title", "version", "docHash", "sizeBytes"],
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(docs)
     print(f"Indexed {len(docs)} docs and {len(chunks)} chunks into {INDEX_DIR}")
