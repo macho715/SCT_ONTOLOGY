@@ -13,12 +13,12 @@ import { z } from "zod";
 import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
-import type { DomainHint } from "./types.js";
+import type { DomainHint, GroundedAnswer } from "./types.js";
+import { logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
 const widgetHtml = readFileSync(path.join(ROOT_DIR, "public", "hvdc-answer-widget.html"), "utf8");
-const WIDGET_URI = "ui://hvdc/answer-card-v4.html";
 
 const domainEnum = z.enum([
   "master",
@@ -102,6 +102,21 @@ const answerOutputSchema = {
       pathConfidence: z.number()
     })
     .nullable(),
+  ui: z
+    .object({
+      dataStatus: z.literal("OK"),
+      uiRenderStatus: z.enum(["READY", "TEMPLATE_FETCH_FAILED"]),
+      businessResultVisible: z.boolean(),
+      fallbackUsed: z.boolean(),
+      cardEnabled: z.boolean(),
+      templateUrl: z.string(),
+      templateVersion: z.string(),
+      schemaVersion: z.string(),
+      errorCode: z.literal("CARD_TEMPLATE_RENDER_FAILED").optional(),
+      errorMessage: z.string().optional(),
+      doNotChange: z.array(z.enum(["verdict", "validationStatus", "evidenceIds", "actions"]))
+    })
+    .optional(),
   piiMasked: z.boolean(),
   generatedAt: z.string()
 };
@@ -118,14 +133,31 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerOutputSchema,
     _meta: {
-      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
-      "openai/outputTemplate": WIDGET_URI,
       "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
     },
     annotations: {
       readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false
+    }
+  },
+  render_hvdc_answer_card: {
+    title: "Render HVDC answer card",
+    description:
+      "Use this after ask_hvdc_ontology to render the final HVDC answer card. Pass through the complete ask_hvdc_ontology structured answer.",
+    inputSchema: answerOutputSchema,
+    outputSchema: answerOutputSchema,
+    _meta: {
+      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
+      "openai/toolInvocation/invoking": "Rendering HVDC answer card",
+      "openai/toolInvocation/invoked": "HVDC answer card ready"
+    },
+    annotations: {
+      readOnlyHint: true,
       destructiveHint: false,
       openWorldHint: false
     }
@@ -243,8 +275,33 @@ export function createHvdcServer(): McpServer {
       return {
         structuredContent: answer,
         content: [{ type: "text", text: answerToText(answer) }],
-        _meta: { uiTemplate: WIDGET_URI, piiMasked: answer.piiMasked }
+        _meta: { piiMasked: answer.piiMasked }
       };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "render_hvdc_answer_card",
+    HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card,
+    async (answer) => {
+      try {
+        const groundedAnswer = withUiState(answer as GroundedAnswer);
+        return {
+          structuredContent: groundedAnswer,
+          content: [{ type: "text", text: answerToText(groundedAnswer) }],
+          _meta: { uiTemplate: WIDGET_URI, piiMasked: groundedAnswer.piiMasked, ui: groundedAnswer.ui }
+        };
+      } catch (error) {
+        const renderError = error instanceof Error ? error : new Error(String(error));
+        const fallbackAnswer = withUiState(answer as GroundedAnswer, "TEMPLATE_FETCH_FAILED", renderError.message);
+        logUiRenderFailure(fallbackAnswer, renderError);
+        return {
+          structuredContent: fallbackAnswer,
+          content: [{ type: "text", text: answerToText(fallbackAnswer) }],
+          _meta: { uiTemplate: WIDGET_URI, piiMasked: fallbackAnswer.piiMasked, ui: fallbackAnswer.ui }
+        };
+      }
     }
   );
 

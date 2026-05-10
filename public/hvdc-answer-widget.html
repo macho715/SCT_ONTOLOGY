@@ -56,6 +56,8 @@
       .meta dt { color: var(--muted); }
       .meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
       .warning-list { border-left: 4px solid var(--warn); padding: 8px 10px; background: color-mix(in srgb, var(--warn) 8%, transparent); }
+      .ui-state { border-left: 4px solid var(--info); }
+      .ui-state-failed { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 8%, transparent); }
       ul { margin: 8px 0 0; padding-left: 18px; }
       li { margin: 4px 0; }
       details { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 0; background: var(--bg); overflow: hidden; contain: layout paint; }
@@ -133,6 +135,60 @@
 
       function renderList(items, fallback) {
         return asArray(items).map((item) => `<li>${escapeHtml(item)}</li>`).join("") || `<li class="empty">${escapeHtml(fallback)}</li>`;
+      }
+
+      function normalizeUiState(answer) {
+        return {
+          dataStatus: answer.ui?.dataStatus ?? "OK",
+          uiRenderStatus: answer.ui?.uiRenderStatus ?? "READY",
+          businessResultVisible: answer.ui?.businessResultVisible ?? true,
+          fallbackUsed: answer.ui?.fallbackUsed ?? false,
+          cardEnabled: answer.ui?.cardEnabled ?? true,
+          templateVersion: answer.ui?.templateVersion ?? "answer-card-v5",
+          schemaVersion: answer.ui?.schemaVersion ?? "1.0.0",
+          errorCode: answer.ui?.errorCode,
+          errorMessage: answer.ui?.errorMessage,
+          doNotChange: answer.ui?.doNotChange ?? ["verdict", "validationStatus", "evidenceIds", "actions"]
+        };
+      }
+
+      function logUiRenderFailure(answer, error) {
+        console.warn("HVDC_CARD_UI_RENDER_FAILED", {
+          answerId: answer?.answerId,
+          routeId: answer?.route?.routeId,
+          verdict: answer?.verdict,
+          validationStatus: answer?.validationStatus,
+          evidenceCount: asArray(answer?.evidenceIds).length,
+          templateVersion: answer?.ui?.templateVersion,
+          schemaVersion: answer?.ui?.schemaVersion,
+          errorMessage: error?.message ?? String(error ?? ""),
+          ts: new Date().toISOString()
+        });
+      }
+
+      function renderUiState(answer) {
+        const ui = normalizeUiState(answer);
+        const failed = ui.uiRenderStatus === "TEMPLATE_FETCH_FAILED" || ui.errorCode === "CARD_TEMPLATE_RENDER_FAILED";
+        const title = failed ? "Card UI warning" : "Card UI status";
+        const message = failed
+          ? "카드 UI template 로딩 실패. 업무 결과는 텍스트 fallback으로 표시합니다."
+          : "업무 결과가 카드 UI와 텍스트 fallback 양쪽에서 사용할 수 있습니다.";
+        return `
+          <section class="panel ui-state ${failed ? "ui-state-failed" : ""}" aria-labelledby="ui-state-title">
+            <h2 id="ui-state-title">${escapeHtml(title)}</h2>
+            <p>${escapeHtml(message)}</p>
+            <dl class="meta">
+              <dt>Data status</dt><dd>${escapeHtml(ui.dataStatus)}</dd>
+              <dt>UI render status</dt><dd>${escapeHtml(ui.uiRenderStatus)}</dd>
+              <dt>Fallback used</dt><dd>${escapeHtml(ui.fallbackUsed)}</dd>
+              <dt>Template version</dt><dd>${escapeHtml(ui.templateVersion)}</dd>
+              <dt>Schema version</dt><dd>${escapeHtml(ui.schemaVersion)}</dd>
+              <dt>Protected fields</dt><dd>${escapeHtml(ui.doNotChange.join(", "))}</dd>
+              ${failed ? `<dt>Error code</dt><dd><code>${escapeHtml(ui.errorCode ?? "CARD_TEMPLATE_RENDER_FAILED")}</code></dd>` : ""}
+              ${ui.errorMessage ? `<dt>Error message</dt><dd>${escapeHtml(ui.errorMessage)}</dd>` : ""}
+            </dl>
+          </section>
+        `;
       }
 
       function renderFallback(title, message, rawText = "") {
@@ -291,6 +347,7 @@
         `).join("") || `<li class="empty">No action.</li>`;
 
         const routeHtml = asArray(answer.route?.requiredDocs).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("") || `<span>No route document</span>`;
+        const uiStatusHtml = renderUiState(answer);
 
         const graphHtml = answer.graphPath ? `
           <ul>${asArray(answer.graphPath.edges).map((edge) => `<li>${escapeHtml(edge.from)} -> <code>${escapeHtml(edge.relation)}</code> -> ${escapeHtml(edge.to)}</li>`).join("")}</ul>
@@ -326,6 +383,7 @@
                 <h2>Next actions</h2>
                 <ul>${actionsHtml}</ul>
               </section>
+              ${uiStatusHtml}
               ${warningsHtml}
             </div>
             <details>
@@ -423,6 +481,22 @@
             const structured = normalizeToolOutput(result);
             if (structured) render(structured);
           } catch (error) {
+            const fallbackAnswer = getLegacyToolOutput();
+            if (fallbackAnswer?.verdict) {
+              fallbackAnswer.ui = {
+                ...(fallbackAnswer.ui ?? normalizeUiState(fallbackAnswer)),
+                dataStatus: "OK",
+                uiRenderStatus: "TEMPLATE_FETCH_FAILED",
+                businessResultVisible: true,
+                fallbackUsed: true,
+                cardEnabled: false,
+                errorCode: "CARD_TEMPLATE_RENDER_FAILED",
+                errorMessage: error instanceof Error ? error.message : String(error)
+              };
+              logUiRenderFailure(fallbackAnswer, error);
+              render(fallbackAnswer);
+              return;
+            }
             renderFallback(
               "tool output unavailable",
               "ChatGPT did not deliver structuredContent to the iframe, and the widget could not recover by calling the render tool.",
@@ -490,7 +564,24 @@
       try {
         renderLoading();
         const initialOutput = extractToolOutput(window.openai?.toolOutput);
-        if (initialOutput) render(initialOutput);
+        if (initialOutput) {
+          try {
+            render(initialOutput);
+          } catch (error) {
+            initialOutput.ui = {
+              ...(initialOutput.ui ?? normalizeUiState(initialOutput)),
+              dataStatus: "OK",
+              uiRenderStatus: "TEMPLATE_FETCH_FAILED",
+              businessResultVisible: true,
+              fallbackUsed: true,
+              cardEnabled: false,
+              errorCode: "CARD_TEMPLATE_RENDER_FAILED",
+              errorMessage: error instanceof Error ? error.message : String(error)
+            };
+            logUiRenderFailure(initialOutput, error);
+            render(initialOutput);
+          }
+        }
         handleOpenAiGlobals(window.openai?.globals ?? {});
         rememberToolInput(extractLegacyToolInput());
         startLegacyOutputPolling();

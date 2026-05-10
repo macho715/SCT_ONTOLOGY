@@ -70,6 +70,15 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.validation.some((item) => item.reasonCode === "AMBIGUOUS_ANY_KEY")).toBe(true);
   });
 
+  it("keeps business result status separate from optional card UI status", () => {
+    const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
+    expect(answer.ui?.dataStatus).toBe("OK");
+    expect(answer.ui?.uiRenderStatus).toBe("READY");
+    expect(answer.ui?.businessResultVisible).toBe(true);
+    expect(answer.ui?.fallbackUsed).toBe(false);
+    expect(answer.ui?.doNotChange).toEqual(["verdict", "validationStatus", "evidenceIds", "actions"]);
+  });
+
   it("masks email and phone in input", () => {
     const masked = maskPii("Contact user@example.com or +971 50 123 4567");
     expect(masked.piiMasked).toBe(true);

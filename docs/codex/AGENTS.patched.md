@@ -6,7 +6,8 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 ## Current State
 - Runtime: Node.js / TypeScript MCP HTTP server at `/mcp`.
 - Default local endpoint: `http://localhost:8787/mcp`.
-- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v4.html`.
+- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v5.html`.
+- UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
@@ -45,8 +46,9 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 - If any-key confidence is ambiguous, return review state instead of choosing silently.
 
 ## Implemented MCP/App Tools
-Current server and ChatGPT submission must stay aligned on these 5 tool names:
+Current server and ChatGPT submission must stay aligned on these 6 tool names:
 - `ask_hvdc_ontology` -> `server/src/answer.ts`
+- `render_hvdc_answer_card` -> `server/src/index.ts`
 - `route_question` -> `server/src/router.ts`
 - `search_ontology_corpus` -> `server/src/corpus.ts`
 - `resolve_any_key` -> `server/src/router.ts`
@@ -124,6 +126,7 @@ Before reporting completion, verify relevant items:
 - PII masking remains effective
 - descriptor parity between server tools and `chatgpt-app-submission.json`
 - widget fallback/accessibility and no external `fetch()` or `http(s)://` resource use
+- UI-only template failures preserve business result data and expose text fallback
 - corpus index has no drift after corpus changes
 
 ## Skills Policy

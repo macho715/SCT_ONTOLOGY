@@ -36,6 +36,15 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("focus-visible");
   });
 
+  it("separates template rendering warnings from business answer data", () => {
+    expect(widgetHtml).toContain("Card UI warning");
+    expect(widgetHtml).toContain("Data status");
+    expect(widgetHtml).toContain("UI render status");
+    expect(widgetHtml).toContain("TEMPLATE_FETCH_FAILED");
+    expect(widgetHtml).toContain("CARD_TEMPLATE_RENDER_FAILED");
+    expect(widgetHtml).toContain("Protected fields");
+  });
+
   it("initializes the MCP Apps bridge before relying on one-shot tool results", () => {
     expect(widgetHtml).toContain("ui/initialize");
     expect(widgetHtml).toContain("ui/notifications/initialized");

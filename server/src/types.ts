@@ -79,6 +79,22 @@ export type ActionRecommendation = {
   dueAt: string | null;
 };
 
+export type UiRenderStatus = "READY" | "TEMPLATE_FETCH_FAILED";
+
+export type UiAnswerState = {
+  dataStatus: "OK";
+  uiRenderStatus: UiRenderStatus;
+  businessResultVisible: boolean;
+  fallbackUsed: boolean;
+  cardEnabled: boolean;
+  templateUrl: string;
+  templateVersion: string;
+  schemaVersion: string;
+  errorCode?: "CARD_TEMPLATE_RENDER_FAILED";
+  errorMessage?: string;
+  doNotChange: Array<"verdict" | "validationStatus" | "evidenceIds" | "actions">;
+};
+
 export type GroundedAnswer = {
   answerId: string;
   verdict: Verdict;
@@ -93,6 +109,7 @@ export type GroundedAnswer = {
   validation: ValidationFinding[];
   actions: ActionRecommendation[];
   graphPath: GraphPath | null;
+  ui?: UiAnswerState;
   piiMasked: boolean;
   generatedAt: string;
 };

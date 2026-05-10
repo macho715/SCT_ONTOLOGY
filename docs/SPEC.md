@@ -141,7 +141,7 @@ Acceptance Scenarios:
 - EC3: CONSOLIDATED-00은 hit되었으나 target extension이 없음 -> App은 limited answer 또는 NO_TARGET_EXTENSION 상태를 반환한다.
 - EC4: userRole 권한이 부족함 -> App은 restricted fields를 mask하고 role-level answer만 반환한다.
 - EC5: KG/SPARQL timeout 발생 -> App은 corpus-only fallback 가능 여부를 표시하고 status claim은 제한한다.
-- EC6: UI component load 실패 -> App은 structuredContent text fallback을 표시한다.
+- EC6: UI component load 실패 -> App은 업무 결과 JSON을 유지하고 `uiRenderStatus=TEMPLATE_FETCH_FAILED`와 structuredContent text fallback을 표시한다.
 - EC7: MCP tool unavailable -> App은 answer generation을 중단하고 TOOL_UNAVAILABLE 상태를 반환한다.
 - EC8: Prompt injection이 retrieved document에 포함됨 -> server-side validation은 instruction-like text를 무시하고 evidence text로만 처리한다.
 - EC9: PII redaction 실패 감지 -> App은 report/export/action을 중단하고 REDACTION_FAILED를 반환한다.
@@ -181,6 +181,7 @@ Acceptance Scenarios:
 - FR-026: System MUST keep Codex Agent Skills as development workflow artifacts and not expose them as runtime user-facing answer tools.
 - FR-027: System MUST include fallback text output when UI components cannot render.
 - FR-028: System MUST provide Open Questions and [NEEDS CLARIFICATION] markers for unresolved product, deployment, auth, or data source decisions.
+- FR-029: System MUST keep UI render failures separate from business validation; `verdict`, `validationStatus`, `evidenceIds`, and `actions` MUST NOT change because the card template failed to load.
 
 ### Non-Functional Requirements
 
@@ -224,7 +225,8 @@ Acceptance Scenarios:
 |---|---|---|---|
 | route_question | question, userRole, language | IntentRoute | Domain Route Banner |
 | search_ontology_corpus | query, requiredDocs, domainHints, topK | EvidenceSnippet[] | Evidence lookup only |
-| ask_hvdc_ontology | question, userRole, language | GroundedAnswer | Evidence Drawer UI |
+| ask_hvdc_ontology | question, userRole, language | GroundedAnswer | Data result and text fallback |
+| render_hvdc_answer_card | GroundedAnswer | GroundedAnswer | Grounded Answer Card |
 | resolve_any_key | identifierScheme, identifierValue | ResolvedEntity[] | Any-key Resolver |
 | query_knowledge_graph | templateId, params | GraphPath, object facts | Ontology Path Viewer |
 | validate_answer | answerDraft, evidenceIds, ruleSet | ValidationFinding[] | Validation Gate Panel |
@@ -270,12 +272,21 @@ Acceptance Scenarios:
       "humanGateRequired": true
     }
   ],
-  "_meta": {
-    "uiTemplate": "ui://hvdc/answer-card-v4.html",
-    "piiMasked": true
+  "ui": {
+    "dataStatus": "OK",
+    "uiRenderStatus": "READY|TEMPLATE_FETCH_FAILED",
+    "businessResultVisible": true,
+    "fallbackUsed": false,
+    "cardEnabled": true,
+    "templateUrl": "ui://hvdc/answer-card-v5.html",
+    "templateVersion": "answer-card-v5",
+    "schemaVersion": "1.0.0",
+    "doNotChange": ["verdict", "validationStatus", "evidenceIds", "actions"]
   }
 }
 ```
+
+`render_hvdc_answer_card` owns the UI template metadata. `ask_hvdc_ontology` remains data-primary and returns text fallback content so the business result stays visible when the card template cannot load.
 
 ### Files
 
@@ -298,7 +309,8 @@ Acceptance Scenarios:
 - A5: Current regulatory/rate/source freshness cannot be guaranteed by ontology corpus alone.
 - A6: Codex Agent Skills are used by developers to build, test, and maintain the app, not by runtime end users.
 - A7: ChatGPT App UI components are rendered from MCP tool structured results and must have text fallback.
-- A8: Source snippets are limited to minimum necessary operational evidence.
+- A8: A card template failure is a UI-only warning and must not be promoted to `NO_EVIDENCE`, `BLOCK`, or any business validation failure.
+- A9: Source snippets are limited to minimum necessary operational evidence.
 
 ### Dependencies
 
@@ -367,7 +379,7 @@ Acceptance Scenarios:
 | R5 | PII leakage | NDA/privacy breach | redaction middleware and export gate |
 | R6 | Current regulation/rate 오답 | compliance/cost risk | STALE_SOURCE and owner review |
 | R7 | Any-key ambiguity | wrong ShipmentUnit or Document | confidence threshold 0.95 and human review |
-| R8 | UI component failure | user cannot inspect evidence visually | structuredContent text fallback |
+| R8 | UI component failure | user cannot inspect evidence visually | `uiRenderStatus=TEMPLATE_FETCH_FAILED` plus structuredContent text fallback |
 | R9 | Human-gate bypass | unauthorized action | server-side action policy and audit log |
 | R10 | Codex Skill/runtime confusion | unsafe architecture | repo AGENTS.md and skill boundaries |
 | R11 | Prompt injection in retrieved docs | validation bypass attempt | retrieved text treated as evidence only |

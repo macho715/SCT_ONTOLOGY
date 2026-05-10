@@ -13,6 +13,7 @@ import type {
 import { loadCorpus, searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import { maskPii, sha256 } from "./redact.js";
+import { buildUiState } from "./ui.js";
 
 const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
@@ -376,6 +377,7 @@ export function answerQuestion(args: {
     validation,
     actions,
     graphPath,
+    ui: buildUiState(),
     piiMasked: maskedQuestion.piiMasked,
     generatedAt
   };
@@ -391,7 +393,12 @@ export function answerToText(answer: GroundedAnswer): string {
     `Business impact: ${answer.businessImpact}`,
     `Route: ${answer.route.requiredDocs.join(" -> ")}`,
     `Evidence: ${answer.evidence.map((item) => `${item.docId}/${item.sectionPath}`).join("; ") || "none"}`,
-    `Next action: ${answer.actions.map((action) => `${action.actionType} (${action.ownerRole})`).join("; ")}`
+    `Next action: ${answer.actions.map((action) => `${action.actionType} (${action.ownerRole})`).join("; ")}`,
+    `Data status: ${answer.ui?.dataStatus ?? "OK"}`,
+    `UI render status: ${answer.ui?.uiRenderStatus ?? "READY"}`,
+    `Business result visible: ${answer.ui?.businessResultVisible ?? true}`,
+    `Fallback used: ${answer.ui?.fallbackUsed ?? false}`,
+    ...(answer.ui?.errorCode ? [`UI warning: ${answer.ui.errorCode} - ${answer.ui.errorMessage ?? "card template render failed"}`] : [])
   ];
   return lines.join("\n");
 }
