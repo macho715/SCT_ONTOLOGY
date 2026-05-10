@@ -13,6 +13,10 @@ CORPUS_DIR = ROOT / "data" / "corpus"
 INDEX_DIR = ROOT / "data" / "index"
 
 
+def repo_path(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
+
+
 def sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -36,7 +40,7 @@ def main() -> None:
         doc_hash = sha256(text)
         doc = {
             "docId": file.stem,
-            "file": str(file.relative_to(ROOT)),
+            "file": repo_path(file),
             "title": title_of(text, file.stem),
             "version": version_of(text),
             "docHash": doc_hash,

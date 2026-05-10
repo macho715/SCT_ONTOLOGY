@@ -2,7 +2,7 @@
   "docs": [
     {
       "docId": "CONSOLIDATED-00-master-ontology",
-      "file": "data\\corpus\\CONSOLIDATED-00-master-ontology.md",
+      "file": "data/corpus/CONSOLIDATED-00-master-ontology.md",
       "title": "hvdc-master-ontology · CONSOLIDATED-00",
       "version": "2.0-final",
       "docHash": "9160a5f19323b9a73a456727122037e88f28deea8d14484638d0b8e2f322133c",
@@ -10,7 +10,7 @@
     },
     {
       "docId": "CONSOLIDATED-01-core-framework-infra",
-      "file": "data\\corpus\\CONSOLIDATED-01-core-framework-infra.md",
+      "file": "data/corpus/CONSOLIDATED-01-core-framework-infra.md",
       "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
       "version": "2.0-final",
       "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
@@ -18,7 +18,7 @@
     },
     {
       "docId": "CONSOLIDATED-02-warehouse-flow",
-      "file": "data\\corpus\\CONSOLIDATED-02-warehouse-flow.md",
+      "file": "data/corpus/CONSOLIDATED-02-warehouse-flow.md",
       "title": "hvdc-warehouse-flow · CONSOLIDATED-02",
       "version": "2.0-final",
       "docHash": "3c9966c1269ae521f2f60a725973e90338141d4d8c0dea1826bf5cac7dd6dade",
@@ -26,7 +26,7 @@
     },
     {
       "docId": "CONSOLIDATED-03-document-ocr",
-      "file": "data\\corpus\\CONSOLIDATED-03-document-ocr.md",
+      "file": "data/corpus/CONSOLIDATED-03-document-ocr.md",
       "title": "hvdc-document-ocr · CONSOLIDATED-03",
       "version": "2.0-final",
       "docHash": "7a56eaedfdfa47152ec2b5f538607929ad0945e20099c34f9b068d041369d87c",
@@ -34,7 +34,7 @@
     },
     {
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
-      "file": "data\\corpus\\CONSOLIDATED-04-barge-bulk-cargo.md",
+      "file": "data/corpus/CONSOLIDATED-04-barge-bulk-cargo.md",
       "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
       "version": "2.0-final",
       "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
@@ -42,7 +42,7 @@
     },
     {
       "docId": "CONSOLIDATED-05-invoice-cost",
-      "file": "data\\corpus\\CONSOLIDATED-05-invoice-cost.md",
+      "file": "data/corpus/CONSOLIDATED-05-invoice-cost.md",
       "title": "hvdc-invoice-cost · CONSOLIDATED-05",
       "version": "2.0-final",
       "docHash": "6df7c7c00a8ae9f001de3694c9e4e5c434e951d2f0f3d9cc27ba8bd8e3ed2a4f",
@@ -50,7 +50,7 @@
     },
     {
       "docId": "CONSOLIDATED-06-material-chain",
-      "file": "data\\corpus\\CONSOLIDATED-06-material-chain.md",
+      "file": "data/corpus/CONSOLIDATED-06-material-chain.md",
       "title": "hvdc-material-handling · CONSOLIDATED-06",
       "version": "2.0-final",
       "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
@@ -58,7 +58,7 @@
     },
     {
       "docId": "CONSOLIDATED-07-port-operations",
-      "file": "data\\corpus\\CONSOLIDATED-07-port-operations.md",
+      "file": "data/corpus/CONSOLIDATED-07-port-operations.md",
       "title": "hvdc-port-operations · CONSOLIDATED-07",
       "version": "2.0-final",
       "docHash": "ce02194bf4330bde3fcb1396033753b6e41ea2c831cd774311cead26a5fda19e",
@@ -66,7 +66,7 @@
     },
     {
       "docId": "CONSOLIDATED-08-communication",
-      "file": "data\\corpus\\CONSOLIDATED-08-communication.md",
+      "file": "data/corpus/CONSOLIDATED-08-communication.md",
       "title": "hvdc-communication · CONSOLIDATED-08",
       "version": "2.0-final",
       "docHash": "170da4f4071f00f9c9e803d33f8aee751d1097ab9feb39efb0d0c6060191abd0",
@@ -74,7 +74,7 @@
     },
     {
       "docId": "CONSOLIDATED-09-operations",
-      "file": "data\\corpus\\CONSOLIDATED-09-operations.md",
+      "file": "data/corpus/CONSOLIDATED-09-operations.md",
       "title": "hvdc-operations · CONSOLIDATED-09",
       "version": "2.0-final",
       "docHash": "b3e9412a4fa2c794896d54f7b36c4faac5ce085f74bcae47b464545f2f5f815f",
@@ -82,7 +82,7 @@
     },
     {
       "docId": "Team_역할분담_매트릭스",
-      "file": "data\\corpus\\Team_역할분담_매트릭스.md",
+      "file": "data/corpus/Team_역할분담_매트릭스.md",
       "title": "HVDC 물류팀 역할분담 매트릭스",
       "version": "sample-0.1",
       "docHash": "850efb35cb26d5e70d82fd0f43f948b124580e7f7097580f5d2d4311eef2f2db",
