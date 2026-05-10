@@ -98,6 +98,7 @@
       let renderedToolOutput = false;
       let latestToolInput = null;
       let selfHealStarted = false;
+      let legacyPoller = null;
       const pendingRequests = new Map();
 
       function redactPii(value) {
@@ -356,6 +357,24 @@
         return normalizeToolOutput(payload) ?? normalizeToolOutput(window.openai?.toolOutput);
       }
 
+      function getLegacyToolOutput() {
+        const openai = window.openai ?? {};
+        const candidates = [
+          openai.toolOutput,
+          openai.toolResult,
+          openai.structuredContent,
+          openai.result,
+          openai.output,
+          openai.response,
+          openai.data
+        ];
+        for (const candidate of candidates) {
+          const normalized = normalizeToolOutput(candidate);
+          if (normalized?.verdict) return normalized;
+        }
+        return null;
+      }
+
       function extractLegacyToolInput() {
         const legacy = window.openai?.toolInput ?? window.openai?.toolInputArguments ?? window.openai?.input;
         if (!legacy) return null;
@@ -388,6 +407,21 @@
             );
           }
         }, 1200);
+      }
+
+      function startLegacyOutputPolling() {
+        if (legacyPoller) return;
+        let attempts = 0;
+        legacyPoller = window.setInterval(() => {
+          attempts += 1;
+          if (renderedToolOutput || attempts > 40) {
+            window.clearInterval(legacyPoller);
+            legacyPoller = null;
+            return;
+          }
+          const output = getLegacyToolOutput();
+          if (output) render(output);
+        }, 250);
       }
 
       async function initializeBridge() {
@@ -430,6 +464,7 @@
         const initialOutput = extractToolOutput(window.openai?.toolOutput);
         if (initialOutput) render(initialOutput);
         rememberToolInput(extractLegacyToolInput());
+        startLegacyOutputPolling();
         initializeBridge();
       } catch (error) {
         renderFallback("render error", error instanceof Error ? error.message : "The widget could not render the tool output.");

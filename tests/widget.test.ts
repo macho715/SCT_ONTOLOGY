@@ -45,6 +45,14 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("ask_hvdc_ontology");
   });
 
+  it("polls legacy ChatGPT output surfaces when structuredContent arrives after load", () => {
+    expect(widgetHtml).toContain("startLegacyOutputPolling");
+    expect(widgetHtml).toContain("getLegacyToolOutput");
+    for (const surface of ["toolOutput", "toolResult", "structuredContent", "response", "data"]) {
+      expect(widgetHtml).toContain(surface);
+    }
+  });
+
   it("constrains long drawers to prevent parent page layout jitter", () => {
     expect(widgetHtml).toContain("overflow-x: hidden");
     expect(widgetHtml).toContain("scrollbar-gutter: stable");
