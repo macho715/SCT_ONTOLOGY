@@ -41,6 +41,7 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("Data status");
     expect(widgetHtml).toContain("UI render status");
     expect(widgetHtml).toContain("TEMPLATE_FETCH_FAILED");
+    expect(widgetHtml).toContain("FALLBACK_RENDERED");
     expect(widgetHtml).toContain("CARD_TEMPLATE_RENDER_FAILED");
     expect(widgetHtml).toContain("Protected fields");
   });

@@ -79,7 +79,19 @@ export type ActionRecommendation = {
   dueAt: string | null;
 };
 
-export type UiRenderStatus = "READY" | "TEMPLATE_FETCH_FAILED";
+export type UiRenderStatus =
+  | "READY"
+  | "RESOURCE_REGISTERED"
+  | "RESOURCE_LOADED"
+  | "TOOL_RESULT_RECEIVED"
+  | "RENDERED"
+  | "RESOURCE_NOT_REGISTERED"
+  | "RESOURCE_MIME_INVALID"
+  | "RESOURCE_CSP_BLOCKED"
+  | "SCHEMA_MISMATCH"
+  | "WIDGET_RENDER_ERROR"
+  | "FALLBACK_RENDERED"
+  | "TEMPLATE_FETCH_FAILED";
 
 export type UiAnswerState = {
   dataStatus: "OK";
@@ -98,6 +110,9 @@ export type UiAnswerState = {
 export type GroundedAnswer = {
   answerId: string;
   verdict: Verdict;
+  dataStatus: "OK";
+  businessResultVisible: boolean;
+  fallbackUsed: boolean;
   summary: string;
   businessImpact: string;
   details: string[];

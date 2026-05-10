@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { answerQuestion, validateGrounding } from "../server/src/answer.js";
 import { maskPii } from "../server/src/redact.js";
 import type { EvidenceSnippet, IntentRoute } from "../server/src/types.js";
+import { withUiState } from "../server/src/ui.js";
 
 function ask(question: string) {
   return answerQuestion({ question, userRole: "test", language: "ko" });
@@ -72,11 +73,30 @@ describe("HVDC ontology grounded answer pipeline", () => {
 
   it("keeps business result status separate from optional card UI status", () => {
     const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
+    expect(answer.dataStatus).toBe("OK");
+    expect(answer.businessResultVisible).toBe(true);
+    expect(answer.fallbackUsed).toBe(false);
     expect(answer.ui?.dataStatus).toBe("OK");
     expect(answer.ui?.uiRenderStatus).toBe("READY");
     expect(answer.ui?.businessResultVisible).toBe(true);
     expect(answer.ui?.fallbackUsed).toBe(false);
     expect(answer.ui?.doNotChange).toEqual(["verdict", "validationStatus", "evidenceIds", "actions"]);
+  });
+
+  it("marks card fallback without mutating the business result", () => {
+    const answer = ask("SCT_ONTOLOGY 카드 UI에서 failed to fetch template가 표시되는 이유와 조치가 무엇인지 설명해줘");
+    const fallback = withUiState(answer, "FALLBACK_RENDERED", "simulated widget render failure");
+
+    expect(fallback.verdict).toBe(answer.verdict);
+    expect(fallback.validationStatus).toBe(answer.validationStatus);
+    expect(fallback.evidenceIds).toEqual(answer.evidenceIds);
+    expect(fallback.actions).toEqual(answer.actions);
+    expect(fallback.dataStatus).toBe("OK");
+    expect(fallback.businessResultVisible).toBe(true);
+    expect(fallback.fallbackUsed).toBe(true);
+    expect(fallback.ui?.uiRenderStatus).toBe("FALLBACK_RENDERED");
+    expect(fallback.ui?.fallbackUsed).toBe(true);
+    expect(fallback.ui?.errorCode).toBe("CARD_TEMPLATE_RENDER_FAILED");
   });
 
   it("masks email and phone in input", () => {

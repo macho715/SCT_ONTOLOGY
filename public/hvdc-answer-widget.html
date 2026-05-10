@@ -138,11 +138,12 @@
       }
 
       function normalizeUiState(answer) {
+        const fallbackUsed = answer.fallbackUsed ?? answer.ui?.fallbackUsed ?? false;
         return {
-          dataStatus: answer.ui?.dataStatus ?? "OK",
+          dataStatus: answer.dataStatus ?? answer.ui?.dataStatus ?? "OK",
           uiRenderStatus: answer.ui?.uiRenderStatus ?? "READY",
-          businessResultVisible: answer.ui?.businessResultVisible ?? true,
-          fallbackUsed: answer.ui?.fallbackUsed ?? false,
+          businessResultVisible: answer.businessResultVisible ?? answer.ui?.businessResultVisible ?? true,
+          fallbackUsed,
           cardEnabled: answer.ui?.cardEnabled ?? true,
           templateVersion: answer.ui?.templateVersion ?? "answer-card-v5",
           schemaVersion: answer.ui?.schemaVersion ?? "1.0.0",
@@ -486,13 +487,16 @@
               fallbackAnswer.ui = {
                 ...(fallbackAnswer.ui ?? normalizeUiState(fallbackAnswer)),
                 dataStatus: "OK",
-                uiRenderStatus: "TEMPLATE_FETCH_FAILED",
+                uiRenderStatus: "FALLBACK_RENDERED",
                 businessResultVisible: true,
                 fallbackUsed: true,
                 cardEnabled: false,
                 errorCode: "CARD_TEMPLATE_RENDER_FAILED",
                 errorMessage: error instanceof Error ? error.message : String(error)
               };
+              fallbackAnswer.dataStatus = "OK";
+              fallbackAnswer.businessResultVisible = true;
+              fallbackAnswer.fallbackUsed = true;
               logUiRenderFailure(fallbackAnswer, error);
               render(fallbackAnswer);
               return;
@@ -571,13 +575,16 @@
             initialOutput.ui = {
               ...(initialOutput.ui ?? normalizeUiState(initialOutput)),
               dataStatus: "OK",
-              uiRenderStatus: "TEMPLATE_FETCH_FAILED",
+              uiRenderStatus: "FALLBACK_RENDERED",
               businessResultVisible: true,
               fallbackUsed: true,
               cardEnabled: false,
               errorCode: "CARD_TEMPLATE_RENDER_FAILED",
               errorMessage: error instanceof Error ? error.message : String(error)
             };
+            initialOutput.dataStatus = "OK";
+            initialOutput.businessResultVisible = true;
+            initialOutput.fallbackUsed = true;
             logUiRenderFailure(initialOutput, error);
             render(initialOutput);
           }

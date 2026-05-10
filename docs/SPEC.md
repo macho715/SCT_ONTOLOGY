@@ -240,6 +240,9 @@ Acceptance Scenarios:
 {
   "answerId": "string",
   "verdict": "PASS|WARN|BLOCK|INFO|NO_EVIDENCE|STALE_SOURCE|MULTIPLE_CANDIDATES",
+  "dataStatus": "OK",
+  "businessResultVisible": true,
+  "fallbackUsed": false,
   "summary": "string",
   "businessImpact": "string",
   "usedSources": [
@@ -274,7 +277,7 @@ Acceptance Scenarios:
   ],
   "ui": {
     "dataStatus": "OK",
-    "uiRenderStatus": "READY|TEMPLATE_FETCH_FAILED",
+    "uiRenderStatus": "READY|RESOURCE_REGISTERED|RESOURCE_LOADED|TOOL_RESULT_RECEIVED|RENDERED|RESOURCE_NOT_REGISTERED|RESOURCE_MIME_INVALID|RESOURCE_CSP_BLOCKED|SCHEMA_MISMATCH|WIDGET_RENDER_ERROR|FALLBACK_RENDERED|TEMPLATE_FETCH_FAILED",
     "businessResultVisible": true,
     "fallbackUsed": false,
     "cardEnabled": true,

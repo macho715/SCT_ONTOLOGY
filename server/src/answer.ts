@@ -366,6 +366,9 @@ export function answerQuestion(args: {
   const answer: GroundedAnswer = {
     answerId: `ans_${sha256(`${maskedQuestion.text}|${generatedAt}`).slice(0, 12)}`,
     verdict,
+    dataStatus: "OK",
+    businessResultVisible: true,
+    fallbackUsed: false,
     summary: core.summary,
     businessImpact: core.businessImpact,
     details: core.details,
@@ -389,15 +392,15 @@ export function answerQuestion(args: {
 export function answerToText(answer: GroundedAnswer): string {
   const lines = [
     `Verdict: ${answer.verdict}`,
+    `Data status: ${answer.dataStatus}`,
+    `Business result visible: ${answer.businessResultVisible}`,
+    `Fallback used: ${answer.fallbackUsed}`,
     `Summary: ${answer.summary}`,
     `Business impact: ${answer.businessImpact}`,
     `Route: ${answer.route.requiredDocs.join(" -> ")}`,
     `Evidence: ${answer.evidence.map((item) => `${item.docId}/${item.sectionPath}`).join("; ") || "none"}`,
     `Next action: ${answer.actions.map((action) => `${action.actionType} (${action.ownerRole})`).join("; ")}`,
-    `Data status: ${answer.ui?.dataStatus ?? "OK"}`,
     `UI render status: ${answer.ui?.uiRenderStatus ?? "READY"}`,
-    `Business result visible: ${answer.ui?.businessResultVisible ?? true}`,
-    `Fallback used: ${answer.ui?.fallbackUsed ?? false}`,
     ...(answer.ui?.errorCode ? [`UI warning: ${answer.ui.errorCode} - ${answer.ui.errorMessage ?? "card template render failed"}`] : [])
   ];
   return lines.join("\n");

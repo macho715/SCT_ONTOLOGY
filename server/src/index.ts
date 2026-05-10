@@ -57,6 +57,9 @@ const routeSchema = z.object({
 const answerOutputSchema = {
   answerId: z.string(),
   verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
+  dataStatus: z.literal("OK"),
+  businessResultVisible: z.boolean(),
+  fallbackUsed: z.boolean(),
   summary: z.string(),
   businessImpact: z.string(),
   details: z.array(z.string()),
@@ -105,7 +108,20 @@ const answerOutputSchema = {
   ui: z
     .object({
       dataStatus: z.literal("OK"),
-      uiRenderStatus: z.enum(["READY", "TEMPLATE_FETCH_FAILED"]),
+      uiRenderStatus: z.enum([
+        "READY",
+        "RESOURCE_REGISTERED",
+        "RESOURCE_LOADED",
+        "TOOL_RESULT_RECEIVED",
+        "RENDERED",
+        "RESOURCE_NOT_REGISTERED",
+        "RESOURCE_MIME_INVALID",
+        "RESOURCE_CSP_BLOCKED",
+        "SCHEMA_MISMATCH",
+        "WIDGET_RENDER_ERROR",
+        "FALLBACK_RENDERED",
+        "TEMPLATE_FETCH_FAILED"
+      ]),
       businessResultVisible: z.boolean(),
       fallbackUsed: z.boolean(),
       cardEnabled: z.boolean(),
