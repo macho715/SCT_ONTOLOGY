@@ -36,6 +36,15 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("focus-visible");
   });
 
+  it("initializes the MCP Apps bridge before relying on one-shot tool results", () => {
+    expect(widgetHtml).toContain("ui/initialize");
+    expect(widgetHtml).toContain("ui/notifications/initialized");
+    expect(widgetHtml).toContain("ui/notifications/tool-input");
+    expect(widgetHtml).toContain("ui/notifications/tool-result");
+    expect(widgetHtml).toContain("tools/call");
+    expect(widgetHtml).toContain("ask_hvdc_ontology");
+  });
+
   it("constrains long drawers to prevent parent page layout jitter", () => {
     expect(widgetHtml).toContain("overflow-x: hidden");
     expect(widgetHtml).toContain("scrollbar-gutter: stable");

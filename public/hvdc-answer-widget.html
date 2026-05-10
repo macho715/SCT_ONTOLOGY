@@ -79,10 +79,10 @@
   <body>
     <main id="root" aria-live="polite">
       <div class="card">
-        <section aria-labelledby="fallback-title">
+        <section aria-labelledby="loading-title">
           <span class="badge INFO">READY</span>
-          <h1 id="fallback-title">Text fallback: no tool output yet</h1>
-          <p class="muted">질문을 실행하면 verdict, route documents, evidence, validation, PII state, next action이 표시됩니다.</p>
+          <h1 id="loading-title">HVDC Ontology Answer</h1>
+          <p class="muted">Waiting for tool output from ChatGPT.</p>
         </section>
       </div>
     </main>
@@ -91,6 +91,14 @@
       const VALID_STATUSES = new Set(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]);
       const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
       const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
+      const PROTOCOL_VERSION = "2026-01-26";
+      const APP_INFO = { name: "hvdc-ontology-answer-widget", version: "0.1.0" };
+      const APP_CAPABILITIES = {};
+      let nextRpcId = 1;
+      let renderedToolOutput = false;
+      let latestToolInput = null;
+      let selfHealStarted = false;
+      const pendingRequests = new Map();
 
       function redactPii(value) {
         return String(value ?? "")
@@ -139,6 +147,18 @@
         `;
       }
 
+      function renderLoading(message = "Waiting for tool output from ChatGPT.") {
+        root.innerHTML = `
+          <div class="card">
+            <section aria-labelledby="loading-title">
+              <span class="badge INFO">READY</span>
+              <h1 id="loading-title">HVDC Ontology Answer</h1>
+              <p class="muted">${escapeHtml(message)}</p>
+            </section>
+          </div>
+        `;
+      }
+
       function normalizeToolOutput(payload) {
         if (!payload) return null;
         if (payload.structuredContent) return payload.structuredContent;
@@ -146,6 +166,34 @@
         if (payload.result?.structuredContent) return payload.result.structuredContent;
         if (payload.toolOutput) return payload.toolOutput;
         return payload;
+      }
+
+      function rememberToolInput(params) {
+        const args = params?.arguments ?? params?.input ?? params;
+        if (args && typeof args === "object" && Object.keys(args).length > 0) {
+          latestToolInput = args;
+        }
+      }
+
+      function postRpc(message) {
+        window.parent?.postMessage(message, "*");
+      }
+
+      function rpcNotify(method, params = {}) {
+        postRpc({ jsonrpc: "2.0", method, params });
+      }
+
+      function rpcRequest(method, params = {}, timeoutMs = 8000) {
+        const id = nextRpcId++;
+        const request = { jsonrpc: "2.0", id, method, params };
+        return new Promise((resolve, reject) => {
+          const timeout = window.setTimeout(() => {
+            pendingRequests.delete(id);
+            reject(new Error(`${method} timed out`));
+          }, timeoutMs);
+          pendingRequests.set(id, { resolve, reject, timeout });
+          postRpc(request);
+        });
       }
 
       function collectWarnings(answer) {
@@ -188,6 +236,7 @@
           renderFallback("missing verdict", "The tool output is missing the required verdict field.", JSON.stringify(answer, null, 2));
           return;
         }
+        renderedToolOutput = true;
 
         const verdict = safeStatus(answer.verdict);
         const validationStatus = safeStatus(answer.validationStatus ?? answer.verdict);
@@ -307,16 +356,81 @@
         return normalizeToolOutput(payload) ?? normalizeToolOutput(window.openai?.toolOutput);
       }
 
+      function extractLegacyToolInput() {
+        const legacy = window.openai?.toolInput ?? window.openai?.toolInputArguments ?? window.openai?.input;
+        if (!legacy) return null;
+        return legacy.arguments ?? legacy;
+      }
+
+      function scheduleSelfHeal() {
+        if (selfHealStarted) return;
+        selfHealStarted = true;
+        window.setTimeout(async () => {
+          if (renderedToolOutput) return;
+          const input = latestToolInput ?? extractLegacyToolInput();
+          if (!input?.question) {
+            renderLoading("Tool output is not available yet. Waiting for ChatGPT to deliver structuredContent.");
+            selfHealStarted = false;
+            return;
+          }
+          try {
+            const result = await rpcRequest("tools/call", {
+              name: "ask_hvdc_ontology",
+              arguments: input
+            });
+            const structured = normalizeToolOutput(result);
+            if (structured) render(structured);
+          } catch (error) {
+            renderFallback(
+              "tool output unavailable",
+              "ChatGPT did not deliver structuredContent to the iframe, and the widget could not recover by calling the render tool.",
+              error instanceof Error ? error.message : String(error)
+            );
+          }
+        }, 1200);
+      }
+
+      async function initializeBridge() {
+        try {
+          const init = await rpcRequest("ui/initialize", {
+            protocolVersion: PROTOCOL_VERSION,
+            appInfo: APP_INFO,
+            appCapabilities: APP_CAPABILITIES
+          });
+          if (init) rpcNotify("ui/notifications/initialized", {});
+        } catch {
+          // Some legacy hosts do not answer ui/initialize; keep the passive message listener active.
+        } finally {
+          scheduleSelfHeal();
+        }
+      }
+
       window.addEventListener("message", (event) => {
         if (event.source !== window.parent) return;
         const message = event.data;
         if (!message || message.jsonrpc !== "2.0") return;
+        if (message.id && pendingRequests.has(message.id)) {
+          const pending = pendingRequests.get(message.id);
+          pendingRequests.delete(message.id);
+          window.clearTimeout(pending.timeout);
+          if (message.error) pending.reject(new Error(message.error.message ?? "JSON-RPC request failed"));
+          else pending.resolve(message.result);
+          return;
+        }
+        if (message.method === "ui/notifications/tool-input" || message.method === "ui/notifications/tool-input-partial") {
+          rememberToolInput(message.params);
+          scheduleSelfHeal();
+          return;
+        }
         if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
       }, { passive: true });
 
       try {
+        renderLoading();
         const initialOutput = extractToolOutput(window.openai?.toolOutput);
         if (initialOutput) render(initialOutput);
+        rememberToolInput(extractLegacyToolInput());
+        initializeBridge();
       } catch (error) {
         renderFallback("render error", error instanceof Error ? error.message : "The widget could not render the tool output.");
       }
