@@ -20,18 +20,6 @@
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible operational actions."
       }
     },
-    "render_hvdc_answer_card": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
-      "justifications": {
-        "read_only_justification": "Renders an already computed HVDC answer as a ChatGPT App card without changing data.",
-        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
-        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
-      }
-    },
     "route_question": {
       "annotations": {
         "readOnlyHint": true,
@@ -96,14 +84,6 @@
       "file_attachment_urls": null,
       "tools_triggered": "ask_hvdc_ontology",
       "expected_output": "Explains that Flow Code is WHP-only and must not be used as route, customs, invoice, or KPI classification.",
-      "expected_output_url": null
-    },
-    {
-      "description": "Render a previously computed HVDC answer as an answer card.",
-      "user_prompt": "위 HVDC ontology 답변을 evidence drawer가 있는 카드로 보여줘",
-      "file_attachment_urls": null,
-      "tools_triggered": "render_hvdc_answer_card",
-      "expected_output": "Displays the existing structured answer in the ChatGPT App card with verdict, evidence, validation, and next action.",
       "expected_output_url": null
     },
     {

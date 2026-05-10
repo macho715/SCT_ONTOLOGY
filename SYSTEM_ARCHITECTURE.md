@@ -79,12 +79,11 @@ flowchart TD
 
 ## 등록된 App tool
 
-`server/src/index.ts`의 `HVDC_TOOL_DESCRIPTORS`와 `registerAppTool` 기준으로 현재 tool은 6개다.
+`server/src/index.ts`의 `HVDC_TOOL_DESCRIPTORS`와 `registerAppTool` 기준으로 현재 tool은 5개다.
 
 | Tool | 구현 파일 | 역할 |
 | --- | --- | --- |
 | `ask_hvdc_ontology` | `server/src/answer.ts` | 질문을 route, corpus search, validation, answer composition 흐름으로 처리한다. |
-| `render_hvdc_answer_card` | `server/src/index.ts` | 이미 계산된 answer object를 ChatGPT App 카드로 렌더링한다. |
 | `route_question` | `server/src/router.ts` | 질문을 ontology domain과 required document로 분류한다. |
 | `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` Markdown 문서에서 EvidenceSnippet을 검색한다. |
 | `resolve_any_key` | `server/src/router.ts` | BL, BOE, DO, Invoice, HVDC_CODE, Site, Milestone 같은 식별자를 후보로 추출한다. |
@@ -96,7 +95,7 @@ flowchart TD
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- `render_hvdc_answer_card` descriptor의 `_meta.openai/outputTemplate`만 `ui://hvdc/answer-card-v4.html`을 가리킨다.
+- `ask_hvdc_ontology` descriptor의 `_meta.ui.resourceUri`와 `_meta.openai/outputTemplate`이 `ui://hvdc/answer-card-v4.html`을 가리킨다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget은 자체 fallback text를 가진다.
 - widget test는 외부 `fetch()`와 `http(s)://` resource 사용이 없는지 확인한다.

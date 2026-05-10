@@ -408,23 +408,17 @@
         window.setTimeout(async () => {
           if (renderedToolOutput) return;
           const input = latestToolInput ?? extractLegacyToolInput();
-          if (input?.answer?.verdict) {
-            render(input.answer);
-            return;
-          }
           if (!input?.question) {
             renderLoading("Tool output is not available yet. Waiting for ChatGPT to deliver structuredContent.");
             selfHealStarted = false;
             return;
           }
           try {
-            const callName = input.answer?.verdict ? "render_hvdc_answer_card" : "ask_hvdc_ontology";
-            const callArgs = input.answer?.verdict ? { answer: input.answer } : input;
             const result = typeof window.openai?.callTool === "function"
-              ? await window.openai.callTool(callName, callArgs)
+              ? await window.openai.callTool("ask_hvdc_ontology", input)
               : await rpcRequest("tools/call", {
-                  name: callName,
-                  arguments: callArgs
+                  name: "ask_hvdc_ontology",
+                  arguments: input
                 });
             const structured = normalizeToolOutput(result);
             if (structured) render(structured);

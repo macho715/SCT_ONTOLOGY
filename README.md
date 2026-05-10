@@ -2,7 +2,7 @@
 
 쉽게 말하면: 이 저장소는 HVDC 물류 질문에 대해 먼저 온톨로지 corpus를 찾고, 근거가 있을 때만 ChatGPT App 안에서 답변하는 로컬 MVP입니다.
 
-현재 상태는 Option B 기준입니다. MCP 서버, 6개 tool, 온톨로지 corpus 색인, Evidence Drawer 위젯, golden eval, GitHub Actions 검증이 들어 있습니다.
+현재 상태는 Option B + Option A render path 기준입니다. MCP 서버, 5개 tool, 온톨로지 corpus 색인, Evidence Drawer 위젯, golden eval, GitHub Actions 검증이 들어 있습니다.
 
 ## 현재 구현 범위
 
@@ -31,10 +31,9 @@
 
 ## MCP tools
 
-현재 서버와 ChatGPT submission 파일은 같은 6개 tool 이름을 사용합니다.
+현재 서버와 ChatGPT submission 파일은 같은 5개 tool 이름을 사용합니다.
 
 - `ask_hvdc_ontology`: 질문을 route, corpus search, validation, answer object로 처리합니다.
-- `render_hvdc_answer_card`: 이미 계산된 answer object를 ChatGPT App 카드로 렌더링합니다.
 - `route_question`: 질문을 HVDC 도메인과 required corpus 문서로 분류합니다.
 - `search_ontology_corpus`: 승인된 `data/corpus/` 문서에서 EvidenceSnippet을 찾습니다.
 - `resolve_any_key`: BL, BOE, DO, Invoice, HVDC code, site, milestone 같은 식별자를 후보로 풉니다.
@@ -42,13 +41,12 @@
 
 ## 전체 흐름
 
-쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, 현재 구현된 6개 tool이 `data/corpus/` 근거를 찾은 뒤 render tool이 Evidence Drawer와 검증 결과를 카드로 돌려줍니다.
+쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾은 뒤 같은 tool result에 연결된 Evidence Drawer 카드로 결과를 돌려줍니다.
 
 ```mermaid
 flowchart LR
   User["ChatGPT 사용자"] --> Mcp["/mcp 서버"]
   Mcp --> Ask["ask_hvdc_ontology"]
-  Mcp --> Render["render_hvdc_answer_card"]
   Mcp --> Route["route_question"]
   Mcp --> Search["search_ontology_corpus"]
   Mcp --> Resolve["resolve_any_key"]
@@ -61,8 +59,7 @@ flowchart LR
   Corpus --> Evidence["EvidenceSnippet"]
   Evidence --> Validate
   Validate --> Drawer["Evidence Drawer"]
-  Ask --> Render
-  Render --> Drawer
+  Ask --> Drawer
   Drawer --> Review["검증 흐름"]
   Review --> User
 ```

@@ -45,9 +45,8 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 - If any-key confidence is ambiguous, return review state instead of choosing silently.
 
 ## Implemented MCP/App Tools
-Current server and ChatGPT submission must stay aligned on these 6 tool names:
+Current server and ChatGPT submission must stay aligned on these 5 tool names:
 - `ask_hvdc_ontology` -> `server/src/answer.ts`
-- `render_hvdc_answer_card` -> `server/src/index.ts`
 - `route_question` -> `server/src/router.ts`
 - `search_ontology_corpus` -> `server/src/corpus.ts`
 - `resolve_any_key` -> `server/src/router.ts`

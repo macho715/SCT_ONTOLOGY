@@ -13,7 +13,7 @@ import { z } from "zod";
 import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
-import type { DomainHint, GroundedAnswer } from "./types.js";
+import type { DomainHint } from "./types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
@@ -118,32 +118,14 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerOutputSchema,
     _meta: {
+      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
     },
     annotations: {
       readOnlyHint: false,
-      destructiveHint: false,
-      openWorldHint: false
-    }
-  },
-  render_hvdc_answer_card: {
-    title: "Render HVDC answer card",
-    description:
-      "Use this after ask_hvdc_ontology when the user should see the HVDC answer as a ChatGPT App card with verdict, evidence, validation, and next action.",
-    inputSchema: {
-      answer: z.object(answerOutputSchema)
-    },
-    outputSchema: answerOutputSchema,
-    _meta: {
-      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
-      "openai/outputTemplate": WIDGET_URI,
-      "openai/widgetAccessible": true,
-      "openai/toolInvocation/invoking": "Rendering HVDC answer card",
-      "openai/toolInvocation/invoked": "HVDC answer card ready"
-    },
-    annotations: {
-      readOnlyHint: true,
       destructiveHint: false,
       openWorldHint: false
     }
@@ -261,21 +243,7 @@ export function createHvdcServer(): McpServer {
       return {
         structuredContent: answer,
         content: [{ type: "text", text: answerToText(answer) }],
-        _meta: { piiMasked: answer.piiMasked }
-      };
-    }
-  );
-
-  registerAppTool(
-    server,
-    "render_hvdc_answer_card",
-    HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card,
-    async ({ answer }) => {
-      const groundedAnswer = answer as GroundedAnswer;
-      return {
-        structuredContent: groundedAnswer,
-        content: [{ type: "text", text: answerToText(groundedAnswer) }],
-        _meta: { uiTemplate: WIDGET_URI, piiMasked: groundedAnswer.piiMasked }
+        _meta: { uiTemplate: WIDGET_URI, piiMasked: answer.piiMasked }
       };
     }
   );
