@@ -223,7 +223,8 @@ Acceptance Scenarios:
 | Tool | Input | Output | Primary UI |
 |---|---|---|---|
 | route_question | question, userRole, language | IntentRoute | Domain Route Banner |
-| search_ontology_corpus | query, requiredDocs, domainHints, topK | EvidenceSnippet[] | Evidence Drawer |
+| search_ontology_corpus | query, requiredDocs, domainHints, topK | EvidenceSnippet[] | Evidence lookup only |
+| render_hvdc_answer_card | answer | GroundedAnswer | Evidence Drawer UI |
 | resolve_any_key | identifierScheme, identifierValue | ResolvedEntity[] | Any-key Resolver |
 | query_knowledge_graph | templateId, params | GraphPath, object facts | Ontology Path Viewer |
 | validate_answer | answerDraft, evidenceIds, ruleSet | ValidationFinding[] | Validation Gate Panel |

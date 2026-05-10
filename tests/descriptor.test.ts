@@ -21,9 +21,9 @@ const submission = JSON.parse(
 const serverSource = readFileSync(path.resolve("server", "src", "index.ts"), "utf8");
 
 describe("Apps SDK/MCP descriptor contract parity", () => {
-  it("keeps the five server tool names in sync with the ChatGPT app submission", () => {
+  it("keeps the six server tool names in sync with the ChatGPT app submission", () => {
     expect(Object.keys(HVDC_TOOL_DESCRIPTORS).sort()).toEqual(Object.keys(submission.tools).sort());
-    expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toHaveLength(5);
+    expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toHaveLength(6);
   });
 
   it("defines schema, metadata, and annotations for every server tool descriptor", () => {
@@ -51,12 +51,17 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("links the primary answer tool to the versioned Apps SDK widget resource", () => {
+  it("keeps ontology answering separate from the versioned Apps SDK render resource", () => {
     const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
+    const renderMeta = HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card._meta;
+    const askMetaRecord = askMeta as Record<string, unknown>;
+    const renderMetaRecord = renderMeta as Record<string, unknown>;
 
-    expect(askMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v4.html");
-    expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v4.html");
-    expect(askMeta["openai/widgetAccessible"]).toBe(true);
+    expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
+    expect(askMetaRecord.ui).toBeUndefined();
+    expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v4.html");
+    expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v4.html");
+    expect(renderMetaRecord["openai/widgetAccessible"]).toBe(true);
   });
 
   it("declares review-facing widget metadata and a narrow CSP", () => {

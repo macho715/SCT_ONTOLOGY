@@ -44,6 +44,7 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("window.openai.callTool");
     expect(widgetHtml).toContain("tools/call");
     expect(widgetHtml).toContain("ask_hvdc_ontology");
+    expect(widgetHtml).toContain("render_hvdc_answer_card");
   });
 
   it("polls legacy ChatGPT output surfaces when structuredContent arrives after load", () => {
