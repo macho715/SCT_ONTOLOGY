@@ -28,9 +28,17 @@
         }
       }
       * { box-sizing: border-box; }
-      body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); }
-      main { max-width: 960px; margin: 0 auto; }
-      .card { border: 1px solid var(--line); border-radius: 18px; background: var(--card); padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+      html { scrollbar-gutter: stable; }
+      body {
+        margin: 0;
+        padding: 12px;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        text-size-adjust: 100%;
+      }
+      main { width: min(100%, 960px); margin: 0 auto; overflow-x: hidden; contain: layout paint; }
+      .card { border: 1px solid var(--line); border-radius: 8px; background: var(--card); padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
       .top { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
       .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 12px; border: 1px solid var(--line); }
       .BLOCK, .NO_EVIDENCE { color: var(--block); }
@@ -40,24 +48,31 @@
       h1 { margin: 8px 0 6px; font-size: 20px; line-height: 1.3; }
       h2 { font-size: 15px; margin: 18px 0 8px; }
       h3 { font-size: 14px; margin: 0 0 6px; }
-      p { margin: 8px 0; line-height: 1.55; }
+      p { margin: 8px 0; line-height: 1.55; overflow-wrap: anywhere; }
       .muted { color: var(--muted); }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
-      .panel { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--bg); }
+      .panel { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--bg); min-width: 0; overflow: hidden; }
       .meta { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 6px 10px; margin: 8px 0 0; font-size: 13px; }
       .meta dt { color: var(--muted); }
-      .meta dd { margin: 0; overflow-wrap: anywhere; }
+      .meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
       .warning-list { border-left: 4px solid var(--warn); padding: 8px 10px; background: color-mix(in srgb, var(--warn) 8%, transparent); }
       ul { margin: 8px 0 0; padding-left: 18px; }
       li { margin: 4px 0; }
-      details { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: var(--bg); }
-      summary { cursor: pointer; font-weight: 700; }
+      details { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 0; background: var(--bg); overflow: hidden; contain: layout paint; }
+      summary { cursor: pointer; font-weight: 700; min-height: 40px; padding: 10px 12px; }
       summary:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--info); outline-offset: 3px; }
-      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-      .evidence { padding: 10px 0; border-top: 1px solid var(--line); }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+      .details-body {
+        max-height: min(520px, 58vh);
+        overflow: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable both-edges;
+        padding: 0 12px 12px;
+      }
+      .evidence { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
       .evidence:first-of-type { border-top: none; }
       .route { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-      .route span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 12px; }
+      .route span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; }
       .empty { color: var(--muted); font-style: italic; }
     </style>
   </head>
@@ -142,10 +157,10 @@
         for (const finding of asArray(answer.validation)) {
           const findingStatus = safeStatus(finding.status, "INFO");
           if (findingStatus === "WARN" || findingStatus === "BLOCK") {
-            warnings.push(`${finding.ruleId ?? "validation"}: ${finding.message ?? findingStatus}`);
+            warnings.push(`${finding.reasonCode ?? finding.ruleId ?? "validation"}: ${finding.message ?? findingStatus}`);
           }
-          if (/STALE|CURRENT|FRESH/i.test(`${finding.ruleId ?? ""} ${finding.message ?? ""}`)) {
-            warnings.push(`Freshness warning: ${finding.message ?? finding.ruleId}`);
+          if (/STALE|CURRENT|FRESH/i.test(`${finding.reasonCode ?? ""} ${finding.ruleId ?? ""} ${finding.message ?? ""}`)) {
+            warnings.push(`Freshness warning: ${finding.message ?? finding.reasonCode ?? finding.ruleId}`);
           }
         }
         for (const action of asArray(answer.actions)) {
@@ -179,14 +194,14 @@
         const validationHtml = asArray(answer.validation).map((item) => `
           <li>
             <strong class="${safeStatus(item.status)}">${escapeHtml(safeStatus(item.status))}</strong>
-            ${escapeHtml(item.ruleId ?? "validation")} - ${escapeHtml(item.message ?? "")}
+            ${escapeHtml(item.reasonCode ?? item.ruleId ?? "validation")} - ${escapeHtml(item.ruleId ?? "validation")} - ${escapeHtml(item.message ?? "")}
           </li>
         `).join("") || `<li class="empty">No validation findings.</li>`;
 
         const evidenceHtml = asArray(answer.evidence).map((item, index) => {
           const linkedValidation = asArray(answer.validation)
             .filter((finding) => asArray(finding.evidenceIds).includes(item.id))
-            .map((finding) => `${finding.ruleId}: ${finding.status}`)
+            .map((finding) => `${finding.reasonCode ?? finding.ruleId}: ${finding.status}`)
             .join(", ");
           return `
             <article class="evidence" aria-labelledby="evidence-${index}">
@@ -261,22 +276,28 @@
               </section>
               ${warningsHtml}
             </div>
-            <details open>
-              <summary>Evidence Drawer</summary>
-              <dl class="meta">
-                <dt>Validation status</dt><dd><strong class="${validationStatus}">${escapeHtml(validationStatus)}</strong></dd>
-                <dt>PII state</dt><dd>${answer.piiMasked ? "PII masked" : "PII masking not reported"}</dd>
-                <dt>Evidence count</dt><dd>${asArray(answer.evidence).length}</dd>
-              </dl>
-              ${evidenceHtml}
-            </details>
             <details>
+              <summary>Evidence Drawer</summary>
+              <div class="details-body">
+                <dl class="meta">
+                  <dt>Validation status</dt><dd><strong class="${validationStatus}">${escapeHtml(validationStatus)}</strong></dd>
+                  <dt>PII state</dt><dd>${answer.piiMasked ? "PII masked" : "PII masking not reported"}</dd>
+                  <dt>Evidence count</dt><dd>${asArray(answer.evidence).length}</dd>
+                </dl>
+                ${evidenceHtml}
+              </div>
+            </details>
+            <details open>
               <summary>Validation Gate</summary>
-              <ul>${validationHtml}</ul>
+              <div class="details-body">
+                <ul>${validationHtml}</ul>
+              </div>
             </details>
             <details>
               <summary>Ontology Path</summary>
-              ${graphHtml}
+              <div class="details-body">
+                ${graphHtml}
+              </div>
             </details>
           </div>
         `;

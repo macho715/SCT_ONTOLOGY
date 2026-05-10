@@ -36,6 +36,14 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("focus-visible");
   });
 
+  it("constrains long drawers to prevent parent page layout jitter", () => {
+    expect(widgetHtml).toContain("overflow-x: hidden");
+    expect(widgetHtml).toContain("scrollbar-gutter: stable");
+    expect(widgetHtml).toContain("overscroll-behavior: contain");
+    expect(widgetHtml).toContain("class=\"details-body\"");
+    expect(widgetHtml).toContain("reasonCode");
+  });
+
   it("does not fetch external resources from the iframe", () => {
     expect(widgetHtml).not.toMatch(/\bfetch\s*\(/);
     expect(widgetHtml).not.toMatch(/https?:\/\//i);
