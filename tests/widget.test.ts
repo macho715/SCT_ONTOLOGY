@@ -48,9 +48,15 @@ describe("HVDC answer widget", () => {
   it("polls legacy ChatGPT output surfaces when structuredContent arrives after load", () => {
     expect(widgetHtml).toContain("startLegacyOutputPolling");
     expect(widgetHtml).toContain("getLegacyToolOutput");
-    for (const surface of ["toolOutput", "toolResult", "structuredContent", "response", "data"]) {
+    for (const surface of ["toolOutput", "toolResult", "structuredContent", "response", "data", "globals"]) {
       expect(widgetHtml).toContain(surface);
     }
+  });
+
+  it("subscribes to the official ChatGPT component bridge globals event", () => {
+    expect(widgetHtml).toContain("openai:set_globals");
+    expect(widgetHtml).toContain("handleOpenAiGlobals");
+    expect(widgetHtml).toContain("event.detail?.globals");
   });
 
   it("constrains long drawers to prevent parent page layout jitter", () => {

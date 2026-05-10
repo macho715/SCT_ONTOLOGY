@@ -6,7 +6,7 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 ## Current State
 - Runtime: Node.js / TypeScript MCP HTTP server at `/mcp`.
 - Default local endpoint: `http://localhost:8787/mcp`.
-- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card.html`.
+- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v3.html`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.

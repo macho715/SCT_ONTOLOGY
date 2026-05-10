@@ -18,6 +18,7 @@ type Submission = {
 const submission = JSON.parse(
   readFileSync(path.resolve("chatgpt-app-submission.json"), "utf8")
 ) as Submission;
+const serverSource = readFileSync(path.resolve("server", "src", "index.ts"), "utf8");
 
 describe("Apps SDK/MCP descriptor contract parity", () => {
   it("keeps the five server tool names in sync with the ChatGPT app submission", () => {
@@ -47,6 +48,29 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       if (toolName !== "ask_hvdc_ontology") {
         expect(descriptor.annotations.readOnlyHint, `${toolName} readOnlyHint`).toBe(true);
       }
+    }
+  });
+
+  it("links the primary answer tool to the versioned Apps SDK widget resource", () => {
+    const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
+
+    expect(askMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v3.html");
+    expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v3.html");
+    expect(askMeta["openai/widgetAccessible"]).toBe(true);
+  });
+
+  it("declares review-facing widget metadata and a narrow CSP", () => {
+    for (const expected of [
+      "openai/widgetDescription",
+      "openai/widgetPrefersBorder",
+      "openai/widgetDomain",
+      "openai/widgetCSP",
+      "connect_domains: []",
+      "resource_domains: []",
+      "frame_domains: []",
+      "redirect_domains: []"
+    ]) {
+      expect(serverSource).toContain(expected);
     }
   });
 });

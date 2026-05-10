@@ -120,7 +120,7 @@ https://<your-ngrok-subdomain>.ngrok.app/mcp
 ChatGPT App UI resource URI는 아래 값입니다.
 
 ```text
-ui://hvdc/answer-card.html
+ui://hvdc/answer-card-v3.html
 ```
 
 Railway MCP URL은 `docs/operations/plan.md`에 아래 값으로 문서화되어 있습니다.

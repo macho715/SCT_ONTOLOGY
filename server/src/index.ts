@@ -18,7 +18,7 @@ import type { DomainHint } from "./types.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
 const widgetHtml = readFileSync(path.join(ROOT_DIR, "public", "hvdc-answer-widget.html"), "utf8");
-const WIDGET_URI = "ui://hvdc/answer-card.html";
+const WIDGET_URI = "ui://hvdc/answer-card-v3.html";
 
 const domainEnum = z.enum([
   "master",
@@ -118,8 +118,9 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerOutputSchema,
     _meta: {
-      ui: { resourceUri: WIDGET_URI },
+      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
       "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
     },
@@ -215,10 +216,20 @@ export function createHvdcServer(): McpServer {
         _meta: {
           ui: {
             prefersBorder: true,
+            domain: "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
             csp: {
-              connect_domains: [],
-              resource_domains: []
+              connectDomains: [],
+              resourceDomains: []
             }
+          },
+          "openai/widgetDescription": "HVDC ontology answer card showing verdict, route documents, evidence, validation findings, and next action.",
+          "openai/widgetPrefersBorder": true,
+          "openai/widgetDomain": "https://hvdc-ontology-chatgpt-app-production.up.railway.app",
+          "openai/widgetCSP": {
+            connect_domains: [],
+            resource_domains: [],
+            frame_domains: [],
+            redirect_domains: []
           }
         }
       }

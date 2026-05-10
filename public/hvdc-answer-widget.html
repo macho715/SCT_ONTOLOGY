@@ -165,6 +165,7 @@
         if (payload.structuredContent) return payload.structuredContent;
         if (payload.params?.structuredContent) return payload.params.structuredContent;
         if (payload.result?.structuredContent) return payload.result.structuredContent;
+        if (payload.result?.content?.[0]?.structuredContent) return payload.result.content[0].structuredContent;
         if (payload.toolOutput) return payload.toolOutput;
         return payload;
       }
@@ -357,8 +358,15 @@
         return normalizeToolOutput(payload) ?? normalizeToolOutput(window.openai?.toolOutput);
       }
 
+      function handleOpenAiGlobals(globals = {}) {
+        const output = extractToolOutput(globals.toolOutput ?? globals.toolResult ?? globals.structuredContent ?? globals.response ?? globals.data);
+        if (output?.verdict) render(output);
+        rememberToolInput(globals.toolInput ?? globals.toolInputArguments ?? globals.input);
+      }
+
       function getLegacyToolOutput() {
         const openai = window.openai ?? {};
+        const globals = openai.globals ?? openai.__globals ?? {};
         const candidates = [
           openai.toolOutput,
           openai.toolResult,
@@ -366,7 +374,12 @@
           openai.result,
           openai.output,
           openai.response,
-          openai.data
+          openai.data,
+          globals.toolOutput,
+          globals.toolResult,
+          globals.structuredContent,
+          globals.response,
+          globals.data
         ];
         for (const candidate of candidates) {
           const normalized = normalizeToolOutput(candidate);
@@ -376,7 +389,14 @@
       }
 
       function extractLegacyToolInput() {
-        const legacy = window.openai?.toolInput ?? window.openai?.toolInputArguments ?? window.openai?.input;
+        const globals = window.openai?.globals ?? window.openai?.__globals ?? {};
+        const legacy =
+          window.openai?.toolInput ??
+          window.openai?.toolInputArguments ??
+          window.openai?.input ??
+          globals.toolInput ??
+          globals.toolInputArguments ??
+          globals.input;
         if (!legacy) return null;
         return legacy.arguments ?? legacy;
       }
@@ -459,10 +479,16 @@
         if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
       }, { passive: true });
 
+      window.addEventListener("openai:set_globals", (event) => {
+        handleOpenAiGlobals(event.detail?.globals ?? event.detail ?? {});
+        scheduleSelfHeal();
+      }, { passive: true });
+
       try {
         renderLoading();
         const initialOutput = extractToolOutput(window.openai?.toolOutput);
         if (initialOutput) render(initialOutput);
+        handleOpenAiGlobals(window.openai?.globals ?? {});
         rememberToolInput(extractLegacyToolInput());
         startLegacyOutputPolling();
         initializeBridge();
