@@ -229,6 +229,7 @@ classDiagram
 
   class ValidationFinding {
     string ruleId
+    string reasonCode
     severity INFO_or_WARN_or_BLOCK
     status PASS_or_WARN_or_BLOCK
     string targetObject

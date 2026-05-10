@@ -210,7 +210,7 @@ Acceptance Scenarios:
 | EvidenceSnippet | 답변 근거 조각 | docId, title, version, sectionPath, snippet, docHash, confidence, sourceType |
 | GraphPath | 질문 entity에서 업무 object까지 KG 경로 | startNode, edges, endNode, pathConfidence |
 | GroundedAnswer | 사용자에게 표시되는 최종 answer object | answerId, verdict, summary, businessImpact, details, evidenceIds, validationStatus |
-| ValidationFinding | rule check 결과 | ruleId, severity, status, targetObject, evidenceIds, message |
+| ValidationFinding | rule check 결과 | ruleId, reasonCode, severity, status, targetObject, evidenceIds, message |
 | ActionRecommendation | 다음 조치 또는 승인 요청 | actionType, ownerRole, parameters, humanGateRequired, dueAt |
 | ToolCallAudit | MCP tool 호출 감사 로그 | toolName, inputHash, outputHash, userRole, timestamp, piiMasked |
 | CorpusDocument | 승인된 ontology/source document | docId, title, version/date, domain, docHash, validation_passes |
@@ -257,6 +257,7 @@ Acceptance Scenarios:
   "validation": [
     {
       "ruleId": "string",
+      "reasonCode": "string",
       "status": "PASS|WARN|BLOCK",
       "severity": "INFO|WARN|BLOCK"
     }

@@ -6,6 +6,7 @@ import type {
   GraphPath,
   GroundedAnswer,
   IntentRoute,
+  ResolvedEntity,
   ValidationFinding,
   Verdict
 } from "./types.js";
@@ -18,6 +19,7 @@ const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
 const M130 = /\bM130\b|site receipt|site closure|닫아도|close/i;
 const FLOW_CODE = /flow code|confirmedflowcode|confirmed flow code/i;
 const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classification|분류|경로|통관|비용|청구|지표/i;
+const ANY_KEY_AMBIGUITY = /ambiguous|ambiguity|unclear|multiple|duplicate|same|which|모호|중복|여러|둘 다|같은|어느|하나만/i;
 const HUMAN_GATE_TERMS =
   /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|whatsapp|email|청구|정산|승인|보고서|전송|발송|내보내기/i;
 const GENERIC_QUERY_TERMS = new Set([
@@ -42,6 +44,7 @@ export function validateGrounding(args: {
   question: string;
   route: IntentRoute;
   evidence: EvidenceSnippet[];
+  resolvedEntities?: ResolvedEntity[];
   piiMasked?: boolean;
 }): ValidationFinding[] {
   const findings: ValidationFinding[] = [];
@@ -50,6 +53,7 @@ export function validateGrounding(args: {
   if (!args.route.requiredDocs.some((doc) => doc.includes("CONSOLIDATED-00"))) {
     findings.push({
       ruleId: "A-ROUTE-001",
+      reasonCode: "MISSING_REQUIRED_DOC",
       severity: "BLOCK",
       status: "BLOCK",
       targetObject: "IntentRoute",
@@ -62,6 +66,7 @@ export function validateGrounding(args: {
   if (!hasMaster) {
     findings.push({
       ruleId: "A-ROUTE-002",
+      reasonCode: "MISSING_MASTER_EVIDENCE",
       severity: "BLOCK",
       status: "BLOCK",
       targetObject: "EvidenceSnippet",
@@ -73,6 +78,7 @@ export function validateGrounding(args: {
   if (args.evidence.length === 0) {
     findings.push({
       ruleId: "A-ANS-001",
+      reasonCode: "INSUFFICIENT_EVIDENCE",
       severity: "BLOCK",
       status: "BLOCK",
       targetObject: "GroundedAnswer",
@@ -85,6 +91,7 @@ export function validateGrounding(args: {
     const isMisuse = FLOW_CODE_MISUSE.test(args.question);
     findings.push({
       ruleId: "A-FLOW-001",
+      reasonCode: isMisuse ? "FLOW_CODE_SCOPE_VIOLATION" : "FLOW_CODE_SCOPE_INFO",
       severity: isMisuse ? "BLOCK" : "INFO",
       status: isMisuse ? "BLOCK" : "PASS",
       targetObject: "WarehouseFlowPolicy",
@@ -96,6 +103,7 @@ export function validateGrounding(args: {
   if (AGI_DAS_M130.test(args.question) && M130.test(args.question)) {
     findings.push({
       ruleId: "V-AGIDAS-001",
+      reasonCode: "M130_CHAIN_EVIDENCE_REQUIRED",
       severity: "BLOCK",
       status: "BLOCK",
       targetObject: "SiteReceipt/M130",
@@ -107,6 +115,7 @@ export function validateGrounding(args: {
   if (CURRENTNESS_TERMS.test(args.question)) {
     findings.push({
       ruleId: "A-CURRENT-001",
+      reasonCode: "STALE_SOURCE_RISK",
       severity: "WARN",
       status: "WARN",
       targetObject: "RegulatoryOrRateAnswer",
@@ -118,6 +127,7 @@ export function validateGrounding(args: {
   if (args.piiMasked) {
     findings.push({
       ruleId: "A-PII-001",
+      reasonCode: "PII_MASKED",
       severity: "INFO",
       status: "PASS",
       targetObject: "RedactedInput",
@@ -129,6 +139,7 @@ export function validateGrounding(args: {
   if (HUMAN_GATE_TERMS.test(args.question)) {
     findings.push({
       ruleId: "A-ACTION-001",
+      reasonCode: "HUMAN_GATE_REQUIRED",
       severity: "WARN",
       status: "WARN",
       targetObject: "HumanGate",
@@ -137,7 +148,25 @@ export function validateGrounding(args: {
     });
   }
 
+  if (hasAmbiguousAnyKey(args.question, args.resolvedEntities ?? [])) {
+    findings.push({
+      ruleId: "A-ANYKEY-001",
+      reasonCode: "AMBIGUOUS_ANY_KEY",
+      severity: "WARN",
+      status: "WARN",
+      targetObject: "ResolvedEntity",
+      evidenceIds,
+      message: "Multiple any-key identifier schemes were detected in an ambiguous request; require Data Steward review before selecting one."
+    });
+  }
+
   return findings;
+}
+
+function hasAmbiguousAnyKey(question: string, resolvedEntities: ResolvedEntity[]): boolean {
+  if (!ANY_KEY_AMBIGUITY.test(question)) return false;
+  const schemes = new Set(resolvedEntities.map((entity) => entity.identifierScheme));
+  return schemes.size >= 2;
 }
 
 function deriveVerdict(evidence: EvidenceSnippet[], findings: ValidationFinding[]): Verdict {
@@ -310,7 +339,14 @@ export function answerQuestion(args: {
     corpus
   });
   const evidence = hasEvidenceSupport(maskedQuestion.text, candidateEvidence) ? candidateEvidence : [];
-  const validation = validateGrounding({ question: maskedQuestion.text, route, evidence, piiMasked: maskedQuestion.piiMasked });
+  const resolvedEntities = resolveAnyKey(maskedQuestion.text);
+  const validation = validateGrounding({
+    question: maskedQuestion.text,
+    route,
+    evidence,
+    resolvedEntities,
+    piiMasked: maskedQuestion.piiMasked
+  });
   const verdict = deriveVerdict(evidence, validation);
   const core = composeSummary(maskedQuestion.text, verdict);
   const actions = [...core.actions];
@@ -324,7 +360,6 @@ export function answerQuestion(args: {
     });
   }
   const graphPath = buildGraphPath(maskedQuestion.text);
-  const resolvedEntities = resolveAnyKey(maskedQuestion.text);
   const generatedAt = new Date().toISOString();
 
   const answer: GroundedAnswer = {

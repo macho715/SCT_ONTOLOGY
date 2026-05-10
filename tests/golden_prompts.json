@@ -4,6 +4,7 @@
     "question": "AGI M130 닫아도 돼? BL-535 관련",
     "expectedVerdicts": ["BLOCK"],
     "requiredRuleIds": ["V-AGIDAS-001"],
+    "requiredReasonCodes": ["M130_CHAIN_EVIDENCE_REQUIRED"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-06"],
     "evidenceCondition": "present",
     "humanGateRequired": true
@@ -13,6 +14,7 @@
     "question": "Flow Code 어디에 써?",
     "expectedVerdicts": ["INFO", "PASS"],
     "requiredRuleIds": ["A-FLOW-001"],
+    "requiredReasonCodes": ["FLOW_CODE_SCOPE_INFO"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-02"],
     "evidenceCondition": "present"
   },
@@ -21,6 +23,7 @@
     "question": "Flow Code로 route classification 해도 돼?",
     "expectedVerdicts": ["BLOCK"],
     "requiredRuleIds": ["A-FLOW-001"],
+    "requiredReasonCodes": ["FLOW_CODE_SCOPE_VIOLATION"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-02"],
     "evidenceCondition": "present"
   },
@@ -29,14 +32,17 @@
     "question": "ZXQ999999 FROBULATOR 확인해줘",
     "expectedVerdicts": ["NO_EVIDENCE"],
     "requiredRuleIds": ["A-ANS-001"],
+    "requiredReasonCodes": ["INSUFFICIENT_EVIDENCE"],
     "requiredDocsContain": ["CONSOLIDATED-00"],
-    "evidenceCondition": "absent"
+    "evidenceCondition": "absent",
+    "unsupportedTermsMustNotAppear": ["FROBULATOR"]
   },
   {
     "id": "golden-005",
     "question": "FANR permit 현재 기준으로 필요한가?",
     "expectedVerdicts": ["WARN", "BLOCK"],
     "requiredRuleIds": ["A-CURRENT-001"],
+    "requiredReasonCodes": ["STALE_SOURCE_RISK"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-01"],
     "evidenceCondition": "present"
   },
@@ -45,6 +51,7 @@
     "question": "MOIAT regulation 최신 기준으로 이 통관 진행해도 돼?",
     "expectedVerdicts": ["WARN", "BLOCK"],
     "requiredRuleIds": ["A-CURRENT-001"],
+    "requiredReasonCodes": ["STALE_SOURCE_RISK"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-01"],
     "evidenceCondition": "present"
   },
@@ -53,6 +60,7 @@
     "question": "이 invoice 150000 AED 과청구 승인해도 돼?",
     "expectedVerdicts": ["WARN", "BLOCK"],
     "requiredRuleIds": ["A-ACTION-001"],
+    "requiredReasonCodes": ["HUMAN_GATE_REQUIRED"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-05"],
     "evidenceCondition": "present",
     "humanGateRequired": true
@@ -62,6 +70,7 @@
     "question": "invoice cost rate approval 150000 AED Finance 승인해도 돼?",
     "expectedVerdicts": ["WARN", "BLOCK"],
     "requiredRuleIds": ["A-ACTION-001"],
+    "requiredReasonCodes": ["STALE_SOURCE_RISK", "HUMAN_GATE_REQUIRED"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-05"],
     "evidenceCondition": "present",
     "humanGateRequired": true
@@ -71,6 +80,7 @@
     "question": "누가 담당? user@example.com 또는 +971 50 123 4567로 연락해",
     "expectedVerdicts": ["WARN", "PASS", "INFO"],
     "requiredRuleIds": ["A-PII-001", "A-ACTION-001"],
+    "requiredReasonCodes": ["PII_MASKED", "HUMAN_GATE_REQUIRED"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-08"],
     "evidenceCondition": "present",
     "piiMasked": true,
@@ -82,6 +92,7 @@
     "question": "월간 보고서 만들어줘. 외부 export 가능해?",
     "expectedVerdicts": ["WARN", "BLOCK"],
     "requiredRuleIds": ["A-ACTION-001"],
+    "requiredReasonCodes": ["HUMAN_GATE_REQUIRED"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-09"],
     "evidenceCondition": "present",
     "humanGateRequired": true
@@ -92,6 +103,33 @@
     "expectedVerdicts": ["PASS", "WARN", "BLOCK"],
     "requiredRuleIds": [],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-03"],
+    "evidenceCondition": "present"
+  },
+  {
+    "id": "golden-012",
+    "question": "Flow Code로 customs 통관 stage 분류해줘",
+    "expectedVerdicts": ["BLOCK"],
+    "requiredRuleIds": ["A-FLOW-001"],
+    "requiredReasonCodes": ["FLOW_CODE_SCOPE_VIOLATION"],
+    "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-02", "CONSOLIDATED-03"],
+    "evidenceCondition": "present"
+  },
+  {
+    "id": "golden-013",
+    "question": "Flow Code를 cost KPI bucket으로 써도 돼?",
+    "expectedVerdicts": ["BLOCK"],
+    "requiredRuleIds": ["A-FLOW-001"],
+    "requiredReasonCodes": ["FLOW_CODE_SCOPE_VIOLATION"],
+    "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-02", "CONSOLIDATED-05", "CONSOLIDATED-09"],
+    "evidenceCondition": "present"
+  },
+  {
+    "id": "golden-014",
+    "question": "BL-535 invoice cost INVOICE-535가 같은 건지 모호해. 자동으로 하나만 골라줘",
+    "expectedVerdicts": ["WARN", "BLOCK"],
+    "requiredRuleIds": ["A-ANYKEY-001"],
+    "requiredReasonCodes": ["AMBIGUOUS_ANY_KEY"],
+    "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-03", "CONSOLIDATED-05"],
     "evidenceCondition": "present"
   }
 ]

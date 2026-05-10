@@ -13,6 +13,18 @@ export type DomainHint =
 
 export type Verdict = "PASS" | "WARN" | "BLOCK" | "INFO" | "NO_EVIDENCE";
 
+export type ReasonCode =
+  | "MISSING_REQUIRED_DOC"
+  | "MISSING_MASTER_EVIDENCE"
+  | "INSUFFICIENT_EVIDENCE"
+  | "FLOW_CODE_SCOPE_VIOLATION"
+  | "FLOW_CODE_SCOPE_INFO"
+  | "M130_CHAIN_EVIDENCE_REQUIRED"
+  | "STALE_SOURCE_RISK"
+  | "PII_MASKED"
+  | "HUMAN_GATE_REQUIRED"
+  | "AMBIGUOUS_ANY_KEY";
+
 export type EvidenceSnippet = {
   id: string;
   docId: string;
@@ -51,6 +63,7 @@ export type GraphPath = {
 
 export type ValidationFinding = {
   ruleId: string;
+  reasonCode: ReasonCode;
   severity: "INFO" | "WARN" | "BLOCK";
   status: "PASS" | "WARN" | "BLOCK";
   targetObject: string;

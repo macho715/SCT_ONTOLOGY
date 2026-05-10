@@ -77,6 +77,7 @@ const answerOutputSchema = {
   validation: z.array(
     z.object({
       ruleId: z.string(),
+      reasonCode: z.string(),
       severity: z.string(),
       status: z.string(),
       targetObject: z.string(),
@@ -186,6 +187,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
       findings: z.array(
         z.object({
           ruleId: z.string(),
+          reasonCode: z.string(),
           severity: z.string(),
           status: z.string(),
           targetObject: z.string(),
