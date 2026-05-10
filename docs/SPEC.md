@@ -281,8 +281,8 @@ Acceptance Scenarios:
     "businessResultVisible": true,
     "fallbackUsed": false,
     "cardEnabled": true,
-    "templateUrl": "ui://hvdc/answer-card-v5.html",
-    "templateVersion": "answer-card-v5",
+    "templateUrl": "ui://hvdc/answer-card-v6.html",
+    "templateVersion": "answer-card-v6",
     "schemaVersion": "1.0.0",
     "doNotChange": ["verdict", "validationStatus", "evidenceIds", "actions"]
   }
