@@ -1,0 +1,13 @@
+{
+  "CONSOLIDATED-00-master-ontology": { "rank": 1, "role": "canonical semantic spine" },
+  "CONSOLIDATED-01-core-framework-infra": { "rank": 2, "role": "core framework/compliance anchor" },
+  "CONSOLIDATED-02-warehouse-flow": { "rank": 2, "role": "warehouse/WHP extension" },
+  "CONSOLIDATED-03-document-ocr": { "rank": 2, "role": "document/OCR evidence" },
+  "CONSOLIDATED-04-barge-bulk-cargo": { "rank": 2, "role": "marine/MOSB/LCT extension" },
+  "CONSOLIDATED-05-invoice-cost": { "rank": 2, "role": "invoice/costguard extension" },
+  "CONSOLIDATED-06-material-chain": { "rank": 2, "role": "material chain/site milestone extension" },
+  "CONSOLIDATED-07-port-operations": { "rank": 2, "role": "port/release evidence" },
+  "CONSOLIDATED-08-communication": { "rank": 3, "role": "communication/approval evidence" },
+  "CONSOLIDATED-09-operations": { "rank": 3, "role": "reporting/KPI extension" },
+  "Team_역할분담_매트릭스": { "rank": 3, "role": "role routing matrix with PII-masked output requirement" }
+}

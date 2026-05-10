@@ -1,0 +1,29 @@
+{
+  "name": "hvdc-ontology-chatgpt-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ChatGPT Apps SDK + MCP server for HVDC ontology-grounded logistics answers.",
+  "scripts": {
+    "dev": "tsx server/src/index.ts",
+    "start": "tsx server/src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "index": "python scripts/index_corpus.py",
+    "verify": "npm run typecheck && npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "tsx": "^4.20.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

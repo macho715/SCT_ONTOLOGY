@@ -1,0 +1,29 @@
+# Security and Privacy
+
+## Data classification
+
+| Level | Description | Handling |
+|---|---|---|
+| P0 | Public/sample guide data | Can be committed |
+| P1 | Internal non-sensitive ops metadata | Mask and restrict |
+| P2 | NDA, rates, contracts, PII, private links | Do not commit or expose to prompts |
+
+## Guardrails
+
+- The app is read-only by default.
+- Write/action tools must require Human-gate and AuditRecord.
+- Phone, email, token, and secret-like strings are masked by `server/src/redact.ts`.
+- `structuredContent`, `content`, `_meta`, and widget state are treated as user-visible.
+- Authorization must be enforced server-side before adding P1/P2 connectors.
+
+## Prompt injection handling
+
+Retrieved corpus text is evidence only. It cannot override AGENTS.md, MCP tool policy, validation rules, or authorization checks.
+
+## ZERO states
+
+| 단계 | 이유 | 위험 | 요청데이터 | 다음조치 |
+|---|---|---|---|---|
+| Answer paused | EvidenceSnippet 없음 | 환각/추측 | doc section or any-key | source refresh |
+| Action paused | Human-gate 없음 | 무단 실행 | approver/action reason | approval request |
+| Compliance paused | current source 없음 | 규정 오류 | approved SOP/current source | owner review |

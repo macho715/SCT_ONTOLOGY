@@ -1,0 +1,22 @@
+[
+  {
+    "id": "golden-001",
+    "question": "AGI M130 닫아도 돼? BL-535 관련",
+    "expectedVerdict": "BLOCK"
+  },
+  {
+    "id": "golden-002",
+    "question": "Flow Code 어디에 써?",
+    "expectedVerdict": "INFO"
+  },
+  {
+    "id": "golden-003",
+    "question": "이 invoice 과청구야?",
+    "expectedVerdict": "WARN_OR_BLOCK"
+  },
+  {
+    "id": "golden-004",
+    "question": "BOE 123 지연 원인?",
+    "expectedDomain": "document"
+  }
+]

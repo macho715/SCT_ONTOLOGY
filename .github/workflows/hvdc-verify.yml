@@ -1,0 +1,76 @@
+name: HVDC ontology verification
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "server/**"
+      - "scripts/**"
+      - "tests/**"
+      - "data/**"
+      - "ontology/**"
+      - "docs/**"
+      - "chatgpt-app-submission.json"
+      - ".github/workflows/hvdc-verify.yml"
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "server/**"
+      - "scripts/**"
+      - "tests/**"
+      - "data/**"
+      - "ontology/**"
+      - "docs/**"
+      - "chatgpt-app-submission.json"
+      - ".github/workflows/hvdc-verify.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Index corpus and verify app
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild ontology corpus index
+        run: npm run index
+
+      - name: Validate generated JSON artifacts
+        shell: bash
+        run: |
+          python -m json.tool data/index/corpus_index.json > /dev/null
+          python -m json.tool data/index/source_role_map.json > /dev/null
+          python -m json.tool chatgpt-app-submission.json > /dev/null
+
+      - name: Typecheck and test
+        run: npm run verify

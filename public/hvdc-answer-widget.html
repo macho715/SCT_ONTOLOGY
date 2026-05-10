@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HVDC Ontology Answer</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bg: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --card: #f9fafb;
+        --block: #991b1b;
+        --warn: #92400e;
+        --pass: #166534;
+        --info: #1d4ed8;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --text: #f3f4f6;
+          --muted: #9ca3af;
+          --line: #1f2937;
+          --card: #111827;
+        }
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); }
+      main { max-width: 960px; margin: 0 auto; }
+      .card { border: 1px solid var(--line); border-radius: 18px; background: var(--card); padding: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+      .top { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+      .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 12px; border: 1px solid var(--line); }
+      .BLOCK, .NO_EVIDENCE { color: var(--block); }
+      .WARN { color: var(--warn); }
+      .PASS { color: var(--pass); }
+      .INFO { color: var(--info); }
+      h1 { margin: 8px 0 6px; font-size: 20px; line-height: 1.3; }
+      h2 { font-size: 15px; margin: 18px 0 8px; }
+      p { margin: 8px 0; line-height: 1.55; }
+      .muted { color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+      .panel { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--bg); }
+      ul { margin: 8px 0 0; padding-left: 18px; }
+      li { margin: 4px 0; }
+      details { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: var(--bg); }
+      summary { cursor: pointer; font-weight: 700; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      .evidence { padding: 10px 0; border-top: 1px solid var(--line); }
+      .evidence:first-of-type { border-top: none; }
+      .route { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+      .route span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 12px; }
+      .empty { color: var(--muted); font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <main id="root" aria-live="polite">
+      <div class="card">
+        <span class="badge INFO">READY</span>
+        <h1>HVDC Ontology Answer App</h1>
+        <p class="muted">질문을 실행하면 온톨로지 route, evidence, validation, next action이 표시됩니다.</p>
+      </div>
+    </main>
+    <script>
+      const root = document.getElementById("root");
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function render(answer) {
+        if (!answer || !answer.verdict) {
+          root.innerHTML = `<div class="card"><span class="badge WARN">NO DATA</span><h1>Tool output is empty</h1></div>`;
+          return;
+        }
+        const evidenceHtml = (answer.evidence || []).map((item) => `
+          <div class="evidence">
+            <strong>${escapeHtml(item.docId)}</strong> / ${escapeHtml(item.sectionPath)}<br />
+            <span class="muted">version ${escapeHtml(item.version)} · confidence ${escapeHtml(item.confidence)} · hash <code>${escapeHtml(String(item.docHash).slice(0, 12))}</code></span>
+            <p>${escapeHtml(item.snippet)}</p>
+          </div>
+        `).join("") || `<p class="empty">No evidence returned.</p>`;
+
+        const validationHtml = (answer.validation || []).map((item) => `
+          <li><strong class="${escapeHtml(item.status)}">${escapeHtml(item.status)}</strong> ${escapeHtml(item.ruleId)} — ${escapeHtml(item.message)}</li>
+        `).join("") || `<li class="empty">No validation findings.</li>`;
+
+        const actionsHtml = (answer.actions || []).map((item) => `
+          <li>${escapeHtml(item.actionType)} → ${escapeHtml(item.ownerRole)} ${item.humanGateRequired ? "(Human-gate)" : ""}</li>
+        `).join("") || `<li class="empty">No action.</li>`;
+
+        const routeHtml = (answer.route?.requiredDocs || []).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("");
+
+        const graphHtml = answer.graphPath ? `
+          <ul>${answer.graphPath.edges.map((edge) => `<li>${escapeHtml(edge.from)} → <code>${escapeHtml(edge.relation)}</code> → ${escapeHtml(edge.to)}</li>`).join("")}</ul>
+        ` : `<p class="empty">No graph path for this question.</p>`;
+
+        root.innerHTML = `
+          <div class="card">
+            <div class="top">
+              <span class="badge ${escapeHtml(answer.verdict)}">${escapeHtml(answer.verdict)}</span>
+              <span class="muted">${escapeHtml(answer.generatedAt)} · PII ${answer.piiMasked ? "masked" : "clear"}</span>
+            </div>
+            <h1>${escapeHtml(answer.summary)}</h1>
+            <p><strong>Business impact:</strong> ${escapeHtml(answer.businessImpact)}</p>
+            <div class="route">${routeHtml}</div>
+            <div class="grid">
+              <section class="panel">
+                <h2>Details</h2>
+                <ul>${(answer.details || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+              </section>
+              <section class="panel">
+                <h2>Next actions</h2>
+                <ul>${actionsHtml}</ul>
+              </section>
+            </div>
+            <details open>
+              <summary>Evidence Drawer</summary>
+              ${evidenceHtml}
+            </details>
+            <details>
+              <summary>Validation Gate</summary>
+              <ul>${validationHtml}</ul>
+            </details>
+            <details>
+              <summary>Ontology Path</summary>
+              ${graphHtml}
+            </details>
+          </div>
+        `;
+      }
+
+      function extractToolOutput(payload) {
+        if (payload?.structuredContent) return payload.structuredContent;
+        if (payload?.params?.structuredContent) return payload.params.structuredContent;
+        if (window.openai?.toolOutput) return window.openai.toolOutput;
+        return null;
+      }
+
+      window.addEventListener("message", (event) => {
+        if (event.source !== window.parent) return;
+        const message = event.data;
+        if (!message || message.jsonrpc !== "2.0") return;
+        if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
+      }, { passive: true });
+
+      if (window.openai?.toolOutput) render(window.openai.toolOutput);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "HVDC Ontology Answer",
+    "subtitle": "HVDC evidence answers",
+    "description": "HVDC Ontology Answer helps logistics users ask HVDC project questions in ChatGPT and receive corpus-grounded answers with route documents, evidence snippets, validation findings, and next actions.",
+    "category": "BUSINESS"
+  },
+  "tools": {
+    "ask_hvdc_ontology": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Computes an ontology-grounded answer and writes a private audit hash log, so it is not strictly read-only.",
+        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible operational actions."
+      }
+    },
+    "route_question": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Classifies a question into ontology domains and required documents without changing data.",
+        "open_world_justification": "Does not contact or modify any public or third-party system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
+      }
+    },
+    "search_ontology_corpus": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Searches local approved ontology corpus files and returns matching evidence snippets.",
+        "open_world_justification": "Does not perform public web search or change external systems.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
+      }
+    },
+    "resolve_any_key": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Parses identifiers from user text and returns local resolution candidates without changing data.",
+        "open_world_justification": "Does not contact or modify any public or third-party system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
+      }
+    },
+    "validate_answer": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Checks evidence coverage, master-spine routing, currentness, and human-gate rules without changing data.",
+        "open_world_justification": "Does not publish content or change public internet state or third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Answer an AGI/DAS site closure question with blocking validation.",
+      "user_prompt": "AGI M130 닫아도 돼? BL-535 관련",
+      "file_attachment_urls": null,
+      "tools_triggered": "ask_hvdc_ontology",
+      "expected_output": "Returns a BLOCK verdict with required CONSOLIDATED documents, evidence snippets, validation findings, and a human-gate next action.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Explain the Flow Code boundary from ontology evidence.",
+      "user_prompt": "Flow Code 어디에 써?",
+      "file_attachment_urls": null,
+      "tools_triggered": "ask_hvdc_ontology",
+      "expected_output": "Explains that Flow Code is WHP-only and must not be used as route, customs, invoice, or KPI classification.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Find evidence snippets for a customs delay question.",
+      "user_prompt": "BOE 123 지연 원인 근거를 찾아줘",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_ontology_corpus",
+      "expected_output": "Returns document and port-related evidence snippets with document ids, section paths, hashes, and confidence.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Resolve an operational identifier before answering.",
+      "user_prompt": "BL-535 관련 자재 상태 확인해줘",
+      "file_attachment_urls": null,
+      "tools_triggered": "resolve_any_key",
+      "expected_output": "Returns candidate entities for the BL identifier with scheme, normalized value, confidence, and target id when available.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Validate whether a draft answer has enough grounding.",
+      "user_prompt": "이 invoice 과청구야? 답변 전에 근거와 human-gate를 검증해줘",
+      "file_attachment_urls": null,
+      "tools_triggered": "validate_answer",
+      "expected_output": "Returns validation findings for evidence coverage, currentness, and any required human gate before final use.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger for unrelated weather requests.",
+      "user_prompt": "내일 두바이 날씨 알려줘",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because weather lookup is outside HVDC ontology workflows.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for general coding help unrelated to the app.",
+      "user_prompt": "파이썬으로 피보나치 함수 만들어줘",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because the request does not need HVDC logistics evidence.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for unsupported external message sending.",
+      "user_prompt": "이 결론을 WhatsApp으로 바로 보내줘",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not send external messages; it should require a separate approved human-gate workflow outside the current read-focused tools.",
+      "expected_output_url": null
+    }
+  ]
+}
