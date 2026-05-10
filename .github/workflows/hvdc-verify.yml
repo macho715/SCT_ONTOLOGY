@@ -6,7 +6,10 @@ on:
       - main
     paths:
       - "AGENTS.md"
+      - "CHANGELOG.md"
+      - "LAYOUT.md"
       - "README.md"
+      - "SYSTEM_ARCHITECTURE.md"
       - "package.json"
       - "package-lock.json"
       - "tsconfig.json"
@@ -21,7 +24,10 @@ on:
   pull_request:
     paths:
       - "AGENTS.md"
+      - "CHANGELOG.md"
+      - "LAYOUT.md"
       - "README.md"
+      - "SYSTEM_ARCHITECTURE.md"
       - "package.json"
       - "package-lock.json"
       - "tsconfig.json"
@@ -65,12 +71,11 @@ jobs:
       - name: Rebuild ontology corpus index
         run: npm run index
 
-      - name: Validate generated JSON artifacts
-        shell: bash
-        run: |
-          python -m json.tool data/index/corpus_index.json > /dev/null
-          python -m json.tool data/index/source_role_map.json > /dev/null
-          python -m json.tool chatgpt-app-submission.json > /dev/null
+      - name: Fail if committed corpus index is stale
+        run: python scripts/check_index_drift.py
+
+      - name: Validate submission JSON
+        run: python -m json.tool chatgpt-app-submission.json > /dev/null
 
       - name: Typecheck and test
         run: npm run verify

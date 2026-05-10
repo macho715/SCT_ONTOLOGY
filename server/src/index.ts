@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   registerAppResource,
   registerAppTool,
@@ -105,7 +105,103 @@ const answerOutputSchema = {
   generatedAt: z.string()
 };
 
-function createHvdcServer(): McpServer {
+export const HVDC_TOOL_DESCRIPTORS = {
+  ask_hvdc_ontology: {
+    title: "Ask HVDC ontology",
+    description:
+      "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, and next action.",
+    inputSchema: {
+      question: z.string().min(1),
+      userRole: z.string().default("ops_user").optional(),
+      language: z.enum(["ko", "en", "auto"]).default("auto").optional()
+    },
+    outputSchema: answerOutputSchema,
+    _meta: {
+      ui: { resourceUri: WIDGET_URI },
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
+      "openai/toolInvocation/invoked": "HVDC ontology answer ready"
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false
+    }
+  },
+  route_question: {
+    title: "Route HVDC question",
+    description: "Use this to classify an HVDC question into ontology domains and required corpus documents.",
+    inputSchema: {
+      question: z.string().min(1),
+      userRole: z.string().default("ops_user").optional(),
+      language: z.enum(["ko", "en", "auto"]).default("auto").optional()
+    },
+    outputSchema: { route: routeSchema },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  search_ontology_corpus: {
+    title: "Search HVDC ontology corpus",
+    description:
+      "Use this when you need evidence snippets from approved HVDC ontology documents. Do not use for public web search.",
+    inputSchema: {
+      query: z.string().min(1),
+      requiredDocs: z.array(z.string()).optional(),
+      domainHints: z.array(domainEnum).optional(),
+      topK: z.number().min(1).max(20).default(8).optional()
+    },
+    outputSchema: { evidence: z.array(evidenceSchema) },
+    _meta: {
+      ui: { resourceUri: WIDGET_URI }
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  resolve_any_key: {
+    title: "Resolve HVDC any-key",
+    description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, or milestone identifiers from a user question.",
+    inputSchema: { identifierOrQuestion: z.string().min(1) },
+    outputSchema: {
+      candidates: z.array(
+        z.object({
+          entityType: z.string(),
+          identifierScheme: z.string(),
+          identifierValue: z.string(),
+          normalizedValue: z.string(),
+          targetRid: z.string().nullable(),
+          confidence: z.number()
+        })
+      )
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  validate_answer: {
+    title: "Validate HVDC answer grounding",
+    description: "Use this to validate evidence coverage, master spine use, currentness, and human-gate requirements before final answer.",
+    inputSchema: {
+      question: z.string().min(1),
+      evidenceIds: z.array(z.string()).optional()
+    },
+    outputSchema: {
+      findings: z.array(
+        z.object({
+          ruleId: z.string(),
+          severity: z.string(),
+          status: z.string(),
+          targetObject: z.string(),
+          evidenceIds: z.array(z.string()),
+          message: z.string()
+        })
+      )
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  }
+};
+
+export type HvdcToolName = keyof typeof HVDC_TOOL_DESCRIPTORS;
+
+export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
 
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => ({
@@ -130,28 +226,7 @@ function createHvdcServer(): McpServer {
   registerAppTool(
     server,
     "ask_hvdc_ontology",
-    {
-      title: "Ask HVDC ontology",
-      description:
-        "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, and next action.",
-      inputSchema: {
-        question: z.string().min(1),
-        userRole: z.string().default("ops_user").optional(),
-        language: z.enum(["ko", "en", "auto"]).default("auto").optional()
-      },
-      outputSchema: answerOutputSchema,
-      _meta: {
-        ui: { resourceUri: WIDGET_URI },
-        "openai/outputTemplate": WIDGET_URI,
-        "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
-        "openai/toolInvocation/invoked": "HVDC ontology answer ready"
-      },
-      annotations: {
-        readOnlyHint: false,
-        destructiveHint: false,
-        openWorldHint: false
-      }
-    },
+    HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology,
     async ({ question, userRole, language }) => {
       const answer = answerQuestion({ question, userRole, language });
       return {
@@ -165,18 +240,7 @@ function createHvdcServer(): McpServer {
   registerAppTool(
     server,
     "route_question",
-    {
-      title: "Route HVDC question",
-      description: "Use this to classify an HVDC question into ontology domains and required corpus documents.",
-      inputSchema: {
-        question: z.string().min(1),
-        userRole: z.string().default("ops_user").optional(),
-        language: z.enum(["ko", "en", "auto"]).default("auto").optional()
-      },
-      outputSchema: { route: routeSchema },
-      _meta: {},
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
-    },
+    HVDC_TOOL_DESCRIPTORS.route_question,
     async ({ question, userRole, language }) => {
       const route = routeQuestion(question, userRole, language);
       return {
@@ -189,22 +253,7 @@ function createHvdcServer(): McpServer {
   registerAppTool(
     server,
     "search_ontology_corpus",
-    {
-      title: "Search HVDC ontology corpus",
-      description:
-        "Use this when you need evidence snippets from approved HVDC ontology documents. Do not use for public web search.",
-      inputSchema: {
-        query: z.string().min(1),
-        requiredDocs: z.array(z.string()).optional(),
-        domainHints: z.array(domainEnum).optional(),
-        topK: z.number().min(1).max(20).default(8).optional()
-      },
-      outputSchema: { evidence: z.array(evidenceSchema) },
-      _meta: {
-        ui: { resourceUri: WIDGET_URI }
-      },
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
-    },
+    HVDC_TOOL_DESCRIPTORS.search_ontology_corpus,
     async ({ query, requiredDocs, domainHints, topK }) => {
       const evidence = searchCorpus({
         query,
@@ -223,25 +272,7 @@ function createHvdcServer(): McpServer {
   registerAppTool(
     server,
     "resolve_any_key",
-    {
-      title: "Resolve HVDC any-key",
-      description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, or milestone identifiers from a user question.",
-      inputSchema: { identifierOrQuestion: z.string().min(1) },
-      outputSchema: {
-        candidates: z.array(
-          z.object({
-            entityType: z.string(),
-            identifierScheme: z.string(),
-            identifierValue: z.string(),
-            normalizedValue: z.string(),
-            targetRid: z.string().nullable(),
-            confidence: z.number()
-          })
-        )
-      },
-      _meta: {},
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
-    },
+    HVDC_TOOL_DESCRIPTORS.resolve_any_key,
     async ({ identifierOrQuestion }) => {
       const candidates = resolveAnyKey(identifierOrQuestion);
       return {
@@ -254,28 +285,7 @@ function createHvdcServer(): McpServer {
   registerAppTool(
     server,
     "validate_answer",
-    {
-      title: "Validate HVDC answer grounding",
-      description: "Use this to validate evidence coverage, master spine use, currentness, and human-gate requirements before final answer.",
-      inputSchema: {
-        question: z.string().min(1),
-        evidenceIds: z.array(z.string()).optional()
-      },
-      outputSchema: {
-        findings: z.array(
-          z.object({
-            ruleId: z.string(),
-            severity: z.string(),
-            status: z.string(),
-            targetObject: z.string(),
-            evidenceIds: z.array(z.string()),
-            message: z.string()
-          })
-        )
-      },
-      _meta: {},
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
-    },
+    HVDC_TOOL_DESCRIPTORS.validate_answer,
     async ({ question }) => {
       const route = routeQuestion(question);
       const evidence = searchCorpus({ query: question, requiredDocs: route.requiredDocs, domainHints: route.domains });
@@ -293,7 +303,7 @@ function createHvdcServer(): McpServer {
 const port = Number(process.env.PORT ?? 8787);
 const MCP_PATH = "/mcp";
 
-const httpServer = createServer(async (req, res) => {
+export const httpServer = createServer(async (req, res) => {
   if (!req.url) {
     res.writeHead(400).end("Missing URL");
     return;
@@ -345,6 +355,12 @@ const httpServer = createServer(async (req, res) => {
   res.writeHead(404).end("Not Found");
 });
 
-httpServer.listen(port, () => {
-  console.log(`HVDC Ontology MCP server listening on http://localhost:${port}${MCP_PATH}`);
-});
+export function startHvdcHttpServer() {
+  return httpServer.listen(port, () => {
+    console.log(`HVDC Ontology MCP server listening on http://localhost:${port}${MCP_PATH}`);
+  });
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  startHvdcHttpServer();
+}

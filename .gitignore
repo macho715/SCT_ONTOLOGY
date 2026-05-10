@@ -8,3 +8,5 @@ out/
 *.log
 *.zip
 hvdc-ontology-chatgpt-app-starter/
+__pycache__/
+*.pyc

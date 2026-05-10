@@ -39,14 +39,20 @@
       .INFO { color: var(--info); }
       h1 { margin: 8px 0 6px; font-size: 20px; line-height: 1.3; }
       h2 { font-size: 15px; margin: 18px 0 8px; }
+      h3 { font-size: 14px; margin: 0 0 6px; }
       p { margin: 8px 0; line-height: 1.55; }
       .muted { color: var(--muted); }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
       .panel { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--bg); }
+      .meta { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 6px 10px; margin: 8px 0 0; font-size: 13px; }
+      .meta dt { color: var(--muted); }
+      .meta dd { margin: 0; overflow-wrap: anywhere; }
+      .warning-list { border-left: 4px solid var(--warn); padding: 8px 10px; background: color-mix(in srgb, var(--warn) 8%, transparent); }
       ul { margin: 8px 0 0; padding-left: 18px; }
       li { margin: 4px 0; }
       details { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: var(--bg); }
       summary { cursor: pointer; font-weight: 700; }
+      summary:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--info); outline-offset: 3px; }
       code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
       .evidence { padding: 10px 0; border-top: 1px solid var(--line); }
       .evidence:first-of-type { border-top: none; }
@@ -58,16 +64,27 @@
   <body>
     <main id="root" aria-live="polite">
       <div class="card">
-        <span class="badge INFO">READY</span>
-        <h1>HVDC Ontology Answer App</h1>
-        <p class="muted">질문을 실행하면 온톨로지 route, evidence, validation, next action이 표시됩니다.</p>
+        <section aria-labelledby="fallback-title">
+          <span class="badge INFO">READY</span>
+          <h1 id="fallback-title">Text fallback: no tool output yet</h1>
+          <p class="muted">질문을 실행하면 verdict, route documents, evidence, validation, PII state, next action이 표시됩니다.</p>
+        </section>
       </div>
     </main>
     <script>
       const root = document.getElementById("root");
+      const VALID_STATUSES = new Set(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]);
+      const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+      const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
+
+      function redactPii(value) {
+        return String(value ?? "")
+          .replace(EMAIL_RE, "[masked-email]")
+          .replace(PHONE_RE, "[masked-phone]");
+      }
 
       function escapeHtml(value) {
-        return String(value ?? "")
+        return redactPii(value)
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
@@ -75,54 +92,182 @@
           .replace(/'/g, "&#039;");
       }
 
+      function asArray(value) {
+        return Array.isArray(value) ? value : [];
+      }
+
+      function safeStatus(value, fallback = "INFO") {
+        const status = String(value ?? "").toUpperCase();
+        return VALID_STATUSES.has(status) ? status : fallback;
+      }
+
+      function displayValue(value, fallback = "Not provided") {
+        if (value === undefined || value === null || value === "") return fallback;
+        if (typeof value === "number") return Number.isFinite(value) ? value.toFixed(2) : fallback;
+        return value;
+      }
+
+      function renderList(items, fallback) {
+        return asArray(items).map((item) => `<li>${escapeHtml(item)}</li>`).join("") || `<li class="empty">${escapeHtml(fallback)}</li>`;
+      }
+
+      function renderFallback(title, message, rawText = "") {
+        root.innerHTML = `
+          <div class="card">
+            <section aria-labelledby="fallback-title">
+              <span class="badge WARN">NO DATA</span>
+              <h1 id="fallback-title">Text fallback: ${escapeHtml(title)}</h1>
+              <p>${escapeHtml(message)}</p>
+              ${rawText ? `<pre class="panel"><code>${escapeHtml(rawText)}</code></pre>` : ""}
+            </section>
+          </div>
+        `;
+      }
+
+      function normalizeToolOutput(payload) {
+        if (!payload) return null;
+        if (payload.structuredContent) return payload.structuredContent;
+        if (payload.params?.structuredContent) return payload.params.structuredContent;
+        if (payload.result?.structuredContent) return payload.result.structuredContent;
+        if (payload.toolOutput) return payload.toolOutput;
+        return payload;
+      }
+
+      function collectWarnings(answer) {
+        const warnings = [];
+        const status = safeStatus(answer.validationStatus ?? answer.verdict);
+        if (["WARN", "BLOCK", "NO_EVIDENCE"].includes(status)) {
+          warnings.push(`Validation status requires attention: ${status}`);
+        }
+        for (const finding of asArray(answer.validation)) {
+          const findingStatus = safeStatus(finding.status, "INFO");
+          if (findingStatus === "WARN" || findingStatus === "BLOCK") {
+            warnings.push(`${finding.ruleId ?? "validation"}: ${finding.message ?? findingStatus}`);
+          }
+          if (/STALE|CURRENT|FRESH/i.test(`${finding.ruleId ?? ""} ${finding.message ?? ""}`)) {
+            warnings.push(`Freshness warning: ${finding.message ?? finding.ruleId}`);
+          }
+        }
+        for (const action of asArray(answer.actions)) {
+          if (action?.humanGateRequired) {
+            warnings.push(`Review required before action: ${action.actionType ?? "human-gated action"}`);
+          }
+        }
+        for (const entity of asArray(answer.resolvedEntities)) {
+          if (typeof entity?.confidence === "number" && entity.confidence < 0.95) {
+            warnings.push(`Review candidate below 0.95 confidence: ${entity.identifierScheme ?? "identifier"}`);
+          }
+        }
+        if (typeof answer.route?.confidence === "number" && answer.route.confidence < 0.95) {
+          warnings.push(`Route review recommended: confidence ${answer.route.confidence.toFixed(2)}`);
+        }
+        return [...new Set(warnings)];
+      }
+
       function render(answer) {
-        if (!answer || !answer.verdict) {
-          root.innerHTML = `<div class="card"><span class="badge WARN">NO DATA</span><h1>Tool output is empty</h1></div>`;
+        if (!answer || typeof answer !== "object") {
+          renderFallback("malformed tool output", "The iframe received no readable structuredContent.");
           return;
         }
-        const evidenceHtml = (answer.evidence || []).map((item) => `
-          <div class="evidence">
-            <strong>${escapeHtml(item.docId)}</strong> / ${escapeHtml(item.sectionPath)}<br />
-            <span class="muted">version ${escapeHtml(item.version)} · confidence ${escapeHtml(item.confidence)} · hash <code>${escapeHtml(String(item.docHash).slice(0, 12))}</code></span>
-            <p>${escapeHtml(item.snippet)}</p>
-          </div>
-        `).join("") || `<p class="empty">No evidence returned.</p>`;
+        if (!answer.verdict) {
+          renderFallback("missing verdict", "The tool output is missing the required verdict field.", JSON.stringify(answer, null, 2));
+          return;
+        }
 
-        const validationHtml = (answer.validation || []).map((item) => `
-          <li><strong class="${escapeHtml(item.status)}">${escapeHtml(item.status)}</strong> ${escapeHtml(item.ruleId)} — ${escapeHtml(item.message)}</li>
+        const verdict = safeStatus(answer.verdict);
+        const validationStatus = safeStatus(answer.validationStatus ?? answer.verdict);
+        const validationHtml = asArray(answer.validation).map((item) => `
+          <li>
+            <strong class="${safeStatus(item.status)}">${escapeHtml(safeStatus(item.status))}</strong>
+            ${escapeHtml(item.ruleId ?? "validation")} - ${escapeHtml(item.message ?? "")}
+          </li>
         `).join("") || `<li class="empty">No validation findings.</li>`;
 
-        const actionsHtml = (answer.actions || []).map((item) => `
-          <li>${escapeHtml(item.actionType)} → ${escapeHtml(item.ownerRole)} ${item.humanGateRequired ? "(Human-gate)" : ""}</li>
+        const evidenceHtml = asArray(answer.evidence).map((item, index) => {
+          const linkedValidation = asArray(answer.validation)
+            .filter((finding) => asArray(finding.evidenceIds).includes(item.id))
+            .map((finding) => `${finding.ruleId}: ${finding.status}`)
+            .join(", ");
+          return `
+            <article class="evidence" aria-labelledby="evidence-${index}">
+              <h3 id="evidence-${index}">${escapeHtml(item.title ?? item.docId ?? "Unknown source document")}</h3>
+              <dl class="meta">
+                <dt>Source doc</dt><dd>${escapeHtml(item.docId)}</dd>
+                <dt>Section path</dt><dd>${escapeHtml(item.sectionPath)}</dd>
+                <dt>Document hash</dt><dd><code>${escapeHtml(item.docHash)}</code></dd>
+                <dt>Confidence</dt><dd>${escapeHtml(displayValue(item.confidence))}</dd>
+                <dt>Version</dt><dd>${escapeHtml(displayValue(item.version))}</dd>
+                <dt>Source type</dt><dd>${escapeHtml(displayValue(item.sourceType))}</dd>
+                <dt>Validation</dt><dd>${escapeHtml(linkedValidation || validationStatus)}</dd>
+                <dt>PII state</dt><dd>${answer.piiMasked ? "PII masked before display" : "No PII masking reported by tool"}</dd>
+              </dl>
+              <p>${escapeHtml(item.snippet)}</p>
+            </article>
+          `;
+        }).join("") || `<p class="empty">No evidence returned. Factual answers should not proceed without evidence.</p>`;
+
+        const warnings = collectWarnings(answer);
+        const warningsHtml = warnings.length ? `
+          <section class="panel warning-list" aria-labelledby="warnings-title">
+            <h2 id="warnings-title">Stale or review warnings</h2>
+            <ul>${warnings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          </section>
+        ` : `
+          <section class="panel" aria-labelledby="warnings-title">
+            <h2 id="warnings-title">Stale or review warnings</h2>
+            <p class="empty">No stale-source or review warning was reported.</p>
+          </section>
+        `;
+
+        const actionsHtml = asArray(answer.actions).map((item) => `
+          <li>${escapeHtml(item.actionType)} - ${escapeHtml(item.ownerRole)} ${item.humanGateRequired ? "(Human-gate required)" : ""}</li>
         `).join("") || `<li class="empty">No action.</li>`;
 
-        const routeHtml = (answer.route?.requiredDocs || []).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("");
+        const routeHtml = asArray(answer.route?.requiredDocs).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("") || `<span>No route document</span>`;
 
         const graphHtml = answer.graphPath ? `
-          <ul>${answer.graphPath.edges.map((edge) => `<li>${escapeHtml(edge.from)} → <code>${escapeHtml(edge.relation)}</code> → ${escapeHtml(edge.to)}</li>`).join("")}</ul>
+          <ul>${asArray(answer.graphPath.edges).map((edge) => `<li>${escapeHtml(edge.from)} -> <code>${escapeHtml(edge.relation)}</code> -> ${escapeHtml(edge.to)}</li>`).join("")}</ul>
         ` : `<p class="empty">No graph path for this question.</p>`;
 
         root.innerHTML = `
           <div class="card">
-            <div class="top">
-              <span class="badge ${escapeHtml(answer.verdict)}">${escapeHtml(answer.verdict)}</span>
-              <span class="muted">${escapeHtml(answer.generatedAt)} · PII ${answer.piiMasked ? "masked" : "clear"}</span>
-            </div>
-            <h1>${escapeHtml(answer.summary)}</h1>
-            <p><strong>Business impact:</strong> ${escapeHtml(answer.businessImpact)}</p>
-            <div class="route">${routeHtml}</div>
+            <section aria-labelledby="verdict-title">
+              <div class="top">
+                <div>
+                  <p class="muted">Verdict</p>
+                  <h1 id="verdict-title"><span class="badge ${verdict}">${escapeHtml(verdict)}</span> ${escapeHtml(answer.summary)}</h1>
+                </div>
+                <span class="muted">${escapeHtml(answer.generatedAt)} - PII ${answer.piiMasked ? "masked" : "not reported masked"}</span>
+              </div>
+              <p><strong>Business impact:</strong> ${escapeHtml(answer.businessImpact)}</p>
+            </section>
+            <section aria-labelledby="route-title">
+              <h2 id="route-title">Route documents</h2>
+              <div class="route">${routeHtml}</div>
+              <dl class="meta">
+                <dt>Route ID</dt><dd>${escapeHtml(displayValue(answer.route?.routeId))}</dd>
+                <dt>Route confidence</dt><dd>${escapeHtml(displayValue(answer.route?.confidence))}</dd>
+                <dt>Routing reason</dt><dd>${escapeHtml(displayValue(answer.route?.routingReason))}</dd>
+              </dl>
+            </section>
             <div class="grid">
               <section class="panel">
                 <h2>Details</h2>
-                <ul>${(answer.details || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                <ul>${renderList(answer.details, "No details returned.")}</ul>
               </section>
               <section class="panel">
                 <h2>Next actions</h2>
                 <ul>${actionsHtml}</ul>
               </section>
+              ${warningsHtml}
             </div>
             <details open>
               <summary>Evidence Drawer</summary>
+              <dl class="meta">
+                <dt>Validation status</dt><dd><strong class="${validationStatus}">${escapeHtml(validationStatus)}</strong></dd>
+                <dt>PII state</dt><dd>${answer.piiMasked ? "PII masked" : "PII masking not reported"}</dd>
+                <dt>Evidence count</dt><dd>${asArray(answer.evidence).length}</dd>
+              </dl>
               ${evidenceHtml}
             </details>
             <details>
@@ -138,10 +283,7 @@
       }
 
       function extractToolOutput(payload) {
-        if (payload?.structuredContent) return payload.structuredContent;
-        if (payload?.params?.structuredContent) return payload.params.structuredContent;
-        if (window.openai?.toolOutput) return window.openai.toolOutput;
-        return null;
+        return normalizeToolOutput(payload) ?? normalizeToolOutput(window.openai?.toolOutput);
       }
 
       window.addEventListener("message", (event) => {
@@ -151,7 +293,12 @@
         if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
       }, { passive: true });
 
-      if (window.openai?.toolOutput) render(window.openai.toolOutput);
+      try {
+        const initialOutput = extractToolOutput(window.openai?.toolOutput);
+        if (initialOutput) render(initialOutput);
+      } catch (error) {
+        renderFallback("render error", error instanceof Error ? error.message : "The widget could not render the tool output.");
+      }
     </script>
   </body>
 </html>

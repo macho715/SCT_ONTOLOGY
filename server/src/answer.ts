@@ -17,11 +17,32 @@ const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|reg
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
 const M130 = /\bM130\b|site receipt|site closure|닫아도|close/i;
 const FLOW_CODE = /flow code|confirmedflowcode|confirmed flow code/i;
+const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classification|분류|경로|통관|비용|청구|지표/i;
+const HUMAN_GATE_TERMS =
+  /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|whatsapp|email|청구|정산|승인|보고서|전송|발송|내보내기/i;
+const GENERIC_QUERY_TERMS = new Set([
+  "the",
+  "and",
+  "for",
+  "with",
+  "status",
+  "current",
+  "needed",
+  "please",
+  "알려줘",
+  "확인해줘",
+  "어디에",
+  "현재",
+  "기준",
+  "되나",
+  "돼"
+]);
 
 export function validateGrounding(args: {
   question: string;
   route: IntentRoute;
   evidence: EvidenceSnippet[];
+  piiMasked?: boolean;
 }): ValidationFinding[] {
   const findings: ValidationFinding[] = [];
   const evidenceIds = args.evidence.map((item) => item.id);
@@ -61,10 +82,11 @@ export function validateGrounding(args: {
   }
 
   if (FLOW_CODE.test(args.question)) {
+    const isMisuse = FLOW_CODE_MISUSE.test(args.question);
     findings.push({
       ruleId: "A-FLOW-001",
-      severity: "INFO",
-      status: "PASS",
+      severity: isMisuse ? "BLOCK" : "INFO",
+      status: isMisuse ? "BLOCK" : "PASS",
       targetObject: "WarehouseFlowPolicy",
       evidenceIds,
       message: "Flow Code is WHP-only and must not be used as shipment route, customs stage, invoice field, or operations KPI bucket."
@@ -90,6 +112,28 @@ export function validateGrounding(args: {
       targetObject: "RegulatoryOrRateAnswer",
       evidenceIds,
       message: "Current regulation/rate/SOP claims require approved current source refresh before final operational use."
+    });
+  }
+
+  if (args.piiMasked) {
+    findings.push({
+      ruleId: "A-PII-001",
+      severity: "INFO",
+      status: "PASS",
+      targetObject: "RedactedInput",
+      evidenceIds,
+      message: "Raw phone, email, or token-like text was masked before routing, retrieval, answer composition, and audit."
+    });
+  }
+
+  if (HUMAN_GATE_TERMS.test(args.question)) {
+    findings.push({
+      ruleId: "A-ACTION-001",
+      severity: "WARN",
+      status: "WARN",
+      targetObject: "HumanGate",
+      evidenceIds,
+      message: "Write, send, export, report publication, invoice, cost, or approval actions require Human-gate before operational use."
     });
   }
 
@@ -122,6 +166,28 @@ function buildGraphPath(question: string): GraphPath | null {
     endNode: site,
     pathConfidence: 0.88
   };
+}
+
+function tokenizeForSupport(input: string): string[] {
+  return Array.from(
+    new Set(
+      input
+        .toLowerCase()
+        .replace(/[^a-z0-9가-힣_/-]+/g, " ")
+        .split(/\s+/)
+        .filter((term) => term.length >= 2 && !GENERIC_QUERY_TERMS.has(term))
+    )
+  );
+}
+
+function hasEvidenceSupport(question: string, evidence: EvidenceSnippet[]): boolean {
+  if (evidence.length === 0) return false;
+  const terms = tokenizeForSupport(question);
+  if (terms.length === 0) return true;
+  const searchableEvidence = evidence
+    .map((item) => `${item.docId} ${item.title} ${item.sectionPath} ${item.snippet}`.toLowerCase())
+    .join("\n");
+  return terms.some((term) => searchableEvidence.includes(term));
 }
 
 function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions"> {
@@ -236,16 +302,27 @@ export function answerQuestion(args: {
   const maskedQuestion = maskPii(args.question);
   const route = routeQuestion(maskedQuestion.text, args.userRole ?? "ops_user", args.language ?? "auto");
   const corpus = loadCorpus();
-  const evidence = searchCorpus({
+  const candidateEvidence = searchCorpus({
     query: maskedQuestion.text,
     requiredDocs: route.requiredDocs,
     domainHints: route.domains,
     topK: 8,
     corpus
   });
-  const validation = validateGrounding({ question: maskedQuestion.text, route, evidence });
+  const evidence = hasEvidenceSupport(maskedQuestion.text, candidateEvidence) ? candidateEvidence : [];
+  const validation = validateGrounding({ question: maskedQuestion.text, route, evidence, piiMasked: maskedQuestion.piiMasked });
   const verdict = deriveVerdict(evidence, validation);
   const core = composeSummary(maskedQuestion.text, verdict);
+  const actions = [...core.actions];
+  if (validation.some((finding) => finding.ruleId === "A-ACTION-001") && !actions.some((action) => action.humanGateRequired)) {
+    actions.push({
+      actionType: "REQUEST_HUMAN_GATE_REVIEW",
+      ownerRole: "Responsible Approver",
+      parameters: { reason: "write/send/export/report/cost/approval gate" },
+      humanGateRequired: true,
+      dueAt: null
+    });
+  }
   const graphPath = buildGraphPath(maskedQuestion.text);
   const resolvedEntities = resolveAnyKey(maskedQuestion.text);
   const generatedAt = new Date().toISOString();
@@ -262,7 +339,7 @@ export function answerQuestion(args: {
     resolvedEntities,
     evidence,
     validation,
-    actions: core.actions,
+    actions,
     graphPath,
     piiMasked: maskedQuestion.piiMasked,
     generatedAt

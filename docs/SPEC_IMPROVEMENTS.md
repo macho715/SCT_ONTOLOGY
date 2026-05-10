@@ -4,7 +4,7 @@ Feature ID/Branch: 002-hvdc-ontology-operational-improvements
 Created: 2026-05-10  
 Status: Draft  
 Owner: HVDC Logistics / App Platform Team  
-Input: `plan.md` Phase 1 Business Review  
+Input: `docs/operations/plan.md` Phase 1 Business Review
 Last Updated: 2026-05-10  
 Version: v0.1.0  
 
@@ -157,7 +157,7 @@ Acceptance Scenarios:
 
 ### Assumptions
 
-- A1: The selected implementation scope is Option B from `plan.md`: balanced improvement with CI/security hardening, SDK contract readiness, Evidence Drawer improvement, and golden evals.
+- A1: The selected implementation scope is Option B from `docs/operations/plan.md`: balanced improvement with CI/security hardening, SDK contract readiness, Evidence Drawer improvement, and golden evals.
 - A2: `macho715/SCT_ONTOLOGY` remains the GitHub repository for this work.
 - A3: `npm run index` and `npm run verify` remain the canonical local verification commands.
 - A4: The current public disclosure decision allows full repository contents to remain public unless the user later changes scope.
@@ -195,7 +195,7 @@ Acceptance Scenarios:
 
 - 2026-05-10 Session:
   - Q: Should the repository upload all files or only a minimum public scope? -> A: User requested full upload.
-  - Q: Which improvement option should be specified first? -> A: `plan.md` recommends Option B, pending approval.
+  - Q: Which improvement option should be specified first? -> A: `docs/operations/plan.md` recommends Option B, pending approval.
   - Q: Should Railway deploy automatically from CI in Option B? -> A: No. Railway production deployment remains manual and approval-gated.
   - Q: Should `data/index/` remain committed? -> A: Yes. It remains committed as reviewable generated evidence, with CI drift checks required.
   - Q: Which GitHub security features are confirmed now? -> A: Secret Scanning and Push Protection are enabled; Dependabot security updates are disabled; Code Scanning setup remains pending.
@@ -230,5 +230,5 @@ Acceptance Scenarios:
 
 ## Changelog
 
-- v0.1.0 (2026-05-10): Initial improvement spec drafted from `plan.md` Phase 1.
+- v0.1.0 (2026-05-10): Initial improvement spec drafted from `docs/operations/plan.md` Phase 1.
 - v0.1.1 (2026-05-10): Resolved Open Questions Q1-Q4 using multi-agent consultation and current repository evidence.

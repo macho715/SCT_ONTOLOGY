@@ -1,131 +1,167 @@
-# HVDC Ontology ChatGPT App Starter
+# HVDC Ontology Grounded ChatGPT App
 
-판정: 실제 구현 가능한 ChatGPT App starter repo입니다.  
-목적: ChatGPT 안에서 HVDC 온톨로지 corpus를 먼저 조회하고, EvidenceSnippet + ValidationFinding + ActionRecommendation을 포함한 업무 답변을 반환합니다.
+쉽게 말하면: 이 저장소는 HVDC 물류 질문에 대해 먼저 온톨로지 corpus를 찾고, 근거가 있을 때만 ChatGPT App 안에서 답변하는 로컬 MVP입니다.
 
-## 1. What this builds
+현재 상태는 Option B 기준입니다. MCP 서버, 5개 tool, 온톨로지 corpus 색인, Evidence Drawer 위젯, golden eval, GitHub Actions 검증이 들어 있습니다.
 
-- Apps SDK / MCP server endpoint: `http://localhost:8787/mcp`
-- ChatGPT iframe widget: `ui://hvdc/answer-card.html`
-- Core tools:
-  - `ask_hvdc_ontology`
-  - `route_question`
-  - `search_ontology_corpus`
-  - `resolve_any_key`
-  - `validate_answer`
-- Local corpus folder: `data/corpus/*.md`
-- Codex Skills: `.agents/skills/*/SKILL.md`
-- Guardrails: CONSOLIDATED-00 mandatory, EvidenceSnippet required, Flow Code WHP-only, PII masking, Human-gate for write/action.
+## 현재 구현 범위
 
-## 2. Install
+| 영역 | 상태 |
+|---|---|
+| MCP 서버 | `server/src/index.ts`에서 `/mcp` 엔드포인트를 실행합니다. 기본 로컬 주소는 `http://localhost:8787/mcp`입니다. |
+| ChatGPT App UI | `public/hvdc-answer-widget.html`이 Answer Card와 Evidence Drawer를 렌더링합니다. |
+| Corpus | `ontology/` 원본을 바탕으로 `data/corpus/`에 승인 문서를 둡니다. |
+| Index | `data/index/`에 `corpus_index.json`, `corpus_inventory.csv`, `source_role_map.json`을 생성합니다. |
+| 검증 | golden prompt, descriptor contract, widget, pipeline 테스트가 있습니다. |
+| CI | `.github/workflows/hvdc-verify.yml`이 index 재생성, drift check, JSON 검증, typecheck/test를 실행합니다. |
+
+## MCP tools
+
+현재 서버와 ChatGPT submission 파일은 같은 5개 tool 이름을 사용합니다.
+
+- `ask_hvdc_ontology`: 질문을 route, corpus search, validation, answer object로 처리합니다.
+- `route_question`: 질문을 HVDC 도메인과 required corpus 문서로 분류합니다.
+- `search_ontology_corpus`: 승인된 `data/corpus/` 문서에서 EvidenceSnippet을 찾습니다.
+- `resolve_any_key`: BL, BOE, DO, Invoice, HVDC code, site, milestone 같은 식별자를 후보로 풉니다.
+- `validate_answer`: CONSOLIDATED-00 포함, 근거 존재, 최신성, Human-gate, Flow Code 경계를 검사합니다.
+
+## 전체 흐름
+
+쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, 현재 구현된 5개 tool이 `data/corpus/` 근거를 찾아 Evidence Drawer와 검증 결과로 돌려줍니다.
+
+```mermaid
+flowchart LR
+  User["ChatGPT 사용자"] --> Mcp["/mcp 서버"]
+  Mcp --> Ask["ask_hvdc_ontology"]
+  Mcp --> Route["route_question"]
+  Mcp --> Search["search_ontology_corpus"]
+  Mcp --> Resolve["resolve_any_key"]
+  Mcp --> Validate["validate_answer"]
+  Ask --> Route
+  Route --> Search
+  Route --> Resolve
+  Resolve --> Search
+  Search --> Corpus["data/corpus"]
+  Corpus --> Evidence["EvidenceSnippet"]
+  Evidence --> Validate
+  Validate --> Drawer["Evidence Drawer"]
+  Drawer --> Review["검증 흐름"]
+  Review --> User
+```
+
+## 데이터와 색인
+
+`data/corpus/`에는 `CONSOLIDATED-00`부터 `CONSOLIDATED-09`까지의 문서와 `Team_역할분담_매트릭스.md`가 들어 있습니다.
+
+색인은 아래 명령으로 다시 만듭니다.
+
+```bash
+npm run index
+```
+
+GitHub Actions와 로컬 검증은 `scripts/check_index_drift.py`로 생성된 색인이 커밋된 색인과 달라졌는지 확인합니다. corpus를 바꾼 뒤 index를 다시 만들지 않으면 CI에서 실패할 수 있습니다.
+
+## 실행 명령
+
+의존성 설치:
 
 ```bash
 npm install
 ```
 
-## 3. Run locally
+로컬 MCP 서버 실행:
 
 ```bash
 npm run dev
 ```
 
-Expected:
+예상 출력:
 
 ```text
 HVDC Ontology MCP server listening on http://localhost:8787/mcp
 ```
 
-## 4. Test with MCP Inspector
+Corpus index 재생성:
 
 ```bash
-npx @modelcontextprotocol/inspector@latest --server-url http://localhost:8787/mcp --transport http
+npm run index
 ```
 
-Try tool:
-
-```json
-{
-  "question": "AGI M130 닫아도 돼? BL-535 관련",
-  "userRole": "ops_user",
-  "language": "ko"
-}
-```
-
-Expected verdict: `BLOCK` because AGI/DAS M130 closure requires MOSB/LCT chain evidence.
-
-## 5. Connect from ChatGPT
-
-1. Expose local server through HTTPS.
+TypeScript 검사와 테스트 실행:
 
 ```bash
-ngrok http 8787
+npm run verify
 ```
 
-2. ChatGPT → Settings → Apps & Connectors → Advanced settings → Developer mode ON.
-3. Settings → Apps & Connectors → Create.
-4. Connector URL:
+## ChatGPT 연결
+
+로컬 개발에서는 HTTPS 터널을 열고 ChatGPT App connector URL에 `/mcp` 주소를 넣습니다.
+
+예:
 
 ```text
 https://<your-ngrok-subdomain>.ngrok.app/mcp
 ```
 
-5. Open a new chat, add the connector, and ask:
+Railway MCP URL은 `docs/operations/plan.md`에 아래 값으로 문서화되어 있습니다.
 
 ```text
-AGI M130 닫아도 돼? BL-535 관련
+https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp
 ```
 
-## 6. Corpus source
+주의: 이 README는 URL이 문서에 적혀 있음을 말합니다. 현재 배포가 살아 있는지는 별도 실행 확인이 필요합니다.
 
-The repo is wired to read approved ontology Markdown from `data/corpus/`.
-Current corpus files are synchronized from the local `ontology/` source folder:
+## Evidence Drawer
 
-```text
-CONSOLIDATED-00-master-ontology.md
-CONSOLIDATED-01-core-framework-infra.md
-CONSOLIDATED-02-warehouse-flow.md
-CONSOLIDATED-03-document-ocr.md
-CONSOLIDATED-04-barge-bulk-cargo.md
-CONSOLIDATED-05-invoice-cost.md
-CONSOLIDATED-06-material-chain.md
-CONSOLIDATED-07-port-operations.md
-CONSOLIDATED-08-communication.md
-CONSOLIDATED-09-operations.md
-Team_역할분담_매트릭스.md
-```
+Evidence Drawer는 답변 근거를 사용자가 확인할 수 있게 보여줍니다.
 
-After changing corpus files, rebuild the section index:
+표시 대상:
+
+- source document
+- section path
+- document hash
+- confidence
+- validation status
+- PII state
+- stale or review warnings
+
+위젯은 외부 URL을 직접 fetch하지 않습니다. ChatGPT App tool result의 structured content를 기준으로 표시합니다.
+
+## Golden evals
+
+`tests/golden_prompts.json`과 `tests/evals.test.ts`는 주요 업무 질문이 기대 verdict, validation rule, required document, evidence 조건을 만족하는지 확인합니다.
+
+대표 시나리오:
+
+- `AGI M130 닫아도 돼?`는 MOSB/LCT chain evidence가 없으면 `BLOCK`입니다.
+- `Flow Code 어디에 써?`는 WHP-only 경계를 확인합니다.
+- invoice, cost, report, send, export 질문은 Human-gate 필요 여부를 확인합니다.
+- 근거가 없으면 EvidenceSnippet 없이 답변을 만들지 않고 fail-safe verdict로 멈춥니다.
+- 이메일과 전화번호는 답변 텍스트에 원문이 남지 않아야 합니다.
+
+## Fail-safe behavior
+
+| 상태 | 조건 | 동작 |
+|---|---|---|
+| `NO_EVIDENCE` | 질문을 뒷받침할 corpus 근거가 없음 | 답변을 중단하고 source 또는 identifier를 요구합니다. |
+| `BLOCK` | `CONSOLIDATED-00` 근거 누락, AGI/DAS M130 선행 근거 누락, Flow Code 오용 등 | 업무 승인이나 close 판단을 하지 않습니다. |
+| `WARN` | 최신 법규, 요율, SOP, cost, invoice, report, send/export 같은 검토 대상 | 최신 승인 source 또는 Human-gate를 요구합니다. |
+| `INFO` | Flow Code 의미 설명처럼 업무 경계 설명이 중심인 경우 | WHP-only 같은 의미 경계를 설명합니다. |
+
+## 현재 한계
+
+- 이 MVP는 corpus-only RAG입니다. live KG, ERP, WMS, Foundry write-back은 구현 범위 밖입니다.
+- 운영 write, 외부 메시지 전송, 보고서 publication, 비용 승인에는 Human-gate가 필요합니다.
+- Railway URL은 문서화되어 있지만, 현재 배포 상태는 이 README 작성 시점에 확인하지 않았습니다.
+- `query_knowledge_graph`, `create_action_request`, `export_answer_report`는 계획 문서에 있는 확장 tool입니다. 현재 서버 tool 5개에는 포함되지 않습니다.
+
+## 확인 기준
+
+README를 바꾼 뒤에는 아래 순서로 확인합니다.
 
 ```bash
 npm run index
 npm run verify
 ```
 
-## 7. Codex usage
-
-Start Codex from repo root. Codex will read `AGENTS.md`. Use skill prompts such as:
-
-```text
-Use the answer-grounding skill. Improve ask_hvdc_ontology so every factual claim has EvidenceSnippet coverage.
-```
-
-```text
-Use the mcp-tool-contract skill. Add export_answer_report with outputSchema and tests.
-```
-
-## 8. Production TODO
-
-- Add authentication before exposing P1/P2 data.
-- Add RBAC and approval flow before write/action tools.
-- Add vector search or hybrid BM25+embedding for larger corpus.
-- Add live KG/GraphDB/Foundry adapter after MVP.
-- Add submission privacy policy and final app icons/screenshots.
-
-## 9. Fail-safe behavior
-
-| State | Trigger | Behavior |
-|---|---|---|
-| `NO_EVIDENCE` | No corpus evidence | Stop answer and request key/source |
-| `BLOCK` | Missing master spine or AGI/DAS M130 closure evidence | Do not approve operational close |
-| `WARN` | Current regulation/rate/SOP claim | Require current approved source refresh |
-| `INFO` | Flow Code boundary question | Explain WHP-only boundary |
+`npm run verify`는 `tsc --noEmit`과 `vitest run`을 실행합니다.

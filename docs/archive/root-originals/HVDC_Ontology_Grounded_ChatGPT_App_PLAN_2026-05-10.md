@@ -8,7 +8,7 @@
 | 문서 버전 | v1.00-draft |
 | 작성일 | 2026-05-10 |
 | 기준 시간대 | Asia/Dubai |
-| 기준 문서 | `HVDC_Ontology_Grounded_ChatGPT_App_UIUX_Spec_2026-05-10.docx` |
+| 기준 문서 | `../../uiux/HVDC_Ontology_Grounded_ChatGPT_App_UIUX_Spec_2026-05-10.docx` |
 | 제품명 | HVDC Ontology Answer App for ChatGPT |
 | 1차 구현 방식 | Corpus-only RAG MVP |
 | 후속 확장 방식 | Hybrid RAG + SPARQL KG |
