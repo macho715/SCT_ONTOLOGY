@@ -17,6 +17,25 @@ type Submission = {
   tools: Record<string, SubmissionTool>;
 };
 
+const APPROVED_V1_TOOL_NAMES = [
+  "ask_hvdc_ontology",
+  "render_hvdc_answer_card",
+  "route_question",
+  "search_ontology_corpus",
+  "resolve_any_key",
+  "validate_answer"
+].sort();
+
+const FORBIDDEN_STANDALONE_TOOL_NAME_PARTS = [
+  "shipment",
+  "rule",
+  "validation",
+  "export",
+  "action",
+  "write_back",
+  "writeback"
+];
+
 const submission = JSON.parse(
   readFileSync(path.resolve("chatgpt-app-submission.json"), "utf8")
 ) as Submission;
@@ -27,8 +46,23 @@ const codexAgentGuidance = readFileSync(path.resolve("docs", "codex", "AGENTS.pa
 
 describe("Apps SDK/MCP descriptor contract parity", () => {
   it("keeps the six server tool names in sync with the ChatGPT app submission", () => {
-    expect(Object.keys(HVDC_TOOL_DESCRIPTORS).sort()).toEqual(Object.keys(submission.tools).sort());
-    expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toHaveLength(6);
+    const serverToolNames = Object.keys(HVDC_TOOL_DESCRIPTORS).sort();
+    const submissionToolNames = Object.keys(submission.tools).sort();
+
+    expect(serverToolNames).toEqual(APPROVED_V1_TOOL_NAMES);
+    expect(submissionToolNames).toEqual(APPROVED_V1_TOOL_NAMES);
+    expect(serverToolNames).toEqual(submissionToolNames);
+  });
+
+  it("blocks new standalone shipment, rule, validation, export, action, or write-back MCP tools in v1", () => {
+    const toolNames = [...Object.keys(HVDC_TOOL_DESCRIPTORS), ...Object.keys(submission.tools)];
+    const approvedToolNames = new Set(APPROVED_V1_TOOL_NAMES);
+    const unexpectedStandaloneTools = toolNames.filter((toolName) => {
+      if (approvedToolNames.has(toolName)) return false;
+      return FORBIDDEN_STANDALONE_TOOL_NAME_PARTS.some((forbiddenPart) => toolName.includes(forbiddenPart));
+    });
+
+    expect(unexpectedStandaloneTools).toEqual([]);
   });
 
   it("defines schema, metadata, and annotations for every server tool descriptor", () => {

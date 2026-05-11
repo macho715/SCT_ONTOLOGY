@@ -42,6 +42,32 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.evidenceTrace.every((trace) => trace.evidenceIds.every((id) => answer.evidenceIds.includes(id)))).toBe(true);
   });
 
+  it("keeps unsupported rule-only shipment output from becoming a supported final answer", () => {
+    const answer = ask("BL-AUH-002");
+
+    expect(answer.shipmentRule).toEqual(
+      expect.objectContaining({
+        found: true,
+        source: "sample_shipment_rule_engine",
+        supportLevel: "SECONDARY_SAMPLE_VALIDATION",
+        matchedKey: "BL-AUH-002",
+        shipmentId: "SHP-0002"
+      })
+    );
+    expect(answer.verdict).toBe("NO_EVIDENCE");
+    expect(answer.validationStatus).toBe("NO_EVIDENCE");
+    expect(answer.evidence).toHaveLength(0);
+    expect(answer.evidenceIds).toHaveLength(0);
+    expect(answer.validation).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ruleId: "V-SHIPMENT-AGIDAS-001", evidenceIds: [] }),
+        expect.objectContaining({ ruleId: "V-SHIPMENT-INVOICE-001", evidenceIds: [] })
+      ])
+    );
+    expect(answer.evidenceTrace.every((trace) => trace.supportState === "NO_DIRECT_EVIDENCE")).toBe(true);
+    expect(answer.evidenceTrace.every((trace) => trace.evidenceIds.length === 0)).toBe(true);
+  });
+
   it("matches package identifiers that are not resolved by the parent router", () => {
     const answer = ask("PKG-AGI-02 package secondary validation 확인해줘");
 

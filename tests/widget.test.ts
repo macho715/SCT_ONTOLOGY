@@ -124,7 +124,122 @@ describe("HVDC answer widget", () => {
 
   it("does not fetch external resources from the iframe", () => {
     expect(widgetHtml).not.toMatch(/\bfetch\s*\(/);
+    expect(widgetHtml).not.toMatch(/\bXMLHttpRequest\b/);
+    expect(widgetHtml).not.toMatch(/\bWebSocket\b/);
+    expect(widgetHtml).not.toMatch(/\bEventSource\b/);
+    expect(widgetHtml).not.toMatch(/\bsendBeacon\s*\(/);
+    expect(widgetHtml).not.toMatch(/\bimportScripts\s*\(/);
     expect(widgetHtml).not.toMatch(/https?:\/\//i);
+    expect(widgetHtml).not.toMatch(/<script\s+[^>]*src=/i);
+    expect(widgetHtml).not.toMatch(/<link\s+[^>]*href=/i);
+    expect(widgetHtml).not.toMatch(/<img\s+[^>]*src=/i);
+  });
+
+  it("keeps the iframe HTML resource-URI agnostic for compatibility aliases", () => {
+    for (const resourceUri of [
+      "ui://hvdc/answer-card-v7.html",
+      "ui://hvdc/answer-card-v6.html",
+      "ui://hvdc/answer-card-v5.html",
+      "ui://hvdc/render_hvdc_answer_card.html"
+    ]) {
+      expect(widgetHtml).not.toContain(resourceUri);
+    }
+
+    expect(widgetHtml).not.toContain("window.location");
+    expect(widgetHtml).not.toContain("document.location");
+  });
+
+  it("renders UI failures without overwriting protected business fields", () => {
+    const html = renderWidgetFixture({
+      answerId: "ui-failure-fixture",
+      verdict: "PASS",
+      dataStatus: "OK",
+      businessResultVisible: true,
+      fallbackUsed: true,
+      summary: "Business verdict remains PASS",
+      businessImpact: "Business impact remains visible",
+      details: ["Business detail remains visible"],
+      evidenceIds: ["ev-protected"],
+      validationStatus: "WARN",
+      route: { routeId: "r-protected", requiredDocs: ["CONSOLIDATED-00"], confidence: 0.95, routingReason: "fixture" },
+      evidence: [
+        {
+          id: "ev-protected",
+          docId: "DOC-PROTECTED",
+          title: "Protected Business Evidence",
+          version: "v1",
+          sectionPath: "Protected Section",
+          snippet: "Evidence remains visible",
+          docHash: "protected-hash",
+          confidence: 0.9,
+          sourceType: "ontology_corpus"
+        }
+      ],
+      evidenceTrace: [
+        {
+          targetType: "summary",
+          targetIndex: null,
+          answerText: "Business verdict remains PASS",
+          supportState: "SUPPORTED",
+          evidenceIds: ["ev-protected"]
+        },
+        {
+          targetType: "action",
+          targetIndex: 0,
+          answerText: "Review protected action",
+          supportState: "SUPPORTED",
+          evidenceIds: ["ev-protected"]
+        }
+      ],
+      validation: [
+        {
+          ruleId: "fixture-rule",
+          reasonCode: "FIXTURE_WARN",
+          severity: "WARN",
+          status: "WARN",
+          targetObject: "fixture",
+          evidenceIds: ["ev-protected"],
+          message: "Validation status remains WARN"
+        }
+      ],
+      actions: [
+        {
+          actionType: "Review protected action",
+          ownerRole: "Ops reviewer",
+          parameters: {},
+          humanGateRequired: true,
+          dueAt: null
+        }
+      ],
+      ui: {
+        dataStatus: "OK",
+        uiRenderStatus: "TEMPLATE_FETCH_FAILED",
+        businessResultVisible: true,
+        fallbackUsed: true,
+        cardEnabled: false,
+        templateVersion: "answer-card-v7",
+        schemaVersion: "1.0.0",
+        errorCode: "CARD_TEMPLATE_RENDER_FAILED",
+        errorMessage: "Fixture template failure",
+        doNotChange: ["verdict", "validationStatus", "evidenceIds", "actions"]
+      },
+      piiMasked: false,
+      generatedAt: "2026-05-11T00:00:00Z"
+    });
+
+    expect(html).toContain("Card UI warning");
+    expect(html).toContain("TEMPLATE_FETCH_FAILED");
+    expect(html).toContain("CARD_TEMPLATE_RENDER_FAILED");
+    expect(html).toContain("Protected fields");
+    expect(html).toContain("verdict, validationStatus, evidenceIds, actions");
+    expect(html).toContain("PASS");
+    expect(html).toContain("Business verdict remains PASS");
+    expect(html).toContain("WARN");
+    expect(html).toContain("Validation status remains WARN");
+    expect(html).toContain("ev-protected");
+    expect(html).toContain("Review protected action");
+    expect(html).toContain("Human-gate required");
+    expect(html).toContain("E1");
   });
 
   it("renders evidence trace labels and no-direct-evidence state without changing protected fields", () => {
