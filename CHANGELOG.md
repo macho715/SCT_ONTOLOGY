@@ -14,6 +14,34 @@ flowchart TD
   F --> G["Next action<br/>push / GitHub Actions 확인"]
 ```
 
+## Unreleased - 2026-05-11 Claude App Layer
+
+### Added
+
+- `server/src/claude-render.ts`: ChatGPT format(`_meta` + `structuredContent.ui`)과 Claude format(직접 GroundedAnswer) 양쪽을 파싱하고 마크다운 카드로 렌더링하는 모듈을 추가했다.
+- `server/src/claude-server.ts`: 표준 `@modelcontextprotocol/sdk`만 사용하는 Claude 전용 MCP 서버를 추가했다. `@modelcontextprotocol/ext-apps` 없음. 포트 `CLAUDE_PORT || 8788`. 6개 tool 동일 등록.
+- `claude-app-submission.json`: Claude Desktop 연결 설정(`claude_desktop_config` 스니펫), tool 목록, Claude 전용 테스트 케이스를 담는 제출 파일을 추가했다.
+- `tests/claude-descriptor.test.ts`: `claude-app-submission.json` ↔ `HVDC_CLAUDE_TOOL_NAMES` parity, `parseGroundedAnswer` 양방향 파싱, `renderAnswerMarkdown` 필수 필드 검증 28개 테스트를 추가했다.
+- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code 연결 안내, 포트 설정, 테스트 프롬프트 5개를 추가했다.
+
+### Changed
+
+- `package.json`에 `claude:dev`와 `claude:start` 스크립트를 추가했다.
+- `AGENTS.md`에 Claude App Layer 섹션(포트, 파싱 계약 표, 연결 방법)을 추가했다.
+- `README.md`에 Claude 서버 현황, Claude 연결 섹션, 실행 명령, 현재 한계를 보충했다.
+- `LAYOUT.md`, `SYSTEM_ARCHITECTURE.md`에 Claude layer 파일과 아키텍처 다이어그램을 추가했다.
+
+### Verified
+
+- 로컬에서 `npm run verify`를 실행했다.
+- 결과: TypeScript typecheck 통과, Vitest 5개 파일 / 71개 테스트(기존 43 + 신규 28) 전원 통과.
+- ChatGPT 서버 기존 동작 무변경 확인: `tests/descriptor.test.ts`, `tests/pipeline.test.ts`, `tests/evals.test.ts`, `tests/widget.test.ts` 43개 테스트 전원 통과.
+
+### Risks
+
+- Claude 서버(`server/src/claude-server.ts`)의 `render_hvdc_answer_card`는 마크다운 텍스트를 반환한다. ChatGPT iframe 위젯은 포트 8787 ChatGPT 서버 전용이다.
+- `CLAUDE_PORT` 환경변수를 설정하지 않으면 기본 8788 포트를 사용한다. 포트 충돌 시 환경변수로 override가 필요하다.
+
 ## Unreleased - 2026-05-11 documentation refresh
 
 현재 문서 갱신 작업은 로컬 변경이다.

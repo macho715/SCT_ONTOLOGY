@@ -4,13 +4,22 @@
 
 ## 현재 구현 범위
 
+### ChatGPT 레이어 (포트 8787)
 - 런타임 서버는 `server/src/index.ts`에 있다.
-- MCP HTTP 경로는 `/mcp`이다.
-- 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
+- MCP HTTP 경로는 `/mcp`이다. 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
 - MCP 구현은 `@modelcontextprotocol/sdk`의 `McpServer`와 `StreamableHTTPServerTransport`를 사용한다.
 - ChatGPT App UI resource는 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
 - UI resource URI는 `ui://hvdc/answer-card-v6.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
+
+### Claude 레이어 (포트 8788)
+- 런타임 서버는 `server/src/claude-server.ts`에 있다.
+- 표준 `@modelcontextprotocol/sdk`의 `McpServer.tool()`만 사용한다. `@modelcontextprotocol/ext-apps` 의존 없음.
+- `render_hvdc_answer_card`는 마크다운 텍스트를 반환한다. iframe 위젯 없음.
+- 포트는 `CLAUDE_PORT` 환경변수 또는 기본 `8788`이다.
+- 렌더링은 `server/src/claude-render.ts`가 담당한다. ChatGPT format(`_meta` 포함)과 Claude format(직접 GroundedAnswer) 양쪽을 파싱한다.
+
+### 공유 코어 (변경 없음)
 - 답변 근거는 런타임에 `data/corpus/*.md`를 직접 읽어서 만든다.
 - `data/index` 파일은 생성/검토용 artifact이며, 현재 검색 런타임의 직접 입력은 `data/corpus`이다.
 - Railway 배포는 `railway.json`에 정의된 `npm run verify` 빌드 검증과 `npm run start` 실행 경계 안에 있다.
@@ -29,37 +38,43 @@
 
 ```mermaid
 flowchart TD
-  User["ChatGPT 사용자"] --> App["ChatGPT App / MCP client"]
-  App --> Endpoint["Node HTTP server<br/>server/src/index.ts<br/>/mcp"]
-  Endpoint --> Mcp["McpServer + StreamableHTTPServerTransport<br/>@modelcontextprotocol/sdk"]
-  Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
+  ChatGPTUser["ChatGPT 사용자"] --> ChatGPTApp["ChatGPT App / MCP client"]
+  ClaudeUser["Claude 사용자"] --> ClaudeClient["Claude Desktop / Claude Code"]
+
+  ChatGPTApp --> CGT_Endpoint["Node HTTP server<br/>server/src/index.ts<br/>포트 8787 /mcp"]
+  ClaudeClient --> CL_Endpoint["Node HTTP server<br/>server/src/claude-server.ts<br/>포트 8788 /mcp"]
+
+  CGT_Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
   ExtApps --> WidgetResource["ui://hvdc/answer-card-v6.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
-  Mcp --> AskTool["ask_hvdc_ontology"]
-  Mcp --> RouteTool["route_question"]
-  Mcp --> SearchTool["search_ontology_corpus"]
-  Mcp --> ResolveTool["resolve_any_key"]
-  Mcp --> ValidateTool["validate_answer"]
+  CL_Endpoint --> ClaudeRender["server/src/claude-render.ts<br/>parseGroundedAnswer + renderAnswerMarkdown"]
 
-  AskTool --> Answer["server/src/answer.ts"]
-  RouteTool --> Router["server/src/router.ts"]
-  SearchTool --> Corpus["server/src/corpus.ts"]
-  ResolveTool --> Router
-  ValidateTool --> Answer
+  subgraph SharedCore["공유 코어 (변경 없음)"]
+    Answer["server/src/answer.ts"]
+    Router["server/src/router.ts"]
+    Corpus["server/src/corpus.ts"]
+    Redact["server/src/redact.ts"]
+    Types["server/src/types.ts"]
+    CorpusFiles["data/corpus/*.md"]
+  end
 
-  Answer --> Redact["server/src/redact.ts"]
-  Answer --> Types["server/src/types.ts"]
-  Answer --> Corpus
+  CGT_Endpoint --> Answer
+  CL_Endpoint --> Answer
   Answer --> Router
-  Corpus --> CorpusFiles["data/corpus/*.md"]
+  Answer --> Corpus
+  Answer --> Redact
+  Answer --> Types
+  Corpus --> CorpusFiles
+  ClaudeRender --> Types
+
   Indexer["scripts/index_corpus.py"] --> IndexFiles["data/index/corpus_index.json<br/>data/index/corpus_inventory.csv"]
   DriftCheck["scripts/check_index_drift.py"] --> IndexFiles
   SourceRole["data/index/source_role_map.json"] --> Review["review / mapping reference"]
 
   GHA[".github/workflows/hvdc-verify.yml"] --> Indexer
   GHA --> DriftCheck
-  GHA --> Verify["npm run verify"]
+  GHA --> Verify["npm run verify (71 tests)"]
   Railway["railway.json"] --> Build["buildCommand: npm run verify"]
   Railway --> Start["startCommand: npm run start"]
   Railway --> Health["healthcheckPath: /"]
@@ -67,7 +82,7 @@ flowchart TD
 
 ## 서버와 MCP 경계
 
-`server/src/index.ts`가 HTTP 서버와 MCP 서버를 함께 정의한다.
+### ChatGPT 서버 (`server/src/index.ts`)
 
 - `createServer`로 Node HTTP 서버를 만든다.
 - `/mcp`에서 `POST`, `GET`, `DELETE` 요청을 받는다.
@@ -77,18 +92,39 @@ flowchart TD
 - 루트 `/`는 `"HVDC Ontology ChatGPT App MCP server"` 텍스트를 반환한다.
 - 기본 포트는 `PORT` 환경변수가 없으면 `8787`이다.
 
+### Claude 서버 (`server/src/claude-server.ts`)
+
+- ChatGPT 서버와 동일한 Node HTTP 구조를 사용한다.
+- 요청마다 `createClaudeServer()`로 MCP server instance를 만든다.
+- `McpServer.tool()`만 사용한다. `registerAppTool`, `registerAppResource` 없음.
+- 루트 `/`는 `"HVDC Ontology Claude App MCP server"` 텍스트를 반환한다.
+- 기본 포트는 `CLAUDE_PORT` 환경변수가 없으면 `8788`이다.
+- `HVDC_CLAUDE_TOOL_NAMES` 배열을 export한다 (테스트 parity 검증용).
+
 ## 등록된 App tool
 
-`server/src/index.ts`의 `HVDC_TOOL_DESCRIPTORS`와 `registerAppTool` 기준으로 현재 server tool은 6개다.
+ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server.ts`) 모두 동일한 6개 tool 이름을 사용한다.
 
-| Tool | 구현 파일 | 역할 |
-| --- | --- | --- |
-| `ask_hvdc_ontology` | `server/src/answer.ts` | 질문을 route, corpus search, validation, answer composition 흐름으로 처리한다. |
-| `render_hvdc_answer_card` | `server/src/index.ts` | 직접 MCP 호출이 가능한 클라이언트에서 이미 생성된 answer object를 같은 카드 UI resource로 렌더링한다. |
-| `route_question` | `server/src/router.ts` | 질문을 ontology domain과 required document로 분류한다. |
-| `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` Markdown 문서에서 EvidenceSnippet을 검색한다. |
-| `resolve_any_key` | `server/src/router.ts` | BL, BOE, DO, Invoice, HVDC_CODE, Site, Milestone 같은 식별자를 후보로 추출한다. |
-| `validate_answer` | `server/src/answer.ts` | master spine, evidence, Flow Code, currentness, human-gate 같은 검증 finding을 만든다. |
+| Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
+| --- | --- | --- | --- |
+| `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + text fallback (UI 없음) | `structuredContent` + 마크다운 카드 |
+| `render_hvdc_answer_card` | ChatGPT: `server/src/index.ts`<br/>Claude: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v6.html` iframe 위젯 | 마크다운 카드 (iframe 없음) |
+| `route_question` | `server/src/router.ts` | JSON route | JSON route |
+| `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` EvidenceSnippet | `data/corpus` EvidenceSnippet |
+| `resolve_any_key` | `server/src/router.ts` | identifier 후보 | identifier 후보 |
+| `validate_answer` | `server/src/answer.ts` | validation findings | validation findings |
+
+### Claude format 파싱 계약 (`server/src/claude-render.ts`)
+
+`render_hvdc_answer_card`는 두 가지 입력 형식을 모두 수락한다:
+
+| 입력 형식 | 감지 방법 | 처리 |
+|---|---|---|
+| ChatGPT format | `_meta` 키 존재 | `structuredContent` 추출 후 `ui` 필드 제거 |
+| wrapped format | `structuredContent` 존재, `_meta` 없음 | `structuredContent` 추출 후 `ui` 필드 제거 |
+| Claude format | 직접 GroundedAnswer 객체 | `ui` 필드만 제거 |
+
+두 형식 모두 같은 마크다운 카드로 출력한다.
 
 ## UI resource와 public widget
 
@@ -320,15 +356,18 @@ classDiagram
 - `npm test`: Vitest test를 실행한다.
 - `npm run verify`: typecheck와 test를 순서대로 실행한다.
 - `npm run index`: corpus index artifact를 다시 만든다.
+- `npm run claude:dev`: Claude 서버를 개발 모드로 실행한다.
+- `npm run claude:start`: Claude 서버를 시작한다.
 
-현재 test 파일은 아래 역할을 가진다.
+현재 test 파일은 아래 역할을 가진다. **총 71개 테스트 통과** (2026-05-11 기준).
 
-| Test file | 확인하는 내용 |
-| --- | --- |
-| `tests/pipeline.test.ts` | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
-| `tests/evals.test.ts` | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
-| `tests/descriptor.test.ts` | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
-| `tests/widget.test.ts` | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
+| Test file | 테스트 수 | 확인하는 내용 |
+| --- | --- | --- |
+| `tests/pipeline.test.ts` | 11 | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
+| `tests/evals.test.ts` | 15 | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
+| `tests/descriptor.test.ts` | 8 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
+| `tests/widget.test.ts` | 9 | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
+| `tests/claude-descriptor.test.ts` | 28 | Claude tool parity, `parseGroundedAnswer` 양방향 포맷 파싱, `renderAnswerMarkdown` 필수 필드를 확인한다. |
 
 ## GitHub Actions
 
@@ -362,8 +401,9 @@ classDiagram
 
 ## 현재 아키텍처 판정
 
-이 저장소의 현재 아키텍처는 corpus-only MCP ChatGPT App MVP다.
+이 저장소의 현재 아키텍처는 **ChatGPT + Claude 듀얼 레이어 corpus-only MCP App MVP**다.
 
-Node HTTP 서버가 `/mcp`를 열고, MCP/App tool descriptor를 등록하고, `data/corpus` Markdown 문서를 런타임에 읽어 evidence 기반 답변을 만든다.
-public widget은 `ui://hvdc/answer-card-v6.html` resource로 연결된다.
-GitHub Actions와 Railway는 같은 `npm run verify` 검증 경계를 공유한다.
+- **ChatGPT 레이어**: `server/src/index.ts`가 포트 8787에서 `/mcp`를 열고, `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v6.html` iframe 위젯을 연결한다.
+- **Claude 레이어**: `server/src/claude-server.ts`가 포트 8788에서 `/mcp`를 열고, 표준 `McpServer.tool()`로 동일한 6개 tool을 등록한다. `render_hvdc_answer_card`는 마크다운 카드를 반환한다. `server/src/claude-render.ts`가 ChatGPT/Claude 양방향 포맷을 파싱한다.
+- **공유 코어**: `answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`는 두 서버가 변경 없이 공유한다.
+- **GitHub Actions와 Railway**: 같은 `npm run verify` 검증 경계를 공유한다. Railway 배포 경계는 ChatGPT 서버(`npm run start`)이다.
