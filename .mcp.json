@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "hvdc-ontology": {
+      "command": "npm",
+      "args": ["run", "claude:stdio"],
+      "cwd": "C:\\Users\\jichu\\Downloads\\HVDC Ontology Grounded"
+    }
+  }
+}
