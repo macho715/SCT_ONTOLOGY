@@ -1,0 +1,13 @@
+.git/
+node_modules/
+dist/
+out/
+.playwright-mcp/
+.env
+.env.*
+*.log
+*.zip
+__pycache__/
+*.pyc
+.claude/
+hvdc_openai_agent/
