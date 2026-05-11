@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "tsx server/src/index.ts",
     "start": "tsx server/src/index.ts",
+    "claude:dev": "tsx server/src/claude-server.ts",
+    "claude:start": "tsx server/src/claude-server.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --exclude \"docs/archive/**\"",
     "index": "python scripts/index_corpus.py",

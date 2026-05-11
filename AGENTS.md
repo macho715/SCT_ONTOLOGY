@@ -56,6 +56,25 @@ Current server and ChatGPT submission must stay aligned on these 6 tool names:
 - `resolve_any_key` -> `server/src/router.ts`
 - `validate_answer` -> `server/src/answer.ts`
 
+## Claude App Layer
+
+A Claude-specific MCP server runs independently on port `8788` (`CLAUDE_PORT` env override):
+- **Server**: `server/src/claude-server.ts` — standard `McpServer.tool()` only, no `ext-apps` dependency
+- **Renderer**: `server/src/claude-render.ts` — parses both ChatGPT format (strips `_meta`, `ui`) and Claude format (direct GroundedAnswer), outputs markdown
+- **Submission**: `claude-app-submission.json` — Claude Desktop config snippet + same 6 tools
+- **Guide**: `docs/CONNECT_CLAUDE.md` — connection instructions + test prompts
+- **Start**: `npm run claude:dev` / `npm run claude:start`
+
+### Claude Parsing Contract (`render_hvdc_answer_card`)
+
+| Input format | Detection | Processing |
+|---|---|---|
+| ChatGPT format | `_meta` present with `openai/*` key | Extract `structuredContent`, strip `ui` field |
+| Wrapped format | `structuredContent` present, no `_meta` | Extract `structuredContent`, strip `ui` field |
+| Claude format | Direct GroundedAnswer object | Strip `ui` field only |
+
+`render_hvdc_answer_card` on port 8788 renders to markdown (no iframe widget). The ChatGPT server on port 8787 is unchanged.
+
 Do not document `query_knowledge_graph`, `create_action_request`, or `export_answer_report` as implemented until source code and descriptor tests confirm them.
 
 ## Confirmed Layout

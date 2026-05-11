@@ -11,54 +11,78 @@
 ```mermaid
 flowchart TD
   RootDocs["루트 문서<br/>README, CHANGELOG, LAYOUT, SYSTEM_ARCHITECTURE"]
-  RootConfig["루트 실행 설정<br/>AGENTS, package, tsconfig, railway, submission"]
-  Server["server/src<br/>MCP 서버와 답변 파이프라인"]
-  Public["public<br/>ChatGPT 앱 위젯 정적 파일"]
-  Tests["tests<br/>자동 검증과 골든 시나리오"]
+  RootConfig["루트 실행 설정<br/>AGENTS, package, tsconfig, railway<br/>chatgpt-app-submission.json<br/>claude-app-submission.json"]
+
+  subgraph ServerChatGPT["ChatGPT 레이어 (포트 8787)"]
+    IndexTs["server/src/index.ts<br/>registerAppTool / registerAppResource"]
+    UiTs["server/src/ui.ts"]
+    Public["public<br/>hvdc-answer-widget.html"]
+  end
+
+  subgraph ServerClaude["Claude 레이어 (포트 8788)"]
+    ClaudeServer["server/src/claude-server.ts<br/>McpServer.tool()"]
+    ClaudeRender["server/src/claude-render.ts<br/>양방향 파싱 + 마크다운 렌더러"]
+  end
+
+  subgraph SharedCore["공유 코어"]
+    Answer["server/src/answer.ts"]
+    Corpus["server/src/corpus.ts"]
+    Router["server/src/router.ts"]
+    Types["server/src/types.ts"]
+    CorpusFiles["data/corpus/*.md"]
+  end
+
+  Tests["tests<br/>71개 테스트<br/>(ChatGPT 43 + Claude 28)"]
   Scripts["scripts<br/>corpus 점검과 index 생성 도구"]
-  Corpus["data/corpus/*.md<br/>런타임 검색 직접 입력"]
   Index["data/index<br/>생성/검토/repro artifact"]
   Ontology["ontology<br/>원본 또는 참조용 온톨로지 묶음"]
   DocsOps["docs/operations<br/>운영 개선 계획"]
+  DocsConnect["docs/CONNECT_CHATGPT.md<br/>docs/CONNECT_CLAUDE.md"]
   DocsUiux["docs/uiux<br/>UI/UX 사양 원본"]
-  DocsCodex["docs/codex<br/>Codex 지침 초안과 보조 문서"]
   DocsArchive["docs/archive<br/>이전 root 원본과 starter 보관"]
   Skills[".agents/skills<br/>Codex 개발/검증 작업 지침"]
   Workflows[".github/workflows<br/>GitHub 자동 검증"]
 
-  RootDocs -->|"제품 범위와 작업 규칙 설명"| Server
-  RootDocs -->|"UI와 검증 기준 설명"| Public
+  RootDocs -->|"제품 범위와 작업 규칙 설명"| ServerChatGPT
+  RootDocs -->|"Claude 레이어 설명"| ServerClaude
   RootDocs -->|"검증 기준 설명"| Tests
-  RootConfig -->|"실행과 제출 설정 제공"| Server
+  RootConfig -->|"chatgpt-submission"| ServerChatGPT
+  RootConfig -->|"claude-submission"| ServerClaude
+  DocsConnect -->|"연결 방법 안내"| ServerChatGPT
+  DocsConnect -->|"연결 방법 안내"| ServerClaude
+
+  IndexTs --> SharedCore
+  ClaudeServer --> SharedCore
+  ClaudeServer --> ClaudeRender
+  ClaudeRender --> Types
+  UiTs --> Types
+  SharedCore --> CorpusFiles
+  Ontology -->|"승인 corpus 정리의 참조 자료"| CorpusFiles
+  Scripts -->|"corpus를 읽어 생성"| Index
+  CorpusFiles -->|"index 생성 입력"| Scripts
+  Index -->|"drift 검토와 재현 근거"| Tests
+  Tests -->|"서버 동작 검증"| SharedCore
+  Tests -->|"위젯 구조 검증"| Public
+  Skills -->|"개발자 작업 절차 제공"| SharedCore
+  Workflows -->|"npm 검증 실행"| Tests
   DocsOps -->|"Option B 작업 기준 제공"| Tests
   DocsUiux -->|"UI 설계 근거 제공"| Public
-  DocsCodex -->|"작업 지침 초안 보관"| RootConfig
   DocsArchive -->|"삭제 없는 보관"| RootDocs
-  Ontology -->|"승인 corpus 정리의 참조 자료"| Corpus
-  Server -->|"질문 답변 시 직접 읽음"| Corpus
-  Scripts -->|"corpus를 읽어 생성"| Index
-  Corpus -->|"index 생성 입력"| Scripts
-  Index -->|"drift 검토와 재현 근거"| Tests
-  Tests -->|"서버 동작 검증"| Server
-  Tests -->|"위젯 구조 검증"| Public
-  Skills -->|"개발자 작업 절차 제공"| Server
-  Skills -->|"검증 작업 절차 제공"| Tests
-  Workflows -->|"npm 검증 실행"| Tests
-  Workflows -->|"빌드/타입 확인"| Server
 ```
 
 ## 루트 파일
 
-- `AGENTS.md`: Codex 작업 규칙과 HVDC 온톨로지 답변 앱의 안전 경계를 정한다.
+- `AGENTS.md`: 작업 규칙과 HVDC 온톨로지 답변 앱의 안전 경계를 정한다. ChatGPT/Claude 양쪽 레이어 설명 포함.
 - `README.md`: 프로젝트 소개와 사용 흐름을 설명하는 루트 안내 문서다.
 - `CHANGELOG.md`: 변경 이력을 기록하는 문서다.
 - `LAYOUT.md`: 현재 저장소 구조와 미커밋 변경 범위를 설명하는 이 문서다.
-- `SYSTEM_ARCHITECTURE.md`: 시스템 구조를 설명하는 문서다.
-- `package.json`: Node.js 앱 이름, 의존성, 실행 스크립트를 정의한다.
+- `SYSTEM_ARCHITECTURE.md`: 시스템 구조를 설명하는 문서다. ChatGPT/Claude 양쪽 아키텍처 포함.
+- `package.json`: Node.js 앱 이름, 의존성, 실행 스크립트를 정의한다. `claude:dev`, `claude:start` 스크립트 포함.
 - `package-lock.json`: npm 의존성 잠금 파일이다.
 - `tsconfig.json`: TypeScript 컴파일 설정이다.
 - `railway.json`: Railway 배포 설정 파일이다.
 - `chatgpt-app-submission.json`: ChatGPT 앱 제출용 메타데이터 파일이다.
+- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. `claude_desktop_config` 스니펫, 6개 tool, Claude 전용 테스트 케이스 포함.
 - `.gitignore`: Git 추적에서 제외할 폴더와 파일 패턴을 정한다.
 
 ## docs
@@ -70,8 +94,10 @@ flowchart TD
 - `docs/SECURITY_PRIVACY.md`: 보안과 개인정보 처리 기준이다.
 - `docs/QA_REPORT.md`: 검증 결과와 품질 확인 내용을 기록한다.
 - `docs/CONNECT_CHATGPT.md`: ChatGPT 연결 방법을 설명한다.
+- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code 연결 방법을 설명한다. 포트 8788, `claude_desktop_config.json` 예시, 테스트 프롬프트 5개 포함.
 - `docs/CODEX_SETUP.md`: Codex 작업 환경 설정 안내다.
 - `docs/SPEC_IMPROVEMENTS.md`: 사양 개선 메모다.
+- `docs/claude-plan-20260511.md`: Claude App Layer 구현 계획 문서다 (Phase 1 CEO review, Phase 2 Engineering review 포함).
 - `docs/codex/AGENTS.patched.md`: 루트에 남기지 않는 Codex 지침 초안 보관본이다.
 - `docs/operations/plan.md`: Option B 운영 개선 실행 계획이다.
 - `docs/uiux/HVDC_Ontology_Grounded_ChatGPT_App_UIUX_Spec_2026-05-10.md`: UI/UX 사양 문서의 Markdown 버전이다.
@@ -83,12 +109,20 @@ flowchart TD
 
 `server/src/`는 MCP 서버와 온톨로지 기반 답변 로직을 담는 TypeScript 소스 폴더다.
 
-- `server/src/index.ts`: 서버 진입점과 MCP 도구 등록 흐름을 담당한다.
+### 공유 코어 (ChatGPT/Claude 공통)
 - `server/src/answer.ts`: 검색 결과를 근거로 답변을 구성하는 로직을 담는다.
 - `server/src/corpus.ts`: 런타임에서 `data/corpus/*.md`를 직접 읽고 검색하는 로직을 담는다.
 - `server/src/router.ts`: 질문을 HVDC 도메인 라우트로 분류하는 로직을 담는다.
 - `server/src/redact.ts`: 이메일과 전화번호 같은 민감정보를 가리는 로직을 담는다.
 - `server/src/types.ts`: 서버 내부에서 공유하는 타입을 정의한다.
+
+### ChatGPT 레이어
+- `server/src/index.ts`: ChatGPT 전용 서버 진입점. `@modelcontextprotocol/ext-apps`의 `registerAppTool`, `registerAppResource` 사용. 포트 `PORT || 8787`.
+- `server/src/ui.ts`: ChatGPT 위젯 UI 상태 빌더. `ui://hvdc/answer-card-v6.html` 등록 헬퍼.
+
+### Claude 레이어
+- `server/src/claude-server.ts`: Claude 전용 서버. 표준 `McpServer.tool()`만 사용. `ext-apps` 없음. 포트 `CLAUDE_PORT || 8788`.
+- `server/src/claude-render.ts`: ChatGPT format(`_meta` 포함)과 Claude format(직접 GroundedAnswer) 양쪽 파싱 후 마크다운 카드 렌더링.
 
 ## public
 
@@ -98,12 +132,13 @@ flowchart TD
 
 ## tests
 
-`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다.
+`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 71개 테스트가 통과한다.
 
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
-- `tests/descriptor.test.ts`: 앱 descriptor 관련 동작을 검증한다.
+- `tests/descriptor.test.ts`: ChatGPT 앱 descriptor와 `chatgpt-app-submission.json` 일치를 검증한다.
 - `tests/evals.test.ts`: 평가 시나리오를 검증한다.
 - `tests/widget.test.ts`: 공개 위젯 HTML의 기대 요소, bridge fallback, 외부 fetch 금지, overflow-safe CSS를 검증한다.
+- `tests/claude-descriptor.test.ts`: Claude 서버 tool parity, 양방향 포맷 파싱(`parseGroundedAnswer`), 마크다운 렌더링 필수 필드를 검증한다. (28개 테스트)
 - `tests/golden_prompts.json`: HVDC 도메인 질문과 기대 판정 데이터를 담는다.
 
 ## scripts
