@@ -14,7 +14,7 @@ import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import type { DomainHint, GroundedAnswer } from "./types.js";
-import { logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
+import { LEGACY_WIDGET_URI, logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
