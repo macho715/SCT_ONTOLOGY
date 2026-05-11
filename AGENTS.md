@@ -97,7 +97,7 @@ public/hvdc-answer-widget.html
 data/corpus/, data/index/, ontology/
 core/, rules/, schemas/, evals/
 scripts/index_corpus.py, scripts/check_index_drift.py
-tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, sct-operating-contract.test.ts, golden_prompts.json
+tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, sct-operating-contract.test.ts, sct-governance-runtime.test.ts, golden_prompts.json
 .agents/skills/
 .github/workflows/hvdc-verify.yml
 ```

@@ -384,7 +384,7 @@ classDiagram
 - `npm run claude:dev`: Claude 서버를 개발 모드로 실행한다.
 - `npm run claude:start`: Claude 서버를 시작한다.
 
-현재 test 파일은 아래 역할을 가진다. **총 96개 테스트 통과** (2026-05-11 기준).
+현재 test 파일은 아래 역할을 가진다. **총 106개 테스트 통과** (2026-05-11 기준).
 
 | Test file | 테스트 수 | 확인하는 내용 |
 | --- | --- | --- |

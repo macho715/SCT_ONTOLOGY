@@ -6,6 +6,7 @@
 
 ### Added
 
+- Added runtime governance scenario coverage in `tests/sct-governance-runtime.test.ts` for Customs, Cost, DEM/DET, Marine close, Warehouse, ETA, OOG/Safety, and Claim situations.
 - Added `core/mission-statement.md` to fix the `sct_ontology` team mission.
 - Added `core/mcp-default-context-policy.md` to define default HVDC logistics context routing.
 - Added `schemas/sct-answer-contract.schema.json` to define the governance answer contract.
@@ -17,18 +18,21 @@
 ### Changed
 
 - Linked the operating governance layer from README, architecture, and AGENTS guidance.
+- Added runtime validation gates for customs missing evidence, cost decision evidence, OOG/safety missing evidence, and claim missing evidence.
 
 ### Verified
 
 - Focused check: `npm test -- tests/sct-operating-contract.test.ts`.
 - Result: 1 test file passed, 6 tests passed.
+- Runtime scenario check: `npm test -- tests/sct-governance-runtime.test.ts`.
+- Result: 1 test file passed, 10 tests passed.
 - Full check: `npm run verify`.
-- Result: TypeScript typecheck passed, 6 test files passed, 96 tests passed.
+- Result: TypeScript typecheck passed, 7 test files passed, 106 tests passed.
 
 ### Known limits
 
-- This update adds governance and regression assets only.
-- It does not add a new runtime MCP tool, production write-back, or live runtime enforcement of every AMBER/ZERO rule.
+- This update does not add a new runtime MCP tool or production write-back.
+- Governance gates are now covered for the simulated scenarios, but the full AMBER/ZERO rulebook is not yet a complete domain engine.
 
 ## Unreleased - 2026-05-11 Phase 3 tool contract and regression gates
 

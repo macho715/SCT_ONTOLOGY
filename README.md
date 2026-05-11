@@ -149,7 +149,7 @@ Corpus index 재생성:
 npm run index
 ```
 
-TypeScript 검사와 테스트 실행 (96개 테스트):
+TypeScript 검사와 테스트 실행 (106개 테스트):
 
 ```bash
 npm run verify

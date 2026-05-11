@@ -20,6 +20,12 @@ import { mergeShipmentValidation } from "./shipment-validation.js";
 const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
 const M130 = /\bM130\b|site receipt|site closure|닫아도|close/i;
+const MISSING_EVIDENCE_TERMS = /without|missing|없|없이|누락|미결|부재|만\s*있|only/i;
+const CUSTOMS_DECISION_TERMS = /customs|boe|release|permit|ci\/pl|hs|coo|통관|반출|허가/i;
+const COST_DECISION_TERMS = /invoice|cost|rate|tariff|rateref|tariffref|aed|청구|정산|비용|요율/i;
+const COST_FINAL_DECISION_TERMS = /approve|approval|confirm|confirmed|post|write|반영|승인|확정|가능/i;
+const OOG_SAFETY_TERMS = /oog|lift plan|lifting plan|lashing|cog|dims|weight|permit|중량|리프팅|양중|안전/i;
+const CLAIM_TERMS = /claim|claim letter|pod|survey|photo|mrr|bl clause|클레임|손상|분쟁/i;
 const FLOW_CODE = /flow code|confirmedflowcode|confirmed flow code/i;
 const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classification|분류|경로|통관|비용|청구|지표/i;
 const ANY_KEY_AMBIGUITY = /ambiguous|ambiguity|unclear|multiple|duplicate|same|which|모호|중복|여러|둘 다|같은|어느|하나만/i;
@@ -125,6 +131,54 @@ export function validateGrounding(args: {
       targetObject: "SiteReceipt/M130",
       evidenceIds,
       message: "AGI/DAS M130 closure requires MOSB/LCT chain evidence such as M115/M116/M117 or approved exception."
+    });
+  }
+
+  if (CUSTOMS_DECISION_TERMS.test(args.question) && MISSING_EVIDENCE_TERMS.test(args.question)) {
+    findings.push({
+      ruleId: "SCT-CUSTOMS-001",
+      reasonCode: "SCT_CUSTOMS_EVIDENCE_REQUIRED",
+      severity: "BLOCK",
+      status: "BLOCK",
+      targetObject: "CustomsEvidenceMatrix",
+      evidenceIds,
+      message: "Customs decisions require CI/PL, HS, COO, BOE, and permit evidence before release or approval."
+    });
+  }
+
+  if (COST_DECISION_TERMS.test(args.question) && COST_FINAL_DECISION_TERMS.test(args.question)) {
+    findings.push({
+      ruleId: "SCT-COST-001",
+      reasonCode: "SCT_COST_EVIDENCE_REQUIRED",
+      severity: "BLOCK",
+      status: "BLOCK",
+      targetObject: "CostEvidenceMatrix",
+      evidenceIds,
+      message: "Cost or invoice decisions require InvoiceLine, RateRef, TariffRef, and BOE/DO/Port evidence before approval or write-back."
+    });
+  }
+
+  if (OOG_SAFETY_TERMS.test(args.question) && MISSING_EVIDENCE_TERMS.test(args.question)) {
+    findings.push({
+      ruleId: "SCT-OOG-001",
+      reasonCode: "SCT_OOG_SAFETY_EVIDENCE_REQUIRED",
+      severity: "BLOCK",
+      status: "BLOCK",
+      targetObject: "OogSafetyEvidenceMatrix",
+      evidenceIds,
+      message: "OOG/Safety decisions require dims, weight, COG, lift plan, lashing, and permit evidence before proceeding."
+    });
+  }
+
+  if (CLAIM_TERMS.test(args.question) && MISSING_EVIDENCE_TERMS.test(args.question)) {
+    findings.push({
+      ruleId: "SCT-CLAIM-001",
+      reasonCode: "SCT_CLAIM_EVIDENCE_REQUIRED",
+      severity: "BLOCK",
+      status: "BLOCK",
+      targetObject: "ClaimEvidenceMatrix",
+      evidenceIds,
+      message: "Claim decisions require POD, MRR, photo, survey, and BL clause evidence before final claim position or letter issue."
     });
   }
 
