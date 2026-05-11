@@ -2,7 +2,7 @@
 
 Feature ID: phase3-tool-contract-regression-gates
 Created: 2026-05-11
-Status: Draft
+Status: Ready for execution review
 Owner: SCT_ONTOLOGY Maintainer / QA Reviewer
 Input: `phase3-plan.md`
 Version: v0.1.0
@@ -106,6 +106,8 @@ FR-015: The full repository verification command MUST pass before Phase 3 is mar
 
 FR-016: Default CI and local regression tests MUST NOT require live OpenAI API calls or production system access.
 
+FR-017: Existing compatibility widget aliases MUST remain covered by widget regression tests when render ownership is verified.
+
 ### Non-Functional Requirements
 
 NFR-001: Tests MUST be deterministic and runnable offline from local repository fixtures.
@@ -164,15 +166,20 @@ SC-007: Focused verification passes with `npm test -- tests/pipeline.test.ts tes
 
 SC-008: Full verification passes with `npm run verify`.
 
+SC-009: Widget regression tests prove the existing compatibility widget aliases remain available while `render_hvdc_answer_card` owns the primary answer-card template.
+
 ## Open Questions & Clarifications
 
-OQ-001: Should Claude descriptor parity be included in Phase 3 acceptance, or should Phase 3 rely on existing full verification coverage only?
+Open Questions: None.
 
-OQ-002: Should compatibility widget alias coverage be an explicit Phase 3 success criterion, or should it remain covered by existing widget tests outside this phase?
+Decision Log:
+- 2026-05-11: OQ-001 resolved. Claude descriptor parity is excluded from direct Phase 3 acceptance. Phase 3 relies on `npm run verify` for existing Claude regression coverage and does not add a new Claude-specific gate.
+- 2026-05-11: OQ-002 resolved. Compatibility widget alias coverage is included as an explicit Phase 3 success criterion because it protects existing render ownership and stale ChatGPT client behavior.
 
 Clarifications Log:
 - 2026-05-11: User requested `$spec-studio phase3-plan.md`.
 - 2026-05-11: Scope is limited to a Spec document derived from `phase3-plan.md`; no implementation code is part of this step.
+- 2026-05-11: Open questions were resolved before Phase 3 execution planning.
 
 ## Risks & Mitigations
 
@@ -196,7 +203,7 @@ Mitigation: Run focused Phase 3 tests first, then `npm run verify` before comple
 | Plan item | Covered by | Success criteria |
 |---|---|---|
 | TOOL-01 ask data-only | FR-004, FR-005 | SC-002 |
-| TOOL-02 render ownership | FR-006, FR-007 | SC-003 |
+| TOOL-02 render ownership | FR-006, FR-007, FR-017 | SC-003, SC-009 |
 | TOOL-03 no new standalone MCP tool | FR-001, FR-003 | SC-001, SC-004 |
 | TEST-01 shipment and gate coverage | FR-008, FR-009, FR-010, FR-011, FR-012 | SC-005 |
 | TEST-02 unsupported rule-only safety | FR-013 | SC-006 |
@@ -211,14 +218,15 @@ Mitigation: Run focused Phase 3 tests first, then `npm run verify` before comple
 - [ ] The spec includes found shipment, not-found shipment, unavailable rule engine, AGI/DAS block, invoice human gate, and unsupported rule-only regression cases.
 - [ ] The spec separates local fixture-based tests from production write-back or live API behavior.
 - [ ] The spec has stable FR, NFR, and SC IDs.
-- [ ] Open questions are accepted, answered, or explicitly deferred before execution.
+- [ ] Open questions are resolved or explicitly deferred before execution.
 
 ## Approval Readiness
 
-Status: Draft.
+Status: Ready for execution review.
 
-This spec is ready for review, but not ready for execution approval until OQ-001 and OQ-002 are answered or explicitly deferred by the project owner.
+This spec has no open questions blocking execution review.
 
 ## Changelog
 
 - v0.1.0: Initial Phase 3 Spec drafted from `phase3-plan.md`.
+- v0.1.1: Resolved OQ-001 and OQ-002, added compatibility widget alias success criterion, and updated approval readiness.
