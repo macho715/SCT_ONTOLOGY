@@ -2,6 +2,34 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-11 sct_ontology MCP operating update
+
+### Added
+
+- Added `core/mission-statement.md` to fix the `sct_ontology` team mission.
+- Added `core/mcp-default-context-policy.md` to define default HVDC logistics context routing.
+- Added `schemas/sct-answer-contract.schema.json` to define the governance answer contract.
+- Added `rules/sct-evidence-matrix.md` for domain evidence requirements and missing-evidence gates.
+- Added `rules/sct-amber-zero-rulebook.md` for AMBER/ZERO gate definitions and high-risk stop conditions.
+- Added `evals/sct-golden-qa.csv` as the Golden Q&A regression seed.
+- Added `tests/sct-operating-contract.test.ts` to keep the operating governance files present and parseable.
+
+### Changed
+
+- Linked the operating governance layer from README, architecture, and AGENTS guidance.
+
+### Verified
+
+- Focused check: `npm test -- tests/sct-operating-contract.test.ts`.
+- Result: 1 test file passed, 6 tests passed.
+- Full check: `npm run verify`.
+- Result: TypeScript typecheck passed, 6 test files passed, 96 tests passed.
+
+### Known limits
+
+- This update adds governance and regression assets only.
+- It does not add a new runtime MCP tool, production write-back, or live runtime enforcement of every AMBER/ZERO rule.
+
 ## Unreleased - 2026-05-11 Phase 3 tool contract and regression gates
 
 ### Added

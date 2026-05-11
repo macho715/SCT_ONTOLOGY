@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sct-ontology.local/schemas/sct-answer-contract.schema.json",
+  "title": "SCT Answer Contract",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "verdict",
+    "summary",
+    "evidence",
+    "evidenceIds",
+    "validationStatus",
+    "validation",
+    "actions",
+    "humanGateRequired",
+    "audit"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "INFO", "WARN", "BLOCK", "NO_EVIDENCE", "AMBER", "ZERO"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "businessImpact": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "docId", "sectionPath", "snippet", "sourceType"],
+        "properties": {
+          "id": { "type": "string" },
+          "docId": { "type": "string" },
+          "sectionPath": { "type": "string" },
+          "snippet": { "type": "string" },
+          "sourceType": { "type": "string" }
+        }
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "validationStatus": {
+      "type": "string",
+      "enum": ["PASS", "INFO", "WARN", "BLOCK", "NO_EVIDENCE", "AMBER", "ZERO"]
+    },
+    "validation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "reasonCode", "status", "evidenceIds", "message"],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "reasonCode": { "type": "string" },
+          "status": { "type": "string" },
+          "evidenceIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["actionType", "ownerRole", "humanGateRequired"],
+        "properties": {
+          "actionType": { "type": "string" },
+          "ownerRole": { "type": "string" },
+          "humanGateRequired": { "type": "boolean" },
+          "parameters": { "type": "object" }
+        }
+      }
+    },
+    "humanGateRequired": {
+      "type": "boolean"
+    },
+    "audit": {
+      "type": "object",
+      "required": ["auditLogRequired", "sourceCoverage"],
+      "properties": {
+        "auditLogRequired": { "type": "boolean" },
+        "sourceCoverage": {
+          "type": "string",
+          "enum": ["FULL", "PARTIAL", "NONE"]
+        }
+      }
+    }
+  }
+}

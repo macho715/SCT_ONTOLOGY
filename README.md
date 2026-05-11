@@ -15,6 +15,7 @@
 | Index | `data/index/`에 `corpus_index.json`, `corpus_inventory.csv`, `source_role_map.json`을 생성합니다. |
 | 검증 | golden prompt, descriptor contract, widget, pipeline 테스트가 있습니다. |
 | CI | `.github/workflows/hvdc-verify.yml`이 index 재생성, drift check, JSON 검증, typecheck/test를 실행합니다. |
+| 운영 거버넌스 | `core/`, `rules/`, `schemas/`, `evals/`에 `sct_ontology` 팀 운영 기준, Evidence Matrix, AMBER/ZERO gate, Answer Contract, Golden Q&A를 둡니다. |
 
 ## Source of Truth
 
@@ -29,6 +30,32 @@
 7. 테스트와 golden fixture: `tests/`
 
 근거가 없는 route, 비용 규칙, 승인 규칙, compliance 판단은 README나 앱 답변에 추가하지 않습니다.
+
+## sct_ontology Operating Layer
+
+`sct_ontology`는 팀 표준 LLM 운영 계층입니다.
+
+목적은 세 가지입니다.
+
+- hallucination을 줄입니다.
+- MR.CHA의 HVDC 물류 지식, 용어, workflow, evidence rule, decision gate를 답변 과정에 주입합니다.
+- 팀원이 같은 기준, 같은 용어, 같은 증빙 요구, 같은 위험 판단으로 LLM을 사용하게 합니다.
+
+운영 기준 파일:
+
+| 파일 | 의미 |
+|---|---|
+| `core/mission-statement.md` | `sct_ontology`의 목적과 운영 원칙을 고정합니다. |
+| `core/mcp-default-context-policy.md` | 사용자가 일반 답변을 명시하지 않으면 HVDC logistics 맥락으로 해석하는 기본 정책입니다. |
+| `schemas/sct-answer-contract.schema.json` | 답변 구조, evidence, validation, action, audit 필드를 고정하는 schema입니다. |
+| `rules/sct-evidence-matrix.md` | Customs, Cost, DEM/DET, ETA, Warehouse, OOG/Safety, Claim별 필수 evidence와 missing gate를 정리합니다. |
+| `rules/sct-amber-zero-rulebook.md` | AMBER/ZERO gate와 high-risk stop 조건을 정리합니다. |
+| `evals/sct-golden-qa.csv` | 팀 답변 일관성을 보기 위한 Golden Q&A regression seed입니다. |
+
+중요한 한계:
+
+이 운영 계층은 governance와 regression 기준입니다.
+새 runtime MCP tool이나 production write-back 기능을 추가하지 않습니다.
 
 ## MCP tools
 
@@ -122,7 +149,7 @@ Corpus index 재생성:
 npm run index
 ```
 
-TypeScript 검사와 테스트 실행 (71개 테스트):
+TypeScript 검사와 테스트 실행 (96개 테스트):
 
 ```bash
 npm run verify

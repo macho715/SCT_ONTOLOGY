@@ -13,6 +13,7 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
+- Operating governance artifacts: `core/mission-statement.md`, `core/mcp-default-context-policy.md`, `schemas/sct-answer-contract.schema.json`, `rules/sct-evidence-matrix.md`, `rules/sct-amber-zero-rulebook.md`, `evals/sct-golden-qa.csv`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
 - New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed.
 
@@ -27,7 +28,8 @@ Use sources in this order:
 7. `data/index/corpus_inventory.csv`
 8. `data/index/corpus_index.json`
 9. Tests and golden fixtures under `tests/`
-10. Product/security docs under `docs/`
+10. Operating governance files under `core/`, `rules/`, `schemas/`, and `evals/`
+11. Product/security docs under `docs/`
 
 Never invent facts, fields, routes, cost rules, approval rules, or compliance interpretations not supported by approved corpus, source code, or tests.
 
@@ -78,6 +80,14 @@ A Claude-specific MCP server runs independently on port `8788` (`CLAUDE_PORT` en
 
 Do not document `query_knowledge_graph`, `create_action_request`, or `export_answer_report` as implemented until source code and descriptor tests confirm them.
 
+## sct_ontology Operating Governance
+
+The `core/`, `rules/`, `schemas/`, and `evals/` folders define team operating governance.
+They document the mission statement, default MCP context policy, Answer Contract, Evidence Matrix, AMBER/ZERO rulebook, and Golden Q&A seed.
+These files are governance and regression assets, not runtime MCP tools and not runtime corpus evidence.
+
+Do not claim runtime enforcement of a governance rule unless source code and tests confirm it.
+
 ## Confirmed Layout
 ```text
 AGENTS.md, README.md, CHANGELOG.md, LAYOUT.md, SYSTEM_ARCHITECTURE.md
@@ -85,8 +95,9 @@ chatgpt-app-submission.json, railway.json
 server/src/index.ts, answer.ts, corpus.ts, router.ts, redact.ts, types.ts
 public/hvdc-answer-widget.html
 data/corpus/, data/index/, ontology/
+core/, rules/, schemas/, evals/
 scripts/index_corpus.py, scripts/check_index_drift.py
-tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, golden_prompts.json
+tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, sct-operating-contract.test.ts, golden_prompts.json
 .agents/skills/
 .github/workflows/hvdc-verify.yml
 ```

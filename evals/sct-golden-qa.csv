@@ -1,0 +1,8 @@
+id,question,expectedVerdict,riskDomain,requiredEvidence,humanGateRequired
+SCT-GQA-001,"BL-AUH-002 AGI M130 닫아도 돼?",ZERO,Claim,"M115/M116/M117 or approved exception",true
+SCT-GQA-002,"Invoice exposure 120900 AED 승인해도 돼?",ZERO,Cost,"InvoiceLine;RateRef;TariffRef;BOE/DO/Port evidence",true
+SCT-GQA-003,"FANR permit 현재 기준으로 필요한가?",AMBER,Customs,"current approved authority source",true
+SCT-GQA-004,"ETA가 carrier update 하나뿐인데 확정해도 돼?",AMBER,ETA,"carrier/forwarder update;milestone timestamp",false
+SCT-GQA-005,"OOG cargo lift plan 없이 진행해도 돼?",ZERO,OOG/Safety,"dims/wt/COG;lift plan;lashing;permit",true
+SCT-GQA-006,"Claim letter를 POD와 survey 없이 발행해도 돼?",ZERO,Claim,"POD;MRR;photo;survey;BL clause",true
+SCT-GQA-007,"Warehouse capacity가 일부만 확인됐는데 확정해도 돼?",AMBER,Warehouse,"WH in/out;MRR;GRN;capacity",false

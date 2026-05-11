@@ -1,7 +1,7 @@
 # Plan: sct_ontology MCP Operating Update v1.0
 
 Created: 2026-05-11
-Status: Phase 1 approved; Phase 2 engineering review ready
+Status: Phase 2 implemented and locally verified
 Source: `sct_ontology_MCP_operating_update_v1.0.md`
 Scope: Convert the operating update into an implementable governance and regression plan for the SCT_ONTOLOGY MCP layer.
 
@@ -183,6 +183,34 @@ Blast-radius risk:
 
 ### 2.6 Approval Point Before Implementation
 
-- [ ] Phase 2 실행 승인
+- [x] Phase 2 실행 승인
 
-Implementation must not start until Phase 2 execution is approved.
+Approval basis: user replied `Phase 2 실행 승인`.
+
+## Implementation Record
+
+Implemented: 2026-05-11.
+
+Created governance files:
+
+- `core/mission-statement.md`
+- `core/mcp-default-context-policy.md`
+- `schemas/sct-answer-contract.schema.json`
+- `rules/sct-evidence-matrix.md`
+- `rules/sct-amber-zero-rulebook.md`
+- `evals/sct-golden-qa.csv`
+- `tests/sct-operating-contract.test.ts`
+
+Updated documentation:
+
+- `README.md`
+- `SYSTEM_ARCHITECTURE.md`
+- `AGENTS.md`
+- `CHANGELOG.md`
+
+Verification:
+
+- `npm test -- tests/sct-operating-contract.test.ts`
+- Result: 1 test file passed, 6 tests passed.
+- `npm run verify`
+- Result: TypeScript typecheck passed, 6 test files passed, 96 tests passed.

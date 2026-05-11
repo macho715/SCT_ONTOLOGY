@@ -24,6 +24,13 @@
 - `data/index` 파일은 생성/검토용 artifact이며, 현재 검색 런타임의 직접 입력은 `data/corpus`이다.
 - Railway 배포는 `railway.json`에 정의된 `npm run verify` 빌드 검증과 `npm run start` 실행 경계 안에 있다.
 
+### sct_ontology 운영 거버넌스 레이어
+- `core/mission-statement.md`와 `core/mcp-default-context-policy.md`는 팀 표준 LLM 운영 목적과 기본 HVDC logistics context 정책을 정의한다.
+- `schemas/sct-answer-contract.schema.json`은 governance 수준의 answer contract를 정의한다.
+- `rules/sct-evidence-matrix.md`와 `rules/sct-amber-zero-rulebook.md`는 evidence requirement와 AMBER/ZERO gate를 정의한다.
+- `evals/sct-golden-qa.csv`는 팀 답변 일관성을 검증하는 Golden Q&A seed다.
+- 이 레이어는 runtime corpus가 아니다. `data/corpus/`에 넣거나 runtime evidence로 쓰려면 별도 승인된 phase가 필요하다.
+
 ## 한계와 경계
 
 - 현재 코드에는 ERP, WMS, ATLP, Foundry, WhatsApp, email 발송 같은 외부 운영 시스템 write-back이 없다.
@@ -68,13 +75,31 @@ flowchart TD
   Corpus --> CorpusFiles
   ClaudeRender --> Types
 
+  subgraph OperatingGovernance["sct_ontology 운영 거버넌스"]
+    Mission["core/mission-statement.md"]
+    ContextPolicy["core/mcp-default-context-policy.md"]
+    AnswerContract["schemas/sct-answer-contract.schema.json"]
+    EvidenceMatrix["rules/sct-evidence-matrix.md"]
+    AmberZero["rules/sct-amber-zero-rulebook.md"]
+    GoldenQA["evals/sct-golden-qa.csv"]
+    OperatingTest["tests/sct-operating-contract.test.ts"]
+  end
+
+  Mission --> OperatingTest
+  ContextPolicy --> OperatingTest
+  AnswerContract --> OperatingTest
+  EvidenceMatrix --> OperatingTest
+  AmberZero --> OperatingTest
+  GoldenQA --> OperatingTest
+
   Indexer["scripts/index_corpus.py"] --> IndexFiles["data/index/corpus_index.json<br/>data/index/corpus_inventory.csv"]
   DriftCheck["scripts/check_index_drift.py"] --> IndexFiles
   SourceRole["data/index/source_role_map.json"] --> Review["review / mapping reference"]
 
   GHA[".github/workflows/hvdc-verify.yml"] --> Indexer
   GHA --> DriftCheck
-  GHA --> Verify["npm run verify (71 tests)"]
+  GHA --> Verify["npm run verify"]
+  Verify --> OperatingTest
   Railway["railway.json"] --> Build["buildCommand: npm run verify"]
   Railway --> Start["startCommand: npm run start"]
   Railway --> Health["healthcheckPath: /"]
@@ -359,7 +384,7 @@ classDiagram
 - `npm run claude:dev`: Claude 서버를 개발 모드로 실행한다.
 - `npm run claude:start`: Claude 서버를 시작한다.
 
-현재 test 파일은 아래 역할을 가진다. **총 71개 테스트 통과** (2026-05-11 기준).
+현재 test 파일은 아래 역할을 가진다. **총 96개 테스트 통과** (2026-05-11 기준).
 
 | Test file | 테스트 수 | 확인하는 내용 |
 | --- | --- | --- |
