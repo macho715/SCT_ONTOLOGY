@@ -96,21 +96,22 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("keeps ask data-only while linking only the render tool to the widget resource", () => {
+  it("links user-visible answer tools to the widget resource without embedding ui in ask structuredContent", () => {
     const askMeta = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology._meta;
     const askMetaRecord = askMeta as Record<string, unknown>;
     const renderMeta = HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card._meta;
     const renderMetaRecord = renderMeta as Record<string, unknown>;
     const askOutputSchema = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.outputSchema as Record<string, unknown>;
 
-    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("call render_hvdc_answer_card next");
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("HVDC answer card");
     expect(HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card.description).toContain(
       "after every user-visible ask_hvdc_ontology answer"
     );
     expect(askOutputSchema.shipmentRule).toBeDefined();
-    expect((askMetaRecord.ui as unknown) ?? undefined).toBeUndefined();
-    expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
-    expect(askMetaRecord["openai/widgetAccessible"]).toBeUndefined();
+    expect((askOutputSchema as { ui?: unknown }).ui).toBeUndefined();
+    expect((askMetaRecord.ui as { resourceUri?: string }).resourceUri).toBe("ui://hvdc/answer-card-v7.html");
+    expect(askMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v7.html");
+    expect(askMetaRecord["openai/widgetAccessible"]).toBe(true);
     expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v7.html");
     expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v7.html");
     expect(renderMetaRecord["openai/widgetAccessible"]).toBe(true);
@@ -205,7 +206,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("returns data-only answer results and render-only Apps SDK template metadata", async () => {
+  it("returns card metadata on ask results while keeping ask structuredContent free of ui state", async () => {
     const mcpServer = createHvdcServer();
     const client = new Client({ name: "descriptor-result-meta-test", version: "0.0.1" });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -223,8 +224,8 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       });
       const askMeta = askResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
 
-      expect(askMeta["openai/outputTemplate"]).toBeUndefined();
-      expect(askMeta.ui?.resourceUri).toBeUndefined();
+      expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v7.html");
+      expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v7.html");
       expect(askMeta.piiMasked).toBe(false);
       expect((askResult.structuredContent as { ui?: unknown }).ui).toBeUndefined();
 
@@ -254,14 +255,13 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     }
   });
 
-  it("asks ChatGPT review cases to render answer cards for user-visible HVDC answers", () => {
+  it("asks ChatGPT review cases to use ask directly for user-visible answer cards", () => {
     const hvdcAnswerPrompts = new Set(["AGI M130 닫아도 돼? BL-535 관련", "Flow Code 어디에 써?"]);
     const hvdcAnswerCases = submission.test_cases.filter((testCase) => hvdcAnswerPrompts.has(testCase.user_prompt));
 
     expect(hvdcAnswerCases.length).toBeGreaterThan(0);
     for (const testCase of hvdcAnswerCases) {
       expect(testCase.tools_triggered).toContain("ask_hvdc_ontology");
-      expect(testCase.tools_triggered).toContain("render_hvdc_answer_card");
       expect(testCase.expected_output).toMatch(/card|카드/i);
     }
   });

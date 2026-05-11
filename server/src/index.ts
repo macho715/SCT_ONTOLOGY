@@ -176,7 +176,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   ask_hvdc_ontology: {
     title: "Ask HVDC ontology",
     description:
-      "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, and next action. For a user-visible final HVDC answer, call render_hvdc_answer_card next with the complete structured answer so the card is shown.",
+      "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, next action, and the HVDC answer card.",
     inputSchema: {
       question: z.string().min(1),
       userRole: z.string().default("ops_user").optional(),
@@ -184,6 +184,9 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     outputSchema: answerDataOutputSchema,
     _meta: {
+      ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
     },
@@ -297,6 +300,18 @@ function buildRenderResultMeta(answer: GroundedAnswer): Record<string, unknown> 
   };
 }
 
+function buildAskResultMeta(answer: GroundedAnswer): Record<string, unknown> {
+  return {
+    "openai/outputTemplate": WIDGET_URI,
+    uiTemplate: WIDGET_URI,
+    piiMasked: answer.piiMasked,
+    ui: {
+      resourceUri: WIDGET_URI,
+      visibility: ["model", "app"]
+    }
+  };
+}
+
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
   const renderToolWidgetAliasUri = "ui://hvdc/render_hvdc_answer_card.html";
@@ -362,7 +377,7 @@ export function createHvdcServer(): McpServer {
       return {
         structuredContent: answer,
         content: [{ type: "text", text: answerToText(answer) }],
-        _meta: { piiMasked: answer.piiMasked }
+        _meta: buildAskResultMeta(answer)
       };
     }
   );

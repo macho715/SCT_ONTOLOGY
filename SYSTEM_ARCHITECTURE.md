@@ -132,7 +132,7 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
-| `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + text fallback (UI 없음) | `structuredContent` + 마크다운 카드 |
+| `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + answer card template metadata | `structuredContent` + 마크다운 카드 |
 | `render_hvdc_answer_card` | ChatGPT: `server/src/index.ts`<br/>Claude: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v7.html` iframe 위젯 | 마크다운 카드 (iframe 없음) |
 | `route_question` | `server/src/router.ts` | JSON route | JSON route |
 | `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` EvidenceSnippet | `data/corpus` EvidenceSnippet |
@@ -157,10 +157,10 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- `ask_hvdc_ontology`는 데이터 전용 tool이다. 답변 JSON과 텍스트 fallback을 반환하지만 UI template metadata를 붙이지 않는다.
+- `ask_hvdc_ontology`는 답변 JSON과 텍스트 fallback을 반환하고, ChatGPT 카드 표시를 위해 tool/result metadata로 `ui://hvdc/answer-card-v7.html`을 가리킨다.
 - `ask_hvdc_ontology`의 `structuredContent`에는 `ui` 객체를 넣지 않는다. `ui.templateUrl`은 render tool에서만 붙인다.
-- `render_hvdc_answer_card` descriptor만 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v7.html`을 가리킨다.
-- 사용자에게 보이는 최종 HVDC 답변은 `ask_hvdc_ontology` 뒤에 `render_hvdc_answer_card`를 이어서 호출해 카드로 표시한다.
+- `render_hvdc_answer_card` descriptor도 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v7.html`을 가리킨다.
+- 사용자에게 보이는 최종 HVDC 답변은 `ask_hvdc_ontology` 한 번으로 카드 표시까지 시도한다. `render_hvdc_answer_card`는 이미 준비된 답변을 명시적으로 다시 렌더링할 때 사용한다.
 - 호환성 alias resource는 `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, `ui://hvdc/render_hvdc_answer_card.html`이다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget CSS는 긴 action id, protected fields, route reason, validation text가 카드 밖으로 잘리지 않도록 줄바꿈과 responsive grid를 적용한다.
@@ -471,8 +471,8 @@ This is expected when the action is a workflow recommendation rather than a dire
 
 ### ChatGPT layer flow
 
-`ask_hvdc_ontology` remains data-only.
-It can return `evidenceTrace`, but it does not attach UI template metadata.
+`ask_hvdc_ontology` returns answer data and ChatGPT card template metadata.
+It can return `evidenceTrace`, but it does not attach `structuredContent.ui`.
 
 `render_hvdc_answer_card` accepts trace data for presentation.
 If old render input omits `evidenceTrace`, the server treats it as `[]`.

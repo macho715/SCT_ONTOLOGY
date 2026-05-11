@@ -7,8 +7,8 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 - Runtime: Node.js / TypeScript MCP HTTP server at `/mcp`.
 - Default local endpoint: `http://localhost:8787/mcp`.
 - UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v7.html`.
-- `ask_hvdc_ontology` is data-only. It must not attach `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
-- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v7.html`.
+- `ask_hvdc_ontology` returns answer data and points ChatGPT to `ui://hvdc/answer-card-v7.html` through tool/result metadata. It must not attach `structuredContent.ui`.
+- `render_hvdc_answer_card` remains available to render an already prepared answer card and points to `ui://hvdc/answer-card-v7.html`.
 - UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
@@ -197,9 +197,9 @@ Do not invent trace evidence, proxy evidence, or fake evidence rows.
 Action traces may intentionally remain `NO_DIRECT_EVIDENCE` with an empty `evidenceIds` array.
 This is valid when the action is a workflow recommendation rather than a directly quoted corpus statement.
 
-`ask_hvdc_ontology` remains data-only.
-It may return `evidenceTrace`, but it must not attach UI metadata, `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
-`render_hvdc_answer_card` owns presentation of the trace.
+`ask_hvdc_ontology` returns answer data and ChatGPT card template metadata.
+It may return `evidenceTrace`, but it must not attach `structuredContent.ui`.
+`render_hvdc_answer_card` remains available for explicit re-rendering and also presents trace data.
 
 ChatGPT widget rendering must show short labels such as `E1` while preserving the raw `EvidenceSnippet.id` in drawer data.
 Claude rendering must show an `Evidence Trace` section in markdown.
