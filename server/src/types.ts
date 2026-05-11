@@ -23,7 +23,10 @@ export type ReasonCode =
   | "STALE_SOURCE_RISK"
   | "PII_MASKED"
   | "HUMAN_GATE_REQUIRED"
-  | "AMBIGUOUS_ANY_KEY";
+  | "AMBIGUOUS_ANY_KEY"
+  | "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED"
+  | "SHIPMENT_INVOICE_HUMAN_GATE_REQUIRED"
+  | "SHIPMENT_MISSING_DOCUMENTS";
 
 export type EvidenceSnippet = {
   id: string;
@@ -99,6 +102,12 @@ export type ShipmentRuleResult = {
   matchedKey: string | null;
   matchedScheme?: string | null;
   shipmentId: string | null;
+  currentStage?: string | null;
+  routingPattern?: string | null;
+  missingDocuments?: string[];
+  openExceptions?: string[];
+  invoiceAudit?: Array<Record<string, unknown>>;
+  invoiceExposureAed?: string | null;
   candidates?: string[];
   risks: Array<Record<string, unknown>>;
   humanGateRequired: boolean;

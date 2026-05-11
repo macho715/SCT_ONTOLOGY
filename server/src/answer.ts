@@ -15,6 +15,7 @@ import { loadCorpus, searchCorpus } from "./corpus.js";
 import { isDailyLogisticsKpiQuestion, resolveAnyKey, routeQuestion } from "./router.js";
 import { maskPii, sha256 } from "./redact.js";
 import { evaluateShipmentRule } from "./shipment-rule.js";
+import { mergeShipmentValidation } from "./shipment-validation.js";
 
 const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
@@ -434,10 +435,12 @@ export function answerQuestion(args: {
     resolvedEntities,
     piiMasked: maskedQuestion.piiMasked
   });
-  const verdict = deriveVerdict(evidence, validation);
+  const shipmentValidation = mergeShipmentValidation(shipmentRule);
+  const mergedValidation = [...validation, ...shipmentValidation.findings];
+  const verdict = deriveVerdict(evidence, mergedValidation);
   const core = composeSummary(maskedQuestion.text, verdict);
-  const actions = [...core.actions];
-  if (validation.some((finding) => finding.ruleId === "A-ACTION-001") && !actions.some((action) => action.humanGateRequired)) {
+  const actions = [...core.actions, ...shipmentValidation.actions];
+  if (mergedValidation.some((finding) => finding.ruleId === "A-ACTION-001") && !actions.some((action) => action.humanGateRequired)) {
     actions.push({
       actionType: "REQUEST_HUMAN_GATE_REVIEW",
       ownerRole: "Responsible Approver",
@@ -466,7 +469,7 @@ export function answerQuestion(args: {
     evidence,
     evidenceTrace,
     shipmentRule,
-    validation,
+    validation: mergedValidation,
     actions,
     graphPath,
     piiMasked: maskedQuestion.piiMasked,

@@ -226,6 +226,48 @@ function buildRisks(shipment: SampleShipment): Array<Record<string, unknown>> {
   return risks;
 }
 
+function money(value: number | string | null | undefined): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function buildInvoiceAudit(shipment: SampleShipment): Array<Record<string, unknown>> {
+  return (shipment.invoice_lines ?? []).map((line) => {
+    const quantity = money(line.quantity);
+    const rate = money(line.rate);
+    const draftAmount = money(line.draft_amount);
+    const expectedByRate = quantity * rate;
+    const standardAmount = line.standard_amount === undefined || line.standard_amount === null ? expectedByRate : money(line.standard_amount);
+    const zeroStandard = standardAmount === 0;
+    const deltaAmount = draftAmount - standardAmount;
+    const deltaPct = zeroStandard ? 0 : (deltaAmount / standardAmount) * 100;
+    const rateMismatch = Math.abs(draftAmount - expectedByRate) > 0.01;
+    const missingEvidence = (line.evidence_refs ?? []).length === 0;
+    const severity = zeroStandard || rateMismatch || missingEvidence || draftAmount >= HUMAN_GATE_THRESHOLD_AED ? "BLOCK" : Math.abs(deltaPct) > 5 ? "WARN" : "PASS";
+    return {
+      lineId: line.line_id,
+      item: line.item,
+      currency: line.currency ?? "AED",
+      draftAmountAed: draftAmount.toFixed(2),
+      standardAmountAed: standardAmount.toFixed(2),
+      deltaAmountAed: deltaAmount.toFixed(2),
+      deltaPct: deltaPct.toFixed(2),
+      expectedByRateAed: expectedByRate.toFixed(2),
+      rateMismatch,
+      missingEvidence,
+      zeroStandard,
+      severity,
+      humanGate: severity === "BLOCK" || draftAmount >= HUMAN_GATE_THRESHOLD_AED,
+      evidenceRefs: line.evidence_refs ?? []
+    };
+  });
+}
+
+function invoiceExposureAed(shipment: SampleShipment): string {
+  const exposure = (shipment.invoice_lines ?? []).reduce((sum, line) => sum + money(line.draft_amount), 0);
+  return exposure.toFixed(2);
+}
+
 export function evaluateShipmentRule(args: {
   question: string;
   resolvedEntities: ResolvedEntity[];
@@ -275,6 +317,7 @@ export function evaluateShipmentRule(args: {
   }
 
   const risks = buildRisks(match.shipment);
+  const invoiceAudit = buildInvoiceAudit(match.shipment);
   const status = risks.some((risk) => risk.severity === "BLOCK") ? "BLOCK" : risks.some((risk) => risk.severity === "WARN") ? "WARN" : "PASS";
   return baseResult({
     found: true,
@@ -282,9 +325,15 @@ export function evaluateShipmentRule(args: {
     matchedKey: match.value,
     matchedScheme: match.scheme,
     shipmentId: match.shipment.shipment_id,
+    currentStage: currentStage(match.shipment),
+    routingPattern: match.shipment.routing_pattern,
+    missingDocuments: missingDocuments(match.shipment),
+    openExceptions: match.shipment.open_exceptions ?? [],
+    invoiceAudit,
+    invoiceExposureAed: invoiceExposureAed(match.shipment),
     candidates,
     risks,
-    humanGateRequired: risks.some((risk) => risk.human_gate === true),
+    humanGateRequired: risks.some((risk) => risk.human_gate === true) || invoiceAudit.some((line) => line.humanGate === true),
     message: `Matched sample shipment ${match.shipment.shipment_id}.`
   });
 }

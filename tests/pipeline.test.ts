@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { answerQuestion, validateGrounding } from "../server/src/answer.js";
 import { maskPii } from "../server/src/redact.js";
 import { evaluateShipmentRule } from "../server/src/shipment-rule.js";
+import { mergeShipmentValidation } from "../server/src/shipment-validation.js";
 import type { EvidenceSnippet, IntentRoute } from "../server/src/types.js";
 import { withUiState } from "../server/src/ui.js";
 
@@ -117,6 +118,88 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(result.risks).toEqual(
       expect.arrayContaining([expect.objectContaining({ rule: "Ambiguous Shipment Candidate" })])
     );
+  });
+
+  it("exposes matched shipment validation details for stage, missing documents, invoice audit, and exposure", () => {
+    const answer = ask("BL-AUH-002 shipment validation merge 확인해줘");
+
+    expect(answer.shipmentRule).toEqual(
+      expect.objectContaining({
+        found: true,
+        currentStage: "M130",
+        routingPattern: "PORT_TO_MOSB_TO_SITE",
+        missingDocuments: expect.arrayContaining(["DO", "SITE_RECEIPT"]),
+        invoiceExposureAed: "120900.00",
+        humanGateRequired: true
+      })
+    );
+    expect(answer.shipmentRule?.invoiceAudit).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ lineId: "L1", severity: "BLOCK", humanGate: true }),
+        expect.objectContaining({ lineId: "L2", severity: "BLOCK", humanGate: true })
+      ])
+    );
+  });
+
+  it("maps shipment rule risks into validation findings and human gate actions without fake evidence ids", () => {
+    const shipmentRule = evaluateShipmentRule({
+      question: "BL-AUH-002 shipment validation merge 확인해줘",
+      resolvedEntities: [],
+      evidence: []
+    });
+    const merged = mergeShipmentValidation(shipmentRule);
+
+    expect(merged.findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ruleId: "V-SHIPMENT-AGIDAS-001",
+          reasonCode: "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED",
+          status: "BLOCK",
+          evidenceIds: []
+        }),
+        expect.objectContaining({
+          ruleId: "V-SHIPMENT-INVOICE-001",
+          reasonCode: "SHIPMENT_INVOICE_HUMAN_GATE_REQUIRED",
+          status: "BLOCK",
+          evidenceIds: []
+        })
+      ])
+    );
+    expect(merged.actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          actionType: "REQUEST_SHIPMENT_RULE_HUMAN_GATE",
+          ownerRole: "Marine / Material Chain Owner",
+          humanGateRequired: true
+        }),
+        expect.objectContaining({
+          actionType: "REQUEST_FINANCE_GATE_REVIEW",
+          ownerRole: "Finance Reviewer",
+          humanGateRequired: true
+        })
+      ])
+    );
+  });
+
+  it("merges shipment validation into final answer verdict and actions while preserving corpus evidence ids", () => {
+    const answer = ask("BL-AUH-002 shipment validation merge 확인해줘");
+
+    expect(answer.verdict).toBe("BLOCK");
+    expect(answer.validationStatus).toBe("BLOCK");
+    expect(answer.validation).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ruleId: "V-SHIPMENT-AGIDAS-001", evidenceIds: [] }),
+        expect.objectContaining({ ruleId: "V-SHIPMENT-INVOICE-001", evidenceIds: [] })
+      ])
+    );
+    expect(answer.actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ actionType: "REQUEST_SHIPMENT_RULE_HUMAN_GATE", humanGateRequired: true }),
+        expect.objectContaining({ actionType: "REQUEST_FINANCE_GATE_REVIEW", humanGateRequired: true })
+      ])
+    );
+    expect(answer.evidenceIds).toEqual(answer.evidence.map((item) => item.id));
+    expect(answer.evidenceTrace.every((trace) => trace.evidenceIds.every((id) => answer.evidenceIds.includes(id)))).toBe(true);
   });
 
   it("keeps Flow Code as WHP-only", () => {
