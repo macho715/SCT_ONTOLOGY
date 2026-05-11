@@ -4,7 +4,7 @@
   "app_info": {
     "display_name": "HVDC Ontology Answer",
     "subtitle": "HVDC evidence answers",
-    "description": "HVDC Ontology Answer helps logistics users ask HVDC project questions in ChatGPT and receive corpus-grounded answers with route documents, evidence snippets, validation findings, and next actions.",
+    "description": "HVDC Ontology Answer helps logistics users ask HVDC project questions in ChatGPT and receive corpus-grounded answers with route documents, evidence snippets, validation findings, and next actions. For user-visible HVDC answers, use ask_hvdc_ontology first and then render_hvdc_answer_card to show the answer card.",
     "category": "BUSINESS"
   },
   "tools": {
@@ -86,16 +86,16 @@
       "description": "Answer an AGI/DAS site closure question with blocking validation.",
       "user_prompt": "AGI M130 닫아도 돼? BL-535 관련",
       "file_attachment_urls": null,
-      "tools_triggered": "ask_hvdc_ontology",
-      "expected_output": "Returns a BLOCK verdict with required CONSOLIDATED documents, evidence snippets, validation findings, and a human-gate next action.",
+      "tools_triggered": "ask_hvdc_ontology, render_hvdc_answer_card",
+      "expected_output": "Returns a BLOCK verdict with required CONSOLIDATED documents, evidence snippets, validation findings, a human-gate next action, and the HVDC answer card.",
       "expected_output_url": null
     },
     {
       "description": "Explain the Flow Code boundary from ontology evidence.",
       "user_prompt": "Flow Code 어디에 써?",
       "file_attachment_urls": null,
-      "tools_triggered": "ask_hvdc_ontology",
-      "expected_output": "Explains that Flow Code is WHP-only and must not be used as route, customs, invoice, or KPI classification.",
+      "tools_triggered": "ask_hvdc_ontology, render_hvdc_answer_card",
+      "expected_output": "Explains that Flow Code is WHP-only and must not be used as route, customs, invoice, or KPI classification, and renders the HVDC answer card.",
       "expected_output_url": null
     },
     {

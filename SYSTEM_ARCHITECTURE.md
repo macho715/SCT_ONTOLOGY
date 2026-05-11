@@ -160,6 +160,7 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 - `ask_hvdc_ontology`는 데이터 전용 tool이다. 답변 JSON과 텍스트 fallback을 반환하지만 UI template metadata를 붙이지 않는다.
 - `ask_hvdc_ontology`의 `structuredContent`에는 `ui` 객체를 넣지 않는다. `ui.templateUrl`은 render tool에서만 붙인다.
 - `render_hvdc_answer_card` descriptor만 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v7.html`을 가리킨다.
+- 사용자에게 보이는 최종 HVDC 답변은 `ask_hvdc_ontology` 뒤에 `render_hvdc_answer_card`를 이어서 호출해 카드로 표시한다.
 - 호환성 alias resource는 `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, `ui://hvdc/render_hvdc_answer_card.html`이다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget CSS는 긴 action id, protected fields, route reason, validation text가 카드 밖으로 잘리지 않도록 줄바꿈과 responsive grid를 적용한다.

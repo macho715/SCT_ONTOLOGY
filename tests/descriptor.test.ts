@@ -15,6 +15,11 @@ type SubmissionTool = {
 
 type Submission = {
   tools: Record<string, SubmissionTool>;
+  test_cases: Array<{
+    user_prompt: string;
+    tools_triggered: string | null;
+    expected_output: string;
+  }>;
 };
 
 const APPROVED_V1_TOOL_NAMES = [
@@ -98,6 +103,10 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     const renderMetaRecord = renderMeta as Record<string, unknown>;
     const askOutputSchema = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.outputSchema as Record<string, unknown>;
 
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("call render_hvdc_answer_card next");
+    expect(HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card.description).toContain(
+      "after every user-visible ask_hvdc_ontology answer"
+    );
     expect(askOutputSchema.shipmentRule).toBeDefined();
     expect((askMetaRecord.ui as unknown) ?? undefined).toBeUndefined();
     expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
@@ -242,6 +251,18 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     } finally {
       await client.close();
       await mcpServer.close();
+    }
+  });
+
+  it("asks ChatGPT review cases to render answer cards for user-visible HVDC answers", () => {
+    const hvdcAnswerPrompts = new Set(["AGI M130 닫아도 돼? BL-535 관련", "Flow Code 어디에 써?"]);
+    const hvdcAnswerCases = submission.test_cases.filter((testCase) => hvdcAnswerPrompts.has(testCase.user_prompt));
+
+    expect(hvdcAnswerCases.length).toBeGreaterThan(0);
+    for (const testCase of hvdcAnswerCases) {
+      expect(testCase.tools_triggered).toContain("ask_hvdc_ontology");
+      expect(testCase.tools_triggered).toContain("render_hvdc_answer_card");
+      expect(testCase.expected_output).toMatch(/card|카드/i);
     }
   });
 });

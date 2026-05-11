@@ -176,7 +176,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   ask_hvdc_ontology: {
     title: "Ask HVDC ontology",
     description:
-      "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, and next action.",
+      "Use this when the user asks an HVDC logistics question that must be answered from the approved ontology corpus with evidence, validation, and next action. For a user-visible final HVDC answer, call render_hvdc_answer_card next with the complete structured answer so the card is shown.",
     inputSchema: {
       question: z.string().min(1),
       userRole: z.string().default("ops_user").optional(),
@@ -196,7 +196,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   render_hvdc_answer_card: {
     title: "Render HVDC answer card",
     description:
-      "Use this after ask_hvdc_ontology to render the final HVDC answer card. Pass through the complete ask_hvdc_ontology structured answer.",
+      "Use this after every user-visible ask_hvdc_ontology answer to render the final HVDC answer card. Pass through the complete ask_hvdc_ontology structured answer.",
     inputSchema: answerDataOutputSchema,
     outputSchema: answerOutputSchema,
     _meta: {

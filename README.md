@@ -62,7 +62,7 @@
 ChatGPT 서버(포트 8787)와 Claude 서버(포트 8788)가 동일한 6개 tool 이름을 공유합니다.
 
 - `ask_hvdc_ontology`: 질문을 route, corpus search, validation, answer object로 처리합니다. 이 tool은 데이터 전용이며 `openai/outputTemplate`, `_meta.ui.resourceUri`, `structuredContent.ui`를 붙이지 않습니다.
-- `render_hvdc_answer_card`: `ask_hvdc_ontology` 결과를 받아 렌더링합니다. ChatGPT 서버는 `ui://hvdc/answer-card-v7.html` 카드 UI로, Claude 서버는 마크다운 카드로 출력합니다. 이 tool만 카드 template metadata를 소유합니다.
+- `render_hvdc_answer_card`: `ask_hvdc_ontology` 결과를 받아 렌더링합니다. 사용자에게 보이는 최종 HVDC 답변마다 이 tool을 이어서 호출해야 합니다. ChatGPT 서버는 `ui://hvdc/answer-card-v7.html` 카드 UI로, Claude 서버는 마크다운 카드로 출력합니다. 이 tool만 카드 template metadata를 소유합니다.
 - `route_question`: 질문을 HVDC 도메인과 required corpus 문서로 분류합니다.
 - `search_ontology_corpus`: 승인된 `data/corpus/` 문서에서 EvidenceSnippet을 찾습니다.
 - `resolve_any_key`: BL, BOE, DO, Invoice, HVDC code, site, milestone 같은 식별자를 후보로 풉니다.
@@ -70,7 +70,7 @@ ChatGPT 서버(포트 8787)와 Claude 서버(포트 8788)가 동일한 6개 tool
 
 ## 전체 흐름
 
-쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾습니다. 이후 시각 카드가 필요하면 ChatGPT가 `render_hvdc_answer_card`를 호출하고, 이 render tool만 `ui://hvdc/answer-card-v7.html` 카드 UI를 연결합니다. 카드 template 로딩이 실패해도 `verdict`, `validationStatus`, `evidenceIds`, `actions`는 바꾸지 않고 텍스트 fallback을 보여줍니다.
+쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾습니다. 그 다음 ChatGPT는 사용자에게 보이는 HVDC 답변을 카드로 보여주기 위해 `render_hvdc_answer_card`를 이어서 호출합니다. 이 render tool만 `ui://hvdc/answer-card-v7.html` 카드 UI를 연결합니다. 카드 template 로딩이 실패해도 `verdict`, `validationStatus`, `evidenceIds`, `actions`는 바꾸지 않고 텍스트 fallback을 보여줍니다.
 
 ```mermaid
 flowchart LR
