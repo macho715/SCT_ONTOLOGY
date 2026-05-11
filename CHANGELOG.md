@@ -2,6 +2,31 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-11 Phase 3 tool contract and regression gates
+
+### Added
+
+- Added Phase 3 descriptor regression gates that pin the approved six MCP tools and block new standalone shipment, rule, validation, export, action, or write-back MCP tools in v1.
+- Added a pipeline regression gate that prevents unsupported rule-only shipment output from becoming a supported final answer or creating fake evidence IDs.
+- Added widget regression gates for external resource blocking, compatibility-alias independence, and UI failure display without overwriting protected business fields.
+- Added `phase3-plan.md` and `phase3-spec.md` as the plan/spec record for this phase.
+
+### Verified
+
+- Local focused regression passed: `npm test -- tests/pipeline.test.ts tests/descriptor.test.ts tests/widget.test.ts`.
+- Result: 3 test files passed, 46 tests passed.
+- Local full verification passed: `npm run verify`.
+- Result: TypeScript typecheck passed, 5 test files passed, 90 tests passed.
+- GitHub Actions passed on `origin/main`.
+- Workflow: `HVDC ontology verification`.
+- Run ID: `25685738394`.
+- Head SHA: `de973340c5fe146d98f44992ae4a8f7f9ecf2b90`.
+
+### Risks
+
+- `.claude/` and `hvdc_openai_agent/` remain untracked local paths and were not included in the Phase 3 push.
+- Phase 3 did not add production write-back, external API calls, or new runtime MCP tools.
+
 ## Unreleased - 2026-05-11 ChatGPT operations cache hardening
 
 ### Changed

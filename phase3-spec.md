@@ -2,10 +2,10 @@
 
 Feature ID: phase3-tool-contract-regression-gates
 Created: 2026-05-11
-Status: Ready for execution review
+Status: Completed
 Owner: SCT_ONTOLOGY Maintainer / QA Reviewer
 Input: `phase3-plan.md`
-Version: v0.1.0
+Version: v0.1.2
 
 ## Summary
 
@@ -150,23 +150,23 @@ D-007: Repository scripts in `package.json`.
 
 ## Success Criteria
 
-SC-001: Descriptor tests prove the server and ChatGPT submission expose exactly the same six v1 tool names.
+SC-001: Descriptor tests prove the server and ChatGPT submission expose exactly the same six v1 tool names. Status: PASS.
 
-SC-002: Descriptor or pipeline tests prove `ask_hvdc_ontology` has no UI metadata, no `openai/outputTemplate`, no `_meta.ui.resourceUri`, and no `structuredContent.ui`.
+SC-002: Descriptor or pipeline tests prove `ask_hvdc_ontology` has no UI metadata, no `openai/outputTemplate`, no `_meta.ui.resourceUri`, and no `structuredContent.ui`. Status: PASS.
 
-SC-003: Descriptor tests prove `render_hvdc_answer_card` owns the approved widget resource metadata.
+SC-003: Descriptor tests prove `render_hvdc_answer_card` owns the approved widget resource metadata. Status: PASS.
 
-SC-004: Descriptor tests prove no new standalone shipment, rule, validation, export, action, or write-back MCP tool exists in v1.
+SC-004: Descriptor tests prove no new standalone shipment, rule, validation, export, action, or write-back MCP tool exists in v1. Status: PASS.
 
-SC-005: Pipeline tests cover found shipment, not-found shipment, unavailable rule engine, AGI/DAS block, and invoice human gate.
+SC-005: Pipeline tests cover found shipment, not-found shipment, unavailable rule engine, AGI/DAS block, and invoice human gate. Status: PASS.
 
-SC-006: Pipeline tests prove unsupported rule-only output cannot become a supported final answer and cannot create fake evidence IDs.
+SC-006: Pipeline tests prove unsupported rule-only output cannot become a supported final answer and cannot create fake evidence IDs. Status: PASS.
 
-SC-007: Focused verification passes with `npm test -- tests/pipeline.test.ts tests/descriptor.test.ts`.
+SC-007: Focused verification passes with `npm test -- tests/pipeline.test.ts tests/descriptor.test.ts`. Status: PASS.
 
-SC-008: Full verification passes with `npm run verify`.
+SC-008: Full verification passes with `npm run verify`. Status: PASS.
 
-SC-009: Widget regression tests prove the existing compatibility widget aliases remain available while `render_hvdc_answer_card` owns the primary answer-card template.
+SC-009: Widget regression tests prove the existing compatibility widget aliases remain available while `render_hvdc_answer_card` owns the primary answer-card template. Status: PASS.
 
 ## Open Questions & Clarifications
 
@@ -211,22 +211,46 @@ Mitigation: Run focused Phase 3 tests first, then `npm run verify` before comple
 
 ## Reviewer Checklist
 
-- [ ] The spec keeps the six-tool v1 contract unchanged.
-- [ ] The spec does not add a new MCP tool.
-- [ ] The spec keeps `ask_hvdc_ontology` data-only.
-- [ ] The spec keeps rendering ownership on `render_hvdc_answer_card`.
-- [ ] The spec includes found shipment, not-found shipment, unavailable rule engine, AGI/DAS block, invoice human gate, and unsupported rule-only regression cases.
-- [ ] The spec separates local fixture-based tests from production write-back or live API behavior.
-- [ ] The spec has stable FR, NFR, and SC IDs.
-- [ ] Open questions are resolved or explicitly deferred before execution.
+- [x] The spec keeps the six-tool v1 contract unchanged.
+- [x] The spec does not add a new MCP tool.
+- [x] The spec keeps `ask_hvdc_ontology` data-only.
+- [x] The spec keeps rendering ownership on `render_hvdc_answer_card`.
+- [x] The spec includes found shipment, not-found shipment, unavailable rule engine, AGI/DAS block, invoice human gate, and unsupported rule-only regression cases.
+- [x] The spec separates local fixture-based tests from production write-back or live API behavior.
+- [x] The spec has stable FR, NFR, and SC IDs.
+- [x] Open questions are resolved or explicitly deferred before execution.
+
+## Completion Record
+
+Completed: 2026-05-11.
+
+Implementation commit:
+- `de97334 test: add phase 3 regression gates`
+
+Local verification:
+- `npm test -- tests/pipeline.test.ts tests/descriptor.test.ts tests/widget.test.ts`
+- Result: 3 test files passed, 46 tests passed.
+- `npm run verify`
+- Result: TypeScript typecheck passed, 5 test files passed, 90 tests passed.
+
+GitHub Actions verification:
+- Workflow: `HVDC ontology verification`
+- Run ID: `25685738394`
+- Head SHA: `de973340c5fe146d98f44992ae4a8f7f9ecf2b90`
+- Result: success.
+
+Completion notes:
+- Phase 3 added regression gates in `tests/descriptor.test.ts`, `tests/pipeline.test.ts`, and `tests/widget.test.ts`.
+- No production write-back, external API call, or new MCP runtime tool was added.
 
 ## Approval Readiness
 
-Status: Ready for execution review.
+Status: Completed.
 
-This spec has no open questions blocking execution review.
+This spec has no open questions blocking execution review, and all Phase 3 success criteria have current local and GitHub Actions evidence.
 
 ## Changelog
 
 - v0.1.0: Initial Phase 3 Spec drafted from `phase3-plan.md`.
 - v0.1.1: Resolved OQ-001 and OQ-002, added compatibility widget alias success criterion, and updated approval readiness.
+- v0.1.2: Marked Phase 3 complete with local verification and GitHub Actions success evidence.
