@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
@@ -275,6 +276,16 @@ export function startClaudeHttpServer() {
   });
 }
 
+export async function startClaudeStdioServer() {
+  const server = createClaudeServer();
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  startClaudeHttpServer();
+  if (process.argv[2] === "--stdio") {
+    startClaudeStdioServer().catch((e) => { console.error(e); process.exit(1); });
+  } else {
+    startClaudeHttpServer();
+  }
 }
