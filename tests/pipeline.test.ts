@@ -8,6 +8,10 @@ function ask(question: string) {
   return answerQuestion({ question, userRole: "test", language: "ko" });
 }
 
+function actionText(action: ReturnType<typeof ask>["actions"][number]): string {
+  return `${action.actionType} - ${action.ownerRole}${action.humanGateRequired ? " (Human-gate required)" : ""}`;
+}
+
 describe("HVDC ontology grounded answer pipeline", () => {
   it("blocks AGI/DAS M130 closure without MOSB/LCT chain evidence", () => {
     const answer = ask("AGI M130 닫아도 돼? BL-535 관련");
@@ -148,6 +152,59 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(fallback.ui?.uiRenderStatus).toBe("FALLBACK_RENDERED");
     expect(fallback.ui?.fallbackUsed).toBe(true);
     expect(fallback.ui?.errorCode).toBe("CARD_TEMPLATE_RENDER_FAILED");
+  });
+
+  it("maps supported answer statements only to evidence ids returned in the same response", () => {
+    const answer = ask("Flow Code 어디에 써?");
+    const evidenceTrace = answer.evidenceTrace;
+    const returnedEvidenceIds = new Set(answer.evidence.map((item) => item.id));
+
+    expect(answer.evidence.length).toBeGreaterThan(0);
+    expect(evidenceTrace?.some((item) => item.supportState === "SUPPORTED")).toBe(true);
+    expect(evidenceTrace?.filter((item) => item.targetType === "action").every((item) => item.supportState === "NO_DIRECT_EVIDENCE")).toBe(true);
+    expect(evidenceTrace).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ targetType: "summary", targetIndex: null, answerText: answer.summary }),
+        expect.objectContaining({ targetType: "businessImpact", targetIndex: null, answerText: answer.businessImpact })
+      ])
+    );
+    answer.details.forEach((detail, index) => {
+      expect(evidenceTrace).toContainEqual(expect.objectContaining({ targetType: "detail", targetIndex: index, answerText: detail }));
+    });
+    answer.actions.forEach((action, index) => {
+      expect(evidenceTrace).toContainEqual(
+        expect.objectContaining({ targetType: "action", targetIndex: index, answerText: actionText(action) })
+      );
+    });
+    for (const trace of evidenceTrace ?? []) {
+      for (const evidenceId of trace.evidenceIds) {
+        expect(returnedEvidenceIds.has(evidenceId), `trace cited missing evidence id ${evidenceId}`).toBe(true);
+      }
+    }
+  });
+
+  it("shows no-direct-evidence trace states without inventing evidence for unsupported answers", () => {
+    const answer = ask("ZXQ999999 FROBULATOR 확인해줘");
+    const evidenceTrace = (answer as { evidenceTrace?: Array<{ supportState: string; evidenceIds: string[] }> }).evidenceTrace;
+
+    expect(answer.verdict).toBe("NO_EVIDENCE");
+    expect(answer.evidence).toHaveLength(0);
+    expect(answer.evidenceIds).toHaveLength(0);
+    expect(evidenceTrace?.length).toBeGreaterThan(0);
+    expect(evidenceTrace?.every((item) => item.supportState === "NO_DIRECT_EVIDENCE" && item.evidenceIds.length === 0)).toBe(true);
+  });
+
+  it("keeps blocked validation and actions intact while adding trace display data", () => {
+    const answer = ask("Flow Code로 customs stage 분류해줘");
+
+    expect(answer.verdict).toBe("BLOCK");
+    expect(answer.validationStatus).toBe("BLOCK");
+    expect(answer.validation.some((item) => item.reasonCode === "FLOW_CODE_SCOPE_VIOLATION")).toBe(true);
+    expect(answer.actions).toEqual(
+      expect.arrayContaining([expect.objectContaining({ actionType: "KEEP_FLOW_CODE_WHP_ONLY", humanGateRequired: false })])
+    );
+    expect(answer.evidenceTrace.length).toBeGreaterThan(0);
+    expect(answer.evidenceTrace.every((trace) => trace.evidenceIds.every((id) => answer.evidenceIds.includes(id)))).toBe(true);
   });
 
   it("masks email and phone in input", () => {

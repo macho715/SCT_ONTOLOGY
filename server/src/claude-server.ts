@@ -44,6 +44,14 @@ const routeSchema = z.object({
   routingReason: z.string()
 });
 
+const evidenceTraceSchema = z.object({
+  targetType: z.enum(["summary", "businessImpact", "detail", "action"]),
+  targetIndex: z.number().nullable(),
+  answerText: z.string(),
+  supportState: z.enum(["SUPPORTED", "NO_DIRECT_EVIDENCE"]),
+  evidenceIds: z.array(z.string())
+});
+
 const answerOutputSchema = {
   answerId: z.string(),
   verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
@@ -67,6 +75,7 @@ const answerOutputSchema = {
     })
   ),
   evidence: z.array(evidenceSchema),
+  evidenceTrace: z.array(evidenceTraceSchema).default([]),
   validation: z.array(
     z.object({
       ruleId: z.string(),

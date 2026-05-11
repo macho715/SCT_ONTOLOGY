@@ -6,11 +6,12 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 ## Current State
 - Runtime: Node.js / TypeScript MCP HTTP server at `/mcp`.
 - Default local endpoint: `http://localhost:8787/mcp`.
-- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v6.html`.
+- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v7.html`.
 - `ask_hvdc_ontology` is data-only. It must not attach `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
-- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v6.html`.
+- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v7.html`.
 - UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
+- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
 - New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed.
@@ -155,3 +156,49 @@ Use `.agents/skills/<skill-name>/SKILL.md` only for workflows that are repeated,
 
 ## Output Contract
 When finishing a task, report: verdict (`PASS`, `WARN`, `BLOCK`, or `PARTIAL`), files changed, commands run with pass/fail result, evidence or tests used, remaining risks, and required human approval. Do not claim completion if required verification was not run; state what was not verified and why.
+
+## Evidence Trace Mode Addendum - 2026-05-11
+
+Evidence Trace Mode is now part of the grounded answer contract.
+`GroundedAnswer` includes `evidenceTrace`, which links visible answer statements to returned evidence snippets.
+
+Trace targets cover:
+- `summary`
+- `businessImpact`
+- `details`
+- `actions`
+
+Each trace item includes:
+- `targetType`
+- `targetIndex`
+- `answerText`
+- `supportState`
+- `evidenceIds`
+
+Allowed support states are:
+- `SUPPORTED`
+- `NO_DIRECT_EVIDENCE`
+
+`server/src/answer.ts` builds evidence trace data after composing the answer.
+Trace entries must only reference evidence IDs returned in the same answer.
+Do not invent trace evidence, proxy evidence, or fake evidence rows.
+
+Action traces may intentionally remain `NO_DIRECT_EVIDENCE` with an empty `evidenceIds` array.
+This is valid when the action is a workflow recommendation rather than a directly quoted corpus statement.
+
+`ask_hvdc_ontology` remains data-only.
+It may return `evidenceTrace`, but it must not attach UI metadata, `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
+`render_hvdc_answer_card` owns presentation of the trace.
+
+ChatGPT widget rendering must show short labels such as `E1` while preserving the raw `EvidenceSnippet.id` in drawer data.
+Claude rendering must show an `Evidence Trace` section in markdown.
+Legacy render inputs without `evidenceTrace` must be treated as `evidenceTrace: []`.
+
+Evidence trace is explanatory UI data.
+It must not change `verdict`, `validationStatus`, `evidenceIds`, `actions`, or business result fields.
+
+Additional verification gates:
+- Trace references stay inside the same answer's returned `evidenceIds`.
+- `NO_DIRECT_EVIDENCE` is shown without creating fake evidence support.
+- ChatGPT widget and Claude markdown both expose trace status.
+- UI-only trace failures preserve the business result and expose fallback text.

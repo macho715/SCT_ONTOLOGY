@@ -11,7 +11,7 @@
     "claude:start": "tsx server/src/claude-server.ts",
     "claude:stdio": "tsx server/src/claude-server.ts --stdio",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --exclude \"docs/archive/**\"",
+    "test": "vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\"",
     "index": "python scripts/index_corpus.py",
     "verify": "npm run typecheck && npm test"
   },

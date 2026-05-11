@@ -8,7 +8,7 @@
 
 목표 상태: `ontology` 변경이 자동 검증되고, ChatGPT Apps SDK 계약이 제출 기준에 맞으며, Evidence UI와 평가셋과 보안 감시가 함께 작동하는 운영 가능한 앱 저장소로 만든다.
 
-현재 구현 상태(2026-05-11): production MCP는 6개 tool을 노출한다. `ask_hvdc_ontology`는 데이터 전용이고, `render_hvdc_answer_card`가 `ui://hvdc/answer-card-v6.html` 카드 template를 소유한다. v5와 render-name resource alias는 ChatGPT 캐시/호환성 보호용으로 유지한다.
+현재 구현 상태(2026-05-11): production MCP는 6개 tool을 노출한다. `ask_hvdc_ontology`는 데이터 전용이고, `render_hvdc_answer_card`가 `ui://hvdc/answer-card-v7.html` 카드 template를 소유한다. v6, v5, render-name resource alias는 ChatGPT 캐시/호환성 보호용으로 유지한다.
 
 영향 범위:
 

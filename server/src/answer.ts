@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type {
   ActionRecommendation,
+  EvidenceTraceItem,
   EvidenceSnippet,
   GraphPath,
   GroundedAnswer,
@@ -38,6 +39,19 @@ const GENERIC_QUERY_TERMS = new Set([
   "기준",
   "되나",
   "돼"
+]);
+const TRACE_GENERIC_TERMS = new Set([
+  ...GENERIC_QUERY_TERMS,
+  "owner",
+  "action",
+  "review",
+  "next",
+  "required",
+  "request",
+  "ontology",
+  "data",
+  "ops",
+  "user"
 ]);
 
 export function validateGrounding(args: {
@@ -219,6 +233,49 @@ function hasEvidenceSupport(question: string, evidence: EvidenceSnippet[]): bool
   return terms.some((term) => searchableEvidence.includes(term));
 }
 
+function matchingEvidenceIds(text: string, evidence: EvidenceSnippet[]): string[] {
+  if (evidence.length === 0) return [];
+  const terms = tokenizeForSupport(text).filter((term) => !TRACE_GENERIC_TERMS.has(term));
+  if (terms.length === 0) return [];
+  return evidence
+    .filter((item) => {
+      const haystack = `${item.docId} ${item.title} ${item.sectionPath} ${item.snippet}`.toLowerCase();
+      return terms.filter((term) => haystack.includes(term)).length >= Math.min(2, terms.length);
+    })
+    .map((item) => item.id);
+}
+
+function buildEvidenceTrace(args: {
+  core: Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions">;
+  evidence: EvidenceSnippet[];
+}): EvidenceTraceItem[] {
+  const formatActionAnswerText = (action: ActionRecommendation): string =>
+    `${action.actionType} - ${action.ownerRole}${action.humanGateRequired ? " (Human-gate required)" : ""}`;
+  const traceInputs: Array<{
+    targetType: EvidenceTraceItem["targetType"];
+    targetIndex: number | null;
+    answerText: string;
+  }> = [
+    { targetType: "summary", targetIndex: null, answerText: args.core.summary },
+    { targetType: "businessImpact", targetIndex: null, answerText: args.core.businessImpact },
+    ...args.core.details.map((answerText, index) => ({ targetType: "detail" as const, targetIndex: index, answerText })),
+    ...args.core.actions.map((action, index) => ({
+      targetType: "action" as const,
+      targetIndex: index,
+      answerText: formatActionAnswerText(action)
+    }))
+  ];
+
+  return traceInputs.map((item) => {
+    const evidenceIds = item.targetType === "action" ? [] : matchingEvidenceIds(item.answerText, args.evidence);
+    return {
+      ...item,
+      supportState: evidenceIds.length > 0 ? "SUPPORTED" : "NO_DIRECT_EVIDENCE",
+      evidenceIds
+    };
+  });
+}
+
 function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions"> {
   if (verdict === "NO_EVIDENCE") {
     return {
@@ -383,6 +440,7 @@ export function answerQuestion(args: {
       dueAt: null
     });
   }
+  const evidenceTrace = buildEvidenceTrace({ core: { ...core, actions }, evidence });
   const graphPath = buildGraphPath(maskedQuestion.text);
   const generatedAt = new Date().toISOString();
 
@@ -400,6 +458,7 @@ export function answerQuestion(args: {
     route,
     resolvedEntities,
     evidence,
+    evidenceTrace,
     validation,
     actions,
     graphPath,
@@ -421,6 +480,11 @@ export function answerToText(answer: GroundedAnswer): string {
     `Business impact: ${answer.businessImpact}`,
     `Route: ${answer.route.requiredDocs.join(" -> ")}`,
     `Evidence: ${answer.evidence.map((item) => `${item.docId}/${item.sectionPath}`).join("; ") || "none"}`,
+    `Evidence trace: ${
+      (answer.evidenceTrace ?? [])
+        .map((item) => `${item.targetType}${item.targetIndex === null ? "" : `[${item.targetIndex}]`}: ${item.supportState}`)
+        .join("; ") || "none"
+    }`,
     `Next action: ${answer.actions.map((action) => `${action.actionType} (${action.ownerRole})`).join("; ")}`,
     `UI render status: ${answer.ui?.uiRenderStatus ?? "READY"}`,
     ...(answer.ui?.errorCode ? [`UI warning: ${answer.ui.errorCode} - ${answer.ui.errorMessage ?? "card template render failed"}`] : [])

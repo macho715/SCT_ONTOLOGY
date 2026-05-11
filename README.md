@@ -35,7 +35,7 @@
 ChatGPT 서버(포트 8787)와 Claude 서버(포트 8788)가 동일한 6개 tool 이름을 공유합니다.
 
 - `ask_hvdc_ontology`: 질문을 route, corpus search, validation, answer object로 처리합니다. 이 tool은 데이터 전용이며 `openai/outputTemplate`, `_meta.ui.resourceUri`, `structuredContent.ui`를 붙이지 않습니다.
-- `render_hvdc_answer_card`: `ask_hvdc_ontology` 결과를 받아 렌더링합니다. ChatGPT 서버는 `ui://hvdc/answer-card-v6.html` 카드 UI로, Claude 서버는 마크다운 카드로 출력합니다. 이 tool만 카드 template metadata를 소유합니다.
+- `render_hvdc_answer_card`: `ask_hvdc_ontology` 결과를 받아 렌더링합니다. ChatGPT 서버는 `ui://hvdc/answer-card-v7.html` 카드 UI로, Claude 서버는 마크다운 카드로 출력합니다. 이 tool만 카드 template metadata를 소유합니다.
 - `route_question`: 질문을 HVDC 도메인과 required corpus 문서로 분류합니다.
 - `search_ontology_corpus`: 승인된 `data/corpus/` 문서에서 EvidenceSnippet을 찾습니다.
 - `resolve_any_key`: BL, BOE, DO, Invoice, HVDC code, site, milestone 같은 식별자를 후보로 풉니다.
@@ -43,7 +43,7 @@ ChatGPT 서버(포트 8787)와 Claude 서버(포트 8788)가 동일한 6개 tool
 
 ## 전체 흐름
 
-쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾습니다. 이후 시각 카드가 필요하면 ChatGPT가 `render_hvdc_answer_card`를 호출하고, 이 render tool만 `ui://hvdc/answer-card-v6.html` 카드 UI를 연결합니다. 카드 template 로딩이 실패해도 `verdict`, `validationStatus`, `evidenceIds`, `actions`는 바꾸지 않고 텍스트 fallback을 보여줍니다.
+쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾습니다. 이후 시각 카드가 필요하면 ChatGPT가 `render_hvdc_answer_card`를 호출하고, 이 render tool만 `ui://hvdc/answer-card-v7.html` 카드 UI를 연결합니다. 카드 template 로딩이 실패해도 `verdict`, `validationStatus`, `evidenceIds`, `actions`는 바꾸지 않고 텍스트 fallback을 보여줍니다.
 
 ```mermaid
 flowchart LR
@@ -161,12 +161,13 @@ https://<your-ngrok-subdomain>.ngrok.app/mcp
 ChatGPT App UI resource URI는 아래 값입니다.
 
 ```text
-ui://hvdc/answer-card-v6.html
+ui://hvdc/answer-card-v7.html
 ```
 
 호환성 resource alias:
 
 ```text
+ui://hvdc/answer-card-v6.html
 ui://hvdc/answer-card-v5.html
 ui://hvdc/render_hvdc_answer_card.html
 ```
@@ -302,3 +303,35 @@ npm ci
 ```
 
 `npm run verify`는 `tsc --noEmit`과 `vitest run --exclude docs/archive/**`를 실행합니다.
+
+## Evidence Trace Mode - 2026-05-11
+
+Evidence Trace Mode adds statement-level evidence visibility to grounded answers.
+쉽게 말하면, 답변 문장 옆에 어떤 근거 조각을 보고 말했는지 표시합니다.
+
+Current behavior:
+- `ask_hvdc_ontology` can return `evidenceTrace` in the answer JSON while staying data-only.
+- `render_hvdc_answer_card` owns the ChatGPT answer-card display.
+- `public/hvdc-answer-widget.html` shows trace chips next to summary, business impact, detail, and action statements.
+- The widget shows short labels such as `E1`, but the Evidence Drawer keeps the raw evidence ID.
+- If a statement has no direct supporting snippet, the UI shows `No direct evidence` instead of creating fake support.
+- The drawer can show connected answer statements for each evidence item.
+- Claude markdown rendering includes an `Evidence Trace` section.
+- Legacy render input without `evidenceTrace` is accepted and treated as an empty trace list.
+
+Scope limits:
+- Evidence trace is a display and explanation layer, not a scoring engine.
+- Evidence trace does not replace `verdict`, `validationStatus`, or the main `evidenceIds` list.
+- Action statements can be `NO_DIRECT_EVIDENCE` when they are workflow recommendations rather than direct corpus claims.
+- Trace data is corpus-only and does not represent live ERP, WMS, ATLP, or KG lineage.
+
+Verification coverage added for this mode:
+- `tests/pipeline.test.ts` checks supported trace, no-evidence trace, and blocked-answer trace preservation.
+- `tests/widget.test.ts` checks trace chips, `No direct evidence`, raw evidence IDs, connected statements, and external fetch blocking.
+- `tests/descriptor.test.ts` checks the render tool fallback when legacy input omits `evidenceTrace`.
+- `tests/claude-descriptor.test.ts` checks Claude markdown trace output.
+
+Latest local verification observed for this feature:
+- Command: `npm run verify`
+- Result: TypeScript check passed, and Vitest passed 5 test files with 78 tests.
+- Meaning: the current implementation and tests agree on the Evidence Trace Mode contract.

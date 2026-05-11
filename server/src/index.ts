@@ -14,7 +14,7 @@ import { answerQuestion, answerToText, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import type { DomainHint, GroundedAnswer } from "./types.js";
-import { LEGACY_WIDGET_URI, logUiRenderFailure, WIDGET_URI, withUiState } from "./ui.js";
+import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
@@ -54,6 +54,14 @@ const routeSchema = z.object({
   routingReason: z.string()
 });
 
+const evidenceTraceSchema = z.object({
+  targetType: z.enum(["summary", "businessImpact", "detail", "action"]),
+  targetIndex: z.number().nullable(),
+  answerText: z.string(),
+  supportState: z.enum(["SUPPORTED", "NO_DIRECT_EVIDENCE"]),
+  evidenceIds: z.array(z.string())
+});
+
 const answerOutputSchema = {
   answerId: z.string(),
   verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
@@ -77,6 +85,7 @@ const answerOutputSchema = {
     })
   ),
   evidence: z.array(evidenceSchema),
+  evidenceTrace: z.array(evidenceTraceSchema).default([]),
   validation: z.array(
     z.object({
       ruleId: z.string(),
@@ -137,6 +146,8 @@ const answerOutputSchema = {
   generatedAt: z.string()
 };
 
+const { ui: _uiOutputSchema, ...answerDataOutputSchema } = answerOutputSchema;
+
 export const HVDC_TOOL_DESCRIPTORS = {
   ask_hvdc_ontology: {
     title: "Ask HVDC ontology",
@@ -147,7 +158,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
       userRole: z.string().default("ops_user").optional(),
       language: z.enum(["ko", "en", "auto"]).default("auto").optional()
     },
-    outputSchema: answerOutputSchema,
+    outputSchema: answerDataOutputSchema,
     _meta: {
       "openai/toolInvocation/invoking": "Searching HVDC ontology corpus",
       "openai/toolInvocation/invoked": "HVDC ontology answer ready"
@@ -162,7 +173,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
     title: "Render HVDC answer card",
     description:
       "Use this after ask_hvdc_ontology to render the final HVDC answer card. Pass through the complete ask_hvdc_ontology structured answer.",
-    inputSchema: answerOutputSchema,
+    inputSchema: answerDataOutputSchema,
     outputSchema: answerOutputSchema,
     _meta: {
       ui: { resourceUri: WIDGET_URI, visibility: ["model", "app"] },
@@ -264,7 +275,6 @@ function buildRenderResultMeta(answer: GroundedAnswer): Record<string, unknown> 
 
 export function createHvdcServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-answer-app", version: "0.1.0" });
-  const legacyWidgetUri = "ui://hvdc/answer-card-v5.html";
   const renderToolWidgetAliasUri = "ui://hvdc/render_hvdc_answer_card.html";
   const widgetResourceMeta = {
     ui: {
@@ -297,7 +307,20 @@ export function createHvdcServer(): McpServer {
   });
 
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => createWidgetResource(WIDGET_URI));
-  registerAppResource(server, "hvdc-answer-widget-legacy", legacyWidgetUri, {}, async () => createWidgetResource(legacyWidgetUri));
+  registerAppResource(
+    server,
+    "hvdc-answer-widget-v6-compat",
+    PREVIOUS_WIDGET_URI,
+    {},
+    async () => createWidgetResource(PREVIOUS_WIDGET_URI)
+  );
+  registerAppResource(
+    server,
+    "hvdc-answer-widget-legacy",
+    LEGACY_WIDGET_URI,
+    {},
+    async () => createWidgetResource(LEGACY_WIDGET_URI)
+  );
   registerAppResource(
     server,
     "render_hvdc_answer_card",
@@ -326,7 +349,7 @@ export function createHvdcServer(): McpServer {
     HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card,
     async (answer) => {
       try {
-        const groundedAnswer = withUiState(answer as GroundedAnswer);
+        const groundedAnswer = withUiState({ ...answer, evidenceTrace: answer.evidenceTrace ?? [] } as GroundedAnswer);
         return {
           structuredContent: groundedAnswer,
           content: [{ type: "text", text: answerToText(groundedAnswer) }],
@@ -334,7 +357,11 @@ export function createHvdcServer(): McpServer {
         };
       } catch (error) {
         const renderError = error instanceof Error ? error : new Error(String(error));
-        const fallbackAnswer = withUiState(answer as GroundedAnswer, "TEMPLATE_FETCH_FAILED", renderError.message);
+        const fallbackAnswer = withUiState(
+          { ...answer, evidenceTrace: answer.evidenceTrace ?? [] } as GroundedAnswer,
+          "TEMPLATE_FETCH_FAILED",
+          renderError.message
+        );
         logUiRenderFailure(fallbackAnswer, renderError);
         return {
           structuredContent: fallbackAnswer,

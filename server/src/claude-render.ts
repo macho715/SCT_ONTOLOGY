@@ -18,7 +18,7 @@ export function parseGroundedAnswer(input: unknown): GroundedAnswer {
 
   // Strip ChatGPT-only ui field before returning
   const { ui: _ui, ...answer } = core as Partial<GroundedAnswer> & { ui?: unknown };
-  return answer as GroundedAnswer;
+  return { evidenceTrace: [], ...answer } as GroundedAnswer;
 }
 
 function verdictBadge(verdict: string): string {
@@ -36,6 +36,24 @@ function renderEvidence(ev: EvidenceSnippet[]): string {
   if (!ev.length) return "_No evidence found._";
   return ev
     .map((e) => `- **[${e.docId}]** ${e.sectionPath} — confidence ${(e.confidence * 100).toFixed(0)}%\n  > ${e.snippet}`)
+    .join("\n");
+}
+
+function buildEvidenceLabels(answer: GroundedAnswer): Map<string, string> {
+  return new Map((answer.evidence ?? []).map((item, index) => [item.id, `E${index + 1}`]));
+}
+
+function renderEvidenceTrace(answer: GroundedAnswer): string {
+  if (!answer.evidenceTrace?.length) return "_No evidence trace returned._";
+  const labels = buildEvidenceLabels(answer);
+  return answer.evidenceTrace
+    .map((trace) => {
+      if (trace.supportState === "NO_DIRECT_EVIDENCE" || trace.evidenceIds.length === 0) {
+        return `- **No direct evidence** — ${trace.answerText}`;
+      }
+      const refs = trace.evidenceIds.map((id) => `${labels.get(id) ?? id} (raw: ${id})`).join(", ");
+      return `- **${refs}** — ${trace.answerText}`;
+    })
     .join("\n");
 }
 
@@ -83,6 +101,10 @@ export function renderAnswerMarkdown(answer: GroundedAnswer): string {
 
   parts.push(`### Evidence (${evidenceCount}건)`);
   parts.push(renderEvidence(answer.evidence ?? []));
+  parts.push("");
+
+  parts.push("### Evidence Trace");
+  parts.push(renderEvidenceTrace(answer));
   parts.push("");
 
   parts.push("### Validation");

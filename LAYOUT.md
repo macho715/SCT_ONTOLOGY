@@ -118,7 +118,7 @@ flowchart TD
 
 ### ChatGPT 레이어
 - `server/src/index.ts`: ChatGPT 전용 서버 진입점. `@modelcontextprotocol/ext-apps`의 `registerAppTool`, `registerAppResource` 사용. 포트 `PORT || 8787`.
-- `server/src/ui.ts`: ChatGPT 위젯 UI 상태 빌더. `ui://hvdc/answer-card-v6.html` 등록 헬퍼.
+- `server/src/ui.ts`: ChatGPT 위젯 UI 상태 빌더. `ui://hvdc/answer-card-v7.html` 등록 헬퍼.
 
 ### Claude 레이어
 - `server/src/claude-server.ts`: Claude 전용 서버. 표준 `McpServer.tool()`만 사용. `ext-apps` 없음. 포트 `CLAUDE_PORT || 8788`.
@@ -128,7 +128,7 @@ flowchart TD
 
 `public/`은 ChatGPT 앱에서 표시할 정적 UI 파일을 담는다.
 
-- `public/hvdc-answer-widget.html`: HVDC 답변 위젯 화면이다. 현재 v6 answer card resource, v5 legacy alias, render tool alias가 모두 같은 HTML을 사용한다. 긴 action명과 protected-field 목록은 카드 안에서 줄바꿈되도록 CSS가 들어 있다.
+- `public/hvdc-answer-widget.html`: HVDC 답변 위젯 화면이다. 현재 v7 answer card resource, v6 previous alias, v5 legacy alias, render tool alias가 모두 같은 HTML을 사용한다. 긴 action명과 protected-field 목록은 카드 안에서 줄바꿈되도록 CSS가 들어 있다.
 
 ## tests
 
@@ -251,3 +251,45 @@ flowchart TD
 - `docs/archive/starter/hvdc-ontology-chatgpt-app-starter/`: starter 폴더다.
 - `docs/archive/starter/hvdc-ontology-chatgpt-app-starter.zip`: starter 압축 파일이다.
 - `__pycache__/`: Python 캐시 폴더다.
+
+## Evidence Trace Mode layout addendum - 2026-05-11
+
+이 추가 섹션은 기존 구조 설명을 지우지 않고, Evidence Trace Mode 구현 이후의 최신 위치만 덧붙입니다.
+
+### Root documentation updates
+
+- `AGENTS.md`: Evidence Trace Mode 작업 규칙, trace support state, data-only tool boundary, verification gates를 추가로 설명합니다.
+- `README.md`: 사용자가 보는 근거 연결 표시, `No direct evidence`, Claude markdown trace, 최신 검증 범위를 설명합니다.
+- `CHANGELOG.md`: Evidence Trace Mode 추가, 변경, 검증, 한계를 변경 이력으로 기록합니다.
+- `LAYOUT.md`: 이 저장소 구조 문서에 Evidence Trace Mode 파일 위치와 검증 범위를 추가합니다.
+- `SYSTEM_ARCHITECTURE.md`: 서버, 위젯, Claude 렌더러 사이의 trace 데이터 흐름을 추가로 설명합니다.
+
+### Runtime and shared-core updates
+
+- `server/src/types.ts`: `EvidenceTraceItem` and `GroundedAnswer.evidenceTrace` define the trace contract.
+- `server/src/answer.ts`: answer composition builds trace entries for summary, business impact, details, and actions.
+- `server/src/index.ts`: ChatGPT render schema accepts `evidenceTrace` and defaults legacy input to an empty array.
+- `server/src/claude-server.ts`: Claude render schema accepts the same trace field.
+- `server/src/claude-render.ts`: Claude markdown renders an `Evidence Trace` section and strips UI-only fields.
+- `public/hvdc-answer-widget.html`: ChatGPT widget shows trace chips, `No direct evidence`, raw evidence IDs, and connected answer statements.
+
+### Operations documents added
+
+- `docs/operations/evidence-trace-mode-plan.md`: implementation plan for Evidence Trace Mode.
+- `docs/operations/evidence-trace-mode-spec.md`: contract-style specification for Evidence Trace Mode.
+
+### Test coverage added or expanded
+
+- `tests/pipeline.test.ts`: supported trace, no-direct-evidence trace, and blocked-answer trace preservation.
+- `tests/widget.test.ts`: trace chip rendering, `No direct evidence`, raw evidence IDs, connected statements, and external fetch blocking.
+- `tests/descriptor.test.ts`: render tool compatibility when legacy input omits `evidenceTrace`.
+- `tests/claude-descriptor.test.ts`: Claude markdown trace rendering.
+
+Latest observed local verification for this addendum:
+- Command: `npm run verify`
+- Result: TypeScript check passed, and Vitest passed 5 test files with 78 tests.
+
+### Stale-count warning
+
+Older sections in this file may still mention the earlier 71-test snapshot.
+For Evidence Trace Mode, use the latest verification note above as the current local evidence.

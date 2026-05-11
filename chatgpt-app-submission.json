@@ -121,6 +121,14 @@
       "tools_triggered": "validate_answer",
       "expected_output": "Returns validation findings for evidence coverage, currentness, and any required human gate before final use.",
       "expected_output_url": null
+    },
+    {
+      "description": "Render the final HVDC answer card without UI errors.",
+      "user_prompt": "AGI M130 답변 결과를 카드로 보여줘. 근거와 validation도 같이 보여줘.",
+      "file_attachment_urls": null,
+      "tools_triggered": "render_hvdc_answer_card",
+      "expected_output": "Renders the prepared HVDC answer card with verdict, route documents, evidence drawer, validation findings, next action, and no card UI error.",
+      "expected_output_url": null
     }
   ],
   "negative_test_cases": [

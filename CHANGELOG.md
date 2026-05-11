@@ -2,6 +2,55 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-11 ChatGPT operations cache hardening
+
+### Changed
+
+- Bumped the canonical ChatGPT widget template URI to `ui://hvdc/answer-card-v7.html` after Evidence Trace Mode changed widget HTML/JS/CSS.
+- Kept `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` as compatibility resource aliases for stale ChatGPT clients.
+
+### Reason
+
+- OpenAI Apps SDK guidance treats the widget URI as the cache key and recommends a new URI when widget markup or bundle behavior changes.
+
+### Verification target
+
+- Run `npm run verify` three times and confirm descriptor, resource, widget, pipeline, and Claude render tests all pass.
+
+## Unreleased - 2026-05-11 Evidence Trace Mode
+
+### Added
+
+- Added `evidenceTrace` to grounded answers so visible answer statements can show supporting evidence status.
+- Added statement-level trace coverage for summary, business impact, details, and actions.
+- Added ChatGPT widget trace chips with short evidence labels such as `E1`.
+- Added drawer support for raw evidence IDs and connected answer statements.
+- Added Claude markdown rendering for `Evidence Trace`.
+- Added operation documents for the plan and spec:
+  - `docs/operations/evidence-trace-mode-plan.md`
+  - `docs/operations/evidence-trace-mode-spec.md`
+
+### Changed
+
+- Kept `ask_hvdc_ontology` data-only while allowing `evidenceTrace` in structured answers.
+- Kept `render_hvdc_answer_card` responsible for answer-card presentation.
+- Preserved legacy render compatibility by treating missing `evidenceTrace` as an empty array.
+- Kept trace display separate from business result fields such as `verdict`, `validationStatus`, `evidenceIds`, and `actions`.
+
+### Verified
+
+- `tests/pipeline.test.ts` covers supported trace, no-direct-evidence trace, and blocked-answer trace preservation.
+- `tests/widget.test.ts` covers trace chip rendering, `No direct evidence`, raw evidence IDs, connected statements, and external fetch blocking.
+- `tests/descriptor.test.ts` covers legacy render input without `evidenceTrace`.
+- `tests/claude-descriptor.test.ts` covers Claude markdown trace output.
+- `npm run verify` passed locally with TypeScript check and Vitest: 5 test files, 78 tests.
+
+### Known limits
+
+- Evidence trace explains answer-to-evidence links; it is not a confidence scoring engine.
+- Action statements can intentionally remain `NO_DIRECT_EVIDENCE`.
+- Trace data remains corpus-only and does not represent live ERP, WMS, ATLP, or KG lineage.
+
 ## Release / Verification State
 
 ```mermaid

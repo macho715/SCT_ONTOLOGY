@@ -9,7 +9,7 @@
 - MCP HTTP 경로는 `/mcp`이다. 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
 - MCP 구현은 `@modelcontextprotocol/sdk`의 `McpServer`와 `StreamableHTTPServerTransport`를 사용한다.
 - ChatGPT App UI resource는 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
-- UI resource URI는 `ui://hvdc/answer-card-v6.html`이다.
+- UI resource URI는 `ui://hvdc/answer-card-v7.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
 
 ### Claude 레이어 (포트 8788)
@@ -45,7 +45,7 @@ flowchart TD
   ClaudeClient --> CL_Endpoint["Node HTTP server<br/>server/src/claude-server.ts<br/>포트 8788 /mcp"]
 
   CGT_Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
-  ExtApps --> WidgetResource["ui://hvdc/answer-card-v6.html"]
+  ExtApps --> WidgetResource["ui://hvdc/answer-card-v7.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
   CL_Endpoint --> ClaudeRender["server/src/claude-render.ts<br/>parseGroundedAnswer + renderAnswerMarkdown"]
@@ -108,7 +108,7 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
 | `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + text fallback (UI 없음) | `structuredContent` + 마크다운 카드 |
-| `render_hvdc_answer_card` | ChatGPT: `server/src/index.ts`<br/>Claude: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v6.html` iframe 위젯 | 마크다운 카드 (iframe 없음) |
+| `render_hvdc_answer_card` | ChatGPT: `server/src/index.ts`<br/>Claude: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v7.html` iframe 위젯 | 마크다운 카드 (iframe 없음) |
 | `route_question` | `server/src/router.ts` | JSON route | JSON route |
 | `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` EvidenceSnippet | `data/corpus` EvidenceSnippet |
 | `resolve_any_key` | `server/src/router.ts` | identifier 후보 | identifier 후보 |
@@ -128,14 +128,14 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 
 ## UI resource와 public widget
 
-`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v6.html` resource로 등록한다.
+`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v7.html` resource로 등록한다.
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
 - `ask_hvdc_ontology`는 데이터 전용 tool이다. 답변 JSON과 텍스트 fallback을 반환하지만 UI template metadata를 붙이지 않는다.
 - `ask_hvdc_ontology`의 `structuredContent`에는 `ui` 객체를 넣지 않는다. `ui.templateUrl`은 render tool에서만 붙인다.
-- `render_hvdc_answer_card` descriptor만 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v6.html`을 가리킨다.
-- 호환성 alias resource는 `ui://hvdc/answer-card-v5.html`와 `ui://hvdc/render_hvdc_answer_card.html`이다.
+- `render_hvdc_answer_card` descriptor만 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v7.html`을 가리킨다.
+- 호환성 alias resource는 `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, `ui://hvdc/render_hvdc_answer_card.html`이다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget CSS는 긴 action id, protected fields, route reason, validation text가 카드 밖으로 잘리지 않도록 줄바꿈과 responsive grid를 적용한다.
 - widget은 자체 fallback text를 가진다.
@@ -403,7 +403,84 @@ classDiagram
 
 이 저장소의 현재 아키텍처는 **ChatGPT + Claude 듀얼 레이어 corpus-only MCP App MVP**다.
 
-- **ChatGPT 레이어**: `server/src/index.ts`가 포트 8787에서 `/mcp`를 열고, `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v6.html` iframe 위젯을 연결한다.
+- **ChatGPT 레이어**: `server/src/index.ts`가 포트 8787에서 `/mcp`를 열고, `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v7.html` iframe 위젯을 연결한다.
 - **Claude 레이어**: `server/src/claude-server.ts`가 포트 8788에서 `/mcp`를 열고, 표준 `McpServer.tool()`로 동일한 6개 tool을 등록한다. `render_hvdc_answer_card`는 마크다운 카드를 반환한다. `server/src/claude-render.ts`가 ChatGPT/Claude 양방향 포맷을 파싱한다.
 - **공유 코어**: `answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`는 두 서버가 변경 없이 공유한다.
 - **GitHub Actions와 Railway**: 같은 `npm run verify` 검증 경계를 공유한다. Railway 배포 경계는 ChatGPT 서버(`npm run start`)이다.
+
+## Evidence Trace Mode architecture addendum - 2026-05-11
+
+이 추가 섹션은 기존 아키텍처 설명을 지우지 않고, Evidence Trace Mode 이후의 최신 데이터 흐름을 덧붙입니다.
+
+### Answer contract
+
+`GroundedAnswer` now includes `evidenceTrace`.
+Each trace item links one visible answer statement to the evidence IDs that support it.
+
+Trace item fields:
+- `targetType`
+- `targetIndex`
+- `answerText`
+- `supportState`
+- `evidenceIds`
+
+Allowed support states:
+- `SUPPORTED`
+- `NO_DIRECT_EVIDENCE`
+
+Trace targets:
+- `summary`
+- `businessImpact`
+- `details`
+- `actions`
+
+### Shared core flow
+
+`server/src/answer.ts` builds the grounded answer first.
+It then builds trace entries from the answer text and the same returned evidence set.
+Trace references must stay inside the answer's returned `evidenceIds`.
+
+Action trace entries can stay `NO_DIRECT_EVIDENCE`.
+This is expected when the action is a workflow recommendation rather than a directly supported corpus statement.
+
+### ChatGPT layer flow
+
+`ask_hvdc_ontology` remains data-only.
+It can return `evidenceTrace`, but it does not attach UI template metadata.
+
+`render_hvdc_answer_card` accepts trace data for presentation.
+If old render input omits `evidenceTrace`, the server treats it as `[]`.
+
+`public/hvdc-answer-widget.html` renders:
+- trace chips next to answer statements
+- short display labels such as `E1`
+- `No direct evidence` for unsupported statements
+- raw evidence IDs in the Evidence Drawer
+- connected answer statements for each drawer evidence item
+
+UI trace failures are presentation failures only.
+They must not change `verdict`, `validationStatus`, `evidenceIds`, `actions`, or other business result fields.
+
+### Claude layer flow
+
+`server/src/claude-render.ts` accepts ChatGPT format, wrapped format, and direct `GroundedAnswer` format.
+It strips UI-only fields before rendering markdown.
+It treats missing `evidenceTrace` as an empty array.
+Claude markdown now includes an `Evidence Trace` section with supported labels and `No direct evidence` status.
+
+### Verification coverage
+
+Evidence Trace Mode is covered by:
+- `tests/pipeline.test.ts` for supported trace, no-direct-evidence trace, and blocked-answer preservation.
+- `tests/widget.test.ts` for trace chips, raw evidence IDs, connected statements, `No direct evidence`, and external fetch blocking.
+- `tests/descriptor.test.ts` for legacy render input compatibility.
+- `tests/claude-descriptor.test.ts` for markdown trace rendering.
+
+Latest observed local verification:
+- Command: `npm run verify`
+- Result: TypeScript check passed, and Vitest passed 5 test files with 78 tests.
+
+### Architecture boundary
+
+Evidence Trace Mode is an explanation layer.
+It is not a confidence scoring engine, live KG lineage system, ERP mutation trail, or external report approval mechanism.

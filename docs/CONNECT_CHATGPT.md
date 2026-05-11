@@ -48,7 +48,8 @@ Expected:
 
 - `ask_hvdc_ontology` runs first and returns a data-only answer.
 - `ask_hvdc_ontology` result has no `openai/outputTemplate` and no `ui` object.
-- `render_hvdc_answer_card` runs next and uses `ui://hvdc/answer-card-v6.html`.
+- `render_hvdc_answer_card` runs next and uses `ui://hvdc/answer-card-v7.html`.
+- `ui://hvdc/answer-card-v6.html` remains available as a compatibility alias for stale ChatGPT sessions.
 - The card displays without `Failed to fetch template`.
 - The summary starts with `Daily logistics KPI`.
 - The Daily KPI answer does not use invoice/cost evidence-pack wording.

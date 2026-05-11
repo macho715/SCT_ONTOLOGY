@@ -5,8 +5,9 @@ Current verification date: 2026-05-11
 ## Current verified state
 
 - `ask_hvdc_ontology` is data-only. It returns no `openai/outputTemplate`, no `_meta.ui.resourceUri`, and no `structuredContent.ui`.
-- `render_hvdc_answer_card` owns the answer-card template `ui://hvdc/answer-card-v6.html`.
-- Registered UI resources include canonical v6, legacy v5, and render tool alias:
+- `render_hvdc_answer_card` owns the answer-card template `ui://hvdc/answer-card-v7.html`.
+- Registered UI resources include canonical v7, previous v6, legacy v5, and render tool alias:
+  - `ui://hvdc/answer-card-v7.html`
   - `ui://hvdc/answer-card-v6.html`
   - `ui://hvdc/answer-card-v5.html`
   - `ui://hvdc/render_hvdc_answer_card.html`
@@ -58,7 +59,7 @@ Production smoke checked the live Railway MCP URL and confirmed the v6 widget re
 |---|---|
 | Ask result template | `ask_hvdc_ontology` result has no `openai/outputTemplate` |
 | Ask result UI payload | `ask_hvdc_ontology` result has no `ui` object |
-| Render template | `render_hvdc_answer_card` result uses `ui://hvdc/answer-card-v6.html` |
+| Render template | `render_hvdc_answer_card` result uses `ui://hvdc/answer-card-v7.html` |
 | Template loading | No `Failed to fetch template` message |
 | Daily KPI wording | Summary starts with `Daily logistics KPI` |
 | Daily KPI wording | No invoice/cost evidence-pack wording in Daily KPI answer |

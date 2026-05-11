@@ -183,7 +183,7 @@ Acceptance Scenarios:
 - FR-028: System MUST provide Open Questions and [NEEDS CLARIFICATION] markers for unresolved product, deployment, auth, or data source decisions.
 - FR-029: System MUST keep UI render failures separate from business validation; `verdict`, `validationStatus`, `evidenceIds`, and `actions` MUST NOT change because the card template failed to load.
 - FR-030: `ask_hvdc_ontology` MUST remain data-only and MUST NOT return `structuredContent.ui`.
-- FR-031: `render_hvdc_answer_card` MUST be the only answer-card tool that attaches `ui://hvdc/answer-card-v6.html`.
+- FR-031: `render_hvdc_answer_card` MUST be the only answer-card tool that attaches `ui://hvdc/answer-card-v7.html`.
 - FR-032: Daily KPI Dashboard lock requests MUST route to operations KPI with Human-gate, not to the default invoice/cost audit summary.
 - FR-033: The answer card MUST wrap long action ids, protected-field lists, route reasons, and validation messages inside the iframe.
 
@@ -284,7 +284,7 @@ Acceptance Scenarios:
 
 `ask_hvdc_ontology` is the data tool: it returns grounded answer JSON and text fallback without attaching a widget template and without returning `structuredContent.ui`.
 
-`render_hvdc_answer_card` is the render tool: it accepts the complete `GroundedAnswer`, attaches `_meta["openai/outputTemplate"]` and `_meta.ui.resourceUri` for `ui://hvdc/answer-card-v6.html`, and adds the render-only `ui` state:
+`render_hvdc_answer_card` is the render tool: it accepts the complete `GroundedAnswer`, attaches `_meta["openai/outputTemplate"]` and `_meta.ui.resourceUri` for `ui://hvdc/answer-card-v7.html`, and adds the render-only `ui` state:
 
 ```json
 {
@@ -294,15 +294,15 @@ Acceptance Scenarios:
     "businessResultVisible": true,
     "fallbackUsed": false,
     "cardEnabled": true,
-    "templateUrl": "ui://hvdc/answer-card-v6.html",
-    "templateVersion": "answer-card-v6",
+    "templateUrl": "ui://hvdc/answer-card-v7.html",
+    "templateVersion": "answer-card-v7",
     "schemaVersion": "1.0.0",
     "doNotChange": ["verdict", "validationStatus", "evidenceIds", "actions"]
   }
 }
 ```
 
-The app also serves compatibility aliases `ui://hvdc/answer-card-v5.html` and `ui://hvdc/render_hvdc_answer_card.html`, both returning the same widget HTML as v6. The business result stays visible as text fallback when the card template cannot load.
+The app also serves compatibility aliases `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html`, all returning the same widget HTML as v7. The business result stays visible as text fallback when the card template cannot load.
 
 Daily KPI Dashboard questions are routed as operations dashboard questions. `DET/DEM` is handled as an operations delay/cost-exposure KPI, not as the default Invoice/CostGuard audit path. Owner/Risk/Next Action lock requests require Human-gate review before locked confirmed operational use.
 

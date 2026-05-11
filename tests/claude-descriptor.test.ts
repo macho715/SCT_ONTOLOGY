@@ -77,6 +77,15 @@ const minimalAnswer: GroundedAnswer = {
       sourceType: "ontology_corpus"
     }
   ],
+  evidenceTrace: [
+    {
+      targetType: "summary",
+      targetIndex: null,
+      answerText: "Test summary",
+      supportState: "SUPPORTED",
+      evidenceIds: ["e1"]
+    }
+  ],
   validation: [
     {
       ruleId: "R001",
@@ -102,6 +111,26 @@ const minimalAnswer: GroundedAnswer = {
   generatedAt: "2026-05-11T00:00:00Z"
 };
 
+const tracedAnswer = {
+  ...minimalAnswer,
+  evidenceTrace: [
+    {
+      targetType: "summary",
+      targetIndex: null,
+      answerText: "Test summary",
+      supportState: "SUPPORTED",
+      evidenceIds: ["e1"]
+    },
+    {
+      targetType: "detail",
+      targetIndex: 0,
+      answerText: "Detail A",
+      supportState: "NO_DIRECT_EVIDENCE",
+      evidenceIds: []
+    }
+  ]
+} as GroundedAnswer;
+
 const chatGptFormatInput = {
   structuredContent: {
     ...minimalAnswer,
@@ -111,15 +140,15 @@ const chatGptFormatInput = {
       businessResultVisible: true,
       fallbackUsed: false,
       cardEnabled: true,
-      templateUrl: "ui://hvdc/answer-card-v6.html",
-      templateVersion: "answer-card-v6",
+      templateUrl: "ui://hvdc/answer-card-v7.html",
+      templateVersion: "answer-card-v7",
       schemaVersion: "1.0.0",
       doNotChange: ["verdict", "validationStatus", "evidenceIds", "actions"]
     }
   },
   _meta: {
-    "openai/outputTemplate": "ui://hvdc/answer-card-v6.html",
-    uiTemplate: "ui://hvdc/answer-card-v6.html",
+    "openai/outputTemplate": "ui://hvdc/answer-card-v7.html",
+    uiTemplate: "ui://hvdc/answer-card-v7.html",
     piiMasked: false
   }
 };
@@ -248,6 +277,18 @@ describe("renderAnswerMarkdown — human gate", () => {
     };
     const md = renderAnswerMarkdown(answer);
     expect(md).toContain("Human gate required");
+  });
+});
+
+describe("renderAnswerMarkdown — evidence trace", () => {
+  it("preserves display labels, raw evidence ids, and no-direct-evidence states", () => {
+    const md = renderAnswerMarkdown(tracedAnswer);
+    expect(md).toContain("Evidence Trace");
+    expect(md).toContain("E1");
+    expect(md).toContain("raw: e1");
+    expect(md).toContain("Test summary");
+    expect(md).toContain("No direct evidence");
+    expect(md).toContain("Detail A");
   });
 });
 

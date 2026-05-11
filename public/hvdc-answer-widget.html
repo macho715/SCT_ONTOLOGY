@@ -77,6 +77,33 @@
       }
       .evidence { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
       .evidence:first-of-type { border-top: none; }
+      .trace-line { display: inline; }
+      .trace-chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 1px 7px;
+        margin-left: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--info);
+        background: var(--bg);
+        cursor: pointer;
+      }
+      .trace-missing {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 1px 7px;
+        margin-left: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+        background: var(--bg);
+      }
+      .trace-connections { margin-top: 8px; }
       .route { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
       .route span { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; white-space: normal; }
       .empty { color: var(--muted); font-style: italic; }
@@ -103,6 +130,7 @@
       const VALID_STATUSES = new Set(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]);
       const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
       const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
+      const TOKEN_RE = /\b(?:sk-[A-Za-z0-9_-]{16,}|sk-proj-[A-Za-z0-9_-]{16,}|[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,})\b/g;
       const PROTOCOL_VERSION = "2026-01-26";
       const APP_INFO = { name: "hvdc-ontology-answer-widget", version: "0.1.0" };
       const APP_CAPABILITIES = {};
@@ -116,7 +144,8 @@
       function redactPii(value) {
         return String(value ?? "")
           .replace(EMAIL_RE, "[masked-email]")
-          .replace(PHONE_RE, "[masked-phone]");
+          .replace(PHONE_RE, "[masked-phone]")
+          .replace(TOKEN_RE, "[masked-token]");
       }
 
       function escapeHtml(value) {
@@ -147,6 +176,64 @@
         return asArray(items).map((item) => `<li>${escapeHtml(item)}</li>`).join("") || `<li class="empty">${escapeHtml(fallback)}</li>`;
       }
 
+      function buildEvidenceDisplayLabels(evidence) {
+        const labels = new Map();
+        asArray(evidence).forEach((item, index) => labels.set(item.id, `E${index + 1}`));
+        return labels;
+      }
+
+      function evidenceTraceFor(answer, targetType, targetIndex = null) {
+        return asArray(answer.evidenceTrace).find(
+          (item) => item?.targetType === targetType && (item.targetIndex ?? null) === targetIndex
+        );
+      }
+
+      function renderTraceBadge(trace, labels) {
+        if (!trace) return "";
+        if (trace.supportState === "NO_DIRECT_EVIDENCE" || asArray(trace.evidenceIds).length === 0) {
+          return `<span class="trace-missing" aria-label="No direct evidence">No direct evidence</span>`;
+        }
+        return asArray(trace.evidenceIds).map((rawEvidenceId) => {
+          const label = labels.get(rawEvidenceId) ?? rawEvidenceId;
+          return `<button type="button" class="trace-chip" data-evidence-id="${escapeHtml(rawEvidenceId)}" aria-label="Open evidence ${escapeHtml(label)}">${escapeHtml(label)}</button>`;
+        }).join("");
+      }
+
+      function renderTracedList(answer, targetType, items, fallback, labels) {
+        return asArray(items).map((item, index) => {
+          const trace = evidenceTraceFor(answer, targetType, index);
+          return `<li><span class="trace-line">${escapeHtml(item)}</span>${renderTraceBadge(trace, labels)}</li>`;
+        }).join("") || `<li class="empty">${escapeHtml(fallback)}</li>`;
+      }
+
+      function traceConnectionsFor(answer, evidenceId) {
+        return asArray(answer.evidenceTrace).filter((trace) => asArray(trace.evidenceIds).includes(evidenceId));
+      }
+
+      function renderTraceConnections(answer, evidenceId) {
+        const connectedStatements = traceConnectionsFor(answer, evidenceId);
+        const connectedHtml = connectedStatements.map((trace) => `<li>${escapeHtml(trace.answerText)}</li>`).join("");
+        return `
+          <dt>Raw evidence ID</dt><dd><code>${escapeHtml(evidenceId)}</code></dd>
+          <dt>Connected answer statements</dt><dd>
+            ${connectedHtml ? `<ul class="trace-connections">${connectedHtml}</ul>` : `<span class="empty">No connected answer statements.</span>`}
+          </dd>
+        `;
+      }
+
+      function cssEscapeValue(value) {
+        if (window.CSS?.escape) return window.CSS.escape(String(value));
+        return String(value).replace(/["\\\]\[]/g, "\\$&");
+      }
+
+      function focusEvidence(rawEvidenceId) {
+        const target = root.querySelector(`[data-raw-evidence-id="${cssEscapeValue(rawEvidenceId)}"]`);
+        if (!target) return;
+        const drawer = target.closest("details");
+        if (drawer) drawer.open = true;
+        target.focus({ preventScroll: false });
+      }
+
       function normalizeUiState(answer) {
         const fallbackUsed = answer.fallbackUsed ?? answer.ui?.fallbackUsed ?? false;
         return {
@@ -155,7 +242,7 @@
           businessResultVisible: answer.businessResultVisible ?? answer.ui?.businessResultVisible ?? true,
           fallbackUsed,
           cardEnabled: answer.ui?.cardEnabled ?? true,
-          templateVersion: answer.ui?.templateVersion ?? "answer-card-v6",
+          templateVersion: answer.ui?.templateVersion ?? "answer-card-v7",
           schemaVersion: answer.ui?.schemaVersion ?? "1.0.0",
           errorCode: answer.ui?.errorCode,
           errorMessage: answer.ui?.errorMessage,
@@ -310,6 +397,7 @@
 
         const verdict = safeStatus(answer.verdict);
         const validationStatus = safeStatus(answer.validationStatus ?? answer.verdict);
+        const evidenceLabels = buildEvidenceDisplayLabels(answer.evidence);
         const validationHtml = asArray(answer.validation).map((item) => `
           <li>
             <strong class="${safeStatus(item.status)}">${escapeHtml(safeStatus(item.status))}</strong>
@@ -322,12 +410,14 @@
             .filter((finding) => asArray(finding.evidenceIds).includes(item.id))
             .map((finding) => `${finding.reasonCode ?? finding.ruleId}: ${finding.status}`)
             .join(", ");
+          const displayLabel = evidenceLabels.get(item.id) ?? `E${index + 1}`;
           return `
-            <article class="evidence" aria-labelledby="evidence-${index}">
-              <h3 id="evidence-${index}">${escapeHtml(item.title ?? item.docId ?? "Unknown source document")}</h3>
+            <article class="evidence" aria-labelledby="evidence-${index}" data-raw-evidence-id="${escapeHtml(item.id)}" tabindex="-1">
+              <h3 id="evidence-${index}">${escapeHtml(displayLabel)} - ${escapeHtml(item.title ?? item.docId ?? "Unknown source document")}</h3>
               <dl class="meta">
                 <dt>Source doc</dt><dd>${escapeHtml(item.docId)}</dd>
                 <dt>Section path</dt><dd>${escapeHtml(item.sectionPath)}</dd>
+                ${renderTraceConnections(answer, item.id)}
                 <dt>Document hash</dt><dd><code>${escapeHtml(item.docHash)}</code></dd>
                 <dt>Confidence</dt><dd>${escapeHtml(displayValue(item.confidence))}</dd>
                 <dt>Version</dt><dd>${escapeHtml(displayValue(item.version))}</dd>
@@ -353,8 +443,8 @@
           </section>
         `;
 
-        const actionsHtml = asArray(answer.actions).map((item) => `
-          <li>${escapeHtml(item.actionType)} - ${escapeHtml(item.ownerRole)} ${item.humanGateRequired ? "(Human-gate required)" : ""}</li>
+        const actionsHtml = asArray(answer.actions).map((item, index) => `
+          <li>${escapeHtml(item.actionType)} - ${escapeHtml(item.ownerRole)} ${item.humanGateRequired ? "(Human-gate required)" : ""}${renderTraceBadge(evidenceTraceFor(answer, "action", index), evidenceLabels)}</li>
         `).join("") || `<li class="empty">No action.</li>`;
 
         const routeHtml = asArray(answer.route?.requiredDocs).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("") || `<span>No route document</span>`;
@@ -370,11 +460,11 @@
               <div class="top">
                 <div>
                   <p class="muted">Verdict</p>
-                  <h1 id="verdict-title"><span class="badge ${verdict}">${escapeHtml(verdict)}</span> ${escapeHtml(answer.summary)}</h1>
+                  <h1 id="verdict-title"><span class="badge ${verdict}">${escapeHtml(verdict)}</span> ${escapeHtml(answer.summary)}${renderTraceBadge(evidenceTraceFor(answer, "summary"), evidenceLabels)}</h1>
                 </div>
                 <span class="muted">${escapeHtml(answer.generatedAt)} - PII ${answer.piiMasked ? "masked" : "not reported masked"}</span>
               </div>
-              <p><strong>Business impact:</strong> ${escapeHtml(answer.businessImpact)}</p>
+              <p><strong>Business impact:</strong> ${escapeHtml(answer.businessImpact)}${renderTraceBadge(evidenceTraceFor(answer, "businessImpact"), evidenceLabels)}</p>
             </section>
             <section aria-labelledby="route-title">
               <h2 id="route-title">Route documents</h2>
@@ -388,7 +478,7 @@
             <div class="grid">
               <section class="panel">
                 <h2>Details</h2>
-                <ul>${renderList(answer.details, "No details returned.")}</ul>
+                <ul>${renderTracedList(answer, "detail", answer.details, "No details returned.", evidenceLabels)}</ul>
               </section>
               <section class="panel">
                 <h2>Next actions</h2>
@@ -474,49 +564,33 @@
       function scheduleSelfHeal() {
         if (selfHealStarted) return;
         selfHealStarted = true;
-        window.setTimeout(async () => {
+        window.setTimeout(() => {
           if (renderedToolOutput) return;
-          const input = latestToolInput ?? extractLegacyToolInput();
-          if (!input?.question) {
-            renderLoading("Tool output is not available yet. Waiting for ChatGPT to deliver structuredContent.");
-            selfHealStarted = false;
+          const fallbackAnswer = getLegacyToolOutput();
+          if (fallbackAnswer?.verdict) {
+            fallbackAnswer.ui = {
+              ...(fallbackAnswer.ui ?? normalizeUiState(fallbackAnswer)),
+              dataStatus: "OK",
+              uiRenderStatus: "FALLBACK_RENDERED",
+              businessResultVisible: true,
+              fallbackUsed: true,
+              cardEnabled: false,
+              errorCode: "CARD_TEMPLATE_RENDER_FAILED",
+              errorMessage: "Structured content arrived through a legacy ChatGPT output surface."
+            };
+            fallbackAnswer.dataStatus = "OK";
+            fallbackAnswer.businessResultVisible = true;
+            fallbackAnswer.fallbackUsed = true;
+            logUiRenderFailure(fallbackAnswer, new Error(fallbackAnswer.ui.errorMessage));
+            render(fallbackAnswer);
             return;
           }
-          try {
-            const result = typeof window.openai?.callTool === "function"
-              ? await window.openai.callTool("ask_hvdc_ontology", input)
-              : await rpcRequest("tools/call", {
-                  name: "ask_hvdc_ontology",
-                  arguments: input
-                });
-            const structured = normalizeToolOutput(result);
-            if (structured) render(structured);
-          } catch (error) {
-            const fallbackAnswer = getLegacyToolOutput();
-            if (fallbackAnswer?.verdict) {
-              fallbackAnswer.ui = {
-                ...(fallbackAnswer.ui ?? normalizeUiState(fallbackAnswer)),
-                dataStatus: "OK",
-                uiRenderStatus: "FALLBACK_RENDERED",
-                businessResultVisible: true,
-                fallbackUsed: true,
-                cardEnabled: false,
-                errorCode: "CARD_TEMPLATE_RENDER_FAILED",
-                errorMessage: error instanceof Error ? error.message : String(error)
-              };
-              fallbackAnswer.dataStatus = "OK";
-              fallbackAnswer.businessResultVisible = true;
-              fallbackAnswer.fallbackUsed = true;
-              logUiRenderFailure(fallbackAnswer, error);
-              render(fallbackAnswer);
-              return;
-            }
-            renderFallback(
-              "tool output unavailable",
-              "ChatGPT did not deliver structuredContent to the iframe, and the widget could not recover by calling the render tool.",
-              error instanceof Error ? error.message : String(error)
-            );
-          }
+          renderFallback(
+            "tool output unavailable",
+            "ChatGPT did not deliver structuredContent to the iframe. No business tool was re-run from the widget.",
+            latestToolInput ?? extractLegacyToolInput() ? "Existing tool input was present but was not re-executed." : ""
+          );
+          selfHealStarted = false;
         }, 1200);
       }
 
@@ -569,6 +643,13 @@
         }
         if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
       }, { passive: true });
+
+      root.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const rawEvidenceId = target.dataset.evidenceId;
+        if (rawEvidenceId) focusEvidence(rawEvidenceId);
+      });
 
       window.addEventListener("openai:set_globals", (event) => {
         handleOpenAiGlobals(event.detail?.globals ?? event.detail ?? {});

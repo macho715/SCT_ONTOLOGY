@@ -79,6 +79,14 @@ export type ActionRecommendation = {
   dueAt: string | null;
 };
 
+export type EvidenceTraceItem = {
+  targetType: "summary" | "businessImpact" | "detail" | "action";
+  targetIndex: number | null;
+  answerText: string;
+  supportState: "SUPPORTED" | "NO_DIRECT_EVIDENCE";
+  evidenceIds: string[];
+};
+
 export type UiRenderStatus =
   | "READY"
   | "RESOURCE_REGISTERED"
@@ -121,6 +129,7 @@ export type GroundedAnswer = {
   route: IntentRoute;
   resolvedEntities: ResolvedEntity[];
   evidence: EvidenceSnippet[];
+  evidenceTrace: EvidenceTraceItem[];
   validation: ValidationFinding[];
   actions: ActionRecommendation[];
   graphPath: GraphPath | null;
