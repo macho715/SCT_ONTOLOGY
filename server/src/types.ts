@@ -87,6 +87,25 @@ export type EvidenceTraceItem = {
   evidenceIds: string[];
 };
 
+export type ShipmentRuleStatus = "PASS" | "INFO" | "WARN" | "BLOCK";
+
+export type ShipmentRuleSupportLevel = "SECONDARY_SAMPLE_VALIDATION";
+
+export type ShipmentRuleResult = {
+  found: boolean;
+  source: "sample_shipment_rule_engine";
+  supportLevel: ShipmentRuleSupportLevel;
+  status: ShipmentRuleStatus;
+  matchedKey: string | null;
+  matchedScheme?: string | null;
+  shipmentId: string | null;
+  candidates?: string[];
+  risks: Array<Record<string, unknown>>;
+  humanGateRequired: boolean;
+  message: string;
+  unavailableReason?: string;
+};
+
 export type UiRenderStatus =
   | "READY"
   | "RESOURCE_REGISTERED"
@@ -130,6 +149,7 @@ export type GroundedAnswer = {
   resolvedEntities: ResolvedEntity[];
   evidence: EvidenceSnippet[];
   evidenceTrace: EvidenceTraceItem[];
+  shipmentRule?: ShipmentRuleResult;
   validation: ValidationFinding[];
   actions: ActionRecommendation[];
   graphPath: GraphPath | null;

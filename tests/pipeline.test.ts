@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { answerQuestion, validateGrounding } from "../server/src/answer.js";
 import { maskPii } from "../server/src/redact.js";
+import { evaluateShipmentRule } from "../server/src/shipment-rule.js";
 import type { EvidenceSnippet, IntentRoute } from "../server/src/types.js";
 import { withUiState } from "../server/src/ui.js";
 
@@ -19,6 +20,103 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.validation.some((item) => item.ruleId === "V-AGIDAS-001")).toBe(true);
     expect(answer.validation.some((item) => item.reasonCode === "M130_CHAIN_EVIDENCE_REQUIRED")).toBe(true);
     expect(answer.route.requiredDocs.some((doc) => doc.includes("CONSOLIDATED-00"))).toBe(true);
+  });
+
+  it("adds a secondary shipment rule match without creating corpus evidence", () => {
+    const answer = ask("BL-AUH-002 shipment rule 상태 확인해줘");
+
+    expect(answer.shipmentRule).toEqual(
+      expect.objectContaining({
+        found: true,
+        source: "sample_shipment_rule_engine",
+        supportLevel: "SECONDARY_SAMPLE_VALIDATION",
+        matchedKey: "BL-AUH-002",
+        shipmentId: "SHP-0002"
+      })
+    );
+    expect(answer.shipmentRule?.risks.length).toBeGreaterThan(0);
+    expect(answer.shipmentRule?.humanGateRequired).toBe(true);
+    expect(answer.evidenceIds).toEqual(answer.evidence.map((item) => item.id));
+    expect(answer.evidence.every((item) => item.sourceType === "ontology_corpus")).toBe(true);
+    expect(answer.evidenceTrace.every((trace) => trace.evidenceIds.every((id) => answer.evidenceIds.includes(id)))).toBe(true);
+  });
+
+  it("matches package identifiers that are not resolved by the parent router", () => {
+    const answer = ask("PKG-AGI-02 package secondary validation 확인해줘");
+
+    expect(answer.shipmentRule).toEqual(
+      expect.objectContaining({
+        found: true,
+        matchedKey: "PKG-AGI-02",
+        shipmentId: "SHP-0002",
+        source: "sample_shipment_rule_engine"
+      })
+    );
+  });
+
+  it("keeps not-found shipment rule state informational", () => {
+    const answer = ask("Flow Code 어디에 써? NO-SUCH-BL");
+
+    expect(answer.shipmentRule).toEqual(
+      expect.objectContaining({
+        found: false,
+        status: "INFO",
+        matchedKey: "NO-SUCH-BL",
+        shipmentId: null
+      })
+    );
+    expect(answer.verdict).toBe("INFO");
+    expect(answer.validation.some((item) => item.ruleId === "SHIPMENT-RULE-001")).toBe(false);
+  });
+
+  it("returns WARN when the secondary shipment rule data is unavailable", () => {
+    const result = evaluateShipmentRule({
+      question: "BL-AUH-002 shipment rule 상태 확인해줘",
+      resolvedEntities: [],
+      evidence: [],
+      sampleShipments: null
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        found: false,
+        status: "WARN",
+        source: "sample_shipment_rule_engine",
+        supportLevel: "SECONDARY_SAMPLE_VALIDATION"
+      })
+    );
+  });
+
+  it("preserves ambiguity when multiple sample shipments match candidate identifiers", () => {
+    const result = evaluateShipmentRule({
+      question: "BL-AUH-002 and PKG-OTHER-02 중 어느 shipment인지 확인해줘",
+      resolvedEntities: [],
+      evidence: [],
+      sampleShipments: [
+        {
+          shipment_id: "SHP-0002",
+          routing_pattern: "PORT_TO_MOSB_TO_SITE",
+          identifiers: { BL: "BL-AUH-002" }
+        },
+        {
+          shipment_id: "SHP-0099",
+          routing_pattern: "PORT_TO_SITE",
+          identifiers: { Package: "PKG-OTHER-02" }
+        }
+      ]
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        found: false,
+        status: "INFO",
+        shipmentId: null
+      })
+    );
+    expect(result.message).toContain("Multiple sample shipments matched");
+    expect(result.risks).toEqual(
+      expect.arrayContaining([expect.objectContaining({ rule: "Ambiguous Shipment Candidate" })])
+    );
   });
 
   it("keeps Flow Code as WHP-only", () => {

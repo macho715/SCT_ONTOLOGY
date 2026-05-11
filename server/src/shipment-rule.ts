@@ -1,0 +1,290 @@
+import type { EvidenceSnippet, ResolvedEntity, ShipmentRuleResult } from "./types.js";
+
+type SampleShipment = {
+  shipment_id: string;
+  routing_pattern: string;
+  identifiers?: Record<string, string>;
+  milestones?: Array<{ code: string; occurred_at?: string | null; evidence_ref?: string | null }>;
+  documents?: Array<{ doc_type: string; ref: string; status?: string }>;
+  invoice_lines?: Array<{
+    line_id: string;
+    item: string;
+    quantity: number | string;
+    rate: number | string;
+    draft_amount: number | string;
+    standard_amount?: number | string | null;
+    currency?: string;
+    evidence_refs?: string[];
+  }>;
+  open_exceptions?: string[];
+};
+
+const SAMPLE_SHIPMENTS: SampleShipment[] = [
+  {
+    shipment_id: "SHP-0001",
+    routing_pattern: "PORT_TO_WH_TO_SITE",
+    identifiers: {
+      BL: "BL-DXB-001",
+      BOE: "BOE-7788",
+      DO: "DO-9911",
+      Invoice: "INV-OFCO-1001",
+      Container: "MSCU1234567",
+      HVDC_CODE: "HVDC-ADOPT-001-0001",
+      Package: "PKG-0001",
+      cargo_type: "NORMAL"
+    },
+    milestones: [
+      { code: "M90", occurred_at: "2026-05-05T08:00:00+00:00", evidence_ref: "ATA-001" },
+      { code: "M91", occurred_at: "2026-05-06T10:00:00+00:00", evidence_ref: "BOE-7788" },
+      { code: "M92", occurred_at: "2026-05-06T12:00:00+00:00", evidence_ref: "DO-9911" }
+    ],
+    documents: [
+      { doc_type: "BOE", ref: "BOE-7788" },
+      { doc_type: "DO", ref: "DO-9911" }
+    ],
+    invoice_lines: [
+      {
+        line_id: "L1",
+        item: "Port charge",
+        quantity: 1,
+        rate: "5000.00",
+        draft_amount: "5000.00",
+        standard_amount: "5000.00",
+        evidence_refs: ["PortServiceEvent:PSE-1", "TariffRef:PORT-2026"]
+      },
+      {
+        line_id: "L2",
+        item: "Trucking",
+        quantity: 2,
+        rate: "1800.00",
+        draft_amount: "4500.00",
+        standard_amount: "3600.00",
+        evidence_refs: ["JourneyLeg:JL-1"]
+      }
+    ],
+    open_exceptions: []
+  },
+  {
+    shipment_id: "SHP-0002",
+    routing_pattern: "PORT_TO_MOSB_TO_SITE",
+    identifiers: {
+      BL: "BL-AUH-002",
+      BOE: "BOE-8899",
+      Invoice: "INV-DSV-2002",
+      Container: "OOG-TRAILER-02",
+      HVDC_CODE: "HVDC-ADOPT-002-0002",
+      Package: "PKG-AGI-02",
+      cargo_type: "AGI"
+    },
+    milestones: [
+      { code: "M90", occurred_at: "2026-05-01T06:00:00+00:00", evidence_ref: "ATA-002" },
+      { code: "M92", occurred_at: "2026-05-02T06:00:00+00:00", evidence_ref: "DO-DRAFT-002" },
+      { code: "M100", occurred_at: "2026-05-06T06:00:00+00:00", evidence_ref: "GATE-002" },
+      { code: "M130", occurred_at: "2026-05-07T16:00:00+00:00", evidence_ref: "SITE-ARR-002" }
+    ],
+    documents: [{ doc_type: "BOE", ref: "BOE-8899" }],
+    invoice_lines: [
+      {
+        line_id: "L1",
+        item: "Marine charge",
+        quantity: 1,
+        rate: "120000.00",
+        draft_amount: "120000.00",
+        standard_amount: "108000.00",
+        evidence_refs: ["MarineEvent:LCT-44"]
+      },
+      {
+        line_id: "L2",
+        item: "DO charge",
+        quantity: 1,
+        rate: "900.00",
+        draft_amount: "900.00",
+        standard_amount: "900.00",
+        evidence_refs: []
+      }
+    ],
+    open_exceptions: ["Missing original DO", "AGI MOSB gate evidence incomplete"]
+  }
+];
+
+const KEY_PATTERNS =
+  /\b(?:SHP-\d+|PKG-[A-Z0-9-]+|BL-[A-Z0-9-]+|BOE-[A-Z0-9-]+|DO-[A-Z0-9-]+|INV-[A-Z0-9-]+|INVOICE-[A-Z0-9-]+|HVDC-[A-Z0-9-]+|[A-Z]{4}\d{7}|NO-SUCH-BL)\b/gi;
+const MILESTONE_ORDER: Record<string, number> = {
+  M00: 0,
+  M90: 90,
+  M91: 91,
+  M92: 92,
+  M100: 100,
+  M115: 115,
+  M116: 116,
+  M117: 117,
+  M130: 130
+};
+const HUMAN_GATE_THRESHOLD_AED = 100000;
+
+function normalizeKey(value: string): string {
+  return value.trim().toUpperCase().replace(/\s+/g, " ");
+}
+
+function baseResult(overrides: Partial<ShipmentRuleResult>): ShipmentRuleResult {
+  return {
+    found: false,
+    source: "sample_shipment_rule_engine",
+    supportLevel: "SECONDARY_SAMPLE_VALIDATION",
+    status: "INFO",
+    matchedKey: null,
+    matchedScheme: null,
+    shipmentId: null,
+    candidates: [],
+    risks: [],
+    humanGateRequired: false,
+    message: "No matching sample shipment rule signal.",
+    ...overrides
+  };
+}
+
+function identifierPairs(shipment: SampleShipment): Array<{ scheme: string; value: string }> {
+  return [
+    { scheme: "shipment_id", value: shipment.shipment_id },
+    ...Object.entries(shipment.identifiers ?? {}).map(([scheme, value]) => ({ scheme, value }))
+  ];
+}
+
+function collectCandidates(question: string, resolvedEntities: ResolvedEntity[]): string[] {
+  const candidates = new Set<string>();
+  for (const match of question.matchAll(KEY_PATTERNS)) {
+    candidates.add(normalizeKey(match[0]));
+  }
+  for (const entity of resolvedEntities) {
+    candidates.add(normalizeKey(entity.normalizedValue));
+    candidates.add(normalizeKey(entity.identifierValue));
+  }
+  return [...candidates].filter(Boolean);
+}
+
+function hasMilestone(shipment: SampleShipment, code: string): boolean {
+  return (shipment.milestones ?? []).some((milestone) => normalizeKey(milestone.code) === code && Boolean(milestone.occurred_at));
+}
+
+function currentStage(shipment: SampleShipment): string {
+  const completed = (shipment.milestones ?? []).filter((milestone) => Boolean(milestone.occurred_at));
+  if (completed.length === 0) return "M00_NOT_STARTED";
+  return completed.reduce((latest, item) => (MILESTONE_ORDER[item.code] > MILESTONE_ORDER[latest.code] ? item : latest)).code;
+}
+
+function hasDocument(shipment: SampleShipment, docType: string): boolean {
+  const target = normalizeKey(docType);
+  return (shipment.documents ?? []).some((doc) => normalizeKey(doc.doc_type) === target && (doc.status ?? "available").toLowerCase() === "available");
+}
+
+function missingDocuments(shipment: SampleShipment): string[] {
+  const stage = currentStage(shipment);
+  const stageRank = MILESTONE_ORDER[stage] ?? 0;
+  const required = new Set<string>();
+  if (stageRank >= MILESTONE_ORDER.M90) required.add("BOE");
+  if (stageRank >= MILESTONE_ORDER.M92) required.add("DO");
+  if (stageRank >= MILESTONE_ORDER.M130) required.add("SITE_RECEIPT");
+  return [...required].filter((docType) => !hasDocument(shipment, docType)).sort();
+}
+
+function buildRisks(shipment: SampleShipment): Array<Record<string, unknown>> {
+  const risks: Array<Record<string, unknown>> = [];
+  const missing = missingDocuments(shipment);
+  if (missing.length > 0) {
+    risks.push({
+      severity: missing.includes("SITE_RECEIPT") ? "BLOCK" : "WARN",
+      rule: "Missing Document Check",
+      detail: `Missing required documents: ${missing.join(", ")}.`,
+      human_gate: missing.includes("SITE_RECEIPT")
+    });
+  }
+
+  const cargoType = normalizeKey(shipment.identifiers?.cargo_type ?? "");
+  const missingMosb = ["M115", "M116", "M117"].filter((code) => !hasMilestone(shipment, code));
+  if (["AGI", "DAS", "AGI/DAS"].includes(cargoType) && hasMilestone(shipment, "M130") && missingMosb.length > 0) {
+    risks.push({
+      severity: "BLOCK",
+      rule: "AGI/DAS MOSB Gate",
+      detail: `M130 exists but missing ${missingMosb.join(", ")}.`,
+      human_gate: true
+    });
+  }
+
+  for (const line of shipment.invoice_lines ?? []) {
+    const draftAmount = Number(line.draft_amount);
+    const evidenceRefs = line.evidence_refs ?? [];
+    if (draftAmount >= HUMAN_GATE_THRESHOLD_AED || evidenceRefs.length === 0) {
+      risks.push({
+        severity: draftAmount >= HUMAN_GATE_THRESHOLD_AED ? "BLOCK" : "WARN",
+        rule: "Invoice Human Gate",
+        detail: `${line.line_id} ${line.item} requires review.`,
+        draft_amount_aed: draftAmount.toFixed(2),
+        human_gate: draftAmount >= HUMAN_GATE_THRESHOLD_AED
+      });
+    }
+  }
+  return risks;
+}
+
+export function evaluateShipmentRule(args: {
+  question: string;
+  resolvedEntities: ResolvedEntity[];
+  evidence: EvidenceSnippet[];
+  sampleShipments?: SampleShipment[] | null;
+}): ShipmentRuleResult {
+  const sampleShipments = args.sampleShipments === undefined ? SAMPLE_SHIPMENTS : args.sampleShipments;
+  if (!Array.isArray(sampleShipments)) {
+    return baseResult({
+      status: "WARN",
+      message: "Secondary sample shipment rule data is unavailable.",
+      unavailableReason: "sample_shipments_unavailable"
+    });
+  }
+
+  const candidates = collectCandidates(args.question, args.resolvedEntities);
+  if (candidates.length === 0) {
+    return baseResult({ candidates, message: "No shipment identifier candidate was found in the question." });
+  }
+
+  const matches: Array<{ shipment: SampleShipment; scheme: string; value: string }> = [];
+  for (const candidate of candidates) {
+    for (const shipment of sampleShipments) {
+      const pair = identifierPairs(shipment).find((item) => normalizeKey(item.value) === candidate);
+      if (pair) matches.push({ shipment, scheme: pair.scheme, value: pair.value });
+    }
+  }
+
+  const uniqueShipmentIds = [...new Set(matches.map((match) => match.shipment.shipment_id))];
+  if (uniqueShipmentIds.length > 1) {
+    return baseResult({
+      status: "INFO",
+      candidates,
+      risks: [{ severity: "WARN", rule: "Ambiguous Shipment Candidate", detail: `Multiple shipments matched: ${uniqueShipmentIds.join(", ")}.` }],
+      message: "Multiple sample shipments matched; preserving ambiguity instead of selecting one."
+    });
+  }
+
+  const match = matches[0];
+  if (!match) {
+    return baseResult({
+      status: "INFO",
+      matchedKey: candidates[0] ?? null,
+      candidates,
+      message: "No sample shipment matched the candidate identifiers."
+    });
+  }
+
+  const risks = buildRisks(match.shipment);
+  const status = risks.some((risk) => risk.severity === "BLOCK") ? "BLOCK" : risks.some((risk) => risk.severity === "WARN") ? "WARN" : "PASS";
+  return baseResult({
+    found: true,
+    status,
+    matchedKey: match.value,
+    matchedScheme: match.scheme,
+    shipmentId: match.shipment.shipment_id,
+    candidates,
+    risks,
+    humanGateRequired: risks.some((risk) => risk.human_gate === true),
+    message: `Matched sample shipment ${match.shipment.shipment_id}.`
+  });
+}

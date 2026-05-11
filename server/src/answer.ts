@@ -14,6 +14,7 @@ import type {
 import { loadCorpus, searchCorpus } from "./corpus.js";
 import { isDailyLogisticsKpiQuestion, resolveAnyKey, routeQuestion } from "./router.js";
 import { maskPii, sha256 } from "./redact.js";
+import { evaluateShipmentRule } from "./shipment-rule.js";
 
 const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
@@ -421,6 +422,11 @@ export function answerQuestion(args: {
   });
   const evidence = hasEvidenceSupport(maskedQuestion.text, candidateEvidence) ? candidateEvidence : [];
   const resolvedEntities = resolveAnyKey(maskedQuestion.text);
+  const shipmentRule = evaluateShipmentRule({
+    question: maskedQuestion.text,
+    resolvedEntities,
+    evidence
+  });
   const validation = validateGrounding({
     question: maskedQuestion.text,
     route,
@@ -459,6 +465,7 @@ export function answerQuestion(args: {
     resolvedEntities,
     evidence,
     evidenceTrace,
+    shipmentRule,
     validation,
     actions,
     graphPath,

@@ -62,7 +62,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     const askMetaRecord = askMeta as Record<string, unknown>;
     const renderMeta = HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card._meta;
     const renderMetaRecord = renderMeta as Record<string, unknown>;
+    const askOutputSchema = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.outputSchema as Record<string, unknown>;
 
+    expect(askOutputSchema.shipmentRule).toBeDefined();
     expect((askMetaRecord.ui as unknown) ?? undefined).toBeUndefined();
     expect(askMetaRecord["openai/outputTemplate"]).toBeUndefined();
     expect(askMetaRecord["openai/widgetAccessible"]).toBeUndefined();

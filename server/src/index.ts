@@ -62,6 +62,23 @@ const evidenceTraceSchema = z.object({
   evidenceIds: z.array(z.string())
 });
 
+const shipmentRuleSchema = z
+  .object({
+    found: z.boolean(),
+    source: z.literal("sample_shipment_rule_engine"),
+    supportLevel: z.literal("SECONDARY_SAMPLE_VALIDATION"),
+    status: z.enum(["PASS", "INFO", "WARN", "BLOCK"]),
+    matchedKey: z.string().nullable(),
+    matchedScheme: z.string().nullable().optional(),
+    shipmentId: z.string().nullable(),
+    candidates: z.array(z.string()).optional(),
+    risks: z.array(z.record(z.unknown())),
+    humanGateRequired: z.boolean(),
+    message: z.string(),
+    unavailableReason: z.string().optional()
+  })
+  .optional();
+
 const answerOutputSchema = {
   answerId: z.string(),
   verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
@@ -86,6 +103,7 @@ const answerOutputSchema = {
   ),
   evidence: z.array(evidenceSchema),
   evidenceTrace: z.array(evidenceTraceSchema).default([]),
+  shipmentRule: shipmentRuleSchema,
   validation: z.array(
     z.object({
       ruleId: z.string(),
