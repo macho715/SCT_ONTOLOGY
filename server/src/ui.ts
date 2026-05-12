@@ -42,7 +42,7 @@ export function withUiState(
   return {
     ...answer,
     dataStatus: "OK",
-    businessResultVisible: true,
+    // WR-05: Preserve caller's businessResultVisible instead of forcing true
     fallbackUsed: failed,
     ui: buildUiState(status, errorMessage)
   };

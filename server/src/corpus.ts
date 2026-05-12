@@ -71,7 +71,14 @@ export function loadCorpus(corpusDir = DEFAULT_CORPUS_DIR): CorpusChunk[] {
   const chunks: CorpusChunk[] = [];
   for (const file of files) {
     const fullPath = path.join(corpusDir, file);
-    const raw = fs.readFileSync(fullPath, "utf8");
+    let raw: string;
+    try {
+      raw = fs.readFileSync(fullPath, "utf8");
+    } catch (err) {
+      // CR-03: Skip unreadable files rather than crashing the entire corpus load
+      console.warn(`corpus: skipping unreadable file ${file}:`, err);
+      continue;
+    }
     const docHash = sha256(raw);
     const docId = file.replace(/\.md$/i, "");
     const title = raw.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? docId;

@@ -18,7 +18,13 @@ import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, WIDGET_URI,
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..", "..");
-const widgetHtml = readFileSync(path.join(ROOT_DIR, "public", "hvdc-answer-widget.html"), "utf8");
+let widgetHtml: string;
+try {
+  widgetHtml = readFileSync(path.join(ROOT_DIR, "public", "hvdc-answer-widget.html"), "utf8");
+} catch {
+  widgetHtml = "<p>HVDC answer card template unavailable.</p>";
+  console.warn("hvdc-answer-widget.html not found; widget will use inline fallback");
+}
 
 const domainEnum = z.enum([
   "master",
@@ -462,7 +468,8 @@ export function createHvdcServer(): McpServer {
     async ({ question }) => {
       const route = routeQuestion(question);
       const evidence = searchCorpus({ query: question, requiredDocs: route.requiredDocs, domainHints: route.domains });
-      const findings = validateGrounding({ question, route, evidence });
+      const resolvedEntities = resolveAnyKey(question);
+      const findings = validateGrounding({ question, route, evidence, resolvedEntities });
       return {
         structuredContent: { findings },
         content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }) }]
@@ -484,9 +491,13 @@ export const httpServer = createServer(async (req, res) => {
 
   const url = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
 
+  const allowedOrigin = process.env.NODE_ENV === "production"
+    ? (process.env.ALLOWED_ORIGIN ?? "https://chatgpt.com")
+    : "*";
+
   if (req.method === "OPTIONS" && url.pathname === MCP_PATH) {
     res.writeHead(204, {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "POST, GET, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "content-type, mcp-session-id",
       "Access-Control-Expose-Headers": "Mcp-Session-Id"
@@ -502,7 +513,7 @@ export const httpServer = createServer(async (req, res) => {
 
   const MCP_METHODS = new Set(["POST", "GET", "DELETE"]);
   if (url.pathname === MCP_PATH && req.method && MCP_METHODS.has(req.method)) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     res.setHeader("Access-Control-Expose-Headers", "Mcp-Session-Id");
     const server = createHvdcServer();
     const transport = new StreamableHTTPServerTransport({

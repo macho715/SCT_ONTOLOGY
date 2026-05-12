@@ -158,12 +158,14 @@ function buildRisks(shipment: SampleShipment): Array<Record<string, unknown>> {
     const draftAmount = Number(line.draft_amount);
     const evidenceRefs = line.evidence_refs ?? [];
     if (draftAmount >= HUMAN_GATE_THRESHOLD_AED || evidenceRefs.length === 0) {
+      // WR-01/WARN-4: missing evidence is BLOCK (not WARN) and requires human gate
+      const severity = draftAmount >= HUMAN_GATE_THRESHOLD_AED || evidenceRefs.length === 0 ? "BLOCK" : "WARN";
       risks.push({
-        severity: draftAmount >= HUMAN_GATE_THRESHOLD_AED ? "BLOCK" : "WARN",
+        severity,
         rule: "Invoice Human Gate",
         detail: `${line.line_id} ${line.item} requires review.`,
         draft_amount_aed: draftAmount.toFixed(2),
-        human_gate: draftAmount >= HUMAN_GATE_THRESHOLD_AED
+        human_gate: severity === "BLOCK"
       });
     }
   }
@@ -184,10 +186,11 @@ function buildInvoiceAudit(shipment: SampleShipment): Array<Record<string, unkno
     const standardAmount = line.standard_amount === undefined || line.standard_amount === null ? expectedByRate : money(line.standard_amount);
     const zeroStandard = standardAmount === 0;
     const deltaAmount = draftAmount - standardAmount;
-    const deltaPct = zeroStandard ? 0 : (deltaAmount / standardAmount) * 100;
+    // WR-04: null instead of misleading 0 when standardAmount is zero
+    const deltaPct = zeroStandard ? null : (deltaAmount / standardAmount) * 100;
     const rateMismatch = Math.abs(draftAmount - expectedByRate) > 0.01;
     const missingEvidence = (line.evidence_refs ?? []).length === 0;
-    const severity = zeroStandard || rateMismatch || missingEvidence || draftAmount >= HUMAN_GATE_THRESHOLD_AED ? "BLOCK" : Math.abs(deltaPct) > 5 ? "WARN" : "PASS";
+    const severity = zeroStandard || rateMismatch || missingEvidence || draftAmount >= HUMAN_GATE_THRESHOLD_AED ? "BLOCK" : deltaPct !== null && Math.abs(deltaPct) > 5 ? "WARN" : "PASS";
     return {
       lineId: line.line_id,
       item: line.item,
@@ -195,7 +198,7 @@ function buildInvoiceAudit(shipment: SampleShipment): Array<Record<string, unkno
       draftAmountAed: draftAmount.toFixed(2),
       standardAmountAed: standardAmount.toFixed(2),
       deltaAmountAed: deltaAmount.toFixed(2),
-      deltaPct: deltaPct.toFixed(2),
+      deltaPct: deltaPct !== null ? deltaPct.toFixed(2) : "N/A",
       expectedByRateAed: expectedByRate.toFixed(2),
       rateMismatch,
       missingEvidence,

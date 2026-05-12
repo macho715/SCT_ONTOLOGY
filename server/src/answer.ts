@@ -279,14 +279,20 @@ function tokenizeForSupport(input: string): string[] {
   );
 }
 
-function hasEvidenceSupport(question: string, evidence: EvidenceSnippet[]): boolean {
+function hasEvidenceSupport(question: string, evidence: EvidenceSnippet[], piiMasked = false): boolean {
   if (evidence.length === 0) return false;
   const terms = tokenizeForSupport(question);
   if (terms.length === 0) return true;
   const searchableEvidence = evidence
     .map((item) => `${item.docId} ${item.title} ${item.sectionPath} ${item.snippet}`.toLowerCase())
     .join("\n");
-  return terms.some((term) => searchableEvidence.includes(term));
+  if (terms.some((term) => searchableEvidence.includes(term))) return true;
+  // PII-masked questions are inherently about contact/identity; accept evidence from
+  // master-ontology or communication docs as they are canonical references for such queries.
+  if (piiMasked) {
+    return evidence.some((e) => /master-ontology|communication/i.test(e.docId));
+  }
+  return false;
 }
 
 function matchingEvidenceIds(text: string, evidence: EvidenceSnippet[]): string[] {
@@ -475,7 +481,7 @@ export function answerQuestion(args: {
     topK: 8,
     corpus
   });
-  const evidence = hasEvidenceSupport(maskedQuestion.text, candidateEvidence) ? candidateEvidence : [];
+  const evidence = hasEvidenceSupport(maskedQuestion.text, candidateEvidence, maskedQuestion.piiMasked) ? candidateEvidence : [];
   const resolvedEntities = resolveAnyKey(maskedQuestion.text);
   const shipmentRule = evaluateShipmentRule({
     question: maskedQuestion.text,
@@ -493,16 +499,18 @@ export function answerQuestion(args: {
   const mergedValidation = [...validation, ...shipmentValidation.findings];
   const verdict = deriveVerdict(evidence, mergedValidation);
   const core = composeSummary(maskedQuestion.text, verdict);
-  const actions = [...core.actions, ...shipmentValidation.actions];
-  if (mergedValidation.some((finding) => finding.ruleId === "A-ACTION-001") && !actions.some((action) => action.humanGateRequired)) {
-    actions.push({
-      actionType: "REQUEST_HUMAN_GATE_REVIEW",
-      ownerRole: "Responsible Approver",
-      parameters: { reason: "write/send/export/report/cost/approval gate" },
-      humanGateRequired: true,
-      dueAt: null
-    });
-  }
+  // WARN-6: Build actions immutably to avoid shared reference between evidenceTrace and answer
+  const baseActions = [...core.actions, ...shipmentValidation.actions];
+  const needsHumanGate = mergedValidation.some((finding) => finding.ruleId === "A-ACTION-001") && !baseActions.some((action) => action.humanGateRequired);
+  const actions = needsHumanGate
+    ? [...baseActions, {
+        actionType: "REQUEST_HUMAN_GATE_REVIEW",
+        ownerRole: "Responsible Approver",
+        parameters: { reason: "write/send/export/report/cost/approval gate" },
+        humanGateRequired: true,
+        dueAt: null
+      }]
+    : baseActions;
   const evidenceTrace = buildEvidenceTrace({ core: { ...core, actions }, evidence });
   const graphPath = buildGraphPath(maskedQuestion.text);
   const generatedAt = new Date().toISOString();
@@ -517,7 +525,8 @@ export function answerQuestion(args: {
     businessImpact: core.businessImpact,
     details: core.details,
     evidenceIds: evidence.map((item) => item.id),
-    validationStatus: verdict === "NO_EVIDENCE" ? "NO_EVIDENCE" : verdict === "BLOCK" ? "BLOCK" : verdict === "WARN" ? "WARN" : "PASS",
+    // WR-02: INFO is a boundary signal; surface as WARN rather than silent PASS
+    validationStatus: verdict === "NO_EVIDENCE" ? "NO_EVIDENCE" : verdict === "BLOCK" ? "BLOCK" : verdict === "WARN" || verdict === "INFO" ? "WARN" : "PASS",
     route,
     resolvedEntities,
     evidence,
