@@ -42,8 +42,6 @@ final_validation_rounds: 5
 final_validation_status: "PASS"
 final_validated_date: "2026-04-27"
 final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
-patch_version: "2.1-flow-boundary-hardening"
-patched_date: "2026-05-12"
 ---
 
 # hvdc-master-ontology · CONSOLIDATED-00
@@ -89,6 +87,7 @@ HVDC 물류 온톨로지의 master spine은 `ShipmentUnit`을 중심으로 Proje
 4. `MOSB` is an **Offshore Staging / Marine Interface Node**. It is not a top-level `Warehouse` class.
 5. `CONSOLIDATED-08-communication.md` is an **Evidence Layer** extension. It connects through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord` only.
 6. Legacy route-coded language is migration debt. It may be listed only in the late migration appendix in [Part 12](#part-12).
+7. Email reply drafting defaults to `EmailDraftMode`. A draft request must not automatically invoke or display `sct_ontology`; it must output a hard-marked `EmailActionCard` and the draft only unless explicit ontology review is requested.
 
 ### 1.2 Corpus Role Matrix
 
@@ -456,6 +455,8 @@ hvdc:validatedBy   a owl:ObjectProperty ; rdfs:domain hvdc:Document ; rdfs:range
 3. Communication records are linked through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord`.
 4. PII shall be masked except approved business names and role-level contacts.
 5. Proof artifacts shall store source document, extraction confidence, rule ID, verdict, timestamp, and reviewer when applicable.
+6. Email drafts are not operational truth, not evidence registration, and not ontology verdicts until the user explicitly requests registration or review.
+7. Email draft outputs must include `EmailActionCard` with `ontology_use = NO_AUTO_SCT_ONTOLOGY` unless the user explicitly requests ontology review.
 
 ### 6.5 OCR KPI Gates
 
@@ -742,6 +743,7 @@ Raw source
 | `V-COST-002` | `Invoice` | Σ lineAmount = invoiceTotal ± 2.00% | BLOCK |
 | `V-COST-003` | `CostGuardResult` | Δ% band assigned | BLOCK |
 | `V-EVID-001` | `Document` / communication | evidence cannot own transaction truth | BLOCK |
+| `V-COMM-DRAFT-001` | email draft output | draft-mode reply must not auto-invoke `sct_ontology`; `EmailActionCard` required | BLOCK |
 
 ### 10.2 SHACL: ShipmentUnit Required Shape
 
@@ -991,18 +993,16 @@ hvdc:flowEvidenceSource a owl:ObjectProperty ;
 
 ### 12.3 Confirmed Flow Code Values
 
-`confirmedFlowCode` values are **warehouse storage / handling classes**. They are not route, customs, port, marine, site-delivery, or cost-allocation codes. The dictionary is intentionally aligned with `CONSOLIDATED-02` so that the master spine and WHP extension use the same operational meaning.
+| Code | Warehouse handling meaning | Minimum evidence | Notes |
+|---:|---|---|---|
+| 0 | `PRE_WH_OR_TENTATIVE` | No M110 WH In evidence and pre-arrival/expected status | Tentative until evidence arrives |
+| 1 | `WH_BYPASS_CONFIRMED` | No M110 WH In evidence and direct delivery/bypass evidence | Confirms no warehouse handling |
+| 2 | `SINGLE_WH_HANDLING` | Exactly 1 M110 WH In / put-away evidence | Standard warehouse handling |
+| 3 | `WH_LINKED_OFFSHORE_HANDLING` | Warehouse evidence plus MOSB staging evidence or AGI/DAS minimum offshore handling class | WH evidence with offshore interface |
+| 4 | `MULTI_WH_OFFSHORE_HANDLING` | At least 2 WH handling events plus MOSB staging evidence | Multi-WH + offshore interface |
+| 5 | `MIXED_OR_UNRESOLVED_WH_PATTERN` | Incomplete, conflicting, split, or pending warehouse evidence | Requires reason flag and review |
 
-| Code | Canonical WH handling class | Korean name | Minimum warehouse evidence | Human-gate |
-|---:|---|---|---|---|
-| 0 | `STANDARD_INDOOR` | 표준 실내 | WH zone/bin = indoor dry storage; no special handling flag | No |
-| 1 | `STANDARD_OUTDOOR` | 표준 야적 | WH zone/yard = outdoor or covered yard; cargo is weather-tolerant | No |
-| 2 | `SPECIAL_INDOOR` | 특수 실내 | Temperature, humidity, shock, precision, preservation, or high-value indoor requirement | Yes if high-value |
-| 3 | `SPECIAL_OUTDOOR` | 특수 야적 | Covered yard, dunnage, corrosion protection, oversized yard control, or abnormal outdoor handling | Yes if abnormal |
-| 4 | `HAZMAT_DG` | 위험물 | UN No. / DG class / MSDS / permit or segregation evidence | Mandatory |
-| 5 | `OOG_ABNORMAL` | 초대형·이상화물 | Abnormal dimensions, engineered lift/rigging plan, heavy/OOG movement evidence | Mandatory |
-
-> Pre-arrival, no-WH, WH-bypass, MOSB-direct, WH→MOSB, and mixed-route semantics must not be encoded in `confirmedFlowCode`. Use `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent` for route/state. If no M110 WH evidence exists, do not create a confirmed WHP class; keep `flowConfirmationStatus = pending/tentative` or no `WarehouseHandlingProfile`.
+> Numeric values are retained for warehouse operational compatibility only. They must never be interpreted as the master Port → WH → MOSB → Site route classifier. The master route classifier remains `ShipmentRoutingPattern`.
 
 ### 12.4 Legacy Migration Map
 
@@ -1063,6 +1063,7 @@ hvdc:flowEvidenceSource a owl:ObjectProperty ;
 | `OSDRClaimBot` | M132 OSD event | Create OSDR/Claim draft and evidence pack |
 | `ComplianceRAG` | Missing/expired permit | Retrieve latest approved SOP/authority evidence |
 | `DailyCOPDigest` | Daily 08:00 Asia/Dubai | At-risk shipments, customs holds, DEM/DET, high-cost invoices |
+| `EmailDraftGuard` | User requests reply/draft | Emit `EmailActionCard` + draft; no automatic `sct_ontology` call |
 
 ### 13.4 QA Checklist
 

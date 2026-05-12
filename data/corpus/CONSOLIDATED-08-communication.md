@@ -55,6 +55,12 @@ semantic_patch:
   - "MOSB is represented as OffshoreStagingNode / MarineInterfaceNode evidence; communication shall not classify MOSB as Warehouse."
   - "PII fields from contact data are masked before register write; raw tel/e-mail never appears in the evidence graph."
   - "A message can propose, request, or approve; only an authorized Foundry Action can mutate operational truth."
+  - "Email drafting defaults to EmailDraftMode; sct_ontology is not invoked or surfaced unless explicitly requested."
+  - "A hard-marked EmailActionCard is mandatory for email drafting output and is not an operational ActionRequest unless the user asks to register or write an action."
+final_validation_rounds: 5
+final_validation_status: "PASS"
+final_validated_date: "2026-04-27"
+final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
 ---
 
 # hvdc-communication · CONSOLIDATED-08
@@ -66,6 +72,8 @@ semantic_patch:
 비즈니스 임팩트는 **승인 누락 0.00건**, **SLA breach 조기 경보**, **OSD/NCR/DEM-DET/permit blocker 증빙 자동 연결**, **PII 마스킹 기반 감사 추적성 확보**이다. 기술 해법은 PROV-O provenance, OWL-Time SLA clock, SHACL evidence gate, SPARQL unresolved-action query, Foundry Action write-back guard를 결합한다.
 
 KPI 목표는 `CommunicationLinkCoverage ≥ 95.00%`, `ApprovalEvidenceCompleteness ≥ 98.00%`, `PIILeakage = 0.00건`, `ActionClosureSLA ≥ 90.00%`, `Validation p95 < 5.00s`이다.
+
+Email reply drafting은 별도 `EmailDraftMode`로 처리한다. 사용자가 단순히 답장 작성을 요청한 경우 `sct_ontology`를 자동 호출하지 않고, 하드마킹된 `EmailActionCard`와 이메일 본문 초안만 출력한다.
 
 **ENG-KR one-liner:** Communication is proof, not operational truth; messages attach evidence, while authorized Foundry Actions update the logistics twin.
 
@@ -82,6 +90,9 @@ KPI 목표는 `CommunicationLinkCoverage ≥ 95.00%`, `ApprovalEvidenceCompleten
 5. Warehouse handling classification remains on `WarehouseHandlingProfile.confirmedFlowCode`; communication cannot create, assign, or infer it.
 6. `MOSB` is an `OffshoreStagingNode` / `MarineInterfaceNode`; communication can store MOSB-related approval evidence but cannot type MOSB as a warehouse.
 7. A message cannot mutate operational transactions. It can create an evidence assertion, approval request, escalation, or work queue item. A separate authorized Foundry Action performs any transaction update.
+8. Email drafting requests are `EmailDraftMode` by default. They do not automatically invoke `sct_ontology`, CostGuard, route verdicting, or regulatory classification.
+9. Email draft output must start with a hard-marked `EmailActionCard`. The card is a presentation/triage artifact, not a KG `ActionRequest`.
+10. `sct_ontology` may be invoked only by explicit user trigger, such as `sct_ontology 사용`, ontology review, risk verdict, CostGuard, compliance judgement, evidence pack creation, or Action registration.
 
 ### 2.2 Included vs Delegated Scope
 
@@ -94,6 +105,7 @@ KPI 목표는 `CommunicationLinkCoverage ≥ 95.00%`, `ApprovalEvidenceCompleten
 | PII redaction | Masked phone/e-mail, role-only exposure, hash-only identity join | HR master data and raw contact vault |
 | Evidence linking | Link to ShipmentUnit, Document, PortCall, CustomsEntry, WarehouseTask, SiteReceipt, Invoice, Exception | Redefining those classes |
 | RAG summary | Summarize discussion and cite evidence objects | Treating LLM summary as source-of-truth |
+| Email drafting | `EmailActionCard` + email body draft in `EmailDraftMode` | Auto-running `sct_ontology` or converting the card to KG action without explicit instruction |
 
 ### 2.3 Domain Boundary Crosswalk
 
@@ -118,6 +130,38 @@ Operational update      -> Authorized Foundry Action in target ontology
 Audit closure           -> AuditRecord links beforeObjectRef, afterObjectRef, evidenceHash
 ```
 
+### 2.4.1 Email Drafting Guard
+
+```text
+User says "답장 작성하라" / "draft reply" / "메일 회신 작성"
+  -> EmailDraftMode
+  -> Emit hard-marked EmailActionCard
+  -> Emit email draft
+  -> DO NOT auto-run sct_ontology
+  -> DO NOT create ActionRequest unless user explicitly says register/write/escalate
+```
+
+Mandatory card:
+
+```text
+[EMAIL_ACTION_CARD]
+mode: EMAIL_DRAFT
+ontology_use: NO_AUTO_SCT_ONTOLOGY | EXPLICIT_ONTOLOGY
+reply_stance: ACKNOWLEDGE | HOLD | REQUEST_INFO | ESCALATE | APPROVE | REJECT
+blocking_inputs: <comma-separated missing inputs or NONE>
+next_action: <single operational next step>
+send_status: DRAFT_READY | HOLD_FOR_REVIEW
+[/EMAIL_ACTION_CARD]
+```
+
+For mixed requests, use two separated lanes:
+
+```text
+Email lane     -> EmailActionCard + Draft
+Ontology lane  -> OntologyReview only if explicitly requested
+```
+
+
 ### 2.5 Legacy Migration Rules
 
 | Legacy wording / pattern | Canonical replacement | Patch action |
@@ -127,6 +171,8 @@ Audit closure           -> AuditRecord links beforeObjectRef, afterObjectRef, ev
 | Email-derived route status | `RouteEvidenceAssertion` or `ApprovalAction.targetObjectRef` | Route owner remains core shipment layer |
 | Message-derived WH handling class | `CommunicationEvidence` on WHP decision | WHP owner remains `CONSOLIDATED-02` |
 | Raw phone/e-mail in graph | `maskedContactRef`, `roleId`, `hashKey` | Redact before write |
+| Email draft auto-runs `sct_ontology` | `EmailDraftMode` with `ontology_use = NO_AUTO_SCT_ONTOLOGY` | Require explicit trigger for ontology lane |
+| Draft action card treated as KG action | `EmailActionCard` presentation artifact | Convert to `ActionRequest` only on explicit register/write/escalate request |
 
 ---
 
@@ -140,6 +186,7 @@ Audit closure           -> AuditRecord links beforeObjectRef, afterObjectRef, ev
 | Thread | `MessageThread`, `ConversationCluster`, `ThreadParticipant` | Multi-message discussion and participants |
 | Intent | `CommunicationIntent`, `RequestIntent`, `ApprovalIntent`, `EscalationIntent`, `ClarificationIntent` | Semantic intent classification |
 | Action | `ActionRequest`, `ApprovalAction`, `RevisionRequest`, `EscalationRecord`, `AcknowledgementAction` | Human decision and workflow action |
+| Drafting | `EmailDraftArtifact`, `EmailActionCard` | Reply composition output; no automatic ontology invocation |
 | Evidence | `EvidenceAttachment`, `AttachmentManifest`, `DocumentPointer`, `ObjectPointer`, `AuditRecord` | Provenance and proof artifact |
 | SLA | `SLAClock`, `ResponseWindow`, `BreachRecord`, `EscalationTier` | Response and closure timing |
 | Security | `PIIRedactionRecord`, `AccessControlTag`, `SensitivityLabel` | Privacy and access guard |
@@ -151,6 +198,8 @@ Audit closure           -> AuditRecord links beforeObjectRef, afterObjectRef, ev
 |---|---|---|---|
 | `CommunicationEvent` | `eventId`, `channel`, `eventTime`, `normalizedSubject`, `language`, `sourceSystem` | `belongsToThread`, `hasParticipant`, `hasIntent`, `referencesObject`, `hasEvidenceAttachment` | Root evidence object |
 | `EmailMessage` | `messageId`, `sentAt`, `receivedAt`, `subjectHash`, `bodyHash` | `subClassOf CommunicationEvent` | Body is optionally stored outside KG |
+| `EmailDraftArtifact` | `draftId`, `draftPurpose`, `createdAt`, `language`, `sourceThreadHash` | `draftsReplyTo`, `hasEmailActionCard` | Draft-only artifact; not sent evidence until registered |
+| `EmailActionCard` | `mode`, `ontologyUse`, `replyStance`, `blockingInputs`, `nextAction`, `sendStatus` | `summarizesDraft`, optional `mayOpenActionRequest` | Hard-marked output card; not a KG action by default |
 | `ChatMessage` | `messageId`, `channelProvider`, `sentAt`, `messageHash` | `subClassOf CommunicationEvent` | WhatsApp/Telegram/Teams normalized |
 | `MessageThread` | `threadId`, `threadStatus`, `openedAt`, `lastActivityAt` | `hasMessage`, `hasOpenAction`, `referencesObject` | One thread can reference many shipments |
 | `CommunicationIntent` | `intentCode`, `confidence`, `classifierVersion` | `classifiedFrom`, `requiresActionType` | LLM/RAG intent is evidence, not truth |
@@ -186,6 +235,8 @@ Audit closure           -> AuditRecord links beforeObjectRef, afterObjectRef, ev
 | `sensitivityLabel` | SKOS enum | `PUBLIC`, `PROJECT_INTERNAL`, `CONFIDENTIAL`, `PII_MASKED`, `LEGAL_HOLD` |
 | `confidence` | decimal | `0.00 <= confidence <= 1.00` |
 | `evidenceHash` | string | Required for every `AuditRecord` |
+| `ontologyUse` | SKOS enum | `NO_AUTO_SCT_ONTOLOGY` unless explicit ontology lane is requested |
+| `sendStatus` | SKOS enum | `DRAFT_READY` or `HOLD_FOR_REVIEW` |
 
 ### 3.5 Core SHACL Shapes (요약)
 
@@ -210,6 +261,13 @@ comm:PIIRedactionShape a sh:NodeShape ;
   sh:targetClass comm:ThreadParticipant ;
   sh:property [ sh:path comm:maskedContactRef ; sh:minCount 1 ] ;
   sh:property [ sh:path comm:rawContactValue ; sh:maxCount 0 ] .
+
+comm:EmailActionCardShape a sh:NodeShape ;
+  sh:targetClass comm:EmailActionCard ;
+  sh:property [ sh:path comm:mode ; sh:hasValue "EMAIL_DRAFT" ] ;
+  sh:property [ sh:path comm:ontologyUse ; sh:minCount 1 ] ;
+  sh:property [ sh:path comm:replyStance ; sh:minCount 1 ] ;
+  sh:property [ sh:path comm:sendStatus ; sh:minCount 1 ] .
 ```
 
 ### 3.6 Foundry Object Model
@@ -233,6 +291,7 @@ comm:PIIRedactionShape a sh:NodeShape ;
 | Source | Input | Output in CONSOLIDATED-08 | Ownership boundary |
 |---|---|---|---|
 | Gmail / Outlook | Message metadata, subject/body hash, attachment manifest | `EmailMessage`, `EvidenceAttachment`, `MessageThread` | Does not create shipment truth |
+| Email draft UI | User-provided email text and draft request | `EmailDraftArtifact`, `EmailActionCard` | Does not auto-call `sct_ontology` and does not create KG action |
 | WhatsApp / Telegram / Teams | Message ID, group, timestamp, sender role, content hash | `ChatMessage`, `CommunicationIntent`, `SLAClock` | Does not create approved action |
 | Document store / LDG | Document pointer, VerificationResult, OCR discrepancy | `DocumentPointer`, `linkedToVerification` | LDG owns document validation |
 | ERP / WMS / ATLP | Object identifiers and status references | `ObjectPointer` to ShipmentUnit/WarehouseTask/ReleaseOrder | Target system owns transaction |
@@ -292,10 +351,44 @@ comm:PIIRedactionShape a sh:NodeShape ;
 | "Cargo is damaged" | `CommunicationEvent` + `ActionRequest(type=OSD_INSPECTION)` | Yes, before NCR/Claim creation |
 | "AGI delivery confirmed" | `CommunicationEvent` with site delivery evidence | Yes, before M130 site receipt if no system event |
 | "Storage class confirmed" | Evidence attached to WHP review | Yes, WHP remains warehouse-owned |
+| "답장 작성하라" / "draft reply" | `EmailActionCard` + draft body | No, unless user explicitly requests ontology review or action registration |
+| "sct_ontology 사용 후 답장" | `EmailActionCard(ontologyUse=EXPLICIT_ONTOLOGY)` + separate `OntologyReview` + draft | Yes, if review result is used for operational mutation |
+
+### 4.5 Email Drafting Output Contract
+
+Email draft outputs must be structurally predictable:
+
+1. `EmailActionCard` first.
+2. `Draft` second.
+3. `Notes` optional and limited to missing input or send-risk.
+4. `OntologyReview` forbidden unless explicitly requested.
+5. No `WARN/HIGH/CRITICAL` ontology verdict banner in normal draft mode; use `reply_stance` and `send_status` instead.
+
+Example for a hold/request-info reply:
+
+```text
+[EMAIL_ACTION_CARD]
+mode: EMAIL_DRAFT
+ontology_use: NO_AUTO_SCT_ONTOLOGY
+reply_stance: HOLD
+blocking_inputs: HE forwarder PIC, booking availability, OEM receiving readiness, cargo dims/wt/condition
+next_action: request HE forwarder and OEM receiving confirmation before shipment decision
+send_status: DRAFT_READY
+[/EMAIL_ACTION_CARD]
+```
 
 ---
 
 ## 5. Validation (SPARQL/RAG/Human-gate)
+
+### 5.0 Prompt-level Gate — Email Drafting
+
+| Rule ID | Trigger | Required output | Block condition |
+|---|---|---|---|
+| `COMM-DRAFT-001` | reply/draft email request | `EmailActionCard` + draft | missing hard-marked card |
+| `COMM-DRAFT-002` | reply/draft email request | `ontology_use = NO_AUTO_SCT_ONTOLOGY` | `sct_ontology` invoked without explicit trigger |
+| `COMM-DRAFT-003` | mixed draft + ontology request | separated Email lane and Ontology lane | ontology verdict mixed into email body |
+| `COMM-DRAFT-004` | action/register request absent | no KG `ActionRequest` write | card converted into operational action without instruction |
 
 ### 5.1 SPARQL — Communication must not own logistics state
 
@@ -473,6 +566,7 @@ Recommended baseline: **Option B** for immediate approval/SLA control. Scale to 
 | `openActionRequest` | intent + target object | `ActionRequest` | Require target or triage status |
 | `recordApprovalAction` | request + actor role + decision | `ApprovalAction` + `AuditRecord` | Check authorization |
 | `createEvidencePack` | thread + target object + attachments | `ProofArtifact` | Hash required |
+| `emailDraftGuard` | email text + draft request | `EmailActionCard` + draft | `NO_AUTO_SCT_ONTOLOGY` unless explicit trigger |
 | `escalateBreachedSLA` | SLAClock | `EscalationRecord` | Business hours calendar |
 
 ### 9.2 RPA / Messaging Hooks
@@ -492,6 +586,8 @@ Recommended baseline: **Option B** for immediate approval/SLA control. Scale to 
 | Intent classification | Queue routing | Approval decision |
 | Key extraction | Candidate object linking | Identity resolution without confidence |
 | Risk note | Escalation hint | Regulatory interpretation as fact |
+| Email draft | Reply composition | Automatic ontology verdict or KG mutation |
+| EmailActionCard | Draft triage and send-readiness | Replacement for `ActionRequest` without explicit user instruction |
 
 ### 9.4 Sheets / Dashboard Hooks
 
