@@ -25,11 +25,23 @@ type SampleShipment = {
   open_exceptions?: string[];
 };
 
-function loadSampleShipments(): SampleShipment[] {
+function isValidShipment(item: unknown): item is SampleShipment {
+  return (
+    typeof item === "object" &&
+    item !== null &&
+    typeof (item as Record<string, unknown>).shipment_id === "string" &&
+    typeof (item as Record<string, unknown>).routing_pattern === "string"
+  );
+}
+
+// Returns null on load/parse failure so caller emits WARN instead of false-negative INFO
+function loadSampleShipments(): SampleShipment[] | null {
   try {
-    return JSON.parse(fs.readFileSync(SAMPLE_SHIPMENTS_PATH, "utf8")) as SampleShipment[];
+    const raw = JSON.parse(fs.readFileSync(SAMPLE_SHIPMENTS_PATH, "utf8")) as unknown;
+    if (!Array.isArray(raw) || !raw.every(isValidShipment)) return null;
+    return raw;
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -69,10 +81,14 @@ function baseResult(overrides: Partial<ShipmentRuleResult>): ShipmentRuleResult 
   };
 }
 
+const NON_IDENTIFIER_KEYS = new Set(["cargo_type", "cargo_class", "service_type"]);
+
 function identifierPairs(shipment: SampleShipment): Array<{ scheme: string; value: string }> {
   return [
     { scheme: "shipment_id", value: shipment.shipment_id },
-    ...Object.entries(shipment.identifiers ?? {}).map(([scheme, value]) => ({ scheme, value }))
+    ...Object.entries(shipment.identifiers ?? {})
+      .filter(([scheme]) => !NON_IDENTIFIER_KEYS.has(scheme.toLowerCase()))
+      .map(([scheme, value]) => ({ scheme, value }))
   ];
 }
 
@@ -93,7 +109,9 @@ function hasMilestone(shipment: SampleShipment, code: string): boolean {
 }
 
 function currentStage(shipment: SampleShipment): string {
-  const completed = (shipment.milestones ?? []).filter((milestone) => Boolean(milestone.occurred_at));
+  const completed = (shipment.milestones ?? []).filter(
+    (milestone) => Boolean(milestone.occurred_at) && milestone.code in MILESTONE_ORDER
+  );
   if (completed.length === 0) return "M00_NOT_STARTED";
   return completed.reduce((latest, item) => (MILESTONE_ORDER[item.code] > MILESTONE_ORDER[latest.code] ? item : latest)).code;
 }
@@ -200,7 +218,12 @@ export function evaluateShipmentRule(args: {
   evidence: EvidenceSnippet[];
   sampleShipments?: SampleShipment[] | null;
 }): ShipmentRuleResult {
-  const sampleShipments = args.sampleShipments === undefined ? loadSampleShipments() : args.sampleShipments;
+  const sampleShipments =
+    args.sampleShipments === undefined
+      ? loadSampleShipments()
+      : Array.isArray(args.sampleShipments)
+        ? args.sampleShipments
+        : null;
   if (!Array.isArray(sampleShipments)) {
     return baseResult({
       status: "WARN",
@@ -244,7 +267,12 @@ export function evaluateShipmentRule(args: {
 
   const risks = buildRisks(match.shipment);
   const invoiceAudit = buildInvoiceAudit(match.shipment);
-  const status = risks.some((risk) => risk.severity === "BLOCK") ? "BLOCK" : risks.some((risk) => risk.severity === "WARN") ? "WARN" : "PASS";
+  const invoiceHasBlock = invoiceAudit.some((line) => line.severity === "BLOCK");
+  const invoiceHasWarn = invoiceAudit.some((line) => line.severity === "WARN");
+  const status =
+    risks.some((risk) => risk.severity === "BLOCK") || invoiceHasBlock ? "BLOCK"
+    : risks.some((risk) => risk.severity === "WARN") || invoiceHasWarn ? "WARN"
+    : "PASS";
   return baseResult({
     found: true,
     status,

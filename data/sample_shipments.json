@@ -41,7 +41,7 @@
         "evidence_refs": ["JourneyLeg:JL-1"]
       }
     ],
-    "open_exceptions": []
+    "open_exceptions": ["Trucking L2: draft_amount 4500 exceeds rate-computed 3600 by 25% — intentional rate mismatch test case"]
   },
   {
     "shipment_id": "SHP-0002",
@@ -84,6 +84,6 @@
         "evidence_refs": []
       }
     ],
-    "open_exceptions": ["Missing original DO", "AGI MOSB gate evidence incomplete"]
+    "open_exceptions": ["Missing original DO", "AGI MOSB gate evidence incomplete", "M91 (BOE clearance milestone) not recorded — BOE document present but clearance event unconfirmed"]
   }
 ]
