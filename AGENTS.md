@@ -46,6 +46,7 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 ## Semantic Boundaries
 - `Flow Code` is WHP-only.
 - Do not use `Flow Code` for route classification, port routing, customs stage, invoice bucket, or operations KPI bucket.
+- Master/WHP `confirmedFlowCode` dictionary: `CONSOLIDATED-00` Part 12.3 and `CONSOLIDATED-02` Section 3.4 must use the same values — warehouse storage/handling classes only: `STANDARD_INDOOR`, `STANDARD_OUTDOOR`, `SPECIAL_INDOOR`, `SPECIAL_OUTDOOR`, `HAZMAT_DG`, `OOG_ABNORMAL`. Route semantics (`PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED`) belong to `ShipmentRoutingPattern`, never to `confirmedFlowCode`. If no M110/M111 warehouse event exists, do not create a confirmed WHP class.
 - AGI/DAS M130 closure must be blocked unless M115/M116/M117 evidence or an approved exception exists.
 - Any-key resolution must support BL, BOE, DO, Invoice, HVDC code, site, and milestone identifiers.
 - If any-key confidence is ambiguous, return review state instead of choosing silently.

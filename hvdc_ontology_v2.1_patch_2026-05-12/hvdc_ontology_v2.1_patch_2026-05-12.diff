@@ -1,0 +1,247 @@
+diff -ru '--exclude=PATCH_SUMMARY.md' '--exclude=scripts' /tmp/orig_cmp/AGENTS.md hvdc_ontology_patch_2026-05-12/AGENTS.md
+--- /tmp/orig_cmp/AGENTS.md	2026-05-12 07:38:03.907757449 +0000
++++ hvdc_ontology_patch_2026-05-12/AGENTS.md	2026-05-12 07:36:29.426384158 +0000
+@@ -60,6 +60,12 @@
+ - `hasLogisticsFlowCode` used as end-to-end route status
+ - `Flow Code 0~5` used to describe Port → WH → MOSB → Site journey semantics
+ 
++Master/WHP dictionary alignment:
++- `CONSOLIDATED-00` Part 12.3 and `CONSOLIDATED-02` Section 3.4 must use the same `confirmedFlowCode` dictionary.
++- Valid `confirmedFlowCode` meanings are warehouse storage / handling classes only: `STANDARD_INDOOR`, `STANDARD_OUTDOOR`, `SPECIAL_INDOOR`, `SPECIAL_OUTDOOR`, `HAZMAT_DG`, `OOG_ABNORMAL`.
++- `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, and `MIXED` belong to `ShipmentRoutingPattern`, never to `confirmedFlowCode`.
++- No-WH or direct/bypass shipments should have no confirmed WHP class unless a real M110/M111 warehouse event exists.
++
+ ### 4.2 Shipment visibility model
+ 
+ Program-wide shipment visibility must use:
+diff -ru '--exclude=PATCH_SUMMARY.md' '--exclude=scripts' /tmp/orig_cmp/CONSOLIDATED-00-master-ontology.md hvdc_ontology_patch_2026-05-12/CONSOLIDATED-00-master-ontology.md
+--- /tmp/orig_cmp/CONSOLIDATED-00-master-ontology.md	2026-05-12 07:38:03.908269410 +0000
++++ hvdc_ontology_patch_2026-05-12/CONSOLIDATED-00-master-ontology.md	2026-05-12 07:36:29.425863742 +0000
+@@ -42,6 +42,8 @@
+ final_validation_status: "PASS"
+ final_validated_date: "2026-04-27"
+ final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
++patch_version: "2.1-flow-boundary-hardening"
++patched_date: "2026-05-12"
+ ---
+ 
+ # hvdc-master-ontology · CONSOLIDATED-00
+@@ -989,16 +991,18 @@
+ 
+ ### 12.3 Confirmed Flow Code Values
+ 
+-| Code | Warehouse handling meaning | Minimum evidence | Notes |
+-|---:|---|---|---|
+-| 0 | `PRE_WH_OR_TENTATIVE` | No M110 WH In evidence and pre-arrival/expected status | Tentative until evidence arrives |
+-| 1 | `WH_BYPASS_CONFIRMED` | No M110 WH In evidence and direct delivery/bypass evidence | Confirms no warehouse handling |
+-| 2 | `SINGLE_WH_HANDLING` | Exactly 1 M110 WH In / put-away evidence | Standard warehouse handling |
+-| 3 | `WH_LINKED_OFFSHORE_HANDLING` | Warehouse evidence plus MOSB staging evidence or AGI/DAS minimum offshore handling class | WH evidence with offshore interface |
+-| 4 | `MULTI_WH_OFFSHORE_HANDLING` | At least 2 WH handling events plus MOSB staging evidence | Multi-WH + offshore interface |
+-| 5 | `MIXED_OR_UNRESOLVED_WH_PATTERN` | Incomplete, conflicting, split, or pending warehouse evidence | Requires reason flag and review |
++`confirmedFlowCode` values are **warehouse storage / handling classes**. They are not route, customs, port, marine, site-delivery, or cost-allocation codes. The dictionary is intentionally aligned with `CONSOLIDATED-02` so that the master spine and WHP extension use the same operational meaning.
+ 
+-> Numeric values are retained for warehouse operational compatibility only. They must never be interpreted as the master Port → WH → MOSB → Site route classifier. The master route classifier remains `ShipmentRoutingPattern`.
++| Code | Canonical WH handling class | Korean name | Minimum warehouse evidence | Human-gate |
++|---:|---|---|---|---|
++| 0 | `STANDARD_INDOOR` | 표준 실내 | WH zone/bin = indoor dry storage; no special handling flag | No |
++| 1 | `STANDARD_OUTDOOR` | 표준 야적 | WH zone/yard = outdoor or covered yard; cargo is weather-tolerant | No |
++| 2 | `SPECIAL_INDOOR` | 특수 실내 | Temperature, humidity, shock, precision, preservation, or high-value indoor requirement | Yes if high-value |
++| 3 | `SPECIAL_OUTDOOR` | 특수 야적 | Covered yard, dunnage, corrosion protection, oversized yard control, or abnormal outdoor handling | Yes if abnormal |
++| 4 | `HAZMAT_DG` | 위험물 | UN No. / DG class / MSDS / permit or segregation evidence | Mandatory |
++| 5 | `OOG_ABNORMAL` | 초대형·이상화물 | Abnormal dimensions, engineered lift/rigging plan, heavy/OOG movement evidence | Mandatory |
++
++> Pre-arrival, no-WH, WH-bypass, MOSB-direct, WH→MOSB, and mixed-route semantics must not be encoded in `confirmedFlowCode`. Use `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent` for route/state. If no M110 WH evidence exists, do not create a confirmed WHP class; keep `flowConfirmationStatus = pending/tentative` or no `WarehouseHandlingProfile`.
+ 
+ ### 12.4 Legacy Migration Map
+ 
+diff -ru '--exclude=PATCH_SUMMARY.md' '--exclude=scripts' /tmp/orig_cmp/CONSOLIDATED-09-operations.md hvdc_ontology_patch_2026-05-12/CONSOLIDATED-09-operations.md
+--- /tmp/orig_cmp/CONSOLIDATED-09-operations.md	2026-05-12 07:38:03.911824219 +0000
++++ hvdc_ontology_patch_2026-05-12/CONSOLIDATED-09-operations.md	2026-05-12 07:36:29.426850056 +0000
+@@ -58,6 +58,8 @@
+ final_validation_status: "PASS"
+ final_validated_date: "2026-04-27"
+ final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
++patch_version: "2.1-query-prefix-hardening"
++patched_date: "2026-05-12"
+ ---
+ 
+ # hvdc-operations · CONSOLIDATED-09
+@@ -312,6 +314,12 @@
+ ### 5.3 SPARQL — Operations must not redefine core truth
+ 
+ ```sparql
++PREFIX ops:    <http://samsung.com/project-logistics/operations#>
++PREFIX wh:     <http://samsung.com/project-logistics/warehouse#>
++PREFIX cost:   <http://samsung.com/project-logistics/cost#>
++PREFIX marine: <http://samsung.com/project-logistics/marine#>
++PREFIX comm:   <http://samsung.com/project-logistics/communication#>
++
+ SELECT ?opsObj ?badPredicate WHERE {
+   ?opsObj a ?opsClass .
+   FILTER(?opsClass IN (ops:OperationRecord ops:KPIObservation ops:OperationalSnapshot))
+@@ -330,6 +338,8 @@
+ ### 5.4 SPARQL — Missing route pattern coverage
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++
+ SELECT ?su WHERE {
+   ?su a hvdc:ShipmentUnit .
+   FILTER NOT EXISTS { ?su hvdc:hasRoutingPattern ?pattern }
+@@ -341,6 +351,8 @@
+ ### 5.5 SPARQL — AGI/DAS offshore gate
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++
+ SELECT ?su ?site WHERE {
+   ?su hvdc:finalDestination ?site ;
+       hvdc:hasMilestone hvdc:M130 .
+@@ -355,6 +367,8 @@
+ ### 5.6 SPARQL — WH stock double-count candidate
+ 
+ ```sparql
++PREFIX ops: <http://samsung.com/project-logistics/operations#>
++
+ SELECT ?su ?location ?date (COUNT(?record) AS ?cnt) WHERE {
+   ?record a ops:OperationRecord ;
+           ops:resolvesToShipmentUnit ?su ;
+@@ -371,6 +385,9 @@
+ ### 5.7 SPARQL — M92 to M100 DEM/DET risk
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
++
+ SELECT ?su ?releasedAt ?gateOutAt WHERE {
+   ?su hvdc:hasMilestoneEvent ?m92 .
+   ?m92 hvdc:milestoneCode "M92" ;
+@@ -389,6 +406,8 @@
+ ### 5.8 SPARQL — Communication open action effect on operations
+ 
+ ```sparql
++PREFIX comm: <http://samsung.com/project-logistics/communication#>
++
+ SELECT ?target (COUNT(?request) AS ?openActions) WHERE {
+   ?request a comm:ActionRequest ;
+            comm:requestStatus "OPEN" ;
+diff -ru '--exclude=PATCH_SUMMARY.md' '--exclude=scripts' /tmp/orig_cmp/HVDC_Logistics_Ontology.combined.md hvdc_ontology_patch_2026-05-12/HVDC_Logistics_Ontology.combined.md
+--- /tmp/orig_cmp/HVDC_Logistics_Ontology.combined.md	2026-05-12 07:38:03.912868338 +0000
++++ hvdc_ontology_patch_2026-05-12/HVDC_Logistics_Ontology.combined.md	2026-05-12 07:37:55.669920365 +0000
+@@ -1,8 +1,9 @@
+ # HVDC Logistics Ontology — Combined Final Corpus
+ 
+-- Bundle: `HVDC_Logistics_Ontology_FINAL_5x_2026-04-27`
+-- Date: `2026-04-27`
++- Bundle: `HVDC_Logistics_Ontology_v2.1_flow_boundary_hardening_2026-05-12`
++- Date: `2026-05-12`
+ - Status: PASS
++- Patch scope: master/WHP `confirmedFlowCode` dictionary alignment, operations SPARQL prefix hardening, executable semantic guard.
+ 
+ 
+ 
+@@ -54,6 +55,8 @@
+ final_validation_status: "PASS"
+ final_validated_date: "2026-04-27"
+ final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
++patch_version: "2.1-flow-boundary-hardening"
++patched_date: "2026-05-12"
+ ---
+ 
+ # hvdc-master-ontology · CONSOLIDATED-00
+@@ -1001,16 +1004,18 @@
+ 
+ ### 12.3 Confirmed Flow Code Values
+ 
+-| Code | Warehouse handling meaning | Minimum evidence | Notes |
+-|---:|---|---|---|
+-| 0 | `PRE_WH_OR_TENTATIVE` | No M110 WH In evidence and pre-arrival/expected status | Tentative until evidence arrives |
+-| 1 | `WH_BYPASS_CONFIRMED` | No M110 WH In evidence and direct delivery/bypass evidence | Confirms no warehouse handling |
+-| 2 | `SINGLE_WH_HANDLING` | Exactly 1 M110 WH In / put-away evidence | Standard warehouse handling |
+-| 3 | `WH_LINKED_OFFSHORE_HANDLING` | Warehouse evidence plus MOSB staging evidence or AGI/DAS minimum offshore handling class | WH evidence with offshore interface |
+-| 4 | `MULTI_WH_OFFSHORE_HANDLING` | At least 2 WH handling events plus MOSB staging evidence | Multi-WH + offshore interface |
+-| 5 | `MIXED_OR_UNRESOLVED_WH_PATTERN` | Incomplete, conflicting, split, or pending warehouse evidence | Requires reason flag and review |
++`confirmedFlowCode` values are **warehouse storage / handling classes**. They are not route, customs, port, marine, site-delivery, or cost-allocation codes. The dictionary is intentionally aligned with `CONSOLIDATED-02` so that the master spine and WHP extension use the same operational meaning.
++
++| Code | Canonical WH handling class | Korean name | Minimum warehouse evidence | Human-gate |
++|---:|---|---|---|---|
++| 0 | `STANDARD_INDOOR` | 표준 실내 | WH zone/bin = indoor dry storage; no special handling flag | No |
++| 1 | `STANDARD_OUTDOOR` | 표준 야적 | WH zone/yard = outdoor or covered yard; cargo is weather-tolerant | No |
++| 2 | `SPECIAL_INDOOR` | 특수 실내 | Temperature, humidity, shock, precision, preservation, or high-value indoor requirement | Yes if high-value |
++| 3 | `SPECIAL_OUTDOOR` | 특수 야적 | Covered yard, dunnage, corrosion protection, oversized yard control, or abnormal outdoor handling | Yes if abnormal |
++| 4 | `HAZMAT_DG` | 위험물 | UN No. / DG class / MSDS / permit or segregation evidence | Mandatory |
++| 5 | `OOG_ABNORMAL` | 초대형·이상화물 | Abnormal dimensions, engineered lift/rigging plan, heavy/OOG movement evidence | Mandatory |
+ 
+-> Numeric values are retained for warehouse operational compatibility only. They must never be interpreted as the master Port → WH → MOSB → Site route classifier. The master route classifier remains `ShipmentRoutingPattern`.
++> Pre-arrival, no-WH, WH-bypass, MOSB-direct, WH→MOSB, and mixed-route semantics must not be encoded in `confirmedFlowCode`. Use `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent` for route/state. If no M110 WH evidence exists, do not create a confirmed WHP class; keep `flowConfirmationStatus = pending/tentative` or no `WarehouseHandlingProfile`.
+ 
+ ### 12.4 Legacy Migration Map
+ 
+@@ -7008,6 +7013,8 @@
+ final_validation_status: "PASS"
+ final_validated_date: "2026-04-27"
+ final_patch_bundle: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27"
++patch_version: "2.1-query-prefix-hardening"
++patched_date: "2026-05-12"
+ ---
+ 
+ # hvdc-operations · CONSOLIDATED-09
+@@ -7262,6 +7269,12 @@
+ ### 5.3 SPARQL — Operations must not redefine core truth
+ 
+ ```sparql
++PREFIX ops:    <http://samsung.com/project-logistics/operations#>
++PREFIX wh:     <http://samsung.com/project-logistics/warehouse#>
++PREFIX cost:   <http://samsung.com/project-logistics/cost#>
++PREFIX marine: <http://samsung.com/project-logistics/marine#>
++PREFIX comm:   <http://samsung.com/project-logistics/communication#>
++
+ SELECT ?opsObj ?badPredicate WHERE {
+   ?opsObj a ?opsClass .
+   FILTER(?opsClass IN (ops:OperationRecord ops:KPIObservation ops:OperationalSnapshot))
+@@ -7280,6 +7293,8 @@
+ ### 5.4 SPARQL — Missing route pattern coverage
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++
+ SELECT ?su WHERE {
+   ?su a hvdc:ShipmentUnit .
+   FILTER NOT EXISTS { ?su hvdc:hasRoutingPattern ?pattern }
+@@ -7291,6 +7306,8 @@
+ ### 5.5 SPARQL — AGI/DAS offshore gate
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++
+ SELECT ?su ?site WHERE {
+   ?su hvdc:finalDestination ?site ;
+       hvdc:hasMilestone hvdc:M130 .
+@@ -7305,6 +7322,8 @@
+ ### 5.6 SPARQL — WH stock double-count candidate
+ 
+ ```sparql
++PREFIX ops: <http://samsung.com/project-logistics/operations#>
++
+ SELECT ?su ?location ?date (COUNT(?record) AS ?cnt) WHERE {
+   ?record a ops:OperationRecord ;
+           ops:resolvesToShipmentUnit ?su ;
+@@ -7321,6 +7340,9 @@
+ ### 5.7 SPARQL — M92 to M100 DEM/DET risk
+ 
+ ```sparql
++PREFIX hvdc: <http://samsung.com/project-logistics#>
++PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
++
+ SELECT ?su ?releasedAt ?gateOutAt WHERE {
+   ?su hvdc:hasMilestoneEvent ?m92 .
+   ?m92 hvdc:milestoneCode "M92" ;
+@@ -7339,6 +7361,8 @@
+ ### 5.8 SPARQL — Communication open action effect on operations
+ 
+ ```sparql
++PREFIX comm: <http://samsung.com/project-logistics/communication#>
++
+ SELECT ?target (COUNT(?request) AS ?openActions) WHERE {
+   ?request a comm:ActionRequest ;
+            comm:requestStatus "OPEN" ;
