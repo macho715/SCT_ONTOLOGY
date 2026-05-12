@@ -104,6 +104,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     const askOutputSchema = HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.outputSchema as Record<string, unknown>;
 
     expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("HVDC answer card");
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("답장 작성하라");
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("draft email");
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("EmailActionCard");
     expect(HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card.description).toContain(
       "after every user-visible ask_hvdc_ontology answer"
     );
@@ -256,13 +259,17 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
   });
 
   it("asks ChatGPT review cases to use ask directly for user-visible answer cards", () => {
-    const hvdcAnswerPrompts = new Set(["AGI M130 닫아도 돼? BL-535 관련", "Flow Code 어디에 써?"]);
+    const hvdcAnswerPrompts = new Set([
+      "AGI M130 닫아도 돼? BL-535 관련",
+      "Flow Code 어디에 써?",
+      "붙여넣은 이메일 내용을 기준으로 Sponsor Emirates ID를 branch office에 요청하는 답장 작성하라."
+    ]);
     const hvdcAnswerCases = submission.test_cases.filter((testCase) => hvdcAnswerPrompts.has(testCase.user_prompt));
 
-    expect(hvdcAnswerCases.length).toBeGreaterThan(0);
+    expect(hvdcAnswerCases.length).toBe(hvdcAnswerPrompts.size);
     for (const testCase of hvdcAnswerCases) {
       expect(testCase.tools_triggered).toContain("ask_hvdc_ontology");
-      expect(testCase.expected_output).toMatch(/card|카드/i);
+      expect(testCase.expected_output).toMatch(/card|카드|EmailActionCard|EMAIL_ACTION_CARD/i);
     }
   });
 });
