@@ -17,12 +17,12 @@ import { maskPii, sha256 } from "./redact.js";
 import { evaluateShipmentRule } from "./shipment-rule.js";
 import { mergeShipmentValidation } from "./shipment-validation.js";
 
-const CURRENTNESS_TERMS = /moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation|규정|허가|요율/i;
+const CURRENTNESS_TERMS = /\b(?:moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation)\b|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
 const M130 = /\bM130\b|site receipt|site closure|닫아도|close/i;
 const MISSING_EVIDENCE_TERMS = /without|missing|없|없이|누락|미결|부재|만\s*있|only/i;
 const CUSTOMS_DECISION_TERMS = /customs|boe|release|permit|ci\/pl|hs|coo|통관|반출|허가/i;
-const COST_DECISION_TERMS = /invoice|cost|rate|tariff|rateref|tariffref|aed|청구|정산|비용|요율/i;
+const COST_DECISION_TERMS = /\b(?:invoice|cost|costguard|rate|rateref|tariff|tariffref|aed|usd)\b|청구|정산|비용|요율/i;
 const COST_FINAL_DECISION_TERMS = /approve|approval|confirm|confirmed|post|write|반영|승인|확정|가능/i;
 const OOG_SAFETY_TERMS = /oog|lift plan|lifting plan|lashing|cog|dims|weight|permit|중량|리프팅|양중|안전/i;
 const CLAIM_TERMS = /claim|claim letter|pod|survey|photo|mrr|bl clause|클레임|손상|분쟁/i;
@@ -425,7 +425,32 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
     };
   }
 
-  if (/invoice|cost|rate|tariff|청구|정산/i.test(question)) {
+  if (isEmailDraftRequest(question)) {
+    return {
+      summary: "이 질문은 비용 감사가 아니라 branch office에 Sponsor Emirates ID 또는 POA + Emirates ID를 요청하는 이메일 초안 작성 요청입니다.",
+      businessImpact: "DSV clearing agent가 요구한 신원 증빙을 명확히 요청하면 Egypt to Abu Dhabi airfreight clearance 지연을 줄일 수 있습니다.",
+      details: [
+        "Subject: Request for Sponsor Emirates ID or POA + Emirates ID for urgent airfreight clearance",
+        "Dear Faiz, DSV clearing agent has advised that branch office support is required for urgent Egypt to Abu Dhabi airfreight clearance.",
+        "Please request either the Emirates ID of the sponsor mentioned in the trade license, or the POA plus Emirates ID of the person named in the POA."
+      ],
+      actions: [
+        {
+          actionType: "DRAFT_BRANCH_OFFICE_EMAIL_REQUEST",
+          ownerRole: "Ops User / Communication Owner",
+          parameters: {
+            recipient: "Faiz",
+            requiredEvidence: "Sponsor Emirates ID or POA plus Emirates ID",
+            purpose: "Egypt to Abu Dhabi airfreight clearance"
+          },
+          humanGateRequired: true,
+          dueAt: null
+        }
+      ]
+    };
+  }
+
+  if (COST_DECISION_TERMS.test(question)) {
     return {
       summary: "Invoice/Cost 질문은 CostGuard evidence pack 기준으로 검토해야 하며, 금액·요율·TariffRef 근거가 없으면 최종 판단을 보류합니다.",
       businessImpact: "RateRef/TariffRef/InvoiceLine 정합성 없이 과청구 판단을 확정하면 정산 dispute 또는 recovery 누락이 발생할 수 있습니다.",
@@ -464,6 +489,10 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
       }
     ]
   };
+}
+
+function isEmailDraftRequest(question: string): boolean {
+  return /email|e-mail|mail|이메일|메일/i.test(question) && /draft|write|compose|request|send|초안|작성|요청|보내|발송|전송/i.test(question);
 }
 
 export function answerQuestion(args: {

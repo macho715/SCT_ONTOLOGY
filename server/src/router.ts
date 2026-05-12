@@ -23,7 +23,7 @@ const DOMAIN_RULES: Array<{ domain: DomainHint; docs: string[]; patterns: RegExp
   {
     domain: "cost",
     docs: ["CONSOLIDATED-05-invoice-cost"],
-    patterns: [/invoice|cost|rate|tariff|dem|det|demurrage|detention|aed|usd|비용|청구|정산/i],
+    patterns: [/\b(?:invoice|cost|costguard|rate|rateref|tariff|tariffref|dem|det|demurrage|detention|aed|usd)\b|비용|청구|정산/i],
     reason: "invoice/cost keyword detected"
   },
   {
