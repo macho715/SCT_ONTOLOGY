@@ -87,7 +87,7 @@ HVDC 물류 온톨로지의 master spine은 `ShipmentUnit`을 중심으로 Proje
 4. `MOSB` is an **Offshore Staging / Marine Interface Node**. It is not a top-level `Warehouse` class.
 5. `CONSOLIDATED-08-communication.md` is an **Evidence Layer** extension. It connects through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord` only.
 6. Legacy route-coded language is migration debt. It may be listed only in the late migration appendix in [Part 12](#part-12).
-7. Email reply drafting defaults to `EmailDraftMode`. A draft request must not automatically invoke or display `sct_ontology`; it must output a hard-marked `EmailActionCard` and the draft only unless explicit ontology review is requested.
+7. Email reply drafting defaults to `EmailDraftMode` with mandatory `sct_ontology` grounding. A draft request must automatically invoke or display `sct_ontology`, then output a hard-marked `EmailActionCard` and the draft while keeping ontology verdict labels out of the outbound email body.
 
 ### 1.2 Corpus Role Matrix
 
@@ -455,8 +455,8 @@ hvdc:validatedBy   a owl:ObjectProperty ; rdfs:domain hvdc:Document ; rdfs:range
 3. Communication records are linked through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord`.
 4. PII shall be masked except approved business names and role-level contacts.
 5. Proof artifacts shall store source document, extraction confidence, rule ID, verdict, timestamp, and reviewer when applicable.
-6. Email drafts are not operational truth, not evidence registration, and not ontology verdicts until the user explicitly requests registration or review.
-7. Email draft outputs must include `EmailActionCard` with `ontology_use = NO_AUTO_SCT_ONTOLOGY` unless the user explicitly requests ontology review.
+6. Email drafts are not operational truth, not evidence registration, and not transaction mutation.
+7. Email draft outputs must include mandatory `sct_ontology` review plus `EmailActionCard` with `ontology_use = AUTO_SCT_ONTOLOGY_REQUIRED`.
 
 ### 6.5 OCR KPI Gates
 
@@ -743,7 +743,7 @@ Raw source
 | `V-COST-002` | `Invoice` | Σ lineAmount = invoiceTotal ± 2.00% | BLOCK |
 | `V-COST-003` | `CostGuardResult` | Δ% band assigned | BLOCK |
 | `V-EVID-001` | `Document` / communication | evidence cannot own transaction truth | BLOCK |
-| `V-COMM-DRAFT-001` | email draft output | draft-mode reply must not auto-invoke `sct_ontology`; `EmailActionCard` required | BLOCK |
+| `V-COMM-DRAFT-001` | email draft output | draft-mode reply must auto-invoke or surface `sct_ontology`; `EmailActionCard` required | BLOCK |
 
 ### 10.2 SHACL: ShipmentUnit Required Shape
 
@@ -1063,7 +1063,7 @@ hvdc:flowEvidenceSource a owl:ObjectProperty ;
 | `OSDRClaimBot` | M132 OSD event | Create OSDR/Claim draft and evidence pack |
 | `ComplianceRAG` | Missing/expired permit | Retrieve latest approved SOP/authority evidence |
 | `DailyCOPDigest` | Daily 08:00 Asia/Dubai | At-risk shipments, customs holds, DEM/DET, high-cost invoices |
-| `EmailDraftGuard` | User requests reply/draft | Emit `EmailActionCard` + draft; no automatic `sct_ontology` call |
+| `EmailDraftGuard` | User requests reply/draft | Invoke/surface `sct_ontology`, then emit `EmailActionCard` + draft; no KG action unless explicitly requested |
 
 ### 13.4 QA Checklist
 

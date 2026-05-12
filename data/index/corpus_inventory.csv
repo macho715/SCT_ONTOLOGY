@@ -1,5 +1,5 @@
 docId,file,title,version,docHash,sizeBytes
-CONSOLIDATED-00-master-ontology,data/corpus/CONSOLIDATED-00-master-ontology.md,hvdc-master-ontology · CONSOLIDATED-00,2.0-final,d5450b516bb009028755254fb970e09760700f3b6fca51c91b2abb35a6eb459e,59252
+CONSOLIDATED-00-master-ontology,data/corpus/CONSOLIDATED-00-master-ontology.md,hvdc-master-ontology · CONSOLIDATED-00,2.0-final,b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09,59291
 CONSOLIDATED-01-core-framework-infra,data/corpus/CONSOLIDATED-01-core-framework-infra.md,hvdc-core-framework-infra · CONSOLIDATED-01,2.0-final,627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f,37492
 CONSOLIDATED-02-warehouse-flow,data/corpus/CONSOLIDATED-02-warehouse-flow.md,hvdc-warehouse-flow · CONSOLIDATED-02,2.0-final,3c9966c1269ae521f2f60a725973e90338141d4d8c0dea1826bf5cac7dd6dade,42143
 CONSOLIDATED-03-document-ocr,data/corpus/CONSOLIDATED-03-document-ocr.md,hvdc-document-ocr · CONSOLIDATED-03,2.0-final,7a56eaedfdfa47152ec2b5f538607929ad0945e20099c34f9b068d041369d87c,40041
@@ -7,6 +7,6 @@ CONSOLIDATED-04-barge-bulk-cargo,data/corpus/CONSOLIDATED-04-barge-bulk-cargo.md
 CONSOLIDATED-05-invoice-cost,data/corpus/CONSOLIDATED-05-invoice-cost.md,hvdc-invoice-cost · CONSOLIDATED-05,2.0-final,6df7c7c00a8ae9f001de3694c9e4e5c434e951d2f0f3d9cc27ba8bd8e3ed2a4f,42669
 CONSOLIDATED-06-material-chain,data/corpus/CONSOLIDATED-06-material-chain.md,hvdc-material-handling · CONSOLIDATED-06,2.0-final,159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16,48422
 CONSOLIDATED-07-port-operations,data/corpus/CONSOLIDATED-07-port-operations.md,hvdc-port-operations · CONSOLIDATED-07,2.0-final,ce02194bf4330bde3fcb1396033753b6e41ea2c831cd774311cead26a5fda19e,50201
-CONSOLIDATED-08-communication,data/corpus/CONSOLIDATED-08-communication.md,hvdc-communication · CONSOLIDATED-08,2.0-final,07206d164f4817b694a59b096b4ba95aa4c983f238e8095ba447417f306e45cc,36831
+CONSOLIDATED-08-communication,data/corpus/CONSOLIDATED-08-communication.md,hvdc-communication · CONSOLIDATED-08,2.0-final,1fd8a0d01c7c5241780688221b03ca314de77d70a5375679316e3b561fc782a5,37242
 CONSOLIDATED-09-operations,data/corpus/CONSOLIDATED-09-operations.md,hvdc-operations · CONSOLIDATED-09,2.0-final,f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569,32780
 Team_역할분담_매트릭스,data/corpus/Team_역할분담_매트릭스.md,HVDC 물류팀 역할분담 매트릭스,sample-0.1,850efb35cb26d5e70d82fd0f43f948b124580e7f7097580f5d2d4311eef2f2db,18924

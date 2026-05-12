@@ -94,24 +94,25 @@ Examples:
 
 ### 4.5 Email drafting mode boundary
 
-Email reply generation is `EmailDraftMode`, not automatic `sct_ontology` analysis mode.
+Email reply generation is `EmailDraftMode` with mandatory `sct_ontology` grounding.
 
 Default rule:
-- A request such as "답장 작성하라", "reply", "draft email", "메일 회신 작성", or "회신 문안 작성" must produce an email draft and a hard-marked `EmailActionCard`.
-- The agent must **not** invoke, display, or claim `sct_ontology` output automatically in email draft mode.
-- The agent may read the provided email text and use ordinary drafting judgment, but it must not run ontology verdicting, CostGuard, route validation, or compliance classification unless explicitly requested.
+- A request such as "답장 작성하라", "reply", "draft email", "메일 회신 작성", or "회신 문안 작성" must first invoke or surface `sct_ontology`, then produce a hard-marked `EmailActionCard` and an email draft.
+- The agent must use `sct_ontology` even when the user does not explicitly ask for it.
+- The agent may draft the email after ontology grounding, but it must not mix ontology verdict labels into the outbound email body.
 
-Explicit trigger rule:
-- `sct_ontology` may be used only when the user explicitly asks for it, for example `sct_ontology 사용`, `ontology로 검토`, `/switch_mode`, `/logi-master`, `CostGuard`, `규정 판정`, `리스크 판정`, `증빙팩 생성`, or `ActionRequest 등록`.
-- If the user requests both a draft and ontology review, separate the outputs into `EmailActionCard`, `Draft`, and `OntologyReview`; do not mix ontology verdict labels into the email body.
+Ontology lane rule:
+- Baseline `sct_ontology` review is mandatory for every email draft request.
+- If the user explicitly asks for deeper review, for example `CostGuard`, `규정 판정`, `리스크 판정`, `증빙팩 생성`, or `ActionRequest 등록`, keep that deeper ontology/action lane separate from the email body.
+- Outputs must be separated into `OntologyReview`, `EmailActionCard`, and `Draft`.
 
 Hard-marked action card rule:
-- Every email draft output must start with this compact card, using the exact bracket markers:
+- Every email draft output must include this compact card immediately after `OntologyReview`, using the exact bracket markers:
 
 ```text
 [EMAIL_ACTION_CARD]
 mode: EMAIL_DRAFT
-ontology_use: NO_AUTO_SCT_ONTOLOGY | EXPLICIT_ONTOLOGY
+ontology_use: AUTO_SCT_ONTOLOGY_REQUIRED | EXPLICIT_DEEP_ONTOLOGY
 reply_stance: ACKNOWLEDGE | HOLD | REQUEST_INFO | ESCALATE | APPROVE | REJECT
 blocking_inputs: <comma-separated missing inputs or NONE>
 next_action: <single operational next step>
@@ -120,7 +121,7 @@ send_status: DRAFT_READY | HOLD_FOR_REVIEW
 ```
 
 - `EmailActionCard` is a presentation and triage artifact. It is **not** a KG `ActionRequest` and must not mutate `ShipmentUnit`, `MilestoneEvent`, `WarehouseHandlingProfile`, `CostGuardResult`, or any transaction object.
-- Only an explicit user instruction to register/write/escalate converts the card into `ActionRequest` / `ApprovalAction` evidence under `CONSOLIDATED-08`.
+- Only an explicit user instruction to register/write/escalate converts the card or ontology review into `ActionRequest` / `ApprovalAction` evidence under `CONSOLIDATED-08`.
 
 ## 5. Canonical vocabulary by domain
 
