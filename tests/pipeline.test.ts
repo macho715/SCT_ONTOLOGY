@@ -330,21 +330,36 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(answer.actions.some((action) => action.actionType === "REQUEST_HUMAN_GATE_REVIEW")).toBe(true);
   });
 
-  it("routes Emirates ID email draft requests to communication instead of CostGuard", () => {
+  it("routes email draft requests to communication without reusing a fixed prior case", () => {
     const answer = ask(
       "A1a가 'This need to request branch office'라고 답한 상황에서 Faiz에게 branch office로 Sponsor Emirates ID 또는 POA + Emirates ID 요청을 보내는 이메일 초안을 작성해줘. Context: DSV clearing agent requires the Emirates ID of the sponsor mentioned in trade license, alternatively POA plus Emirates ID of the person named in the POA, for urgent Egypt to Abu Dhabi airfreight clearance Q100008617 / 194-00033224."
     );
 
-    expect(answer.summary).toContain("이메일 초안 작성 요청");
+    expect(answer.summary).toContain("HVDC 물류 이메일 답장 작성 요청");
     expect(answer.summary).not.toContain("CostGuard evidence pack");
-    expect(answer.details.join(" ")).toContain("Dear Faiz");
-    expect(answer.actions[0]?.actionType).toBe("DRAFT_BRANCH_OFFICE_EMAIL_REQUEST");
-    expect(answer.actions[0]?.parameters.requiredEvidence).toBe("Sponsor Emirates ID or POA plus Emirates ID");
+    expect(answer.summary).not.toContain("branch office에 Sponsor Emirates ID 또는 POA + Emirates ID");
+    expect(answer.details.join(" ")).not.toContain("Dear Faiz");
+    expect(answer.actions[0]?.actionType).toBe("DRAFT_CONTEXTUAL_EMAIL_REPLY");
+    expect(answer.actions[0]?.parameters.draftSource).toBe("current user-provided email/thread only");
+    expect(answer.actions[0]?.parameters.hardcodedPriorCase).toBe("forbidden");
     expect(answer.route.domains).toContain("communication");
     expect(answer.route.domains).not.toContain("cost");
     expect(answer.route.requiredDocs).toContain("CONSOLIDATED-08-communication");
     expect(answer.route.requiredDocs).not.toContain("CONSOLIDATED-05-invoice-cost");
     expect(answer.validation.some((item) => item.reasonCode === "STALE_SOURCE_RISK")).toBe(false);
+  });
+
+  it("keeps generic email reply requests generic", () => {
+    const answer = ask("붙여넣은 이메일 내용을 기준으로 답장작성");
+    const answerText = [answer.summary, answer.businessImpact, ...answer.details, ...answer.actions.map((action) => action.actionType)].join(" ");
+
+    expect(answer.summary).toContain("HVDC 물류 이메일 답장 작성 요청");
+    expect(answerText).not.toContain("Sponsor Emirates ID");
+    expect(answerText).not.toContain("POA + Emirates ID");
+    expect(answerText).not.toContain("branch office");
+    expect(answerText).not.toContain("Dear Faiz");
+    expect(answer.actions[0]?.actionType).toBe("DRAFT_CONTEXTUAL_EMAIL_REPLY");
+    expect(answer.route.domains).toContain("communication");
   });
 
   it("keeps business result status separate from render-only card UI status", () => {

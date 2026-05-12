@@ -427,21 +427,21 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
 
   if (isEmailDraftRequest(question)) {
     return {
-      summary: "이 질문은 비용 감사가 아니라 branch office에 Sponsor Emirates ID 또는 POA + Emirates ID를 요청하는 이메일 초안 작성 요청입니다.",
-      businessImpact: "DSV clearing agent가 요구한 신원 증빙을 명확히 요청하면 Egypt to Abu Dhabi airfreight clearance 지연을 줄일 수 있습니다.",
+      summary: "이 질문은 HVDC 물류 이메일 답장 작성 요청입니다. sct_ontology 검토 후 현재 제공된 이메일 문맥에 맞춰 초안을 분리해야 합니다.",
+      businessImpact: "이메일 초안 내용을 특정 과거 케이스로 고정하지 않으면 잘못된 수신자, 요청 문서, 운송 목적이 포함되는 리스크를 줄일 수 있습니다.",
       details: [
-        "Subject: Request for Sponsor Emirates ID or POA + Emirates ID for urgent airfreight clearance",
-        "Dear Faiz, DSV clearing agent has advised that branch office support is required for urgent Egypt to Abu Dhabi airfreight clearance.",
-        "Please request either the Emirates ID of the sponsor mentioned in the trade license, or the POA plus Emirates ID of the person named in the POA."
+        "OntologyReview를 먼저 분리하고, 그 다음 EMAIL_ACTION_CARD와 Draft를 출력합니다.",
+        "Draft는 현재 사용자가 제공한 이메일 본문, 첨부, 수신자, 요청 목적에만 근거해야 합니다.",
+        "이전 문의의 수신자, 증빙명, route, 목적 문구를 재사용하지 않습니다."
       ],
       actions: [
         {
-          actionType: "DRAFT_BRANCH_OFFICE_EMAIL_REQUEST",
+          actionType: "DRAFT_CONTEXTUAL_EMAIL_REPLY",
           ownerRole: "Ops User / Communication Owner",
           parameters: {
-            recipient: "Faiz",
-            requiredEvidence: "Sponsor Emirates ID or POA plus Emirates ID",
-            purpose: "Egypt to Abu Dhabi airfreight clearance"
+            requiredProcess: "OntologyReview -> EMAIL_ACTION_CARD -> Draft",
+            draftSource: "current user-provided email/thread only",
+            hardcodedPriorCase: "forbidden"
           },
           humanGateRequired: true,
           dueAt: null

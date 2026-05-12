@@ -100,10 +100,10 @@
     },
     {
       "description": "Draft an HVDC logistics email reply only after ontology grounding.",
-      "user_prompt": "붙여넣은 이메일 내용을 기준으로 Sponsor Emirates ID를 branch office에 요청하는 답장 작성하라.",
+      "user_prompt": "붙여넣은 이메일 내용을 기준으로 답장 작성하라.",
       "file_attachment_urls": null,
       "tools_triggered": "ask_hvdc_ontology",
-      "expected_output": "Automatically invokes the HVDC ontology answer flow before drafting, returns an OntologyReview with evidence, then an EMAIL_ACTION_CARD and a concise email draft without placing ontology verdict labels inside the outbound email body.",
+      "expected_output": "Automatically invokes the HVDC ontology answer flow before drafting, returns an OntologyReview with evidence, then an EMAIL_ACTION_CARD and a concise email draft based only on the current uploaded email context without placing ontology verdict labels inside the outbound email body.",
       "expected_output_url": null
     },
     {

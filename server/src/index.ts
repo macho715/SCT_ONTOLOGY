@@ -182,7 +182,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   ask_hvdc_ontology: {
     title: "Ask HVDC ontology",
     description:
-      "Use this when the user asks any HVDC logistics question or HVDC logistics email reply/draft request, including '답장 작성하라', '메일 회신 작성', 'draft email', sponsor Emirates ID/POA, customs clearance, or attachment-based reply requests. Run it before drafting so ChatGPT surfaces sct_ontology/OntologyReview, evidence, validation, next action, the EmailActionCard, and the HVDC answer card.",
+      "Use this when the user asks any HVDC logistics question or HVDC logistics email reply/draft request, including '답장 작성하라', '메일 회신 작성', 'draft email', customs clearance, shipping schedule, document request, cost clarification, or attachment-based reply requests. Run it before drafting so ChatGPT surfaces sct_ontology/OntologyReview, evidence, validation, next action, the EmailActionCard, and the HVDC answer card. Email draft content must come from the current user-provided email/thread, not from a prior fixed case.",
     inputSchema: {
       question: z.string().min(1),
       userRole: z.string().default("ops_user").optional(),

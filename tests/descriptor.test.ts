@@ -107,6 +107,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("답장 작성하라");
     expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("draft email");
     expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("EmailActionCard");
+    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.description).toContain("current user-provided email/thread");
     expect(HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card.description).toContain(
       "after every user-visible ask_hvdc_ontology answer"
     );
@@ -262,7 +263,7 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     const hvdcAnswerPrompts = new Set([
       "AGI M130 닫아도 돼? BL-535 관련",
       "Flow Code 어디에 써?",
-      "붙여넣은 이메일 내용을 기준으로 Sponsor Emirates ID를 branch office에 요청하는 답장 작성하라."
+      "붙여넣은 이메일 내용을 기준으로 답장 작성하라."
     ]);
     const hvdcAnswerCases = submission.test_cases.filter((testCase) => hvdcAnswerPrompts.has(testCase.user_prompt));
 
