@@ -1,0 +1,57 @@
+[
+  {
+    "shipment_id": "SHP-0001",
+    "routing_pattern": "PORT_TO_WH_TO_SITE",
+    "identifiers": {
+      "BL": "BL-DXB-001",
+      "BOE": "BOE-7788",
+      "DO": "DO-9911",
+      "Invoice": "INV-OFCO-1001",
+      "Container": "MSCU1234567",
+      "HVDC_CODE": "HVDC-ADOPT-001-0001",
+      "Package": "PKG-0001",
+      "cargo_type": "NORMAL"
+    },
+    "milestones": [
+      {"code": "M90", "occurred_at": "2026-05-05T08:00:00+00:00", "evidence_ref": "ATA-001"},
+      {"code": "M91", "occurred_at": "2026-05-06T10:00:00+00:00", "evidence_ref": "BOE-7788"},
+      {"code": "M92", "occurred_at": "2026-05-06T12:00:00+00:00", "evidence_ref": "DO-9911"}
+    ],
+    "documents": [
+      {"doc_type": "BOE", "ref": "BOE-7788"},
+      {"doc_type": "DO", "ref": "DO-9911"}
+    ],
+    "invoice_lines": [
+      {"line_id": "L1", "item": "Port charge", "quantity": 1, "rate": "5000.00", "draft_amount": "5000.00", "standard_amount": "5000.00", "evidence_refs": ["PortServiceEvent:PSE-1", "TariffRef:PORT-2026"]},
+      {"line_id": "L2", "item": "Trucking", "quantity": 2, "rate": "1800.00", "draft_amount": "4500.00", "standard_amount": "3600.00", "evidence_refs": ["JourneyLeg:JL-1"]}
+    ],
+    "open_exceptions": []
+  },
+  {
+    "shipment_id": "SHP-0002",
+    "routing_pattern": "PORT_TO_MOSB_TO_SITE",
+    "identifiers": {
+      "BL": "BL-AUH-002",
+      "BOE": "BOE-8899",
+      "Invoice": "INV-DSV-2002",
+      "Container": "OOG-TRAILER-02",
+      "HVDC_CODE": "HVDC-ADOPT-002-0002",
+      "Package": "PKG-AGI-02",
+      "cargo_type": "AGI"
+    },
+    "milestones": [
+      {"code": "M90", "occurred_at": "2026-05-01T06:00:00+00:00", "evidence_ref": "ATA-002"},
+      {"code": "M92", "occurred_at": "2026-05-02T06:00:00+00:00", "evidence_ref": "DO-DRAFT-002"},
+      {"code": "M100", "occurred_at": "2026-05-06T06:00:00+00:00", "evidence_ref": "GATE-002"},
+      {"code": "M130", "occurred_at": "2026-05-07T16:00:00+00:00", "evidence_ref": "SITE-ARR-002"}
+    ],
+    "documents": [
+      {"doc_type": "BOE", "ref": "BOE-8899"}
+    ],
+    "invoice_lines": [
+      {"line_id": "L1", "item": "Marine charge", "quantity": 1, "rate": "120000.00", "draft_amount": "120000.00", "standard_amount": "108000.00", "evidence_refs": ["MarineEvent:LCT-44"]},
+      {"line_id": "L2", "item": "DO charge", "quantity": 1, "rate": "900.00", "draft_amount": "900.00", "standard_amount": "900.00", "evidence_refs": []}
+    ],
+    "open_exceptions": ["Missing original DO", "AGI MOSB gate evidence incomplete"]
+  }
+]

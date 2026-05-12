@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hvdc-openai-agent"
+version = "0.2.0"
+description = "HVDC logistics control agent using OpenAI Agents SDK with deterministic offline rules"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary - sample code for internal evaluation" }
+authors = [{ name = "HVDC Logistics Automation" }]
+dependencies = [
+  "openai-agents>=0.3.0",
+  "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.8",
+]
+
+[project.scripts]
+hvdc-agent = "hvdc_openai_agent.agent_app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hvdc_openai_agent"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["hvdc_openai_agent"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.",
+]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []

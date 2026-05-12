@@ -1,0 +1,3 @@
+판정: ZERO
+근거: shipment=SHP-0002, stage=M130, risk=5, block=3, exposure=AED 120900.00
+다음행동: Human/Finance gate 후 증빙 보완

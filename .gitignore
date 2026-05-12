@@ -10,3 +10,5 @@ out/
 hvdc-ontology-chatgpt-app-starter/
 __pycache__/
 *.pyc
+.claude/
+*.docx

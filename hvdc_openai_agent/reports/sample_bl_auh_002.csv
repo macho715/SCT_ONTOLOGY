@@ -1,0 +1,12 @@
+section,shipment_id,item,severity,value,detail
+summary,SHP-0002,current_stage,,M130,PORT_TO_MOSB_TO_SITE
+summary,SHP-0002,invoice_exposure_aed,,120900.00,
+missing_document,SHP-0002,DO,BLOCK,,required evidence missing
+missing_document,SHP-0002,SITE_RECEIPT,BLOCK,,required evidence missing
+risk,SHP-0002,Customs Delay Alert,WARN,,ATA M90 exists but BOE clearance M91 is missing.
+risk,SHP-0002,DEM/DET Risk Alert,HIGH,,M92→M100 closed late; elapsed 96.00 hrs > 72.00 hrs.
+risk,SHP-0002,BLOCK Gate-out closure,BLOCK,,M100 exists but DO document is missing.
+risk,SHP-0002,BLOCK Site receipt closure,BLOCK,,M130 exists but SITE_RECEIPT is missing.
+risk,SHP-0002,AGI/DAS MOSB Gate,BLOCK,,"M130 exists but missing M115, M116, M117."
+invoice,SHP-0002,L1,CRITICAL,12000.00,Marine charge delta=11.11%
+invoice,SHP-0002,L2,BLOCK,0.00,DO charge delta=0.00%

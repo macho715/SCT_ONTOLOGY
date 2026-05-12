@@ -1,0 +1,112 @@
+{
+  "project": "hvdc-openai-agent",
+  "version": "0.2.0-final",
+  "file_count": 21,
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "b546c5bf5875655763191d34f3b7e2a77a3baabaa035954c156ab3f0b3f2ef8c",
+      "bytes": 55
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "5c68180d0fc1e2911a288e393f296e376f844f8fcf07b29e85e4a5c76ad1224b",
+      "bytes": 662
+    },
+    {
+      "path": "MANIFEST.json",
+      "sha256": "4f3791ea87aace88e0c477f63dc0edc342bfac69e83582e148d8cc970be504ef",
+      "bytes": 3410
+    },
+    {
+      "path": "Makefile",
+      "sha256": "4af1f48363c539af96a7b5ebfaa0fb8cec18423642f9936f572528c39256ede6",
+      "bytes": 470
+    },
+    {
+      "path": "README.md",
+      "sha256": "07c2941027897e5e06ef96a9236691b03b0c713d1754d6be92e02085af416de8",
+      "bytes": 2145
+    },
+    {
+      "path": "data/sample_shipments.json",
+      "sha256": "9f4d0cb26829bdd8645b253b97ace78195cff4e2eee36ec268ede8e9aa30360f",
+      "bytes": 2495
+    },
+    {
+      "path": "docs/OFFICIAL_OPENAI_USAGE.md",
+      "sha256": "faf29ea879082d14dd4b35495a2fd2771dea822f5a5ad8782a8aa07fdbfe56ee",
+      "bytes": 534
+    },
+    {
+      "path": "docs/REVIEW_PATCH_LOG.md",
+      "sha256": "82cf34d5f73428217ba41fe6f386b96ef0ae90cbf6e6d45b23074ce29685679d",
+      "bytes": 1712
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "sha256": "0e5a2cc5d364438604003d48e13cfea9e03031c918b9f07d730e85e704e43bc5",
+      "bytes": 1107
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "dcd25bf34667137e33ef000cf683416fc637cd797f69ca3dd8820bd5ce6fc86d",
+      "bytes": 1144
+    },
+    {
+      "path": "reports/final_validation.txt",
+      "sha256": "812f5ed3f737ea9547fbd56cb1d71e7a73c8d2e53c233bcfa60618569b2f1ec7",
+      "bytes": 1396
+    },
+    {
+      "path": "reports/sample_bl_auh_002.csv",
+      "sha256": "8482e1561f14cb5c86da5e25ce0d99f817a6e7ed6ee7bb2239db50bbd97c13d5",
+      "bytes": 858
+    },
+    {
+      "path": "reports/sample_bl_auh_002.json",
+      "sha256": "69b4ef4db827759e4319ae89c84f1bf6690181ab7452d63d0ee863f2b7b7475e",
+      "bytes": 2806
+    },
+    {
+      "path": "reports/sample_bl_auh_002.txt",
+      "sha256": "710dfd0068d9fa050c5e59024b0da6d22bca59c986c9cd6f8400eff179c9e9e6",
+      "bytes": 143
+    },
+    {
+      "path": "src/hvdc_openai_agent/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "src/hvdc_openai_agent/agent_app.py",
+      "sha256": "771dc7a19955f8574314b969b5b0e793d340800513cb3f6ab7aae18eded20a21",
+      "bytes": 5741
+    },
+    {
+      "path": "src/hvdc_openai_agent/core.py",
+      "sha256": "54a2d3ed59695d9d13cc0541a535d31c09f78dbe86f8a8d43d6d9b8688abcbd5",
+      "bytes": 13325
+    },
+    {
+      "path": "src/hvdc_openai_agent/reporting.py",
+      "sha256": "57e3b7dbd2617e1161b5afb971f911ac1d8ec224d9a77520dfa517ade46f3f21",
+      "bytes": 2695
+    },
+    {
+      "path": "tests/test_agent_app.py",
+      "sha256": "85e3f87fc9421f09f4afc51f3a39da7d7923a10802a1ed9feec5d249d32235c8",
+      "bytes": 1974
+    },
+    {
+      "path": "tests/test_core.py",
+      "sha256": "c97317b93aadbefc77c3763a49f7ee1d53f0e4c76637080c3bc83821d43f5420",
+      "bytes": 4383
+    },
+    {
+      "path": "tests/test_reporting.py",
+      "sha256": "803305461df1545ecee4fcfb3721ce3cfd7340f8a979b66f1d6040423b96466e",
+      "bytes": 786
+    }
+  ]
+}

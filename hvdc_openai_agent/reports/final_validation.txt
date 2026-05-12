@@ -1,0 +1,23 @@
+FINAL VALIDATION
+- pytest -q: 22 passed
+- pytest --cov=hvdc_openai_agent: 90.62%, fail_under 85 reached
+- compileall src tests: passed
+- offline brief/json/csv smoke: passed
+- OpenAI online mode: not executed because OPENAI_API_KEY is not available in this sandbox
+......................                                                   [100%]
+
+COVERAGE OUTPUT
+......................                                                   [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.5-final-0 ________________
+
+Name                                 Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------
+src/hvdc_openai_agent/__init__.py        0      0      0      0   100%
+src/hvdc_openai_agent/agent_app.py      75     10     20      6    81%   50, 66, 83, 99-102, 112, 132, 139
+src/hvdc_openai_agent/core.py          202      7     66     10    94%   101, 160->162, 187, 204, 230, 259->272, 262->272, 295, 305, 307
+src/hvdc_openai_agent/reporting.py      32      2     10      1    93%   32-33
+--------------------------------------------------------------------------------
+TOTAL                                  309     19     96     17    91%
+Required test coverage of 85.0% reached. Total coverage: 90.62%
+22 passed in 0.33s

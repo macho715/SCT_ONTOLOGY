@@ -1,0 +1,104 @@
+{
+  "found": true,
+  "snapshot": {
+    "shipment_id": "SHP-0002",
+    "current_stage": "M130",
+    "routing_pattern": "PORT_TO_MOSB_TO_SITE",
+    "identifiers": {
+      "BL": "BL-AUH-002",
+      "BOE": "BOE-8899",
+      "Invoice": "INV-DSV-2002",
+      "Container": "OOG-TRAILER-02",
+      "HVDC_CODE": "HVDC-ADOPT-002-0002",
+      "Package": "PKG-AGI-02",
+      "cargo_type": "AGI"
+    },
+    "missing_documents": [
+      "DO",
+      "SITE_RECEIPT"
+    ],
+    "open_exceptions": [
+      "Missing original DO",
+      "AGI MOSB gate evidence incomplete"
+    ],
+    "risks": [
+      {
+        "severity": "WARN",
+        "rule": "Customs Delay Alert",
+        "detail": "ATA M90 exists but BOE clearance M91 is missing.",
+        "evidence_refs": [],
+        "human_gate": false
+      },
+      {
+        "severity": "HIGH",
+        "rule": "DEM/DET Risk Alert",
+        "detail": "M92→M100 closed late; elapsed 96.00 hrs > 72.00 hrs.",
+        "evidence_refs": [],
+        "human_gate": false
+      },
+      {
+        "severity": "BLOCK",
+        "rule": "BLOCK Gate-out closure",
+        "detail": "M100 exists but DO document is missing.",
+        "evidence_refs": [],
+        "human_gate": false
+      },
+      {
+        "severity": "BLOCK",
+        "rule": "BLOCK Site receipt closure",
+        "detail": "M130 exists but SITE_RECEIPT is missing.",
+        "evidence_refs": [],
+        "human_gate": false
+      },
+      {
+        "severity": "BLOCK",
+        "rule": "AGI/DAS MOSB Gate",
+        "detail": "M130 exists but missing M115, M116, M117.",
+        "evidence_refs": [],
+        "human_gate": true
+      }
+    ],
+    "invoice_audit": [
+      {
+        "line_id": "L1",
+        "item": "Marine charge",
+        "currency": "AED",
+        "draft_amount_aed": "120000.00",
+        "standard_amount_aed": "108000.00",
+        "delta_amount_aed": "12000.00",
+        "delta_pct": "11.11",
+        "severity": "CRITICAL",
+        "human_gate": true,
+        "evidence_refs": [
+          "MarineEvent:LCT-44"
+        ],
+        "checks": {
+          "expected_by_rate_aed": "120000.00",
+          "rate_mismatch": false,
+          "missing_evidence": false,
+          "zero_standard": false
+        }
+      },
+      {
+        "line_id": "L2",
+        "item": "DO charge",
+        "currency": "AED",
+        "draft_amount_aed": "900.00",
+        "standard_amount_aed": "900.00",
+        "delta_amount_aed": "0.00",
+        "delta_pct": "0.00",
+        "severity": "BLOCK",
+        "human_gate": true,
+        "evidence_refs": [],
+        "checks": {
+          "expected_by_rate_aed": "900.00",
+          "rate_mismatch": false,
+          "missing_evidence": true,
+          "zero_standard": false
+        }
+      }
+    ],
+    "invoice_exposure_aed": "120900.00",
+    "human_gate_required": true
+  }
+}
