@@ -6,6 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ALLOWED_ORIGIN = "https://chatgpt.com"
 WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev"
+MCP_AUTH_SCOPES = "files:upload files:write"
 
 [[r2_buckets]]
 binding = "HVDC_FILES"

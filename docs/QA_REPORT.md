@@ -13,6 +13,7 @@ Current verification date: 2026-05-13
   - `ui://hvdc/render_hvdc_answer_card.html`
 - Daily KPI Dashboard lock prompts route to operations KPI, not Invoice/CostGuard default summary.
 - The card widget wraps long action names, protected-field lists, route reasons, and validation text to reduce overflow.
+- Protected upload/write tools are available as MCP tools, but they fail closed without OAuth Bearer scopes and Human-gate approval.
 
 ## Local checks
 
@@ -28,9 +29,9 @@ Latest local verification:
 npm run verify
 ```
 
-Result: TypeScript typecheck passed, Vitest 7 files / 110 tests passed, and `wrangler deploy --dry-run` passed.
+Result: TypeScript typecheck passed, Vitest 8 files / 113 tests passed, and `wrangler deploy --dry-run` passed.
 
-Current Cloudflare production verification: `/healthz`, MCP `initialize`, MCP `tools/list`, `ask_hvdc_ontology`, and D1 audit logging were checked against `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
+Current Cloudflare production verification: `/healthz`, OAuth protected resource metadata, MCP `initialize`, MCP `tools/list`, `ask_hvdc_ontology`, unauthenticated protected-tool fail-closed behavior, and D1 audit logging were checked against `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
 
 ## Golden prompts
 
@@ -52,6 +53,7 @@ Current Cloudflare production verification: `/healthz`, MCP `initialize`, MCP `t
 | Validation p95 | <5.00s |
 | PII Leakage | 0.00 |
 | Human-gate enforcement | 100.00% for write/action |
+| Protected upload/write fail-closed | 100.00% without required Bearer scope |
 
 ## Manual ChatGPT checks
 

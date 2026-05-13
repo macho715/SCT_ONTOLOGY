@@ -134,7 +134,7 @@ Independent test:
 
 - SC-001: `npm run verify` passes.
 - SC-002: `python -m json.tool chatgpt-app-submission.json` passes.
-- SC-003: Local MCP `tools/list` returns exactly 6 tools.
+- SC-003: Local MCP `tools/list` returns the active implemented tool list and keeps render-template ownership unchanged.
 - SC-004: Local MCP confirms `ask_hvdc_ontology` has no `_meta.ui.resourceUri`.
 - SC-005: Local MCP confirms `ask_hvdc_ontology` has no `_meta["openai/outputTemplate"]`.
 - SC-005a: Local MCP confirms `ask_hvdc_ontology` result has no `structuredContent.ui`.

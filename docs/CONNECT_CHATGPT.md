@@ -8,6 +8,10 @@ Use this Cloudflare MCP endpoint:
 https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp
 ```
 
+Read-only question and validation tools work through the normal connector path.
+Protected upload/write tools require `Authorization: Bearer` with `files:upload` or `files:write` scope plus Human-gate approval.
+If that token is missing, the protected tool returns `AUTH_REQUIRED` instead of writing anything.
+
 ## ChatGPT settings
 
 1. Settings -> Apps & Connectors -> Advanced settings -> Developer mode ON.

@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Purpose
-This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, evidence-grounded MCP ChatGPT App for HVDC Project Logistics. It is not a general chatbot, not a production write-back tool, and not a live KG implementation.
+This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, evidence-grounded MCP ChatGPT App for HVDC Project Logistics. It is not a general chatbot, not an ERP/WMS production write-back tool, and not a live KG implementation.
 
 ## Current State
 - Runtime: Cloudflare Workers MCP HTTP server at `/mcp`.
@@ -11,6 +11,7 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 - `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v7.html`.
 - UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
+- Protected upload/write tools may write only to Cloudflare R2/D1 managed storage after OAuth Bearer scope and Human-gate approval.
 - Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
@@ -49,13 +50,18 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 - If any-key confidence is ambiguous, return review state instead of choosing silently.
 
 ## Implemented MCP/App Tools
-Current server and ChatGPT submission must stay aligned on these 6 tool names:
+Current server and ChatGPT submission must stay aligned on these 11 tool names:
 - `ask_hvdc_ontology` -> `server/src/answer.ts`
 - `render_hvdc_answer_card` -> `server/src/hvdc-server.ts`
 - `route_question` -> `server/src/router.ts`
 - `search_ontology_corpus` -> `server/src/corpus.ts`
 - `resolve_any_key` -> `server/src/router.ts`
 - `validate_answer` -> `server/src/answer.ts`
+- `create_upload_url` -> `server/src/hvdc-server.ts`, `server/src/worker.ts`
+- `complete_upload` -> `server/src/hvdc-server.ts`, `server/src/worker.ts`
+- `attach_uploaded_file` -> `server/src/hvdc-server.ts`, `server/src/worker.ts`
+- `write_file_dry_run` -> `server/src/hvdc-server.ts`, `server/src/worker.ts`
+- `write_file_commit` -> `server/src/hvdc-server.ts`, `server/src/worker.ts`
 
 Do not document `query_knowledge_graph`, `create_action_request`, or `export_answer_report` as implemented until source code and descriptor tests confirm them.
 
@@ -63,12 +69,13 @@ Do not document `query_knowledge_graph`, `create_action_request`, or `export_ans
 ```text
 AGENTS.md, README.md, CHANGELOG.md, LAYOUT.md, SYSTEM_ARCHITECTURE.md
 chatgpt-app-submission.json, wrangler.toml
-server/src/worker.ts, hvdc-server.ts, index.ts, answer.ts, corpus.ts, router.ts, redact.ts, types.ts
+migrations/0001_mcp_audit_logs.sql, migrations/0002_mcp_upload_write.sql
+server/src/worker.ts, hvdc-server.ts, claude-server.ts, index.ts, answer.ts, corpus.ts, router.ts, redact.ts, types.ts
 server/src/generated/
 public/hvdc-answer-widget.html
 data/corpus/, data/index/, ontology/
 scripts/index_corpus.py, scripts/check_index_drift.py, scripts/generate_worker_assets.py
-tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, golden_prompts.json
+tests/pipeline.test.ts, descriptor.test.ts, write-upload-tools.test.ts, evals.test.ts, widget.test.ts, golden_prompts.json
 .agents/skills/
 .github/workflows/hvdc-verify.yml
 ```
@@ -97,6 +104,7 @@ Human approval is required before:
 - external message sending through WhatsApp, email, TG, or similar channels
 - report publication or external export
 - transaction mutation or cost approval
+- Cloudflare R2/D1 managed upload/write unless the dedicated MCP tool enforces OAuth Bearer scope and Human-gate approval
 - destructive file operations
 - dependency installation or lockfile modification
 - deployment, Cloudflare Workers/R2/D1 config, production config, auth, secret, token, `.env*`, or CI/CD changes
@@ -107,6 +115,7 @@ Invoice or CostGuard answers above `100,000.00 AED`, or with `HIGH` / `CRITICAL`
 ## Privacy and Security
 - Mask phone numbers, email addresses, and token-like strings in UI, logs, reports, tests, and exports.
 - Never expose secrets, tokens, private URLs, credentials, or internal commercial terms.
+- Protected upload/write tools require `files:upload` or `files:write` OAuth Bearer scope and must fail closed without it.
 - Tool failures must fail closed with `TOOL_UNAVAILABLE`, `NO_EVIDENCE`, `STALE_SOURCE`, `WARN`, or `BLOCK`.
 - Cloudflare runtime writes hash-based audit rows to D1 `mcp_audit_logs`. Node fallback writes `out/audit.jsonl`.
 

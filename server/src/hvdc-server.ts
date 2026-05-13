@@ -16,9 +16,161 @@ export type HvdcServerOptions = {
   widgetHtml?: string;
   widgetDomain?: string;
   audit?: (record: AuditRecord) => void | Promise<void>;
+  auth?: HvdcAuthContext;
+  storage?: HvdcProtectedStorage;
 };
 
 const DEFAULT_WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev";
+
+export type HvdcAuthContext = {
+  authenticated: boolean;
+  subject?: string;
+  scopes: string[];
+};
+
+export type ApprovalInput = {
+  approvedByRole: string;
+  approvalRef: string;
+  reason: string;
+};
+
+export type UploadPurpose = "evidence_attachment" | "source_document" | "audit_support" | "ops_working_file";
+
+export type ProtectedToolStatus =
+  | "AUTH_REQUIRED"
+  | "INSUFFICIENT_SCOPE"
+  | "STORAGE_UNAVAILABLE"
+  | "VALIDATION_FAILED"
+  | "UPLOAD_URL_READY"
+  | "UPLOAD_PENDING"
+  | "UPLOADED"
+  | "ATTACHED"
+  | "DRY_RUN_READY"
+  | "COMMITTED"
+  | "NOT_FOUND"
+  | "CONFLICT";
+
+export type CreateUploadUrlInput = {
+  fileName: string;
+  mimeType: string;
+  byteLength?: number;
+  purpose: UploadPurpose;
+  ttlSeconds?: number;
+  approval: ApprovalInput;
+  auth: HvdcAuthContext;
+};
+
+export type CreateUploadUrlResult = {
+  status: ProtectedToolStatus;
+  uploadId?: string;
+  uploadUrl?: string;
+  method?: "PUT";
+  expiresAt?: string;
+  objectKey?: string;
+  maxBytes?: number;
+  requiredHeaders?: Record<string, string>;
+  humanGateRequired: true;
+  auditId?: string;
+  message: string;
+  requiredScopes?: string[];
+};
+
+export type CompleteUploadInput = {
+  uploadId: string;
+  approval: ApprovalInput;
+  auth: HvdcAuthContext;
+};
+
+export type CompleteUploadResult = {
+  status: ProtectedToolStatus;
+  uploadId?: string;
+  objectKey?: string;
+  fileName?: string;
+  mimeType?: string;
+  byteLength?: number;
+  uploadedAt?: string;
+  humanGateRequired: true;
+  auditId?: string;
+  message: string;
+  requiredScopes?: string[];
+};
+
+export type AttachUploadedFileInput = {
+  uploadId: string;
+  targetType: "ShipmentUnit" | "Document" | "Invoice" | "CommunicationEvent" | "AuditRecord" | "Other";
+  targetRef: string;
+  evidenceNote: string;
+  approval: ApprovalInput;
+  auth: HvdcAuthContext;
+};
+
+export type AttachUploadedFileResult = {
+  status: ProtectedToolStatus;
+  attachmentId?: string;
+  uploadId?: string;
+  targetType?: string;
+  targetRef?: string;
+  objectKey?: string;
+  humanGateRequired: true;
+  auditId?: string;
+  message: string;
+  requiredScopes?: string[];
+};
+
+export type WriteFileDryRunInput = {
+  targetPath: string;
+  content: string;
+  baseContentHash?: string;
+  changeReason: string;
+  approval: ApprovalInput;
+  auth: HvdcAuthContext;
+};
+
+export type WriteFileDryRunResult = {
+  status: ProtectedToolStatus;
+  proposalId?: string;
+  targetPath?: string;
+  proposedObjectKey?: string;
+  contentHash?: string;
+  diffSummary?: {
+    mode: "CREATE" | "UPDATE";
+    addedLines: number;
+    removedLines: number;
+    previousHash: string | null;
+  };
+  humanGateRequired: true;
+  auditId?: string;
+  message: string;
+  requiredScopes?: string[];
+};
+
+export type WriteFileCommitInput = {
+  proposalId: string;
+  commitReason: string;
+  approval: ApprovalInput;
+  auth: HvdcAuthContext;
+};
+
+export type WriteFileCommitResult = {
+  status: ProtectedToolStatus;
+  proposalId?: string;
+  commitId?: string;
+  targetPath?: string;
+  objectKey?: string;
+  contentHash?: string;
+  humanGateRequired: true;
+  auditId?: string;
+  message: string;
+  requiredScopes?: string[];
+};
+
+export type HvdcProtectedStorage = {
+  createUploadUrl?: (input: CreateUploadUrlInput) => Promise<CreateUploadUrlResult>;
+  completeUpload?: (input: CompleteUploadInput) => Promise<CompleteUploadResult>;
+  attachUploadedFile?: (input: AttachUploadedFileInput) => Promise<AttachUploadedFileResult>;
+  createWriteProposal?: (input: WriteFileDryRunInput) => Promise<WriteFileDryRunResult>;
+  commitWriteProposal?: (input: WriteFileCommitInput) => Promise<WriteFileCommitResult>;
+};
 
 const domainEnum = z.enum([
   "master",
@@ -33,6 +185,92 @@ const domainEnum = z.enum([
   "team",
   "compliance"
 ]);
+
+const approvalSchema = z.object({
+  approvedByRole: z.string().min(2).max(80),
+  approvalRef: z.string().min(3).max(120),
+  reason: z.string().min(5).max(500)
+});
+
+const protectedToolStatusSchema = z.enum([
+  "AUTH_REQUIRED",
+  "INSUFFICIENT_SCOPE",
+  "STORAGE_UNAVAILABLE",
+  "VALIDATION_FAILED",
+  "UPLOAD_URL_READY",
+  "UPLOAD_PENDING",
+  "UPLOADED",
+  "ATTACHED",
+  "DRY_RUN_READY",
+  "COMMITTED",
+  "NOT_FOUND",
+  "CONFLICT"
+]);
+
+const protectedBaseOutputSchema = {
+  status: protectedToolStatusSchema,
+  humanGateRequired: z.literal(true),
+  auditId: z.string().optional(),
+  message: z.string(),
+  requiredScopes: z.array(z.string()).optional()
+};
+
+const uploadPurposeSchema = z.enum(["evidence_attachment", "source_document", "audit_support", "ops_working_file"]);
+
+const createUploadUrlOutputSchema = {
+  ...protectedBaseOutputSchema,
+  uploadId: z.string().optional(),
+  uploadUrl: z.string().optional(),
+  method: z.literal("PUT").optional(),
+  expiresAt: z.string().optional(),
+  objectKey: z.string().optional(),
+  maxBytes: z.number().optional(),
+  requiredHeaders: z.record(z.string(), z.string()).optional()
+};
+
+const completeUploadOutputSchema = {
+  ...protectedBaseOutputSchema,
+  uploadId: z.string().optional(),
+  objectKey: z.string().optional(),
+  fileName: z.string().optional(),
+  mimeType: z.string().optional(),
+  byteLength: z.number().optional(),
+  uploadedAt: z.string().optional()
+};
+
+const attachUploadedFileOutputSchema = {
+  ...protectedBaseOutputSchema,
+  attachmentId: z.string().optional(),
+  uploadId: z.string().optional(),
+  targetType: z.string().optional(),
+  targetRef: z.string().optional(),
+  objectKey: z.string().optional()
+};
+
+const writeDryRunOutputSchema = {
+  ...protectedBaseOutputSchema,
+  proposalId: z.string().optional(),
+  targetPath: z.string().optional(),
+  proposedObjectKey: z.string().optional(),
+  contentHash: z.string().optional(),
+  diffSummary: z
+    .object({
+      mode: z.enum(["CREATE", "UPDATE"]),
+      addedLines: z.number(),
+      removedLines: z.number(),
+      previousHash: z.string().nullable()
+    })
+    .optional()
+};
+
+const writeCommitOutputSchema = {
+  ...protectedBaseOutputSchema,
+  proposalId: z.string().optional(),
+  commitId: z.string().optional(),
+  targetPath: z.string().optional(),
+  objectKey: z.string().optional(),
+  contentHash: z.string().optional()
+};
 
 const evidenceSchema = z.object({
   id: z.string(),
@@ -282,6 +520,77 @@ export const HVDC_TOOL_DESCRIPTORS = {
     },
     _meta: {},
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  create_upload_url: {
+    title: "Create HVDC upload URL",
+    description:
+      "Use this to create an OAuth Bearer-scope protected, Human-gate approved upload URL for an HVDC evidence attachment or source document. Requires files:upload scope and an approval record.",
+    inputSchema: {
+      fileName: z.string().min(1).max(240),
+      mimeType: z.string().min(3).max(120),
+      byteLength: z.number().int().min(0).max(100 * 1024 * 1024).optional(),
+      purpose: uploadPurposeSchema,
+      ttlSeconds: z.number().int().min(60).max(3600).default(600).optional(),
+      approval: approvalSchema
+    },
+    outputSchema: createUploadUrlOutputSchema,
+    _meta: {},
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  complete_upload: {
+    title: "Complete HVDC upload",
+    description:
+      "Use this after a direct upload to confirm the OAuth Bearer-scope protected, Human-gate approved file is present in R2. Requires files:upload scope and an approval record.",
+    inputSchema: {
+      uploadId: z.string().min(8).max(160),
+      approval: approvalSchema
+    },
+    outputSchema: completeUploadOutputSchema,
+    _meta: {},
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  attach_uploaded_file: {
+    title: "Attach uploaded HVDC file",
+    description:
+      "Use this to attach an uploaded R2 object to an HVDC target after OAuth Bearer authorization and Human-gate approval. Requires files:write scope and an approval record.",
+    inputSchema: {
+      uploadId: z.string().min(8).max(160),
+      targetType: z.enum(["ShipmentUnit", "Document", "Invoice", "CommunicationEvent", "AuditRecord", "Other"]),
+      targetRef: z.string().min(1).max(160),
+      evidenceNote: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    outputSchema: attachUploadedFileOutputSchema,
+    _meta: {},
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  write_file_dry_run: {
+    title: "Dry-run HVDC file write",
+    description:
+      "Use this to create an OAuth Bearer-scope protected, Human-gate approved dry-run write proposal in the Cloudflare R2/D1 managed file store. Requires files:write scope and never mutates external ERP/WMS systems.",
+    inputSchema: {
+      targetPath: z.string().min(1).max(240),
+      content: z.string().min(1).max(512 * 1024),
+      baseContentHash: z.string().max(128).optional(),
+      changeReason: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    outputSchema: writeDryRunOutputSchema,
+    _meta: {},
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  write_file_commit: {
+    title: "Commit HVDC file write",
+    description:
+      "Use this to commit a prior OAuth Bearer-scope protected, Human-gate approved dry-run write proposal into the Cloudflare R2/D1 managed file store. Requires files:write scope and an approval record.",
+    inputSchema: {
+      proposalId: z.string().min(8).max(160),
+      commitReason: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    outputSchema: writeCommitOutputSchema,
+    _meta: {},
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
   }
 };
 
@@ -310,6 +619,59 @@ function buildAskResultMeta(answer: GroundedAnswer): Record<string, unknown> {
       visibility: ["model", "app"]
     }
   };
+}
+
+function currentAuth(options: HvdcServerOptions): HvdcAuthContext {
+  return options.auth ?? { authenticated: false, scopes: [] };
+}
+
+function missingAuth(requiredScopes: string[]): CreateUploadUrlResult {
+  return {
+    status: "AUTH_REQUIRED",
+    humanGateRequired: true,
+    requiredScopes,
+    message: `OAuth Bearer token with scope ${requiredScopes.join(" ")} is required.`
+  };
+}
+
+function insufficientScope(requiredScopes: string[]): CreateUploadUrlResult {
+  return {
+    status: "INSUFFICIENT_SCOPE",
+    humanGateRequired: true,
+    requiredScopes,
+    message: `Bearer token is missing required scope ${requiredScopes.join(" ")}.`
+  };
+}
+
+function storageUnavailable(feature: string): CreateUploadUrlResult {
+  return {
+    status: "STORAGE_UNAVAILABLE",
+    humanGateRequired: true,
+    message: `${feature} storage adapter is not configured for this runtime.`
+  };
+}
+
+function requireScopes(options: HvdcServerOptions, requiredScopes: string[]): CreateUploadUrlResult | null {
+  const auth = currentAuth(options);
+  if (!auth.authenticated) return missingAuth(requiredScopes);
+  const grantedScopes = new Set(auth.scopes);
+  const hasAllScopes = requiredScopes.every((scope) => grantedScopes.has(scope));
+  if (!hasAllScopes) return insufficientScope(requiredScopes);
+  return null;
+}
+
+async function auditProtectedTool(
+  options: HvdcServerOptions,
+  toolName: string,
+  input: unknown,
+  output: unknown
+): Promise<Record<string, unknown>> {
+  const auditId = crypto.randomUUID();
+  await options.audit?.(buildAuditRecord(toolName, input, { auditId, output }, true));
+  if (output && typeof output === "object") {
+    return { ...(output as Record<string, unknown>), auditId };
+  }
+  return { status: "VALIDATION_FAILED", humanGateRequired: true, auditId, message: "Invalid protected tool output." };
 }
 
 export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
@@ -470,6 +832,91 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
       return {
         structuredContent: { findings },
         content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "create_upload_url",
+    HVDC_TOOL_DESCRIPTORS.create_upload_url,
+    async (input) => {
+      const authFailure = requireScopes(options, ["files:upload"]);
+      const result = authFailure ?? (options.storage?.createUploadUrl
+        ? await options.storage.createUploadUrl({ ...(input as Omit<CreateUploadUrlInput, "auth">), auth: currentAuth(options) })
+        : storageUnavailable("R2 upload"));
+      const structuredContent = await auditProtectedTool(options, "create_upload_url", input, result);
+      return {
+        structuredContent,
+        content: [{ type: "text", text: JSON.stringify(structuredContent) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "complete_upload",
+    HVDC_TOOL_DESCRIPTORS.complete_upload,
+    async (input) => {
+      const authFailure = requireScopes(options, ["files:upload"]);
+      const result = authFailure ?? (options.storage?.completeUpload
+        ? await options.storage.completeUpload({ ...(input as Omit<CompleteUploadInput, "auth">), auth: currentAuth(options) })
+        : storageUnavailable("R2 upload completion"));
+      const structuredContent = await auditProtectedTool(options, "complete_upload", input, result);
+      return {
+        structuredContent,
+        content: [{ type: "text", text: JSON.stringify(structuredContent) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "attach_uploaded_file",
+    HVDC_TOOL_DESCRIPTORS.attach_uploaded_file,
+    async (input) => {
+      const authFailure = requireScopes(options, ["files:write"]);
+      const result = authFailure ?? (options.storage?.attachUploadedFile
+        ? await options.storage.attachUploadedFile({ ...(input as Omit<AttachUploadedFileInput, "auth">), auth: currentAuth(options) })
+        : storageUnavailable("R2 attachment"));
+      const structuredContent = await auditProtectedTool(options, "attach_uploaded_file", input, result);
+      return {
+        structuredContent,
+        content: [{ type: "text", text: JSON.stringify(structuredContent) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "write_file_dry_run",
+    HVDC_TOOL_DESCRIPTORS.write_file_dry_run,
+    async (input) => {
+      const authFailure = requireScopes(options, ["files:write"]);
+      const result = authFailure ?? (options.storage?.createWriteProposal
+        ? await options.storage.createWriteProposal({ ...(input as Omit<WriteFileDryRunInput, "auth">), auth: currentAuth(options) })
+        : storageUnavailable("R2/D1 write proposal"));
+      const structuredContent = await auditProtectedTool(options, "write_file_dry_run", input, result);
+      return {
+        structuredContent,
+        content: [{ type: "text", text: JSON.stringify(structuredContent) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "write_file_commit",
+    HVDC_TOOL_DESCRIPTORS.write_file_commit,
+    async (input) => {
+      const authFailure = requireScopes(options, ["files:write"]);
+      const result = authFailure ?? (options.storage?.commitWriteProposal
+        ? await options.storage.commitWriteProposal({ ...(input as Omit<WriteFileCommitInput, "auth">), auth: currentAuth(options) })
+        : storageUnavailable("R2/D1 write commit"));
+      const structuredContent = await auditProtectedTool(options, "write_file_commit", input, result);
+      return {
+        structuredContent,
+        content: [{ type: "text", text: JSON.stringify(structuredContent) }]
       };
     }
   );

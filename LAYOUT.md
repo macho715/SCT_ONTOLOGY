@@ -35,7 +35,7 @@ flowchart TD
     CorpusFiles["server/src/generated/corpus-data.ts"]
   end
 
-  Tests["tests<br/>110개 테스트<br/>Cloudflare dry-run 포함"]
+  Tests["tests<br/>113개 테스트<br/>Cloudflare dry-run 포함"]
   Scripts["scripts<br/>corpus 점검과 index 생성 도구"]
   Index["data/index<br/>생성/검토/repro artifact"]
   Ontology["ontology<br/>원본 또는 참조용 온톨로지 묶음"]
@@ -87,7 +87,7 @@ flowchart TD
 - `tsconfig.json`: TypeScript 컴파일 설정이다.
 - `wrangler.toml`: Cloudflare Workers, R2, D1 배포 설정 파일이다.
 - `chatgpt-app-submission.json`: ChatGPT 앱 제출용 메타데이터 파일이다.
-- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. Cloudflare MCP URL, `claude_desktop_config` HTTP 스니펫, 6개 tool, Claude 전용 테스트 케이스 포함.
+- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. Cloudflare MCP URL, `claude_desktop_config` HTTP 스니펫, 11개 tool, Claude 전용 테스트 케이스 포함.
 - `.gitignore`: Git 추적에서 제외할 폴더와 파일 패턴을 정한다.
 
 ## docs
@@ -141,13 +141,14 @@ flowchart TD
 
 ## tests
 
-`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 110개 테스트가 통과한다.
+`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 113개 테스트가 통과한다.
 
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
 - `tests/descriptor.test.ts`: ChatGPT 앱 descriptor와 `chatgpt-app-submission.json` 일치를 검증한다.
+- `tests/write-upload-tools.test.ts`: OAuth Bearer 보호 upload/write tool의 fail-closed 동작과 승인된 dry-run/commit 경로를 검증한다.
 - `tests/evals.test.ts`: 평가 시나리오를 검증한다.
 - `tests/widget.test.ts`: 공개 위젯 HTML의 기대 요소, bridge fallback, 외부 fetch 금지, overflow-safe CSS를 검증한다.
-- `tests/claude-descriptor.test.ts`: Claude 서버 tool parity, 양방향 포맷 파싱(`parseGroundedAnswer`), 마크다운 렌더링 필수 필드를 검증한다. (28개 테스트)
+- `tests/claude-descriptor.test.ts`: Claude 서버 tool parity, 양방향 포맷 파싱(`parseGroundedAnswer`), 마크다운 렌더링 필수 필드를 검증한다. (29개 테스트)
 - `tests/golden_prompts.json`: HVDC 도메인 질문과 기대 판정 데이터를 담는다.
 
 ## scripts
@@ -218,17 +219,16 @@ flowchart TD
 
 - `.github/workflows/hvdc-verify.yml`: TypeScript와 테스트 검증을 실행하는 GitHub Actions workflow다.
 
-## 현재 미커밋 변경: Cloudflare remote MCP 전환
+## 현재 미커밋 변경: Cloudflare protected upload/write tool
 
-현재 작업 트리에는 Cloudflare Workers/R2/D1 remote MCP 전환 변경이 있다.
+현재 작업 트리에는 Cloudflare Workers/R2/D1 기반 upload/write tool 후속 변경이 있다.
 이 문서는 해당 변경을 되돌리지 않고, 현재 상태를 기록한다.
 
-- Cloudflare runtime: `server/src/worker.ts`, `server/src/hvdc-server.ts`, `wrangler.toml`
-- Cloudflare storage: `migrations/0001_mcp_audit_logs.sql`, R2 binding `HVDC_FILES`, D1 binding `MCP_AUDIT_DB`
-- Generated runtime assets: `server/src/generated/`, `scripts/generate_worker_assets.py`
-- Claude/Cursor 연결: `.mcp.json`, `start-hvdc-mcp.cmd`, `C:\Users\jichu\.cursor\mcp.json`, Claude 설정 파일
-- 제거된 Railway 설정: `railway.json`, `.railwayignore`
-- 검증: `npm run verify`, remote `/healthz`, remote MCP `tools/list`, `ask_hvdc_ontology`, D1 audit count
+- Protected runtime: `server/src/worker.ts`, `server/src/hvdc-server.ts`, `server/src/claude-server.ts`
+- Cloudflare storage: `migrations/0001_mcp_audit_logs.sql`, `migrations/0002_mcp_upload_write.sql`, R2 binding `HVDC_FILES`, D1 binding `MCP_AUDIT_DB`
+- Submission metadata: `chatgpt-app-submission.json`, `claude-app-submission.json`
+- Regression: `tests/write-upload-tools.test.ts`, `tests/descriptor.test.ts`, `tests/claude-descriptor.test.ts`
+- 검증: focused protected-tool tests, `npm run typecheck`, full `npm run verify`
 
 ## 무시된 폴더와 파일
 
@@ -276,9 +276,9 @@ flowchart TD
 
 Latest observed local verification for this addendum:
 - Command: `npm run verify`
-- Result: TypeScript check passed, Vitest passed 7 test files with 110 tests, and Wrangler Worker dry-run passed.
+- Result: TypeScript check passed, Vitest passed 8 test files with 113 tests, and Wrangler Worker dry-run passed.
 
 ### Stale-count warning
 
 Older archived files may still mention earlier 71/78-test snapshots.
-For the active repository, use the latest 110-test verification note above as the current local evidence.
+For the active repository, use the latest 113-test verification note above as the current local evidence.

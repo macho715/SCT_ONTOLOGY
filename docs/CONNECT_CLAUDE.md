@@ -65,7 +65,7 @@ Optional local debugging only:
 
 ---
 
-## Available Tools (6)
+## Available Tools (11)
 
 | Tool | Description |
 |---|---|
@@ -75,6 +75,15 @@ Optional local debugging only:
 | `search_ontology_corpus` | Evidence snippets from approved HVDC documents |
 | `resolve_any_key` | Resolve BL, BOE, DO, Invoice, HVDC code identifiers |
 | `validate_answer` | Check evidence coverage, human-gate, currentness |
+| `create_upload_url` | Create a Human-gate approved R2 upload URL; requires `files:upload` Bearer scope |
+| `complete_upload` | Confirm uploaded file metadata; requires `files:upload` Bearer scope |
+| `attach_uploaded_file` | Attach uploaded evidence to a target; requires `files:write` Bearer scope |
+| `write_file_dry_run` | Create a managed-file write proposal; requires `files:write` Bearer scope |
+| `write_file_commit` | Commit an approved write proposal into R2 `managed/`; requires `files:write` Bearer scope |
+
+Protected upload/write tools are Cloudflare-managed storage tools only.
+They do not write to ERP, WMS, ATLP, Foundry, email, or messaging systems.
+If Claude connects without a Bearer token, these protected tools return `AUTH_REQUIRED`.
 
 ---
 

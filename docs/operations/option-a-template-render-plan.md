@@ -94,7 +94,7 @@ Keep the app submission and docs on the 6-tool data/render surface.
 
 Expected result:
 
-- `chatgpt-app-submission.json` lists 6 tools.
+- Historical note: this 2026-05-10 plan expected `chatgpt-app-submission.json` to list 6 tools. The current active runtime lists 11 tools after protected upload/write was added.
 - README, AGENTS, SYSTEM_ARCHITECTURE, and SPEC describe the 6-tool decoupled surface consistently.
 - Docs explain that `render_hvdc_answer_card` renders the answer card after `ask_hvdc_ontology`.
 
@@ -115,7 +115,7 @@ Expected result:
 |---:|---|---|
 | 1 | Patch `server/src/index.ts` descriptor and registration | Decoupled data/render template link |
 | 2 | Patch `public/hvdc-answer-widget.html` | Host-delivered render output, no external fetch, overflow-safe card |
-| 3 | Patch descriptor/widget tests | Tests enforce 6 tools and render-only template link |
+| 3 | Patch descriptor/widget tests | Tests enforce the active tool list and render-only template link |
 | 4 | Check `chatgpt-app-submission.json` | Submission matches runtime tools |
 | 5 | Patch docs | User-facing docs match implementation |
 | 6 | Run local checks | `npm run verify`, JSON validation, MCP smoke |

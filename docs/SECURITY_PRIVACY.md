@@ -11,7 +11,9 @@
 ## Guardrails
 
 - The app is read-only by default.
-- Write/action tools must require Human-gate and AuditRecord.
+- Write/action tools must require OAuth Bearer authorization, Human-gate approval, and AuditRecord.
+- Protected upload/write tools require `files:upload` or `files:write` scope and fail closed with `AUTH_REQUIRED` or `INSUFFICIENT_SCOPE`.
+- Protected upload/write tools may write only to the configured Cloudflare R2/D1 managed store, not to ERP, WMS, ATLP, Foundry, email, or messaging systems.
 - Phone, email, token, and secret-like strings are masked by `server/src/redact.ts`.
 - `structuredContent`, `content`, `_meta`, and widget state are treated as user-visible.
 - Authorization must be enforced server-side before adding P1/P2 connectors.

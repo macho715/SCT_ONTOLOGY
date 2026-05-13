@@ -24,6 +24,19 @@ const domainEnum = z.enum([
   "compliance"
 ]);
 
+const approvalSchema = z.object({
+  approvedByRole: z.string().min(2).max(80),
+  approvalRef: z.string().min(3).max(120),
+  reason: z.string().min(5).max(500)
+});
+
+const protectedOutputSchema = {
+  status: z.enum(["AUTH_REQUIRED", "STORAGE_UNAVAILABLE"]),
+  humanGateRequired: z.literal(true),
+  message: z.string(),
+  requiredScopes: z.array(z.string()).optional()
+};
+
 const evidenceSchema = z.object({
   id: z.string(),
   docId: z.string(),
@@ -110,15 +123,34 @@ const answerOutputSchema = {
 
 export const HVDC_CLAUDE_TOOL_NAMES = [
   "ask_hvdc_ontology",
+  "create_upload_url",
+  "complete_upload",
+  "attach_uploaded_file",
   "render_hvdc_answer_card",
   "route_question",
   "search_ontology_corpus",
   "resolve_any_key",
-  "validate_answer"
+  "validate_answer",
+  "write_file_dry_run",
+  "write_file_commit"
 ] as const;
 
 export function createClaudeServer(): McpServer {
   const server = new McpServer({ name: "hvdc-ontology-claude-app", version: "0.1.0" });
+  const authRequired = (requiredScopes: string[]) => ({
+    structuredContent: {
+      status: "AUTH_REQUIRED",
+      humanGateRequired: true,
+      requiredScopes,
+      message: `Use the Cloudflare remote MCP endpoint with OAuth Bearer scope ${requiredScopes.join(" ")}.`
+    },
+    content: [
+      {
+        type: "text" as const,
+        text: `AUTH_REQUIRED: OAuth Bearer scope ${requiredScopes.join(" ")} is required on the Cloudflare remote MCP endpoint.`
+      }
+    ]
+  });
 
   server.tool(
     "ask_hvdc_ontology",
@@ -219,6 +251,67 @@ export function createClaudeServer(): McpServer {
         content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }, null, 2) }]
       };
     }
+  );
+
+  server.tool(
+    "create_upload_url",
+    "Create a Human-gate approved R2 upload URL. Local fallback requires Cloudflare remote MCP OAuth Bearer scope files:upload.",
+    {
+      fileName: z.string().min(1).max(240),
+      mimeType: z.string().min(3).max(120),
+      byteLength: z.number().int().min(0).max(100 * 1024 * 1024).optional(),
+      purpose: z.enum(["evidence_attachment", "source_document", "audit_support", "ops_working_file"]),
+      ttlSeconds: z.number().int().min(60).max(3600).default(600).optional(),
+      approval: approvalSchema
+    },
+    async () => authRequired(["files:upload"])
+  );
+
+  server.tool(
+    "complete_upload",
+    "Complete a Human-gate approved R2 upload. Local fallback requires Cloudflare remote MCP OAuth Bearer scope files:upload.",
+    {
+      uploadId: z.string().min(8).max(160),
+      approval: approvalSchema
+    },
+    async () => authRequired(["files:upload"])
+  );
+
+  server.tool(
+    "attach_uploaded_file",
+    "Attach an uploaded file to an HVDC target. Local fallback requires Cloudflare remote MCP OAuth Bearer scope files:write.",
+    {
+      uploadId: z.string().min(8).max(160),
+      targetType: z.enum(["ShipmentUnit", "Document", "Invoice", "CommunicationEvent", "AuditRecord", "Other"]),
+      targetRef: z.string().min(1).max(160),
+      evidenceNote: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    async () => authRequired(["files:write"])
+  );
+
+  server.tool(
+    "write_file_dry_run",
+    "Create a Human-gate approved write dry-run proposal. Local fallback requires Cloudflare remote MCP OAuth Bearer scope files:write.",
+    {
+      targetPath: z.string().min(1).max(240),
+      content: z.string().min(1).max(512 * 1024),
+      baseContentHash: z.string().max(128).optional(),
+      changeReason: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    async () => authRequired(["files:write"])
+  );
+
+  server.tool(
+    "write_file_commit",
+    "Commit a Human-gate approved write dry-run proposal. Local fallback requires Cloudflare remote MCP OAuth Bearer scope files:write.",
+    {
+      proposalId: z.string().min(8).max(160),
+      commitReason: z.string().min(5).max(500),
+      approval: approvalSchema
+    },
+    async () => authRequired(["files:write"])
   );
 
   return server;

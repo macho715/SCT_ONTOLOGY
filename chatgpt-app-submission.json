@@ -20,6 +20,66 @@
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible operational actions."
       }
     },
+    "create_upload_url": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a short-lived upload token and writes a private audit hash log.",
+        "open_world_justification": "Writes only to the configured Cloudflare R2/D1 project storage after OAuth scope and Human-gate approval.",
+        "destructive_justification": "Does not delete or overwrite existing objects."
+      }
+    },
+    "complete_upload": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Confirms uploaded file state and writes a private audit hash log.",
+        "open_world_justification": "Reads the configured Cloudflare R2/D1 project storage only.",
+        "destructive_justification": "Does not delete, overwrite, or revoke access."
+      }
+    },
+    "attach_uploaded_file": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates an attachment record and writes a private audit hash log.",
+        "open_world_justification": "Writes only to configured Cloudflare D1 project metadata after OAuth scope and Human-gate approval.",
+        "destructive_justification": "Does not delete or overwrite uploaded objects."
+      }
+    },
+    "write_file_dry_run": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a proposed write artifact and private audit hash log.",
+        "open_world_justification": "Writes only to configured Cloudflare R2/D1 project storage after OAuth scope and Human-gate approval.",
+        "destructive_justification": "Dry-run does not overwrite committed content."
+      }
+    },
+    "write_file_commit": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Commits a prior dry-run write proposal and writes a private audit hash log.",
+        "open_world_justification": "Writes only to configured Cloudflare R2/D1 project storage after OAuth scope and Human-gate approval.",
+        "destructive_justification": "Does not delete content and only commits a previously created proposal."
+      }
+    },
     "render_hvdc_answer_card": {
       "annotations": {
         "readOnlyHint": true,

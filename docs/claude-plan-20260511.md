@@ -28,7 +28,7 @@ https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp
 
 **2026-05-11 당시 상태**: HVDC Ontology 답변 앱은 ChatGPT 전용으로만 동작했다. `@modelcontextprotocol/ext-apps`, `ui://hvdc/` 리소스 URI, `openai/outputTemplate` 메타 등 ChatGPT SDK 의존 요소가 하드코딩되어 있어 Claude Desktop / Claude Code에서는 tool이 노출되지 않고 위젯 렌더링이 불가능했다.
 
-**현재 목표 상태**: 동일한 corpus·answer 코어를 유지하면서 Claude 계열 클라이언트가 Cloudflare remote MCP의 6개 tool을 사용한다. `server/src/claude-server.ts`는 운영 주경로가 아니라 legacy/local fallback과 포맷 테스트용으로만 남긴다.
+**현재 목표 상태**: 동일한 corpus·answer 코어를 유지하면서 Claude 계열 클라이언트가 Cloudflare remote MCP의 11개 tool을 사용한다. `server/src/claude-server.ts`는 운영 주경로가 아니라 legacy/local fallback과 포맷 테스트용으로만 남긴다. upload/write tool은 Cloudflare remote MCP에서만 실제 R2/D1 storage adapter를 사용하고, local fallback은 `AUTH_REQUIRED`를 반환한다.
 
 **영향 범위**: HVDC Project Logistics 사용자 全員 — ChatGPT 미사용자·Claude Code 사용자(개발팀 포함) 포함.
 
@@ -138,7 +138,7 @@ graph TD
 
 ```
 1. server/src/claude-render.ts    ← TYPES 의존만 있음. 독립 작성 가능.
-2. claude-app-submission.json     ← Cloudflare MCP URL과 6개 tool 목록 기준.
+2. claude-app-submission.json     ← Cloudflare MCP URL과 11개 tool 목록 기준.
 3. start-hvdc-mcp.cmd             ← stdio-only client용 `mcp-remote` bridge.
 4. tests/claude-descriptor.test.ts ← 2, 3 완료 후 작성.
 5. docs/CONNECT_CLAUDE.md         ← 2 완료 후 작성 (포트·URL 확정).
@@ -223,7 +223,7 @@ server.tool(
 | ChatGPT format 파싱 | `tests/claude-descriptor.test.ts` | `_meta["openai/outputTemplate"]` 포함 입력 → GroundedAnswer 추출 성공 |
 | Claude format 파싱 | `tests/claude-descriptor.test.ts` | `ui` 없는 순수 GroundedAnswer → 마크다운 렌더 성공 |
 | 마크다운 카드 필수 필드 | `tests/claude-descriptor.test.ts` | verdict, route, evidence count, actions 포함 여부 |
-| **전체 회귀 테스트** | `npm run verify` | TypeScript typecheck, Vitest 7 files / 110 tests, Worker dry-run 통과 |
+| **전체 회귀 테스트** | `npm run verify` | TypeScript typecheck, Vitest 8 files / 113 tests, Worker dry-run 통과 |
 
 ---
 
@@ -281,5 +281,5 @@ server.tool(
 
 검증:
 ```bash
-npm run verify   # 7개 test file / 110개 테스트와 Worker dry-run 확인
+npm run verify   # 8개 test file / 113개 테스트와 Worker dry-run 확인
 ```

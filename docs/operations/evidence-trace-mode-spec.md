@@ -61,7 +61,7 @@ Acceptance Scenarios:
 - FR-005: The ChatGPT Answer Card MUST show short display labels such as `E1` and `E2` near supported answer content while preserving raw `evidence.id` values in data.
 - FR-006: The Evidence Drawer MUST show document/source identifier, `sectionPath`, raw evidence ID, evidence text, and connected answer statement text for mapped evidence.
 - FR-007: The Claude markdown renderer MUST preserve the evidence relationship in readable text form.
-- FR-008: The system MUST keep existing six MCP tool names unchanged.
+- FR-008: The system MUST keep previously implemented read/render tool names unchanged. Later protected upload/write tools are additive and must be covered by descriptor parity tests.
 - FR-009: The system MUST keep `NO_EVIDENCE` and `BLOCK` behavior intact and MUST NOT attach invented support in those states.
 - FR-010: The system MUST keep UI render failures isolated from business result fields.
 - FR-011: The implementation MUST update relevant pipeline, widget, descriptor, and Claude descriptor tests when behavior or contracts change.
@@ -113,7 +113,7 @@ Display labels such as `E1` and `E2` are presentation labels derived from the re
 - SC-004: A widget test proves that the Evidence Drawer shows source information, `sectionPath`, raw evidence ID, and connected answer statement text.
 - SC-005: A widget test proves that the page still avoids external `fetch()` and `http(s)://` resource use.
 - SC-006: A Claude renderer test proves that markdown output preserves the evidence relationship in text form.
-- SC-007: Descriptor tests prove the existing six MCP tool names remain aligned with submission metadata.
+- SC-007: Descriptor tests prove the currently implemented MCP tool names remain aligned with submission metadata.
 - SC-008: `npm run verify` completes successfully after the implementation.
 - SC-009: A mixed supported/unsupported fixture proves that supported statements show display labels and unsupported statements show `No direct evidence` without fake evidence rows.
 

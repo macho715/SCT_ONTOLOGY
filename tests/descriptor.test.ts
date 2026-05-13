@@ -24,11 +24,16 @@ type Submission = {
 
 const APPROVED_V1_TOOL_NAMES = [
   "ask_hvdc_ontology",
+  "attach_uploaded_file",
+  "complete_upload",
+  "create_upload_url",
   "render_hvdc_answer_card",
   "route_question",
   "search_ontology_corpus",
   "resolve_any_key",
-  "validate_answer"
+  "validate_answer",
+  "write_file_commit",
+  "write_file_dry_run"
 ].sort();
 
 const FORBIDDEN_STANDALONE_TOOL_NAME_PARTS = [
@@ -87,11 +92,19 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       expect(descriptor.annotations).toEqual(submission.tools[toolName].annotations);
     }
 
-    expect(HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology.annotations.readOnlyHint).toBe(false);
-    expect(HVDC_TOOL_DESCRIPTORS.render_hvdc_answer_card.annotations.readOnlyHint).toBe(true);
+    const sideEffectTools = new Set([
+      "ask_hvdc_ontology",
+      "create_upload_url",
+      "complete_upload",
+      "attach_uploaded_file",
+      "write_file_dry_run",
+      "write_file_commit"
+    ]);
 
     for (const [toolName, descriptor] of Object.entries(HVDC_TOOL_DESCRIPTORS)) {
-      if (toolName !== "ask_hvdc_ontology") {
+      if (sideEffectTools.has(toolName)) {
+        expect(descriptor.annotations.readOnlyHint, `${toolName} readOnlyHint`).toBe(false);
+      } else {
         expect(descriptor.annotations.readOnlyHint, `${toolName} readOnlyHint`).toBe(true);
       }
     }
@@ -280,5 +293,24 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     expect(workerSource).toContain('const MCP_PATH = "/mcp"');
     expect(workerSource).toContain("MCP_AUDIT_DB");
     expect(workerSource).toContain("HVDC_FILES");
+  });
+
+  it("declares OAuth-protected upload and write tools with Human-gate language", () => {
+    for (const toolName of [
+      "create_upload_url",
+      "complete_upload",
+      "attach_uploaded_file",
+      "write_file_dry_run",
+      "write_file_commit"
+    ]) {
+      const descriptor = HVDC_TOOL_DESCRIPTORS[toolName as keyof typeof HVDC_TOOL_DESCRIPTORS];
+      expect(descriptor.description, `${toolName} description`).toMatch(/OAuth|Bearer|scope/i);
+      expect(descriptor.description, `${toolName} description`).toMatch(/Human-gate|approval/i);
+      expect(descriptor.inputSchema, `${toolName} input schema`).toHaveProperty("approval");
+      expect(descriptor.outputSchema, `${toolName} output schema`).toHaveProperty("status");
+      expect(descriptor.annotations.readOnlyHint, `${toolName} readOnlyHint`).toBe(false);
+      expect(descriptor.annotations.destructiveHint, `${toolName} destructiveHint`).toBe(false);
+      expect(descriptor.annotations.openWorldHint, `${toolName} openWorldHint`).toBe(false);
+    }
   });
 });

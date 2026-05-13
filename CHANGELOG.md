@@ -2,6 +2,35 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-13 Protected OAuth upload/write tools
+
+### Added
+
+- Added OAuth Bearer protected MCP tools: `create_upload_url`, `complete_upload`, `attach_uploaded_file`, `write_file_dry_run`, and `write_file_commit`.
+- Added Cloudflare R2/D1 storage adapter for short-lived upload URLs, uploaded file metadata, attachment metadata, write proposals, and managed-file commits.
+- Added OAuth protected resource metadata endpoints at `/.well-known/oauth-protected-resource` and `/.well-known/oauth-protected-resource/mcp`.
+- Added D1 migration `migrations/0002_mcp_upload_write.sql` for upload tokens, uploaded files, file attachments, and write proposals.
+- Added regression coverage in `tests/write-upload-tools.test.ts`.
+
+### Changed
+
+- Expanded ChatGPT and Claude submission metadata from 6 to 11 runtime tools.
+- Marked upload/write tools as non-read-only and Human-gate guarded in descriptor metadata.
+- Kept local Claude fallback read-safe by returning `AUTH_REQUIRED` for protected upload/write tools.
+
+### Verified
+
+- Focused check: `npm test -- tests/write-upload-tools.test.ts tests/descriptor.test.ts tests/claude-descriptor.test.ts`.
+- Result: 3 test files passed, 43 tests passed.
+- Full check: `npm run verify`.
+- Result: TypeScript typecheck passed, Vitest 8 files / 113 tests passed, and `wrangler deploy --dry-run` passed.
+
+### Risks
+
+- A production `MCP_AUTH_TOKEN` secret must be configured before protected upload/write tools can be used successfully.
+- Full external OAuth authorization-server issuance and consent UX are separate from this resource-server gate.
+- Protected tools write only to Cloudflare R2/D1 managed storage and do not write back to ERP, WMS, ATLP, Foundry, email, or messaging systems.
+
 ## Unreleased - 2026-05-13 Cloudflare Workers MCP migration and deployment
 
 ### Added
@@ -30,8 +59,8 @@
 
 ### Risks
 
-- OAuth, approval workflow, and upload/write MCP tools are still future scope.
-- R2 is bound for file storage, but the current six public tools do not expose upload or write operations.
+- OAuth, approval workflow, and upload/write MCP tools were completed in the later protected-tool update above.
+- R2 is now used by protected upload/write tools for managed evidence and file proposal storage.
 
 ## Unreleased - 2026-05-11 sct_ontology MCP operating update
 

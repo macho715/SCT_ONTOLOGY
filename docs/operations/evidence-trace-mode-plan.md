@@ -73,7 +73,7 @@ HVDC Ontology Grounded ChatGPT App의 Evidence 품질을 높인다.
 - 답변 주요 문장마다 연결된 evidence가 있거나, 근거 부족 상태가 명확히 표시된다.
 - Evidence Drawer에서 문서명, 원문, 연결된 답변 문장을 확인할 수 있다.
 - `NO_EVIDENCE` 경로에서 근거 없는 연결이 생성되지 않는다.
-- 기존 6개 tool 이름과 descriptor parity가 유지된다.
+- 기존 read/render tool 이름과 descriptor parity가 유지된다. 이후 추가된 protected upload/write tool은 별도 descriptor parity로 관리한다.
 - `npm run verify`가 통과한다.
 - 사용자 기준으로 "이 문장이 어떤 문서 근거에서 왔는지"를 확인할 수 있다.
 

@@ -38,7 +38,8 @@
 - 현재 코드에는 SPARQL KG 실행 엔드포인트가 없다.
 - Cloudflare 운영 `ask_hvdc_ontology`는 D1 `mcp_audit_logs`에 입력/출력 hash와 PII masking 상태를 기록한다.
 - Node fallback 실행은 `out/audit.jsonl`에 같은 hash 기반 감사 로그를 남긴다.
-- R2 바인딩은 파일 저장을 위한 준비 경계다. 현재 6개 MCP tool은 운영 write/upload tool을 아직 노출하지 않는다.
+- R2/D1 바인딩은 보호된 upload/write tool의 관리 저장소다. 이 tool들은 OAuth Bearer scope와 Human-gate approval이 없으면 실패한다.
+- 보호된 upload/write tool은 Cloudflare R2/D1 내부의 `uploads/`, `writes/proposals/`, `managed/` 경로와 D1 metadata만 변경한다.
 - Cloudflare 설정만으로 ERP, WMS, ATLP, Foundry 같은 외부 운영 시스템 write-back이 생기지는 않는다.
 
 ## 실행 흐름
@@ -72,6 +73,7 @@ flowchart TD
   end
 
   CGT_Endpoint --> Answer
+  CGT_Endpoint --> ProtectedTools["protected upload/write tools"]
   Answer --> Router
   Answer --> Corpus
   Answer --> Redact
@@ -79,6 +81,8 @@ flowchart TD
   Corpus --> CorpusFiles
   Answer --> AuditD1
   CGT_Endpoint --> FilesR2
+  ProtectedTools --> FilesR2
+  ProtectedTools --> AuditD1
   ClaudeRender --> Types
 
   subgraph OperatingGovernance["sct_ontology 운영 거버넌스"]
@@ -130,7 +134,7 @@ flowchart TD
 
 ## 등록된 App tool
 
-Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claude bridge가 동일한 6개 tool 이름을 사용한다.
+Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claude bridge가 동일한 11개 tool 이름을 사용한다.
 
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
@@ -140,6 +144,11 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 | `search_ontology_corpus` | `server/src/corpus.ts` | generated corpus EvidenceSnippet | generated corpus EvidenceSnippet |
 | `resolve_any_key` | `server/src/router.ts` | identifier 후보 | identifier 후보 |
 | `validate_answer` | `server/src/answer.ts` | validation findings | validation findings |
+| `create_upload_url` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | OAuth Bearer + Human-gate 후 R2 upload URL | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
+| `complete_upload` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | R2 upload metadata 확인 | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
+| `attach_uploaded_file` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | D1 attachment metadata 작성 | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
+| `write_file_dry_run` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | R2/D1 managed write proposal 작성 | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
+| `write_file_commit` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | 승인된 proposal을 R2 `managed/`에 commit | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
 
 ### Claude format 파싱 계약 (`server/src/claude-render.ts`)
 
@@ -388,13 +397,14 @@ classDiagram
 - `npm run claude:start`: Cloudflare remote MCP로 연결하는 `mcp-remote` bridge를 실행한다.
 - `npm run claude:local`: legacy/local Claude fallback 서버를 실행한다.
 
-현재 test 파일은 아래 역할을 가진다. **총 110개 테스트 통과** (2026-05-13 기준).
+현재 test 파일은 아래 역할을 가진다. **총 113개 테스트 통과** (2026-05-13 기준).
 
 | Test file | 테스트 수 | 확인하는 내용 |
 | --- | --- | --- |
 | `tests/pipeline.test.ts` | 25 | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
 | `tests/evals.test.ts` | 15 | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
-| `tests/descriptor.test.ts` | 11 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
+| `tests/descriptor.test.ts` | 12 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
+| `tests/write-upload-tools.test.ts` | 2 | OAuth Bearer 보호 upload/write tool의 fail-closed와 승인된 dry-run/commit 경로를 확인한다. |
 | `tests/widget.test.ts` | 14 | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
 | `tests/claude-descriptor.test.ts` | 29 | Claude tool parity, `parseGroundedAnswer` 양방향 포맷 파싱, `renderAnswerMarkdown` 필수 필드를 확인한다. |
 | `tests/sct-operating-contract.test.ts` | 6 | SCT 운영 계약을 확인한다. |
