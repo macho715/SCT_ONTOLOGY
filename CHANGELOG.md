@@ -2,6 +2,25 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-13 FMC role evidence corpus
+
+### Added
+
+- Added `data/corpus/HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md` as a searchable FMC role evidence source.
+- Added FMC role routing for person, owner, ActorRole, escalation, role-boundary, and milestone-owner questions.
+- Added `tests/fmc-role-corpus.test.ts` and golden prompts for `Arvin FANR BOE 담당 업무` and `M115 담당자 누구야?`.
+
+### Changed
+
+- Updated corpus search so required documents keep at least one eligible evidence chunk in the returned topK set.
+- Registered the FMC role corpus in `data/index/source_role_map.json`.
+- Updated README, architecture, layout, and QA docs to include the new role evidence corpus.
+
+### Verified
+
+- Focused check: `npx vitest run tests/fmc-role-corpus.test.ts tests/evals.test.ts`.
+- Result: 2 test files passed, 22 tests passed.
+
 ## Unreleased - 2026-05-13 Protected OAuth upload/write tools
 
 ### Added

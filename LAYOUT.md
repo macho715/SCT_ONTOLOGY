@@ -35,7 +35,7 @@ flowchart TD
     CorpusFiles["server/src/generated/corpus-data.ts"]
   end
 
-  Tests["tests<br/>113개 테스트<br/>Cloudflare dry-run 포함"]
+  Tests["tests<br/>120개 테스트<br/>Cloudflare dry-run 포함"]
   Scripts["scripts<br/>corpus 점검과 index 생성 도구"]
   Index["data/index<br/>생성/검토/repro artifact"]
   Ontology["ontology<br/>원본 또는 참조용 온톨로지 묶음"]
@@ -141,9 +141,10 @@ flowchart TD
 
 ## tests
 
-`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 113개 테스트가 통과한다.
+`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 120개 테스트가 통과한다.
 
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
+- `tests/fmc-role-corpus.test.ts`: FMC 역할 분석 corpus가 사람·담당자·milestone owner 질문에서 검색되는지 검증한다.
 - `tests/descriptor.test.ts`: ChatGPT 앱 descriptor와 `chatgpt-app-submission.json` 일치를 검증한다.
 - `tests/write-upload-tools.test.ts`: OAuth Bearer 보호 upload/write tool의 fail-closed 동작과 승인된 dry-run/commit 경로를 검증한다.
 - `tests/evals.test.ts`: 평가 시나리오를 검증한다.
@@ -173,6 +174,7 @@ flowchart TD
 - `CONSOLIDATED-08-communication.md`: communication 문서다.
 - `CONSOLIDATED-09-operations.md`: operations 문서다.
 - `Team_역할분담_매트릭스.md`: 팀 역할 분담 문서다.
+- `HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md`: FMC 사람·역할·담당 구간·에스컬레이션 근거 문서다.
 
 ## data/index
 

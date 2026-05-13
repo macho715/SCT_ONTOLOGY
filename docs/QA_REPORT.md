@@ -12,6 +12,7 @@ Current verification date: 2026-05-13
   - `ui://hvdc/answer-card-v5.html`
   - `ui://hvdc/render_hvdc_answer_card.html`
 - Daily KPI Dashboard lock prompts route to operations KPI, not Invoice/CostGuard default summary.
+- FMC role questions such as `Arvin FANR BOE 담당 업무` and `M115 담당자 누구야?` route to the FMC role evidence corpus while retaining `CONSOLIDATED-00`.
 - The card widget wraps long action names, protected-field lists, route reasons, and validation text to reduce overflow.
 - Protected upload/write tools are available as MCP tools, but they fail closed without OAuth Bearer scopes and Human-gate approval.
 
@@ -29,7 +30,7 @@ Latest local verification:
 npm run verify
 ```
 
-Result: TypeScript typecheck passed, Vitest 8 files / 113 tests passed, and `wrangler deploy --dry-run` passed.
+Result: TypeScript typecheck passed, Vitest 9 files / 120 tests passed, and `wrangler deploy --dry-run` passed.
 
 Current Cloudflare production verification: `/healthz`, OAuth protected resource metadata, MCP `initialize`, MCP `tools/list`, `ask_hvdc_ontology`, unauthenticated protected-tool fail-closed behavior, and D1 audit logging were checked against `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
 
@@ -43,6 +44,8 @@ Current Cloudflare production verification: `/healthz`, OAuth protected resource
 | 4.00 | BOE 123 지연 원인? | Document/Port chronology evidence |
 | 5.00 | 월간 보고서 만들어줘 | Operations/report artifact guidance |
 | 6.00 | Daily KPI Dashboard 원장에서 Owner / Risk / Next Action 잠금 처리 | WARN with operations KPI summary and Human-gate |
+| 7.00 | Arvin FANR BOE 담당 업무 | FMC role evidence + master spine, WARN for currentness |
+| 8.00 | M115 담당자 누구야? | FMC role evidence + master spine |
 
 ## Exit criteria
 

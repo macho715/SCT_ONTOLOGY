@@ -24,6 +24,7 @@ DOMAIN_BY_DOC: list[tuple[re.Pattern[str], list[str]]] = [
     (re.compile(r"07|port|ofco", re.I), ["port"]),
     (re.compile(r"08|communication", re.I), ["communication"]),
     (re.compile(r"09|operations|analytics", re.I), ["operations"]),
+    (re.compile(r"fmc|role|actorrole|역할", re.I), ["communication", "operations", "team"]),
 ]
 
 

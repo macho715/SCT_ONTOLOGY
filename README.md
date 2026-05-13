@@ -11,7 +11,7 @@
 | MCP 서버 (ChatGPT) | `server/src/worker.ts`가 Cloudflare Workers `/mcp` 엔드포인트입니다. 운영 URL은 `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`입니다. |
 | MCP 서버 (Claude/Cursor) | Claude Code, Claude Desktop, claude.ai, Cursor 모두 같은 Cloudflare Workers 원격 MCP URL을 사용합니다. `start-hvdc-mcp.cmd`는 로컬 서버가 아니라 이 원격 MCP로 연결하는 stdio bridge입니다. |
 | ChatGPT App UI | `public/hvdc-answer-widget.html`이 Answer Card와 Evidence Drawer를 렌더링합니다. 카드 UI 실패는 업무 결과 실패로 올리지 않으며, 긴 action/meta 텍스트는 카드 안에서 줄바꿈합니다. |
-| Corpus | `ontology/` 원본을 바탕으로 `data/corpus/`에 승인 문서를 두고, `scripts/generate_worker_assets.py`가 Worker 번들용 `server/src/generated/corpus-data.ts`를 만듭니다. |
+| Corpus | `ontology/` 원본과 승인된 FMC 역할 분석 문서를 바탕으로 `data/corpus/`에 승인 문서를 두고, `scripts/generate_worker_assets.py`가 Worker 번들용 `server/src/generated/corpus-data.ts`를 만듭니다. |
 | Index | `data/index/`에 `corpus_index.json`, `corpus_inventory.csv`, `source_role_map.json`을 생성합니다. |
 | 검증 | golden prompt, descriptor contract, widget, pipeline 테스트가 있습니다. |
 | CI | `.github/workflows/hvdc-verify.yml`이 index 재생성, drift check, JSON 검증, typecheck/test를 실행합니다. |
@@ -24,12 +24,13 @@
 
 1. `data/corpus/CONSOLIDATED-00-master-ontology.md`
 2. 관련 extension corpus 문서: `data/corpus/CONSOLIDATED-01`부터 `CONSOLIDATED-09`
-3. Cloudflare Worker 구현: `server/src/worker.ts`
-4. UI 위젯: `public/hvdc-answer-widget.html`
-5. 공통 MCP 서버 구현: `server/src/hvdc-server.ts`
-6. 제출 메타데이터: `chatgpt-app-submission.json`
-7. 색인과 역할 매핑: `data/index/`
-8. 테스트와 golden fixture: `tests/`
+3. 역할·담당자·milestone owner 근거: `data/corpus/HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md`
+4. Cloudflare Worker 구현: `server/src/worker.ts`
+5. UI 위젯: `public/hvdc-answer-widget.html`
+6. 공통 MCP 서버 구현: `server/src/hvdc-server.ts`
+7. 제출 메타데이터: `chatgpt-app-submission.json`
+8. 색인과 역할 매핑: `data/index/`
+9. 테스트와 golden fixture: `tests/`
 
 근거가 없는 route, 비용 규칙, 승인 규칙, compliance 판단은 README나 앱 답변에 추가하지 않습니다.
 
@@ -114,7 +115,9 @@ flowchart LR
 
 ## 데이터와 색인
 
-`data/corpus/`에는 `CONSOLIDATED-00`부터 `CONSOLIDATED-09`까지의 문서와 `Team_역할분담_매트릭스.md`가 들어 있습니다.
+`data/corpus/`에는 `CONSOLIDATED-00`부터 `CONSOLIDATED-09`까지의 문서, `Team_역할분담_매트릭스.md`, `HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md`가 들어 있습니다.
+
+FMC 역할 분석 문서는 Arvin, Haitham, Karthik, Roldan, kEn, Jhysn, Ronnel, 차민규, 정상욱 같은 사람·역할·담당 구간 질문의 evidence source다. 이 문서는 개인을 canonical class로 승격하지 않고, `CONSOLIDATED-00-master-ontology.md`와 함께 role evidence로만 사용한다. 이름은 role routing에 사용할 수 있고, snippet 출력은 기존 redactor가 전화번호와 token-like 문자열을 계속 가린다.
 
 색인은 아래 명령으로 다시 만듭니다.
 
