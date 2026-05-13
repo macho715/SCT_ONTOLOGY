@@ -1,0 +1,62 @@
+{
+  "dataStatus": "OK",
+  "evidenceState": "WARN",
+  "objectType": "OperationalContext",
+  "identifiers": [
+    {
+      "identifierScheme": "INVOICE_NO",
+      "identifierValue": "INV-2024-003",
+      "normalizedValue": "INV-2024-003",
+      "sourceSystem": "local-prototype",
+      "isPrimary": true,
+      "evidenceState": "PASS"
+    },
+    {
+      "identifierScheme": "HVDC_CODE",
+      "identifierValue": "HVDC-ADOPT-SCT-0003",
+      "normalizedValue": "HVDC-ADOPT-SCT-0003",
+      "sourceSystem": "local-prototype",
+      "isPrimary": false,
+      "evidenceState": "PASS"
+    }
+  ],
+  "operationalContext": {
+    "objectType": "CostEvidenceContext",
+    "routingPattern": "WH_ONLY",
+    "journeyStage": "CUSTOMS_CLEARANCE"
+  },
+  "routingPattern": "WH_ONLY",
+  "journeyStage": "CUSTOMS_CLEARANCE",
+  "costGuardResult": {
+    "objectType": "CostGuardResult",
+    "invoiceNo": "INV-2024-003",
+    "reviewStance": "REVIEW_REQUIRED",
+    "severity": "HIGH",
+    "riskTypes": ["MISSING_VAT", "MISSING_DUTY"],
+    "missingInputs": ["dutyAmount", "vatAmount"],
+    "sourceEvidenceIds": ["invoice:INV-2024-003:1", "invoice:INV-2024-003:2"]
+  },
+  "invoiceEvidence": {
+    "objectType": "InvoiceEvidence",
+    "invoiceNo": "INV-2024-003",
+    "totalAmount": 12500.0,
+    "currency": "USD",
+    "supplierName": "Example Supplier"
+  },
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "invoice:INV-2024-003:1",
+      "sourceType": "rule_alert",
+      "sourceField": "MISSING_VAT",
+      "sourceSystem": "local-rules"
+    },
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "invoice:INV-2024-003:2",
+      "sourceType": "rule_alert",
+      "sourceField": "MISSING_DUTY",
+      "sourceSystem": "local-rules"
+    }
+  ]
+}

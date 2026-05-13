@@ -1,0 +1,137 @@
+{
+  "dataStatus": "AMBIGUOUS",
+  "objectType": "AnyKeyResolverResult",
+  "query": {
+    "rawValue": "CONT-AMB-01",
+    "schemeHint": "CONTAINER_NO",
+    "normalizedValue": "CONT-AMB-01"
+  },
+  "detectedScheme": "CONTAINER_NO",
+  "normalizedKey": "CONT-AMB-01",
+  "status": "AMBIGUOUS",
+  "confidence": 0.55,
+  "canonicalContext": {
+    "dataStatus": "AMBIGUOUS",
+    "evidenceState": "AMBIGUOUS",
+    "objectType": "OperationalContext",
+    "identifiers": [
+      {
+        "identifierScheme": "CONTAINER_NO",
+        "identifierValue": "CONT-AMB-01",
+        "normalizedValue": "CONT-AMB-01",
+        "sourceSystem": "local-prototype",
+        "isPrimary": true,
+        "evidenceState": "PASS"
+      }
+    ],
+    "operationalContext": {
+      "objectType": "JoinEvidenceContext",
+      "reason": "Multiple candidates matched the same key.",
+      "candidateCount": 2
+    },
+    "candidates": [
+      {
+        "sourceSystem": "DSV",
+        "sourceField": "CONTAINER NO",
+        "recordId": "ctx:CONT-AMB-01-A"
+      },
+      {
+        "sourceSystem": "PKGS",
+        "sourceField": "CONTAINER NO",
+        "recordId": "ctx:CONT-AMB-01-B"
+      }
+    ],
+    "conflicts": [],
+    "evidenceRefs": [
+      {
+        "objectType": "EvidenceRef",
+        "evidenceId": "join:CONT-AMB-01:1",
+        "sourceType": "join_candidate",
+        "sourceField": "CONTAINER NO",
+        "sourceSystem": "DSV"
+      },
+      {
+        "objectType": "EvidenceRef",
+        "evidenceId": "join:CONT-AMB-01:2",
+        "sourceType": "join_candidate",
+        "sourceField": "CONTAINER NO",
+        "sourceSystem": "PKGS"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "recordId": "ctx:CONT-AMB-01-A",
+      "confidence": 0.61,
+      "canonicalIdentifiers": [
+        {
+          "identifierScheme": "HVDC_CODE",
+          "identifierValue": "HVDC-ADOPT-SCT-0101",
+          "normalizedValue": "HVDC-ADOPT-SCT-0101",
+          "sourceSystem": "DSV",
+          "isPrimary": true,
+          "evidenceState": "PASS"
+        }
+      ],
+      "sourceFields": [
+        {
+          "sourceSystem": "DSV",
+          "sourceField": "CONTAINER NO",
+          "sourceValue": "CONT-AMB-01",
+          "recordRef": "DSV#row=31"
+        }
+      ]
+    },
+    {
+      "recordId": "ctx:CONT-AMB-01-B",
+      "confidence": 0.58,
+      "canonicalIdentifiers": [
+        {
+          "identifierScheme": "HVDC_CODE",
+          "identifierValue": "HVDC-ADOPT-SCT-0102",
+          "normalizedValue": "HVDC-ADOPT-SCT-0102",
+          "sourceSystem": "PKGS",
+          "isPrimary": true,
+          "evidenceState": "PASS"
+        }
+      ],
+      "sourceFields": [
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "CONTAINER NO",
+          "sourceValue": "CONT-AMB-01",
+          "recordRef": "PKGS#row=77"
+        }
+      ]
+    }
+  ],
+  "sourceFields": [],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "resolver:dsv:31",
+      "sourceType": "fixture_row",
+      "sourceField": "CONTAINER NO",
+      "sourceSystem": "DSV"
+    },
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "resolver:pkgs:77",
+      "sourceType": "fixture_row",
+      "sourceField": "CONTAINER NO",
+      "sourceSystem": "PKGS"
+    }
+  ],
+  "evidenceState": {
+    "status": "AMBIGUOUS",
+    "candidateCount": 2,
+    "missingEvidence": [],
+    "conflicts": []
+  },
+  "privacy": {
+    "rawEvidenceExposed": false,
+    "piiMasked": false,
+    "maskingApplied": []
+  },
+  "nextAction": "Review alternate candidates before using this key."
+}

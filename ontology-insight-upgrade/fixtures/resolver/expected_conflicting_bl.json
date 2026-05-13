@@ -1,0 +1,127 @@
+{
+  "dataStatus": "CONFLICT",
+  "objectType": "AnyKeyResolverResult",
+  "query": {
+    "rawValue": "BL-0049",
+    "schemeHint": "BL_NO",
+    "normalizedValue": "BL-0049"
+  },
+  "detectedScheme": "BL_NO",
+  "normalizedKey": "BL-0049",
+  "status": "CONFLICTING_EVIDENCE",
+  "confidence": 0.36,
+  "canonicalContext": {
+    "dataStatus": "CONFLICT",
+    "evidenceState": "CONFLICT",
+    "objectType": "OperationalContext",
+    "identifiers": [
+      {
+        "identifierScheme": "BL_NO",
+        "identifierValue": "BL-0049",
+        "normalizedValue": "BL-0049",
+        "sourceSystem": "local-prototype",
+        "isPrimary": true,
+        "evidenceState": "PASS"
+      }
+    ],
+    "operationalContext": {
+      "objectType": "JoinEvidenceContext",
+      "reason": "Sources disagree on material fields.",
+      "candidateCount": 2
+    },
+    "candidates": [
+      {
+        "sourceSystem": "DSV",
+        "sourceField": "BL NO",
+        "sourceValue": "BL-0049",
+        "recordId": "ctx:HVDC-ADOPT-SCT-0001",
+        "hvdcCode": "HVDC-ADOPT-SCT-0001"
+      },
+      {
+        "sourceSystem": "PKGS",
+        "sourceField": "BL NO",
+        "sourceValue": "BL-0049",
+        "recordId": "ctx:HVDC-ADOPT-SCT-0002",
+        "hvdcCode": "HVDC-ADOPT-SCT-0002"
+      }
+    ],
+    "conflicts": [
+      {
+        "field": "hvdcCode",
+        "values": [
+          "HVDC-ADOPT-SCT-0001",
+          "HVDC-ADOPT-SCT-0002"
+        ]
+      }
+    ],
+    "evidenceRefs": [
+      {
+        "objectType": "EvidenceRef",
+        "evidenceId": "join:BL-0049:1",
+        "sourceType": "join_candidate",
+        "sourceField": "BL NO",
+        "sourceSystem": "DSV"
+      },
+      {
+        "objectType": "EvidenceRef",
+        "evidenceId": "join:BL-0049:2",
+        "sourceType": "join_candidate",
+        "sourceField": "BL NO",
+        "sourceSystem": "PKGS"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "sourceSystem": "DSV",
+      "sourceField": "BL NO",
+      "sourceValue": "BL-0049",
+      "recordId": "ctx:HVDC-ADOPT-SCT-0001",
+      "hvdcCode": "HVDC-ADOPT-SCT-0001"
+    },
+    {
+      "sourceSystem": "PKGS",
+      "sourceField": "BL NO",
+      "sourceValue": "BL-0049",
+      "recordId": "ctx:HVDC-ADOPT-SCT-0002",
+      "hvdcCode": "HVDC-ADOPT-SCT-0002"
+    }
+  ],
+  "sourceFields": [],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "join:BL-0049:1",
+      "sourceType": "join_candidate",
+      "sourceField": "BL NO",
+      "sourceSystem": "DSV"
+    },
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "join:BL-0049:2",
+      "sourceType": "join_candidate",
+      "sourceField": "BL NO",
+      "sourceSystem": "PKGS"
+    }
+  ],
+  "evidenceState": {
+    "status": "CONFLICT",
+    "candidateCount": 2,
+    "missingEvidence": [],
+    "conflicts": [
+      {
+        "field": "hvdcCode",
+        "values": [
+          "HVDC-ADOPT-SCT-0001",
+          "HVDC-ADOPT-SCT-0002"
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "rawEvidenceExposed": false,
+    "piiMasked": false,
+    "maskingApplied": []
+  },
+  "nextAction": "Resolve conflicting evidence before relying on this key."
+}

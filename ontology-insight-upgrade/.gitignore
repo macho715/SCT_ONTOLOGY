@@ -1,0 +1,18 @@
+# Generated Python cache
+__pycache__/
+*.pyc
+
+# Generated runtime and audit artifacts
+artifacts/*.csv
+artifacts/*.ndjson
+artifacts/*.hash.json
+artifacts/health_report.json
+artifacts/integration_test_results.json
+
+# Local runtime output
+logs/
+uploads/
+
+# Local Fuseki runtime state
+fuseki/**/run/
+fuseki/**/data/

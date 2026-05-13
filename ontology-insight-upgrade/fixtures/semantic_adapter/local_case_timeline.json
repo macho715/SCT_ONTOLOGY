@@ -1,0 +1,28 @@
+{
+  "sourceQuery": "queries/02-case-timeline-events.rq",
+  "sourceSystem": "local-fuseki",
+  "caseNumber": "HVDC-ADOPT-SCT-0001",
+  "events": [
+    {
+      "eventDate": "2024-10-02T08:00:00Z",
+      "eventType": "PORT_IN",
+      "sourceLocation": "Busan Port",
+      "targetLocation": "Busan Terminal",
+      "transportMode": "PORT"
+    },
+    {
+      "eventDate": "2024-10-05T12:00:00Z",
+      "eventType": "CUSTOMS_HOLD",
+      "sourceLocation": "Busan Terminal",
+      "targetLocation": "Dubai Customs",
+      "transportMode": "OCEAN"
+    },
+    {
+      "eventDate": "2024-10-12T16:00:00Z",
+      "eventType": "FINAL_OUT",
+      "sourceLocation": "Dubai Customs",
+      "targetLocation": "Abu Dhabi Project Site",
+      "transportMode": "TRUCK"
+    }
+  ]
+}

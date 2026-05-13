@@ -1,0 +1,7 @@
+{
+  "toolName": "validate_mcp_output",
+  "dataStatus": "OK",
+  "objectType": "MCPOutputValidationResult",
+  "findingCount": 0,
+  "validationStatus": "PASS"
+}

@@ -1,0 +1,25 @@
+{
+  "sourceQuery": "queries/03-invoice-risk-analysis.rq",
+  "sourceSystem": "local-rules",
+  "invoice": {
+    "invoiceNumber": "INV-2024-003",
+    "hvdcCode": "HVDC-ADOPT-SCT-0003",
+    "totalAmount": 12500.0,
+    "currency": "USD",
+    "supplierName": "Example Supplier",
+    "routingPattern": "WH_ONLY",
+    "journeyStage": "CUSTOMS_CLEARANCE"
+  },
+  "alerts": [
+    {
+      "riskType": "MISSING_VAT",
+      "severity": "HIGH",
+      "missingInputs": ["vatAmount"]
+    },
+    {
+      "riskType": "MISSING_DUTY",
+      "severity": "HIGH",
+      "missingInputs": ["dutyAmount"]
+    }
+  ]
+}

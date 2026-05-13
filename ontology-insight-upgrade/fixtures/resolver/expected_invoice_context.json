@@ -1,0 +1,82 @@
+{
+  "dataStatus": "OK",
+  "objectType": "AnyKeyResolverResult",
+  "query": {
+    "rawValue": "INV-2026-0002",
+    "schemeHint": "INVOICE_NO",
+    "normalizedValue": "INV-2026-0002"
+  },
+  "detectedScheme": "INVOICE_NO",
+  "normalizedKey": "INV-2026-0002",
+  "status": "MATCHED",
+  "confidence": 0.92,
+  "canonicalContext": {
+    "dataStatus": "OK",
+    "evidenceState": "PASS",
+    "objectType": "OperationalContext",
+    "identifiers": [
+      {
+        "identifierScheme": "INVOICE_NO",
+        "identifierValue": "INV-2026-0002",
+        "normalizedValue": "INV-2026-0002",
+        "sourceSystem": "OFCO",
+        "isPrimary": true,
+        "evidenceState": "PASS"
+      }
+    ],
+    "operationalContext": {
+      "objectType": "CostEvidenceContext",
+      "routingPattern": "DIRECT",
+      "journeyStage": "CUSTOMS_CLEARANCE"
+    },
+    "routingPattern": "DIRECT",
+    "journeyStage": "CUSTOMS_CLEARANCE",
+    "costGuardResult": {
+      "objectType": "CostGuardResult",
+      "invoiceNo": "INV-2026-0002",
+      "reviewStance": "REVIEW_REQUIRED",
+      "severity": "WARN",
+      "riskTypes": [
+        "VAT"
+      ],
+      "missingInputs": [
+        "BOE No."
+      ]
+    }
+  },
+  "sourceFields": [
+    {
+      "sourceSystem": "OFCO",
+      "sourceField": "INVOICE NO",
+      "sourceValue": "INV-2026-0002",
+      "recordRef": "OFCO#row=8"
+    },
+    {
+      "sourceSystem": "OFCO",
+      "sourceField": "PO NO",
+      "sourceValue": "PO-2026-7788",
+      "recordRef": "OFCO#row=8"
+    }
+  ],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "resolver:ofco:8",
+      "sourceType": "fixture_row",
+      "sourceField": "INVOICE NO",
+      "sourceSystem": "OFCO"
+    }
+  ],
+  "evidenceState": {
+    "status": "PASS",
+    "candidateCount": 1,
+    "missingEvidence": [],
+    "conflicts": []
+  },
+  "privacy": {
+    "rawEvidenceExposed": false,
+    "piiMasked": false,
+    "maskingApplied": []
+  },
+  "nextAction": "Use resolved context for read-only risk review."
+}

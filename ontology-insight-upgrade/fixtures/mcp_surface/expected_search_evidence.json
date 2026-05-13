@@ -1,0 +1,8 @@
+{
+  "toolName": "search_evidence_refs",
+  "dataStatus": "OK",
+  "objectType": "EvidenceSearchResult",
+  "minimumMatchCount": 1,
+  "requiredEvidenceIds": ["pack:vat:INV-2026-0002"],
+  "validationStatus": "PASS"
+}

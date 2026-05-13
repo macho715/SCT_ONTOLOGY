@@ -1,0 +1,7 @@
+{
+  "toolName": "resolve_operational_key",
+  "arguments": {
+    "value": "INV-2026-0002",
+    "scheme": "INVOICE_NO"
+  }
+}

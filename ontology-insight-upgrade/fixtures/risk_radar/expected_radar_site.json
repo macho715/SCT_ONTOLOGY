@@ -1,0 +1,14 @@
+{
+  "objectType": "OperationalRiskRadarResult",
+  "dataStatus": "OK",
+  "riskSummary": {
+    "totalCards": 5,
+    "highestSeverity": "HIGH",
+    "openCardCount": 4,
+    "missingInputCount": 3,
+    "reviewStance": "REVIEW_REQUIRED"
+  },
+  "topRiskTypes": ["CUSTOMS", "DEM_DET", "DOCUMENT"],
+  "requiredMissingInputs": ["GRN", "M130 confirmation", "latestBOEStatus"],
+  "requiredEvidenceIds": ["resolver:pkgs:42", "risk:site-customs:AGI", "risk:site-demdet:AGI"]
+}

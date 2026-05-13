@@ -1,0 +1,17 @@
+{
+  "sourceQuery": "queries/01-monthly-warehouse-stock.rq",
+  "sourceSystem": "local-fuseki",
+  "confirmedFlowCode": 2,
+  "flowConfirmationStatus": "confirmed",
+  "snapshots": [
+    {
+      "warehouse": "DXB-WH",
+      "yearMonth": "2024-11",
+      "totalInbound": 10,
+      "totalOutbound": 4,
+      "netMovement": 6,
+      "avgClosingStock": 18,
+      "warehouseType": "LOGISTICS_HUB"
+    }
+  ]
+}

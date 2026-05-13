@@ -1,0 +1,252 @@
+{
+  "version": "phase3-fixture-v1",
+  "records": [
+    {
+      "recordId": "ctx:HVDC-ADOPT-SCT-0001",
+      "confidence": 0.97,
+      "identifiers": [
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0001"},
+        {"scheme": "PACKAGE_NO", "value": "PKG-AGI-0001"},
+        {"scheme": "INVOICE_NO", "value": "INV-2026-0001"},
+        {"scheme": "CONTAINER_NO", "value": "CONT-0001"},
+        {"scheme": "SITE_CODE", "value": "AGI"}
+      ],
+      "canonicalContext": {
+        "dataStatus": "OK",
+        "evidenceState": "PASS",
+        "objectType": "OperationalContext",
+        "identifiers": [
+          {
+            "identifierScheme": "HVDC_CODE",
+            "identifierValue": "HVDC-ADOPT-SCT-0001",
+            "normalizedValue": "HVDC-ADOPT-SCT-0001",
+            "sourceSystem": "PKGS",
+            "isPrimary": true,
+            "evidenceState": "PASS"
+          },
+          {
+            "identifierScheme": "PACKAGE_NO",
+            "identifierValue": "PKG-AGI-0001",
+            "normalizedValue": "PKG-AGI-0001",
+            "sourceSystem": "PKGS",
+            "isPrimary": false,
+            "evidenceState": "PASS"
+          }
+        ],
+        "shipmentUnit": {
+          "objectType": "ShipmentUnit",
+          "shipmentUnitId": "su:HVDC-ADOPT-SCT-0001",
+          "routingPattern": "WH_MOSB",
+          "journeyStage": "WAREHOUSE_STORAGE",
+          "currentMilestoneCode": "M110"
+        },
+        "routingPattern": "WH_MOSB",
+        "journeyStage": "WAREHOUSE_STORAGE"
+      },
+      "sourceFields": [
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "HVDC CODE",
+          "sourceValue": "HVDC-ADOPT-SCT-0001",
+          "recordRef": "C:\\Users\\jichu\\Downloads\\HVDC source\\pkgs.xlsx#row=42"
+        },
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "CONTACT EMAIL",
+          "sourceValue": "planner@example.com",
+          "recordRef": "pkgs:row:42"
+        },
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "ACCOUNT ID",
+          "sourceValue": "c8dfb4938159505c737d009b7f217f9e",
+          "recordRef": "token=mcp_secret_123456789"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "objectType": "EvidenceRef",
+          "evidenceId": "resolver:pkgs:42",
+          "sourceType": "fixture_row",
+          "sourceField": "HVDC CODE",
+          "sourceSystem": "PKGS"
+        }
+      ]
+    },
+    {
+      "recordId": "ctx:INV-2026-0002",
+      "confidence": 0.92,
+      "identifiers": [
+        {"scheme": "INVOICE_NO", "value": "INV-2026-0002"},
+        {"scheme": "PO_NO", "value": "PO-2026-7788"},
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0002"}
+      ],
+      "canonicalContext": {
+        "dataStatus": "OK",
+        "evidenceState": "PASS",
+        "objectType": "OperationalContext",
+        "identifiers": [
+          {
+            "identifierScheme": "INVOICE_NO",
+            "identifierValue": "INV-2026-0002",
+            "normalizedValue": "INV-2026-0002",
+            "sourceSystem": "OFCO",
+            "isPrimary": true,
+            "evidenceState": "PASS"
+          }
+        ],
+        "operationalContext": {
+          "objectType": "CostEvidenceContext",
+          "routingPattern": "DIRECT",
+          "journeyStage": "CUSTOMS_CLEARANCE"
+        },
+        "routingPattern": "DIRECT",
+        "journeyStage": "CUSTOMS_CLEARANCE",
+        "costGuardResult": {
+          "objectType": "CostGuardResult",
+          "invoiceNo": "INV-2026-0002",
+          "reviewStance": "REVIEW_REQUIRED",
+          "severity": "WARN",
+          "riskTypes": ["VAT"],
+          "missingInputs": ["BOE No."]
+        }
+      },
+      "sourceFields": [
+        {
+          "sourceSystem": "OFCO",
+          "sourceField": "INVOICE NO",
+          "sourceValue": "INV-2026-0002",
+          "recordRef": "OFCO#row=8"
+        },
+        {
+          "sourceSystem": "OFCO",
+          "sourceField": "PO NO",
+          "sourceValue": "PO-2026-7788",
+          "recordRef": "OFCO#row=8"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "objectType": "EvidenceRef",
+          "evidenceId": "resolver:ofco:8",
+          "sourceType": "fixture_row",
+          "sourceField": "INVOICE NO",
+          "sourceSystem": "OFCO"
+        }
+      ]
+    },
+    {
+      "recordId": "ctx:CONT-AMB-01-A",
+      "confidence": 0.61,
+      "identifiers": [
+        {"scheme": "CONTAINER_NO", "value": "CONT-AMB-01"},
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0101"}
+      ],
+      "canonicalContext": {
+        "dataStatus": "OK",
+        "evidenceState": "PASS",
+        "objectType": "OperationalContext",
+        "identifiers": [
+          {
+            "identifierScheme": "HVDC_CODE",
+            "identifierValue": "HVDC-ADOPT-SCT-0101",
+            "normalizedValue": "HVDC-ADOPT-SCT-0101",
+            "sourceSystem": "DSV",
+            "isPrimary": true,
+            "evidenceState": "PASS"
+          }
+        ],
+        "routingPattern": "DIRECT",
+        "journeyStage": "OCEAN"
+      },
+      "sourceFields": [
+        {
+          "sourceSystem": "DSV",
+          "sourceField": "CONTAINER NO",
+          "sourceValue": "CONT-AMB-01",
+          "recordRef": "DSV#row=31"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "objectType": "EvidenceRef",
+          "evidenceId": "resolver:dsv:31",
+          "sourceType": "fixture_row",
+          "sourceField": "CONTAINER NO",
+          "sourceSystem": "DSV"
+        }
+      ]
+    },
+    {
+      "recordId": "ctx:CONT-AMB-01-B",
+      "confidence": 0.58,
+      "identifiers": [
+        {"scheme": "CONTAINER_NO", "value": "CONT-AMB-01"},
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0102"}
+      ],
+      "canonicalContext": {
+        "dataStatus": "OK",
+        "evidenceState": "PASS",
+        "objectType": "OperationalContext",
+        "identifiers": [
+          {
+            "identifierScheme": "HVDC_CODE",
+            "identifierValue": "HVDC-ADOPT-SCT-0102",
+            "normalizedValue": "HVDC-ADOPT-SCT-0102",
+            "sourceSystem": "PKGS",
+            "isPrimary": true,
+            "evidenceState": "PASS"
+          }
+        ],
+        "routingPattern": "WH_ONLY",
+        "journeyStage": "WAREHOUSE_RECEIVING"
+      },
+      "sourceFields": [
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "CONTAINER NO",
+          "sourceValue": "CONT-AMB-01",
+          "recordRef": "PKGS#row=77"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "objectType": "EvidenceRef",
+          "evidenceId": "resolver:pkgs:77",
+          "sourceType": "fixture_row",
+          "sourceField": "CONTAINER NO",
+          "sourceSystem": "PKGS"
+        }
+      ]
+    }
+  ],
+  "conflicts": [
+    {
+      "scheme": "BL_NO",
+      "value": "BL-0049",
+      "confidence": 0.36,
+      "candidates": [
+        {
+          "sourceSystem": "DSV",
+          "sourceField": "BL NO",
+          "sourceValue": "BL-0049",
+          "recordId": "ctx:HVDC-ADOPT-SCT-0001",
+          "hvdcCode": "HVDC-ADOPT-SCT-0001"
+        },
+        {
+          "sourceSystem": "PKGS",
+          "sourceField": "BL NO",
+          "sourceValue": "BL-0049",
+          "recordId": "ctx:HVDC-ADOPT-SCT-0002",
+          "hvdcCode": "HVDC-ADOPT-SCT-0002"
+        }
+      ],
+      "conflicts": [
+        {
+          "field": "hvdcCode",
+          "values": ["HVDC-ADOPT-SCT-0001", "HVDC-ADOPT-SCT-0002"]
+        }
+      ]
+    }
+  ]
+}

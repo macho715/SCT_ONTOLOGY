@@ -1,0 +1,50 @@
+{
+  "dataStatus": "OK",
+  "evidenceState": "PASS",
+  "objectType": "OperationalContext",
+  "identifiers": [
+    {
+      "identifierScheme": "WAREHOUSE",
+      "identifierValue": "DXB-WH",
+      "normalizedValue": "DXB-WH",
+      "sourceSystem": "local-prototype",
+      "isPrimary": true,
+      "evidenceState": "PASS"
+    }
+  ],
+  "operationalContext": {
+    "objectType": "WarehouseEvidenceSet",
+    "routingPattern": null,
+    "journeyStage": "WAREHOUSE_STORAGE"
+  },
+  "routingPattern": null,
+  "journeyStage": "WAREHOUSE_STORAGE",
+  "warehouseEvidence": [
+    {
+      "objectType": "WarehouseEvidence",
+      "warehouseId": "DXB-WH",
+      "period": "2024-11",
+      "totalInbound": 10.0,
+      "totalOutbound": 4.0,
+      "netMovement": 6.0,
+      "closingStock": 18.0,
+      "warehouseRoleEvidence": "LOGISTICS_HUB",
+      "sourceEvidenceId": "stock:DXB-WH:2024-11:1"
+    }
+  ],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "stock:DXB-WH:2024-11:1",
+      "sourceType": "sparql_row",
+      "sourceField": "StockSnapshot",
+      "sourceSystem": "local-fuseki"
+    }
+  ],
+  "warehouseHandlingProfile": {
+    "objectType": "WarehouseHandlingProfile",
+    "flowConfirmationStatus": "confirmed",
+    "confirmedFlowCode": 2,
+    "sourceEvidenceId": "stock:DXB-WH:2024-11:1"
+  }
+}

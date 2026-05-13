@@ -1,0 +1,39 @@
+{
+  "toolName": "validate_mcp_output",
+  "arguments": {
+    "output": {
+      "toolName": "resolve_operational_key",
+      "dataStatus": "OK",
+      "structuredContent": {
+        "objectType": "AnyKeyResolverResult",
+        "dataStatus": "OK"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "resolve_operational_key returned AnyKeyResolverResult with OK; evidence refs: 0."
+        }
+      ],
+      "evidenceRefs": [],
+      "validation": {
+        "status": "PASS",
+        "findings": []
+      },
+      "annotations": {
+        "readOnly": true,
+        "mutationAllowed": false
+      },
+      "privacy": {
+        "rawEvidenceExposed": false,
+        "piiMasked": false,
+        "maskingApplied": []
+      },
+      "actionBoundary": {
+        "mode": "READ_ONLY_EVIDENCE_LOOKUP",
+        "readOnly": true,
+        "mutationAllowed": false,
+        "requiresHumanGateForAction": true
+      }
+    }
+  }
+}

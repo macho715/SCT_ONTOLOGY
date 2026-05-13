@@ -1,0 +1,8 @@
+{
+  "toolName": "resolve_operational_key",
+  "dataStatus": "MALFORMED_INPUT",
+  "objectType": "MCPToolError",
+  "status": "MALFORMED_INPUT",
+  "missingInputs": ["value"],
+  "validationStatus": "PASS"
+}

@@ -1,0 +1,102 @@
+{
+  "dataStatus": "OK",
+  "evidenceState": "PASS",
+  "objectType": "OperationalContext",
+  "identifiers": [
+    {
+      "identifierScheme": "HVDC_CODE",
+      "identifierValue": "HVDC-ADOPT-SCT-0001",
+      "normalizedValue": "HVDC-ADOPT-SCT-0001",
+      "sourceSystem": "local-prototype",
+      "isPrimary": true,
+      "evidenceState": "PASS"
+    }
+  ],
+  "shipmentUnit": {
+    "objectType": "ShipmentUnit",
+    "shipmentUnitId": "su:HVDC-ADOPT-SCT-0001",
+    "routingPattern": "DIRECT",
+    "journeyStage": "SITE_RECEIVING",
+    "currentMilestoneCode": "M130"
+  },
+  "routingPattern": "DIRECT",
+  "journeyStage": "SITE_RECEIVING",
+  "milestoneEvents": [
+    {
+      "objectType": "MilestoneEvent",
+      "milestoneCode": "M50",
+      "milestoneName": "Terminal Received",
+      "eventTime": "2024-10-02T08:00:00Z",
+      "journeyStage": "PORT_ENTRY",
+      "statusAfterEvent": "PORT_IN",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:1"
+    },
+    {
+      "objectType": "MilestoneEvent",
+      "milestoneCode": "M90",
+      "milestoneName": "BOE Submitted",
+      "eventTime": "2024-10-05T12:00:00Z",
+      "journeyStage": "CUSTOMS_CLEARANCE",
+      "statusAfterEvent": "CUSTOMS_HOLD",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:2"
+    },
+    {
+      "objectType": "MilestoneEvent",
+      "milestoneCode": "M130",
+      "milestoneName": "Site Arrived",
+      "eventTime": "2024-10-12T16:00:00Z",
+      "journeyStage": "SITE_RECEIVING",
+      "statusAfterEvent": "FINAL_OUT",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:3"
+    }
+  ],
+  "journeyLegs": [
+    {
+      "objectType": "JourneyLeg",
+      "legId": "leg:HVDC-ADOPT-SCT-0001:1",
+      "fromNode": "Busan Port",
+      "toNode": "Busan Terminal",
+      "mode": "PORT",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:1"
+    },
+    {
+      "objectType": "JourneyLeg",
+      "legId": "leg:HVDC-ADOPT-SCT-0001:2",
+      "fromNode": "Busan Terminal",
+      "toNode": "Dubai Customs",
+      "mode": "OCEAN",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:2"
+    },
+    {
+      "objectType": "JourneyLeg",
+      "legId": "leg:HVDC-ADOPT-SCT-0001:3",
+      "fromNode": "Dubai Customs",
+      "toNode": "Abu Dhabi Project Site",
+      "mode": "TRUCK",
+      "sourceEvidenceId": "timeline:HVDC-ADOPT-SCT-0001:3"
+    }
+  ],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "timeline:HVDC-ADOPT-SCT-0001:1",
+      "sourceType": "sparql_row",
+      "sourceField": "TransportEvent",
+      "sourceSystem": "local-fuseki"
+    },
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "timeline:HVDC-ADOPT-SCT-0001:2",
+      "sourceType": "sparql_row",
+      "sourceField": "TransportEvent",
+      "sourceSystem": "local-fuseki"
+    },
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "timeline:HVDC-ADOPT-SCT-0001:3",
+      "sourceType": "sparql_row",
+      "sourceField": "TransportEvent",
+      "sourceSystem": "local-fuseki"
+    }
+  ]
+}

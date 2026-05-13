@@ -1,0 +1,91 @@
+{
+  "dataStatus": "OK",
+  "objectType": "AnyKeyResolverResult",
+  "query": {
+    "rawValue": "HVDC-ADOPT-SCT-0001",
+    "schemeHint": "HVDC_CODE",
+    "normalizedValue": "HVDC-ADOPT-SCT-0001"
+  },
+  "detectedScheme": "HVDC_CODE",
+  "normalizedKey": "HVDC-ADOPT-SCT-0001",
+  "status": "MATCHED",
+  "confidence": 0.97,
+  "canonicalContext": {
+    "dataStatus": "OK",
+    "evidenceState": "PASS",
+    "objectType": "OperationalContext",
+    "identifiers": [
+      {
+        "identifierScheme": "HVDC_CODE",
+        "identifierValue": "HVDC-ADOPT-SCT-0001",
+        "normalizedValue": "HVDC-ADOPT-SCT-0001",
+        "sourceSystem": "PKGS",
+        "isPrimary": true,
+        "evidenceState": "PASS"
+      },
+      {
+        "identifierScheme": "PACKAGE_NO",
+        "identifierValue": "PKG-AGI-0001",
+        "normalizedValue": "PKG-AGI-0001",
+        "sourceSystem": "PKGS",
+        "isPrimary": false,
+        "evidenceState": "PASS"
+      }
+    ],
+    "shipmentUnit": {
+      "objectType": "ShipmentUnit",
+      "shipmentUnitId": "su:HVDC-ADOPT-SCT-0001",
+      "routingPattern": "WH_MOSB",
+      "journeyStage": "WAREHOUSE_STORAGE",
+      "currentMilestoneCode": "M110"
+    },
+    "routingPattern": "WH_MOSB",
+    "journeyStage": "WAREHOUSE_STORAGE"
+  },
+  "sourceFields": [
+    {
+      "sourceSystem": "PKGS",
+      "sourceField": "HVDC CODE",
+      "sourceValue": "HVDC-ADOPT-SCT-0001",
+      "recordRef": "[MASKED_LOCAL_PATH]"
+    },
+    {
+      "sourceSystem": "PKGS",
+      "sourceField": "CONTACT EMAIL",
+      "sourceValue": "[MASKED_EMAIL]",
+      "recordRef": "pkgs:row:42"
+    },
+    {
+      "sourceSystem": "PKGS",
+      "sourceField": "ACCOUNT ID",
+      "sourceValue": "[MASKED_ACCOUNT_ID]",
+      "recordRef": "[MASKED_SECRET]"
+    }
+  ],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "resolver:pkgs:42",
+      "sourceType": "fixture_row",
+      "sourceField": "HVDC CODE",
+      "sourceSystem": "PKGS"
+    }
+  ],
+  "evidenceState": {
+    "status": "PASS",
+    "candidateCount": 1,
+    "missingEvidence": [],
+    "conflicts": []
+  },
+  "privacy": {
+    "rawEvidenceExposed": false,
+    "piiMasked": true,
+    "maskingApplied": [
+      "ACCOUNT_ID",
+      "EMAIL",
+      "LOCAL_PATH",
+      "SECRET"
+    ]
+  },
+  "nextAction": "Use resolved context for read-only risk review."
+}

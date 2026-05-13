@@ -1,0 +1,8 @@
+{
+  "toolName": "get_operational_risk_radar",
+  "dataStatus": "OK",
+  "objectType": "OperationalRiskRadarResult",
+  "topRiskTypes": ["HS_OOG", "INVOICE_TAX", "COST_GUARD"],
+  "requiredEvidenceIds": ["resolver:ofco:8", "risk:costguard:INV-2026-0002"],
+  "validationStatus": "PASS"
+}

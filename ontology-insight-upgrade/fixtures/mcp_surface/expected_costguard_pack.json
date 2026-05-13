@@ -1,0 +1,9 @@
+{
+  "toolName": "get_costguard_evidence_pack",
+  "dataStatus": "OK",
+  "objectType": "CostGuardEvidencePack",
+  "reviewStance": "REVIEW_REQUIRED",
+  "invoiceNo": "INV-2026-0002",
+  "requiredEvidenceIds": ["pack:vat:INV-2026-0002", "risk:costguard:INV-2026-0002"],
+  "validationStatus": "PASS"
+}

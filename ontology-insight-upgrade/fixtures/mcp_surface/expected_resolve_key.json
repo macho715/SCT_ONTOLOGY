@@ -1,0 +1,9 @@
+{
+  "toolName": "resolve_operational_key",
+  "dataStatus": "OK",
+  "objectType": "AnyKeyResolverResult",
+  "status": "MATCHED",
+  "detectedScheme": "INVOICE_NO",
+  "requiredEvidenceIds": ["resolver:ofco:8"],
+  "validationStatus": "PASS"
+}

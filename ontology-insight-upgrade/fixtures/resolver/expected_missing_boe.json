@@ -1,0 +1,56 @@
+{
+  "dataStatus": "NO_EVIDENCE",
+  "objectType": "AnyKeyResolverResult",
+  "query": {
+    "rawValue": "BOE-2026-MISSING",
+    "schemeHint": "BOE_NO",
+    "normalizedValue": "BOE-2026-MISSING"
+  },
+  "detectedScheme": "BOE_NO",
+  "normalizedKey": "BOE-2026-MISSING",
+  "status": "NOT_FOUND",
+  "confidence": 0.0,
+  "canonicalContext": {
+    "dataStatus": "NO_EVIDENCE",
+    "evidenceState": "NO_EVIDENCE",
+    "objectType": "OperationalContext",
+    "identifiers": [],
+    "operationalContext": {
+      "objectType": "NoEvidenceContext",
+      "reason": "No resolver index record matched this key."
+    },
+    "evidenceRefs": [
+      {
+        "objectType": "EvidenceRef",
+        "evidenceId": "no-evidence:BOE-2026-MISSING",
+        "sourceType": "query",
+        "sourceField": "BOE-2026-MISSING",
+        "sourceSystem": "local-prototype"
+      }
+    ]
+  },
+  "sourceFields": [],
+  "evidenceRefs": [
+    {
+      "objectType": "EvidenceRef",
+      "evidenceId": "no-evidence:BOE-2026-MISSING",
+      "sourceType": "query",
+      "sourceField": "BOE-2026-MISSING",
+      "sourceSystem": "local-prototype"
+    }
+  ],
+  "evidenceState": {
+    "status": "NO_EVIDENCE",
+    "candidateCount": 0,
+    "missingEvidence": [
+      "BOE_NO"
+    ],
+    "conflicts": []
+  },
+  "privacy": {
+    "rawEvidenceExposed": false,
+    "piiMasked": false,
+    "maskingApplied": []
+  },
+  "nextAction": "Ask for another identifier or add evidence to the source index."
+}

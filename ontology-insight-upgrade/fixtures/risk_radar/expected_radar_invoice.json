@@ -1,0 +1,14 @@
+{
+  "objectType": "OperationalRiskRadarResult",
+  "dataStatus": "OK",
+  "riskSummary": {
+    "totalCards": 8,
+    "highestSeverity": "HIGH",
+    "openCardCount": 7,
+    "missingInputCount": 4,
+    "reviewStance": "REVIEW_REQUIRED"
+  },
+  "topRiskTypes": ["HS_OOG", "INVOICE_TAX", "COST_GUARD"],
+  "requiredMissingInputs": ["boeClearanceTimestamp", "dutyAmount", "signedCIPL", "standardRateBackup"],
+  "requiredEvidenceIds": ["resolver:ofco:8", "risk:invoice-tax:INV-2026-0002", "risk:costguard:INV-2026-0002"]
+}

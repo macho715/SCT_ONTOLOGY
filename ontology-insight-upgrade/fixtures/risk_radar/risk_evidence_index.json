@@ -1,0 +1,401 @@
+{
+  "version": "phase4-fixture-v1",
+  "profiles": [
+    {
+      "profileId": "risk:invoice:INV-2026-0002",
+      "matchKeys": [
+        {"scheme": "INVOICE_NO", "value": "INV-2026-0002"},
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0002"},
+        {"scheme": "PO_NO", "value": "PO-2026-7788"}
+      ],
+      "riskCards": [
+        {
+          "riskType": "INVOICE_TAX",
+          "status": "REVIEW",
+          "severity": "HIGH",
+          "confidence": 0.88,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:invoice-tax:INV-2026-0002",
+              "sourceType": "fixture_row",
+              "sourceField": "VAT/DUTY",
+              "sourceSystem": "OFCO"
+            }
+          ],
+          "missingInputs": ["dutyAmount"],
+          "ownerCue": "Finance reviewer",
+          "nextAction": "Compare VAT and duty evidence against BOE and CIPL.",
+          "reviewStance": "REVIEW_REQUIRED",
+          "details": {
+            "vatStatus": "PRESENT",
+            "dutyStatus": "MISSING"
+          }
+        },
+        {
+          "riskType": "HS_OOG",
+          "status": "REVIEW",
+          "severity": "HIGH",
+          "confidence": 0.82,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:hs-oog:HVDC-ADOPT-SCT-0002",
+              "sourceType": "sparql_row",
+              "sourceField": "HS/OOG",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "Customs and transport owner",
+          "nextAction": "Check HS and OOG handling evidence before shipment review.",
+          "reviewStance": "REVIEW_REQUIRED",
+          "details": {
+            "hsRisk": "CONTROLLED",
+            "oogRisk": "HIGH"
+          }
+        },
+        {
+          "riskType": "COST_GUARD",
+          "status": "REVIEW",
+          "severity": "WARN",
+          "confidence": 0.86,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:costguard:INV-2026-0002",
+              "sourceType": "rule_alert",
+              "sourceField": "CostGuard",
+              "sourceSystem": "hvdc_rules"
+            }
+          ],
+          "missingInputs": ["standardRateBackup"],
+          "ownerCue": "Cost control owner",
+          "nextAction": "Review rate variance with standard-rate backup.",
+          "reviewStance": "REVIEW_REQUIRED",
+          "details": {
+            "deltaPct": 6.25,
+            "currency": "USD"
+          }
+        },
+        {
+          "riskType": "CUSTOMS",
+          "status": "WATCH",
+          "severity": "WARN",
+          "confidence": 0.78,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:customs:INV-2026-0002",
+              "sourceType": "query_result",
+              "sourceField": "BOE",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": ["boeClearanceTimestamp"],
+          "ownerCue": "Customs broker",
+          "nextAction": "Request BOE clearance timestamp evidence.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "DOCUMENT",
+          "status": "WATCH",
+          "severity": "WARN",
+          "confidence": 0.74,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:document:INV-2026-0002",
+              "sourceType": "document_check",
+              "sourceField": "CIPL",
+              "sourceSystem": "document-evidence"
+            }
+          ],
+          "missingInputs": ["signedCIPL"],
+          "ownerCue": "Document controller",
+          "nextAction": "Collect signed CIPL evidence for the invoice file.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "DEM_DET",
+          "status": "MONITOR",
+          "severity": "INFO",
+          "confidence": 0.66,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:demdet:INV-2026-0002",
+              "sourceType": "kpi_row",
+              "sourceField": "DEM/DET",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "Logistics coordinator",
+          "nextAction": "Monitor DEM and DET exposure until gate-out evidence is current.",
+          "reviewStance": "MONITOR"
+        },
+        {
+          "riskType": "MILESTONE",
+          "status": "MONITOR",
+          "severity": "INFO",
+          "confidence": 0.7,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:milestone:INV-2026-0002",
+              "sourceType": "timeline_row",
+              "sourceField": "MilestoneEvent",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "SCM planner",
+          "nextAction": "Check next milestone update before weekly review.",
+          "reviewStance": "MONITOR"
+        },
+        {
+          "riskType": "WAREHOUSE",
+          "status": "CLEAR",
+          "severity": "PASS",
+          "confidence": 0.9,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:warehouse:HVDC-ADOPT-SCT-0002",
+              "sourceType": "stock_snapshot",
+              "sourceField": "WarehouseEvidence",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "Warehouse coordinator",
+          "nextAction": "Keep warehouse stock evidence current.",
+          "reviewStance": "MONITOR"
+        }
+      ],
+      "costGuardEvidence": {
+        "reviewStance": "REVIEW_REQUIRED",
+        "invoiceIdentity": {
+          "invoiceNo": "INV-2026-0002",
+          "poNo": "PO-2026-7788",
+          "hvdcCode": "HVDC-ADOPT-SCT-0002",
+          "supplierName": "Demo Supplier",
+          "currency": "USD"
+        },
+        "invoiceLines": [
+          {
+            "lineId": "INV-2026-0002-L1",
+            "description": "Converter transformer handling",
+            "quantity": 1,
+            "unitPrice": 1062.5,
+            "standardRate": 1000.0,
+            "deltaPct": 6.25,
+            "severity": "WARN"
+          }
+        ],
+        "linkedEvidence": [
+          {
+            "evidenceType": "BOE",
+            "status": "MISSING_FIELD",
+            "missingInputs": ["dutyAmount"],
+            "evidenceRefs": [
+              {
+                "objectType": "EvidenceRef",
+                "evidenceId": "pack:boe:INV-2026-0002",
+                "sourceType": "customs_record",
+                "sourceField": "BOE",
+                "sourceSystem": "customs-evidence"
+              }
+            ]
+          },
+          {
+            "evidenceType": "CIPL",
+            "status": "PRESENT",
+            "missingInputs": [],
+            "evidenceRefs": [
+              {
+                "objectType": "EvidenceRef",
+                "evidenceId": "pack:cipl:INV-2026-0002",
+                "sourceType": "document_record",
+                "sourceField": "CIPL",
+                "sourceSystem": "document-evidence"
+              }
+            ]
+          },
+          {
+            "evidenceType": "TARIFF",
+            "status": "PRESENT",
+            "missingInputs": [],
+            "evidenceRefs": [
+              {
+                "objectType": "EvidenceRef",
+                "evidenceId": "pack:tariff:INV-2026-0002",
+                "sourceType": "tariff_record",
+                "sourceField": "HS_CODE",
+                "sourceSystem": "tariff-evidence"
+              }
+            ]
+          },
+          {
+            "evidenceType": "VAT",
+            "status": "PRESENT",
+            "missingInputs": [],
+            "evidenceRefs": [
+              {
+                "objectType": "EvidenceRef",
+                "evidenceId": "pack:vat:INV-2026-0002",
+                "sourceType": "invoice_record",
+                "sourceField": "VAT",
+                "sourceSystem": "OFCO"
+              }
+            ]
+          },
+          {
+            "evidenceType": "DUTY",
+            "status": "MISSING_FIELD",
+            "missingInputs": ["dutyAmount"],
+            "evidenceRefs": [
+              {
+                "objectType": "EvidenceRef",
+                "evidenceId": "pack:duty:INV-2026-0002",
+                "sourceType": "invoice_record",
+                "sourceField": "DUTY",
+                "sourceSystem": "OFCO"
+              }
+            ]
+          }
+        ],
+        "warehouseEvidence": [
+          {
+            "warehouseId": "AGI-WH",
+            "journeyStage": "WAREHOUSE_STORAGE",
+            "sourceEvidenceId": "risk:warehouse:HVDC-ADOPT-SCT-0002"
+          }
+        ],
+        "costGuardResult": {
+          "objectType": "CostGuardResult",
+          "invoiceNo": "INV-2026-0002",
+          "reviewStance": "REVIEW_REQUIRED",
+          "severity": "WARN",
+          "riskTypes": ["RATE_VARIANCE", "DUTY_EVIDENCE_GAP"],
+          "missingInputs": ["dutyAmount", "standardRateBackup"]
+        },
+        "evidenceRefs": [
+          {
+            "objectType": "EvidenceRef",
+            "evidenceId": "risk:costguard:INV-2026-0002",
+            "sourceType": "rule_alert",
+            "sourceField": "CostGuard",
+            "sourceSystem": "hvdc_rules"
+          }
+        ],
+        "missingInputs": ["dutyAmount", "standardRateBackup"]
+      }
+    },
+    {
+      "profileId": "risk:site:AGI",
+      "matchKeys": [
+        {"scheme": "SITE_CODE", "value": "AGI"},
+        {"scheme": "HVDC_CODE", "value": "HVDC-ADOPT-SCT-0001"}
+      ],
+      "riskCards": [
+        {
+          "riskType": "CUSTOMS",
+          "status": "REVIEW",
+          "severity": "HIGH",
+          "confidence": 0.81,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:site-customs:AGI",
+              "sourceType": "customs_kpi",
+              "sourceField": "BOE clearance aging",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": ["latestBOEStatus"],
+          "ownerCue": "Customs broker",
+          "nextAction": "Refresh latest BOE status before site delivery review.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "DEM_DET",
+          "status": "WATCH",
+          "severity": "WARN",
+          "confidence": 0.72,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:site-demdet:AGI",
+              "sourceType": "kpi_row",
+              "sourceField": "DEM/DET",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "Logistics coordinator",
+          "nextAction": "Check container free-time exposure before gate-out.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "DOCUMENT",
+          "status": "WATCH",
+          "severity": "WARN",
+          "confidence": 0.69,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:site-document:AGI",
+              "sourceType": "document_check",
+              "sourceField": "POD/GRN",
+              "sourceSystem": "document-evidence"
+            }
+          ],
+          "missingInputs": ["GRN"],
+          "ownerCue": "Site document controller",
+          "nextAction": "Collect GRN evidence after site receipt.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "MILESTONE",
+          "status": "WATCH",
+          "severity": "WARN",
+          "confidence": 0.71,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:site-milestone:AGI",
+              "sourceType": "timeline_row",
+              "sourceField": "M130 Site Arrived",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": ["M130 confirmation"],
+          "ownerCue": "SCM planner",
+          "nextAction": "Confirm M130 site arrival evidence.",
+          "reviewStance": "REVIEW_REQUIRED"
+        },
+        {
+          "riskType": "WAREHOUSE",
+          "status": "CLEAR",
+          "severity": "PASS",
+          "confidence": 0.87,
+          "evidenceRefs": [
+            {
+              "objectType": "EvidenceRef",
+              "evidenceId": "risk:site-warehouse:AGI",
+              "sourceType": "stock_snapshot",
+              "sourceField": "WarehouseEvidence",
+              "sourceSystem": "local-fuseki"
+            }
+          ],
+          "missingInputs": [],
+          "ownerCue": "Warehouse coordinator",
+          "nextAction": "Keep site warehouse evidence current.",
+          "reviewStance": "MONITOR"
+        }
+      ]
+    }
+  ]
+}

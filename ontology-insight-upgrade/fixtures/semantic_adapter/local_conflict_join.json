@@ -1,0 +1,25 @@
+{
+  "sourceSystem": "local-fixture",
+  "lookupScheme": "BL_NO",
+  "lookupKey": "BL-0049",
+  "candidates": [
+    {
+      "sourceSystem": "DSV",
+      "sourceField": "BL NO",
+      "shipmentUnitId": "su:HVDC-ADOPT-SCT-0001",
+      "hvdcCode": "HVDC-ADOPT-SCT-0001"
+    },
+    {
+      "sourceSystem": "PKGS",
+      "sourceField": "BL NO",
+      "shipmentUnitId": "su:HVDC-ADOPT-SCT-0002",
+      "hvdcCode": "HVDC-ADOPT-SCT-0002"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "hvdcCode",
+      "values": ["HVDC-ADOPT-SCT-0001", "HVDC-ADOPT-SCT-0002"]
+    }
+  ]
+}

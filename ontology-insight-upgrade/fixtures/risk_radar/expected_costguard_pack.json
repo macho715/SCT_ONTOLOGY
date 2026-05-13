@@ -1,0 +1,10 @@
+{
+  "objectType": "CostGuardEvidencePack",
+  "dataStatus": "OK",
+  "reviewStance": "REVIEW_REQUIRED",
+  "invoiceNo": "INV-2026-0002",
+  "lineCount": 1,
+  "requiredLinkedEvidence": ["BOE", "CIPL", "DUTY", "TARIFF", "VAT"],
+  "missingInputs": ["dutyAmount", "standardRateBackup"],
+  "severity": "WARN"
+}

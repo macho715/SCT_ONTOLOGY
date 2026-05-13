@@ -1,0 +1,14 @@
+{
+  "objectType": "OperationalRiskRadarResult",
+  "dataStatus": "NO_EVIDENCE",
+  "riskSummary": {
+    "totalCards": 1,
+    "highestSeverity": "NO_EVIDENCE",
+    "openCardCount": 1,
+    "missingInputCount": 1,
+    "reviewStance": "MONITOR"
+  },
+  "topRiskTypes": ["MISSING_EVIDENCE"],
+  "requiredMissingInputs": ["risk evidence profile"],
+  "requiredEvidenceIds": ["no-evidence:BOE-2026-MISSING"]
+}
