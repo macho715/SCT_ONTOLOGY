@@ -21,6 +21,7 @@
 ### 공유 코어
 - 답변 근거는 `scripts/generate_worker_assets.py`가 만든 `server/src/generated/corpus-data.ts`에서 읽는다.
 - `data/corpus`는 승인 corpus 원본이고, Worker 배포 전 generated module로 번들링한다.
+- FMC 역할 분석 corpus는 사람, 담당자, 에스컬레이션, milestone owner 질문의 evidence source다. 이 문서는 `CONSOLIDATED-00-master-ontology`와 함께 조회하며 개인 이름을 canonical ontology class로 승격하지 않는다.
 - `data/index` 파일은 생성/검토용 artifact이며, 검색 런타임의 직접 입력은 generated corpus module이다.
 - Cloudflare 배포는 `wrangler.toml`과 `npm run worker:deploy` 경계 안에 있다.
 
@@ -210,7 +211,8 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 질문 routing과 any-key 후보 추출을 담당한다.
 
 - 모든 route는 기본으로 `CONSOLIDATED-00-master-ontology`를 포함한다.
-- warehouse, document, marine, cost, material, port, communication, operations, compliance domain rule이 있다.
+- warehouse, document, marine, cost, material, port, communication, operations, team, compliance domain rule이 있다.
+- team rule은 `HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined`를 required doc으로 추가한다.
 - 매칭 domain이 없으면 operations context로 fallback한다.
 - BL, BOE, DO, INVOICE, HVDC_CODE, SITE, MILESTONE pattern을 추출한다.
 - Site와 Milestone 후보는 현재 `targetRid`가 `null`이다.
@@ -372,7 +374,7 @@ classDiagram
 
 런타임 답변은 `server/src/generated/corpus-data.ts`에 번들된 Markdown corpus section을 기준으로 한다.
 
-현재 `data/corpus`에는 `CONSOLIDATED-00-master-ontology.md`부터 `CONSOLIDATED-09-operations.md`까지의 corpus 문서와 `Team_역할분담_매트릭스.md`가 있다. `scripts/generate_worker_assets.py`가 이 원본을 Worker용 TypeScript 모듈로 만든다.
+현재 `data/corpus`에는 `CONSOLIDATED-00-master-ontology.md`부터 `CONSOLIDATED-09-operations.md`까지의 corpus 문서, `Team_역할분담_매트릭스.md`, `HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md`가 있다. `scripts/generate_worker_assets.py`가 이 원본을 Worker용 TypeScript 모듈로 만든다.
 
 ### 생성된 index artifact
 

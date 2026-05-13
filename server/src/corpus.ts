@@ -44,10 +44,17 @@ export function searchCorpus(args: {
       return { chunk, score };
     })
     .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score - a.score);
+
+  const requiredSelections = Array.from(requiredDocs)
+    .map((docId) => scored.find(({ chunk }) => chunk.docId.toLowerCase() === docId))
+    .filter((item): item is (typeof scored)[number] => Boolean(item));
+
+  const selected = [...requiredSelections, ...scored]
+    .filter((item, index, all) => all.findIndex((candidate) => candidate.chunk.id === item.chunk.id) === index)
     .slice(0, topK);
 
-  return scored.map(({ chunk, score }) => {
+  return selected.map(({ chunk, score }) => {
     const normalized = chunk.text.replace(/\s+/g, " ").trim();
     const snippetText = normalized.length > 500 ? `${normalized.slice(0, 500)}…` : normalized;
     const masked = maskPii(snippetText);

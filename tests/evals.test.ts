@@ -12,6 +12,7 @@ type GoldenPrompt = {
   requiredRuleIds: string[];
   requiredReasonCodes?: ReasonCode[];
   requiredDocsContain: string[];
+  requiredEvidenceDocsContain?: string[];
   evidenceCondition: EvidenceCondition;
   piiMasked?: boolean;
   rawMustNotAppear?: string[];
@@ -56,6 +57,12 @@ describe("golden prompt validation gates", () => {
     if (prompt.evidenceCondition === "present") {
       expect(answer.evidence.length, `${prompt.id} should carry EvidenceSnippet entries`).toBeGreaterThan(0);
       expect(answer.evidence.some((item) => item.docId.includes("CONSOLIDATED-00")), `${prompt.id} should include master evidence`).toBe(true);
+      for (const docFragment of prompt.requiredEvidenceDocsContain ?? []) {
+        expect(
+          answer.evidence.some((item) => item.docId.includes(docFragment)),
+          `${prompt.id} missing required evidence doc ${docFragment}`
+        ).toBe(true);
+      }
     } else {
       expect(answer.evidence.length, `${prompt.id} should fail closed without EvidenceSnippet entries`).toBe(0);
       expect(answer.evidenceIds.length, `${prompt.id} should not cite unsupported evidence`).toBe(0);

@@ -1,7 +1,19 @@
 import type { DomainHint, IntentRoute, ResolvedEntity } from "./types.js";
 import { sha256 } from "./redact.js";
 
+export const FMC_ROLE_DOC = "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined";
+
 const DOMAIN_RULES: Array<{ domain: DomainHint; docs: string[]; patterns: RegExp[]; reason: string }> = [
+  {
+    domain: "team",
+    docs: [FMC_ROLE_DOC],
+    patterns: [
+      /\b(?:arvin|haitham|karthik|roldan|dan|ken|kEn|jhysn|jhason|jason|ronnel|ronpap20|minkyu|shariff)\b|차민규|정상욱|상욱/i,
+      /\b(?:actorrole|role|owner|responsib|escalation|backup|handover)\b|담당|담당자|책임자|역할|업무|경계|에스컬레이션|인수인계/i,
+      /\bM(?:80|90|91|92|100|110|111|115|116|117|120|121|130|131|132|140|150|160)\b.*(?:owner|담당|책임|역할)|(?:owner|담당|책임|역할).*\bM(?:80|90|91|92|100|110|111|115|116|117|120|121|130|131|132|140|150|160)\b/i
+    ],
+    reason: "FMC role/person/milestone responsibility keyword detected"
+  },
   {
     domain: "warehouse",
     docs: ["CONSOLIDATED-02-warehouse-flow"],

@@ -9,5 +9,6 @@
   "CONSOLIDATED-07-port-operations": { "rank": 2, "role": "port/release evidence" },
   "CONSOLIDATED-08-communication": { "rank": 3, "role": "communication/approval evidence" },
   "CONSOLIDATED-09-operations": { "rank": 3, "role": "reporting/KPI extension" },
-  "Team_역할분담_매트릭스": { "rank": 3, "role": "role routing matrix with PII-masked output requirement" }
+  "Team_역할분담_매트릭스": { "rank": 3, "role": "role routing matrix with PII-masked output requirement" },
+  "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined": { "rank": 3, "role": "FMC role evidence corpus for person, owner, milestone responsibility, escalation, and role-boundary questions" }
 }

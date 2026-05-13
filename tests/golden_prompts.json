@@ -131,5 +131,24 @@
     "requiredReasonCodes": ["AMBIGUOUS_ANY_KEY"],
     "requiredDocsContain": ["CONSOLIDATED-00", "CONSOLIDATED-03", "CONSOLIDATED-05"],
     "evidenceCondition": "present"
+  },
+  {
+    "id": "golden-015",
+    "question": "Arvin FANR BOE 담당 업무",
+    "expectedVerdicts": ["WARN"],
+    "requiredRuleIds": ["A-CURRENT-001"],
+    "requiredReasonCodes": ["STALE_SOURCE_RISK"],
+    "requiredDocsContain": ["CONSOLIDATED-00", "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined"],
+    "requiredEvidenceDocsContain": ["HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined"],
+    "evidenceCondition": "present"
+  },
+  {
+    "id": "golden-016",
+    "question": "M115 담당자 누구야?",
+    "expectedVerdicts": ["PASS"],
+    "requiredRuleIds": [],
+    "requiredDocsContain": ["CONSOLIDATED-00", "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined"],
+    "requiredEvidenceDocsContain": ["HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined"],
+    "evidenceCondition": "present"
   }
 ]
