@@ -2,7 +2,13 @@
 
 ## Overview
 
-The HVDC Ontology Claude App runs on port **8788** (separate from the ChatGPT server on 8787). It uses the standard MCP SDK — no ChatGPT-specific extensions required.
+Claude Code, Claude Desktop, and claude.ai should use the same Cloudflare Workers remote MCP endpoint:
+
+```text
+https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp
+```
+
+`start-hvdc-mcp.cmd` is kept only as a stdio bridge for clients that still start a local command. It proxies to the Cloudflare endpoint and does not run the old legacy fallback process.
 
 ---
 
@@ -14,9 +20,8 @@ Add the following to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "hvdc-ontology": {
-      "command": "npm",
-      "args": ["run", "claude:start"],
-      "cwd": "/path/to/HVDC-Ontology-Grounded"
+      "type": "http",
+      "url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
     }
   }
 }
@@ -30,19 +35,14 @@ Config file location:
 
 ## Claude Code (CLI)
 
-### Start the server manually
-
-```bash
-npm run claude:dev
-```
-
-Then add to your project's `.mcp.json`:
+Add to your project's `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "hvdc-ontology": {
-      "url": "http://localhost:8788/mcp"
+      "type": "http",
+      "url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
     }
   }
 }
@@ -51,19 +51,17 @@ Then add to your project's `.mcp.json`:
 Or via the CLI flag:
 
 ```bash
-claude --mcp-server "hvdc-ontology=http://localhost:8788/mcp"
+claude --mcp-server "hvdc-ontology=https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
 ```
 
 ---
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `CLAUDE_PORT` | `8788` | Claude server port |
-| `PORT` | `8787` | ChatGPT server port (unchanged) |
+No local Claude port is required for the Cloudflare remote MCP path.
 
-Both servers can run simultaneously.
+Optional local debugging only:
+- `npm run claude:local`
 
 ---
 
@@ -103,7 +101,7 @@ Both servers can run simultaneously.
 
 `render_hvdc_answer_card` accepts **both** response formats:
 
-**ChatGPT format** (from the ChatGPT App on port 8787):
+**ChatGPT format** (from ChatGPT app responses):
 ```json
 {
   "structuredContent": { "...GroundedAnswer...", "ui": { "templateUrl": "ui://hvdc/..." } },
@@ -111,7 +109,7 @@ Both servers can run simultaneously.
 }
 ```
 
-**Claude format** (from this server on port 8788):
+**Claude format** (from remote MCP tool responses):
 ```json
 {
   "answerId": "...",

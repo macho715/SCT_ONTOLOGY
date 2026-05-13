@@ -1,28 +1,28 @@
 # HVDC Ontology Grounded 시스템 아키텍처
 
-쉽게 말하면, 이 저장소는 ChatGPT App에서 HVDC 물류 질문을 받고, 로컬 온톨로지 corpus 파일에서 근거를 찾은 뒤, MCP HTTP 엔드포인트 `/mcp`로 구조화된 답변과 public widget을 돌려주는 Node 기반 서버입니다.
+쉽게 말하면, 이 저장소는 ChatGPT App에서 HVDC 물류 질문을 받고, Worker 번들에 포함된 온톨로지 corpus에서 근거를 찾은 뒤, Cloudflare Workers MCP HTTP 엔드포인트 `/mcp`로 구조화된 답변과 public widget을 돌려주는 서버입니다.
 
 ## 현재 구현 범위
 
-### ChatGPT 레이어 (포트 8787)
-- 런타임 서버는 `server/src/index.ts`에 있다.
-- MCP HTTP 경로는 `/mcp`이다. 루트 `/`는 Railway healthcheck용 텍스트 응답을 돌려준다.
-- MCP 구현은 `@modelcontextprotocol/sdk`의 `McpServer`와 `StreamableHTTPServerTransport`를 사용한다.
-- ChatGPT App UI resource는 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
+### ChatGPT 레이어 (Cloudflare Workers)
+- 런타임 서버는 `server/src/worker.ts`에 있다.
+- MCP HTTP 경로는 `/mcp`이다. 루트 `/`와 `/healthz`는 Cloudflare health response를 돌려준다.
+- MCP 구현은 `agents/mcp`의 `createMcpHandler`와 `@modelcontextprotocol/sdk`의 `McpServer`를 사용한다.
+- ChatGPT App UI resource는 `server/src/hvdc-server.ts`에서 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
 - UI resource URI는 `ui://hvdc/answer-card-v7.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
 
-### Claude 레이어 (포트 8788)
-- 런타임 서버는 `server/src/claude-server.ts`에 있다.
-- 표준 `@modelcontextprotocol/sdk`의 `McpServer.tool()`만 사용한다. `@modelcontextprotocol/ext-apps` 의존 없음.
-- `render_hvdc_answer_card`는 마크다운 텍스트를 반환한다. iframe 위젯 없음.
-- 포트는 `CLAUDE_PORT` 환경변수 또는 기본 `8788`이다.
-- 렌더링은 `server/src/claude-render.ts`가 담당한다. ChatGPT format(`_meta` 포함)과 Claude format(직접 GroundedAnswer) 양쪽을 파싱한다.
+### Claude 레이어 (Cloudflare 원격 MCP)
+- Claude Code, Claude Desktop, claude.ai는 모두 Cloudflare Workers 원격 MCP `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`를 사용한다.
+- `.mcp.json`, `C:\Users\jichu\.claude\settings.json`, `C:\Users\jichu\AppData\Roaming\Claude\claude_desktop_config.json`은 같은 HTTP URL을 가리킨다.
+- `start-hvdc-mcp.cmd`는 로컬 Claude 서버가 아니라 `mcp-remote` stdio bridge로 Cloudflare MCP에 연결한다.
+- `server/src/claude-server.ts`와 `server/src/claude-render.ts`는 기존 포맷 호환과 테스트용 로컬 fallback이다. 운영 연결 기준은 아니다.
 
-### 공유 코어 (변경 없음)
-- 답변 근거는 런타임에 `data/corpus/*.md`를 직접 읽어서 만든다.
-- `data/index` 파일은 생성/검토용 artifact이며, 현재 검색 런타임의 직접 입력은 `data/corpus`이다.
-- Railway 배포는 `railway.json`에 정의된 `npm run verify` 빌드 검증과 `npm run start` 실행 경계 안에 있다.
+### 공유 코어
+- 답변 근거는 `scripts/generate_worker_assets.py`가 만든 `server/src/generated/corpus-data.ts`에서 읽는다.
+- `data/corpus`는 승인 corpus 원본이고, Worker 배포 전 generated module로 번들링한다.
+- `data/index` 파일은 생성/검토용 artifact이며, 검색 런타임의 직접 입력은 generated corpus module이다.
+- Cloudflare 배포는 `wrangler.toml`과 `npm run worker:deploy` 경계 안에 있다.
 
 ### sct_ontology 운영 거버넌스 레이어
 - `core/mission-statement.md`와 `core/mcp-default-context-policy.md`는 팀 표준 LLM 운영 목적과 기본 HVDC logistics context 정책을 정의한다.
@@ -36,26 +36,29 @@
 - 현재 코드에는 ERP, WMS, ATLP, Foundry, WhatsApp, email 발송 같은 외부 운영 시스템 write-back이 없다.
 - 현재 코드에는 public web search가 없다.
 - 현재 코드에는 SPARQL KG 실행 엔드포인트가 없다.
-- 현재 `ask_hvdc_ontology`는 답변 생성 시 `out/audit.jsonl`에 입력/출력 hash와 PII masking 상태를 기록한다.
-- 이 감사 로그는 운영 시스템 변경이 아니라 로컬 파일 기록이다.
-- Railway 설정은 서버 실행과 healthcheck 경계를 정의한다.
-- Railway 설정만으로 외부 데이터 저장소나 운영 시스템 연동이 생기지는 않는다.
+- Cloudflare 운영 `ask_hvdc_ontology`는 D1 `mcp_audit_logs`에 입력/출력 hash와 PII masking 상태를 기록한다.
+- Node fallback 실행은 `out/audit.jsonl`에 같은 hash 기반 감사 로그를 남긴다.
+- R2 바인딩은 파일 저장을 위한 준비 경계다. 현재 6개 MCP tool은 운영 write/upload tool을 아직 노출하지 않는다.
+- Cloudflare 설정만으로 ERP, WMS, ATLP, Foundry 같은 외부 운영 시스템 write-back이 생기지는 않는다.
 
 ## 실행 흐름
 
 ```mermaid
 flowchart TD
   ChatGPTUser["ChatGPT 사용자"] --> ChatGPTApp["ChatGPT App / MCP client"]
-  ClaudeUser["Claude 사용자"] --> ClaudeClient["Claude Desktop / Claude Code"]
+  ClaudeUser["Claude 사용자"] --> ClaudeClient["Claude Desktop / Claude Code / claude.ai"]
 
-  ChatGPTApp --> CGT_Endpoint["Node HTTP server<br/>server/src/index.ts<br/>포트 8787 /mcp"]
-  ClaudeClient --> CL_Endpoint["Node HTTP server<br/>server/src/claude-server.ts<br/>포트 8788 /mcp"]
+  ChatGPTApp --> CGT_Endpoint["Cloudflare Worker<br/>server/src/worker.ts<br/>/mcp"]
+  ClaudeClient --> ClaudeRemote["Cloudflare remote MCP<br/>same /mcp endpoint"]
+  ClaudeBridge["start-hvdc-mcp.cmd<br/>mcp-remote stdio bridge"] --> ClaudeRemote
+  ClaudeRemote --> CGT_Endpoint
 
-  CGT_Endpoint --> ExtApps["registerAppTool / registerAppResource<br/>@modelcontextprotocol/ext-apps"]
+  CGT_Endpoint --> McpHandler["createMcpHandler<br/>agents/mcp"]
+  McpHandler --> ExtApps["registerAppTool / registerAppResource<br/>server/src/hvdc-server.ts"]
   ExtApps --> WidgetResource["ui://hvdc/answer-card-v7.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
-  CL_Endpoint --> ClaudeRender["server/src/claude-render.ts<br/>parseGroundedAnswer + renderAnswerMarkdown"]
+  ClaudeRender["server/src/claude-render.ts<br/>legacy/local markdown fallback"]
 
   subgraph SharedCore["공유 코어 (변경 없음)"]
     Answer["server/src/answer.ts"]
@@ -63,16 +66,19 @@ flowchart TD
     Corpus["server/src/corpus.ts"]
     Redact["server/src/redact.ts"]
     Types["server/src/types.ts"]
-    CorpusFiles["data/corpus/*.md"]
+    CorpusFiles["server/src/generated/corpus-data.ts"]
+    AuditD1["D1 mcp_audit_logs"]
+    FilesR2["R2 HVDC_FILES binding"]
   end
 
   CGT_Endpoint --> Answer
-  CL_Endpoint --> Answer
   Answer --> Router
   Answer --> Corpus
   Answer --> Redact
   Answer --> Types
   Corpus --> CorpusFiles
+  Answer --> AuditD1
+  CGT_Endpoint --> FilesR2
   ClaudeRender --> Types
 
   subgraph OperatingGovernance["sct_ontology 운영 거버넌스"]
@@ -100,42 +106,38 @@ flowchart TD
   GHA --> DriftCheck
   GHA --> Verify["npm run verify"]
   Verify --> OperatingTest
-  Railway["railway.json"] --> Build["buildCommand: npm run verify"]
-  Railway --> Start["startCommand: npm run start"]
-  Railway --> Health["healthcheckPath: /"]
+  Wrangler["wrangler.toml"] --> WorkerDeploy["npm run worker:deploy"]
+  WorkerDeploy --> Health["/healthz"]
 ```
 
 ## 서버와 MCP 경계
 
-### ChatGPT 서버 (`server/src/index.ts`)
+### ChatGPT 서버 (`server/src/worker.ts`)
 
-- `createServer`로 Node HTTP 서버를 만든다.
-- `/mcp`에서 `POST`, `GET`, `DELETE` 요청을 받는다.
-- `OPTIONS /mcp`는 CORS preflight 응답을 돌려준다.
-- 요청마다 `createHvdcServer()`로 MCP server instance를 만들고 `StreamableHTTPServerTransport`에 연결한다.
+- Cloudflare Worker `fetch()`가 `/mcp`, `/`, `/healthz`를 처리한다.
+- `/mcp`에서 `POST`, `GET`, `DELETE`, `OPTIONS` 요청을 받는다.
+- 요청마다 `createHvdcServer()`로 MCP server instance를 만들고 `agents/mcp`의 `createMcpHandler`에 연결한다.
 - `enableJsonResponse: true`가 설정되어 있다.
-- 루트 `/`는 `"HVDC Ontology ChatGPT App MCP server"` 텍스트를 반환한다.
-- 기본 포트는 `PORT` 환경변수가 없으면 `8787`이다.
+- 루트 `/`와 `/healthz`는 runtime, storage binding, widget domain 상태를 JSON으로 반환한다.
+- Node fallback은 `server/src/index.ts`이며 `npm run node:dev`로 실행한다.
 
-### Claude 서버 (`server/src/claude-server.ts`)
+### Claude bridge와 fallback
 
-- ChatGPT 서버와 동일한 Node HTTP 구조를 사용한다.
-- 요청마다 `createClaudeServer()`로 MCP server instance를 만든다.
-- `McpServer.tool()`만 사용한다. `registerAppTool`, `registerAppResource` 없음.
-- 루트 `/`는 `"HVDC Ontology Claude App MCP server"` 텍스트를 반환한다.
-- 기본 포트는 `CLAUDE_PORT` 환경변수가 없으면 `8788`이다.
-- `HVDC_CLAUDE_TOOL_NAMES` 배열을 export한다 (테스트 parity 검증용).
+- Claude 운영 연결은 Cloudflare Worker `/mcp`를 직접 HTTP로 사용한다.
+- HTTP MCP를 직접 지원하지 않는 stdio client는 `start-hvdc-mcp.cmd`를 실행한다.
+- `start-hvdc-mcp.cmd`는 `mcp-remote https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`를 실행한다.
+- `server/src/claude-server.ts`는 legacy/local fallback과 `HVDC_CLAUDE_TOOL_NAMES` parity 테스트용으로 유지한다.
 
 ## 등록된 App tool
 
-ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server.ts`) 모두 동일한 6개 tool 이름을 사용한다.
+Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claude bridge가 동일한 6개 tool 이름을 사용한다.
 
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
-| `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + answer card template metadata | `structuredContent` + 마크다운 카드 |
-| `render_hvdc_answer_card` | ChatGPT: `server/src/index.ts`<br/>Claude: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v7.html` iframe 위젯 | 마크다운 카드 (iframe 없음) |
+| `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + answer card template metadata | Cloudflare MCP text/structured result |
+| `render_hvdc_answer_card` | Cloudflare: `server/src/hvdc-server.ts`<br/>Legacy local: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v7.html` iframe 위젯 | Cloudflare MCP text/structured result 또는 legacy markdown fallback |
 | `route_question` | `server/src/router.ts` | JSON route | JSON route |
-| `search_ontology_corpus` | `server/src/corpus.ts` | `data/corpus` EvidenceSnippet | `data/corpus` EvidenceSnippet |
+| `search_ontology_corpus` | `server/src/corpus.ts` | generated corpus EvidenceSnippet | generated corpus EvidenceSnippet |
 | `resolve_any_key` | `server/src/router.ts` | identifier 후보 | identifier 후보 |
 | `validate_answer` | `server/src/answer.ts` | validation findings | validation findings |
 
@@ -153,7 +155,7 @@ ChatGPT 서버(`server/src/index.ts`)와 Claude 서버(`server/src/claude-server
 
 ## UI resource와 public widget
 
-`server/src/index.ts`는 `public/hvdc-answer-widget.html`을 읽어서 `ui://hvdc/answer-card-v7.html` resource로 등록한다.
+`server/src/hvdc-server.ts`는 generated widget module을 읽어서 `ui://hvdc/answer-card-v7.html` resource로 등록한다.
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
@@ -359,9 +361,9 @@ classDiagram
 
 ### 런타임 입력
 
-런타임 답변은 `data/corpus/*.md`에서 직접 읽은 Markdown corpus를 기준으로 한다.
+런타임 답변은 `server/src/generated/corpus-data.ts`에 번들된 Markdown corpus section을 기준으로 한다.
 
-현재 `data/corpus`에는 `CONSOLIDATED-00-master-ontology.md`부터 `CONSOLIDATED-09-operations.md`까지의 corpus 문서와 `Team_역할분담_매트릭스.md`가 있다.
+현재 `data/corpus`에는 `CONSOLIDATED-00-master-ontology.md`부터 `CONSOLIDATED-09-operations.md`까지의 corpus 문서와 `Team_역할분담_매트릭스.md`가 있다. `scripts/generate_worker_assets.py`가 이 원본을 Worker용 TypeScript 모듈로 만든다.
 
 ### 생성된 index artifact
 
@@ -380,20 +382,23 @@ classDiagram
 
 - `npm run typecheck`: TypeScript typecheck를 실행한다.
 - `npm test`: Vitest test를 실행한다.
-- `npm run verify`: typecheck와 test를 순서대로 실행한다.
+- `npm run verify`: generated asset 생성, typecheck, Vitest, Worker dry-run을 순서대로 실행한다.
 - `npm run index`: corpus index artifact를 다시 만든다.
-- `npm run claude:dev`: Claude 서버를 개발 모드로 실행한다.
-- `npm run claude:start`: Claude 서버를 시작한다.
+- `npm run claude:dev`: Cloudflare remote MCP로 연결하는 `mcp-remote` bridge를 실행한다.
+- `npm run claude:start`: Cloudflare remote MCP로 연결하는 `mcp-remote` bridge를 실행한다.
+- `npm run claude:local`: legacy/local Claude fallback 서버를 실행한다.
 
-현재 test 파일은 아래 역할을 가진다. **총 106개 테스트 통과** (2026-05-11 기준).
+현재 test 파일은 아래 역할을 가진다. **총 110개 테스트 통과** (2026-05-13 기준).
 
 | Test file | 테스트 수 | 확인하는 내용 |
 | --- | --- | --- |
-| `tests/pipeline.test.ts` | 11 | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
+| `tests/pipeline.test.ts` | 25 | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
 | `tests/evals.test.ts` | 15 | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
-| `tests/descriptor.test.ts` | 8 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
-| `tests/widget.test.ts` | 9 | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
-| `tests/claude-descriptor.test.ts` | 28 | Claude tool parity, `parseGroundedAnswer` 양방향 포맷 파싱, `renderAnswerMarkdown` 필수 필드를 확인한다. |
+| `tests/descriptor.test.ts` | 11 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
+| `tests/widget.test.ts` | 14 | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
+| `tests/claude-descriptor.test.ts` | 29 | Claude tool parity, `parseGroundedAnswer` 양방향 포맷 파싱, `renderAnswerMarkdown` 필수 필드를 확인한다. |
+| `tests/sct-operating-contract.test.ts` | 6 | SCT 운영 계약을 확인한다. |
+| `tests/sct-governance-runtime.test.ts` | 10 | SCT governance runtime 경계를 확인한다. |
 
 ## GitHub Actions
 
@@ -410,29 +415,29 @@ classDiagram
 7. `python -m json.tool chatgpt-app-submission.json > /dev/null`
 8. `npm run verify`
 
-## Railway 배포 경계
+## Cloudflare 배포 경계
 
-`railway.json` 기준 Railway는 아래만 정의한다.
+`wrangler.toml` 기준 Cloudflare는 아래를 정의한다.
 
-- build builder: `RAILPACK`
-- build command: `npm run verify`
-- start command: `npm run start`
-- healthcheck path: `/`
-- healthcheck timeout: `60`
-- restart policy: `ON_FAILURE`
-- max retries: `3`
+- Worker entrypoint: `server/src/worker.ts`
+- MCP path: `/mcp`
+- compatibility date: `2026-05-13`
+- compatibility flag: `nodejs_compat`
+- R2 binding: `HVDC_FILES`
+- D1 binding: `MCP_AUDIT_DB`
+- health path: `/healthz`
 
-따라서 Railway 배포 경계는 Node MCP server 실행과 root healthcheck 확인까지다.
-이 설정은 외부 운영 시스템 연결이나 데이터 write-back을 추가하지 않는다.
+따라서 Cloudflare 배포 경계는 Worker MCP server 실행, R2/D1 binding 연결, health response 확인까지다.
+이 설정은 외부 운영 시스템 연결이나 업무 데이터 write-back을 추가하지 않는다.
 
 ## 현재 아키텍처 판정
 
-이 저장소의 현재 아키텍처는 **ChatGPT + Claude 듀얼 레이어 corpus-only MCP App MVP**다.
+이 저장소의 현재 아키텍처는 **Cloudflare Workers/R2/D1 remote MCP + Claude/Cursor/ChatGPT 공통 Cloudflare 연결**이다.
 
-- **ChatGPT 레이어**: `server/src/index.ts`가 포트 8787에서 `/mcp`를 열고, `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v7.html` iframe 위젯을 연결한다.
-- **Claude 레이어**: `server/src/claude-server.ts`가 포트 8788에서 `/mcp`를 열고, 표준 `McpServer.tool()`로 동일한 6개 tool을 등록한다. `render_hvdc_answer_card`는 마크다운 카드를 반환한다. `server/src/claude-render.ts`가 ChatGPT/Claude 양방향 포맷을 파싱한다.
-- **공유 코어**: `answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`는 두 서버가 변경 없이 공유한다.
-- **GitHub Actions와 Railway**: 같은 `npm run verify` 검증 경계를 공유한다. Railway 배포 경계는 ChatGPT 서버(`npm run start`)이다.
+- **ChatGPT 레이어**: `server/src/worker.ts`가 Cloudflare Workers에서 `/mcp`를 열고, `server/src/hvdc-server.ts`가 `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v7.html` iframe 위젯을 연결한다.
+- **Claude 레이어**: Claude Code, Claude Desktop, claude.ai는 같은 Cloudflare Worker `/mcp`에 연결한다. stdio만 지원하는 경로는 `start-hvdc-mcp.cmd`가 `mcp-remote`로 Cloudflare에 프록시한다.
+- **공유 코어**: `answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`는 두 서버가 공유한다.
+- **GitHub Actions와 Cloudflare**: `npm run verify`가 generated worker assets, typecheck, tests, Worker dry-run을 같은 검증 경계로 묶는다. Cloudflare 배포 경계는 `npm run worker:deploy`이다.
 
 ## Evidence Trace Mode architecture addendum - 2026-05-11
 

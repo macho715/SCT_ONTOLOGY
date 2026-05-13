@@ -44,7 +44,8 @@ const FORBIDDEN_STANDALONE_TOOL_NAME_PARTS = [
 const submission = JSON.parse(
   readFileSync(path.resolve("chatgpt-app-submission.json"), "utf8")
 ) as Submission;
-const serverSource = readFileSync(path.resolve("server", "src", "index.ts"), "utf8");
+const serverSource = readFileSync(path.resolve("server", "src", "hvdc-server.ts"), "utf8");
+const workerSource = readFileSync(path.resolve("server", "src", "worker.ts"), "utf8");
 const rootAgentGuidance = readFileSync(path.resolve("AGENTS.md"), "utf8");
 const systemArchitecture = readFileSync(path.resolve("SYSTEM_ARCHITECTURE.md"), "utf8");
 const codexAgentGuidance = readFileSync(path.resolve("docs", "codex", "AGENTS.patched.md"), "utf8");
@@ -189,14 +190,14 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       expect((legacyContent as { text: string }).text).toBe((canonicalContent as { text: string }).text);
       expect((renderAliasContent as { text: string }).text).toBe((canonicalContent as { text: string }).text);
       expect((canonicalContent as { _meta?: { ui?: { domain?: string; csp?: unknown }; [key: string]: unknown } })._meta?.ui?.domain).toBe(
-        "https://hvdc-ontology-chatgpt-app-production.up.railway.app"
+        "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev"
       );
       expect((canonicalContent as { _meta?: { ui?: { csp?: { connectDomains?: string[]; resourceDomains?: string[] } } } })._meta?.ui?.csp).toEqual({
         connectDomains: [],
         resourceDomains: []
       });
       expect((canonicalContent as { _meta?: Record<string, unknown> })._meta?.["openai/widgetDomain"]).toBe(
-        "https://hvdc-ontology-chatgpt-app-production.up.railway.app"
+        "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev"
       );
       expect((canonicalContent as { _meta?: Record<string, unknown> })._meta?.["openai/widgetCSP"]).toEqual({
         connect_domains: [],
@@ -272,5 +273,12 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       expect(testCase.tools_triggered).toContain("ask_hvdc_ontology");
       expect(testCase.expected_output).toMatch(/card|카드|EmailActionCard|EMAIL_ACTION_CARD/i);
     }
+  });
+
+  it("uses the Cloudflare Worker MCP entrypoint instead of a legacy deployment config", () => {
+    expect(workerSource).toContain('import { createMcpHandler } from "agents/mcp"');
+    expect(workerSource).toContain('const MCP_PATH = "/mcp"');
+    expect(workerSource).toContain("MCP_AUDIT_DB");
+    expect(workerSource).toContain("HVDC_FILES");
   });
 });

@@ -8,15 +8,13 @@
     "category": "BUSINESS"
   },
   "mcp_server": {
-    "local_url": "http://localhost:8788/mcp",
-    "production_url": "https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp"
+    "production_url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
   },
   "claude_desktop_config": {
     "mcpServers": {
       "hvdc-ontology": {
-        "command": "npm",
-        "args": ["run", "claude:start"],
-        "cwd": "<repo-path>"
+        "type": "http",
+        "url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
       }
     }
   },

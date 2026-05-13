@@ -4,8 +4,8 @@
 This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, evidence-grounded MCP ChatGPT App for HVDC Project Logistics. It is not a general chatbot, not a production write-back tool, and not a live KG implementation.
 
 ## Current State
-- Runtime: Node.js / TypeScript MCP HTTP server at `/mcp`.
-- Default local endpoint: `http://localhost:8787/mcp`.
+- Runtime: Cloudflare Workers MCP HTTP server at `/mcp`.
+- Default production endpoint: `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
 - UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v7.html`.
 - `ask_hvdc_ontology` is data-only. It must not attach `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
 - `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v7.html`.
@@ -14,7 +14,7 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 - Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
-- New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed.
+- New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed. Cloudflare production deployment is a separate manual release step unless an approved deployment workflow exists.
 
 ## Source of Truth
 Use sources in this order:
@@ -51,7 +51,7 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 ## Implemented MCP/App Tools
 Current server and ChatGPT submission must stay aligned on these 6 tool names:
 - `ask_hvdc_ontology` -> `server/src/answer.ts`
-- `render_hvdc_answer_card` -> `server/src/index.ts`
+- `render_hvdc_answer_card` -> `server/src/hvdc-server.ts`
 - `route_question` -> `server/src/router.ts`
 - `search_ontology_corpus` -> `server/src/corpus.ts`
 - `resolve_any_key` -> `server/src/router.ts`
@@ -62,11 +62,12 @@ Do not document `query_knowledge_graph`, `create_action_request`, or `export_ans
 ## Confirmed Layout
 ```text
 AGENTS.md, README.md, CHANGELOG.md, LAYOUT.md, SYSTEM_ARCHITECTURE.md
-chatgpt-app-submission.json, railway.json
-server/src/index.ts, answer.ts, corpus.ts, router.ts, redact.ts, types.ts
+chatgpt-app-submission.json, wrangler.toml
+server/src/worker.ts, hvdc-server.ts, index.ts, answer.ts, corpus.ts, router.ts, redact.ts, types.ts
+server/src/generated/
 public/hvdc-answer-widget.html
 data/corpus/, data/index/, ontology/
-scripts/index_corpus.py, scripts/check_index_drift.py
+scripts/index_corpus.py, scripts/check_index_drift.py, scripts/generate_worker_assets.py
 tests/pipeline.test.ts, descriptor.test.ts, evals.test.ts, widget.test.ts, golden_prompts.json
 .agents/skills/
 .github/workflows/hvdc-verify.yml
@@ -77,15 +78,16 @@ Do not create new top-level folders unless the task explicitly requires it.
 Use confirmed commands only:
 - Install: `npm install`
 - CI install: `npm ci`
-- Dev server: `npm run dev`
+- Dev server: `npm run dev` (Cloudflare Wrangler)
+- Node fallback server: `npm run node:dev`
 - Rebuild corpus index: `npm run index`
 - Typecheck: `npm run typecheck`
 - Test: `npm test`
 - Verify: `npm run verify`
 - Drift check: `python scripts/check_index_drift.py`
 - Submission JSON check: `python -m json.tool chatgpt-app-submission.json > /dev/null`
-- Railway build boundary: `npm run verify`
-- Railway start boundary: `npm run start`
+- Cloudflare dry-run boundary: `npm run worker:dry-run`
+- Cloudflare deploy boundary: `npm run worker:deploy`
 
 No lint or format command is confirmed in the provided repository evidence. Do not add one unless `package.json`, config, or CI confirms it.
 
@@ -97,7 +99,7 @@ Human approval is required before:
 - transaction mutation or cost approval
 - destructive file operations
 - dependency installation or lockfile modification
-- deployment, Railway config, production config, auth, secret, token, `.env*`, or CI/CD changes
+- deployment, Cloudflare Workers/R2/D1 config, production config, auth, secret, token, `.env*`, or CI/CD changes
 - corpus semantic changes that alter business meaning
 
 Invoice or CostGuard answers above `100,000.00 AED`, or with `HIGH` / `CRITICAL` risk, must require Finance approval gate.
@@ -106,7 +108,7 @@ Invoice or CostGuard answers above `100,000.00 AED`, or with `HIGH` / `CRITICAL`
 - Mask phone numbers, email addresses, and token-like strings in UI, logs, reports, tests, and exports.
 - Never expose secrets, tokens, private URLs, credentials, or internal commercial terms.
 - Tool failures must fail closed with `TOOL_UNAVAILABLE`, `NO_EVIDENCE`, `STALE_SOURCE`, `WARN`, or `BLOCK`.
-- `out/audit.jsonl` is a local hash-based audit log, not an operational system mutation.
+- Cloudflare runtime writes hash-based audit rows to D1 `mcp_audit_logs`. Node fallback writes `out/audit.jsonl`.
 
 ## Development Workflow
 1. Read affected source, corpus, tests, and descriptors first.

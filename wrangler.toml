@@ -1,0 +1,18 @@
+name = "hvdc-ontology-chatgpt-app"
+main = "server/src/worker.ts"
+compatibility_date = "2026-05-13"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ALLOWED_ORIGIN = "https://chatgpt.com"
+WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev"
+
+[[r2_buckets]]
+binding = "HVDC_FILES"
+bucket_name = "hvdc-ontology-files"
+
+[[d1_databases]]
+binding = "MCP_AUDIT_DB"
+database_name = "hvdc-mcp-audit"
+database_id = "5a934620-4a9a-41c0-908b-f292fab2f0bd"
+migrations_dir = "migrations"

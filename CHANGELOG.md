@@ -2,6 +2,37 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-13 Cloudflare Workers MCP migration and deployment
+
+### Added
+
+- Added `server/src/worker.ts` as the Cloudflare Workers MCP entrypoint using `agents/mcp` `createMcpHandler`.
+- Added `server/src/hvdc-server.ts` as the shared ChatGPT MCP tool/resource factory.
+- Added generated Worker asset modules under `server/src/generated/` for corpus, sample shipment data, and widget HTML.
+- Added `scripts/generate_worker_assets.py` to rebuild Worker bundle data from approved local sources.
+- Added `wrangler.toml` with Cloudflare Workers, R2, and D1 bindings.
+- Added D1 audit table migration at `migrations/0001_mcp_audit_logs.sql`.
+
+### Changed
+
+- Switched the primary ChatGPT MCP runtime from the former Node deployment target to Cloudflare Workers.
+- Changed `npm run dev` and `npm run start` to run Wrangler Worker dev.
+- Kept `server/src/index.ts` as a Node fallback behind `npm run node:dev`.
+- Changed audit handling so Cloudflare runtime writes hash-only rows to D1 `mcp_audit_logs`; Node fallback still writes `out/audit.jsonl`.
+- Removed former deployment files that are no longer used by the Cloudflare path.
+
+### Verified
+
+- Full check: `npm run verify`.
+- Result: TypeScript typecheck passed, Vitest 7 files / 110 tests passed, and `wrangler deploy --dry-run` passed.
+- Cloudflare deploy completed for `hvdc-ontology-chatgpt-app.mscho715.workers.dev`.
+- Remote smoke passed for `/healthz`, MCP `initialize`, `tools/list`, `ask_hvdc_ontology`, and D1 audit logging.
+
+### Risks
+
+- OAuth, approval workflow, and upload/write MCP tools are still future scope.
+- R2 is bound for file storage, but the current six public tools do not expose upload or write operations.
+
 ## Unreleased - 2026-05-11 sct_ontology MCP operating update
 
 ### Added
@@ -125,15 +156,15 @@ flowchart TD
 ### Added
 
 - `server/src/claude-render.ts`: ChatGPT format(`_meta` + `structuredContent.ui`)과 Claude format(직접 GroundedAnswer) 양쪽을 파싱하고 마크다운 카드로 렌더링하는 모듈을 추가했다.
-- `server/src/claude-server.ts`: 표준 `@modelcontextprotocol/sdk`만 사용하는 Claude 전용 MCP 서버를 추가했다. `@modelcontextprotocol/ext-apps` 없음. 포트 `CLAUDE_PORT || 8788`. 6개 tool 동일 등록.
+- `server/src/claude-server.ts`: 당시 Claude 전용 MCP 서버로 추가했다. 현재 운영 기준은 Cloudflare remote MCP이며 이 파일은 legacy/local fallback과 parity 테스트용으로 남아 있다.
 - `claude-app-submission.json`: Claude Desktop 연결 설정(`claude_desktop_config` 스니펫), tool 목록, Claude 전용 테스트 케이스를 담는 제출 파일을 추가했다.
 - `tests/claude-descriptor.test.ts`: `claude-app-submission.json` ↔ `HVDC_CLAUDE_TOOL_NAMES` parity, `parseGroundedAnswer` 양방향 파싱, `renderAnswerMarkdown` 필수 필드 검증 28개 테스트를 추가했다.
-- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code 연결 안내, 포트 설정, 테스트 프롬프트 5개를 추가했다.
+- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code 연결 안내와 테스트 프롬프트 5개를 추가했다. 현재 문서는 Cloudflare remote MCP URL을 기본값으로 설명한다.
 
 ### Changed
 
-- `package.json`에 `claude:dev`와 `claude:start` 스크립트를 추가했다.
-- `AGENTS.md`에 Claude App Layer 섹션(포트, 파싱 계약 표, 연결 방법)을 추가했다.
+- `package.json`에 Claude 연결 스크립트를 추가했다. 현재 `claude:dev`, `claude:start`, `claude:stdio`는 Cloudflare `mcp-remote` bridge를 실행한다.
+- `AGENTS.md`에 Claude App Layer 섹션을 추가했다. 현재 운영 연결 방법은 Cloudflare remote MCP 기준이다.
 - `README.md`에 Claude 서버 현황, Claude 연결 섹션, 실행 명령, 현재 한계를 보충했다.
 - `LAYOUT.md`, `SYSTEM_ARCHITECTURE.md`에 Claude layer 파일과 아키텍처 다이어그램을 추가했다.
 
@@ -145,8 +176,8 @@ flowchart TD
 
 ### Risks
 
-- Claude 서버(`server/src/claude-server.ts`)의 `render_hvdc_answer_card`는 마크다운 텍스트를 반환한다. ChatGPT iframe 위젯은 포트 8787 ChatGPT 서버 전용이다.
-- `CLAUDE_PORT` 환경변수를 설정하지 않으면 기본 8788 포트를 사용한다. 포트 충돌 시 환경변수로 override가 필요하다.
+- `server/src/claude-server.ts`는 legacy/local fallback이다. 운영 연결은 Cloudflare remote MCP와 `mcp-remote` bridge를 사용한다.
+- ChatGPT iframe 위젯은 Cloudflare Worker의 registered resource URI를 통해 제공된다.
 
 ## Unreleased - 2026-05-11 documentation refresh
 
@@ -183,7 +214,7 @@ Commits: `ce02ae3`, `e98cb56`, `cfea296`, `0090286`
 
 - 로컬에서 `npm run verify`를 실행했다.
 - 결과: TypeScript typecheck 통과, 활성 Vitest 4개 파일 / 43개 테스트 통과.
-- Railway production 배포 후 MCP smoke로 tool descriptor, resource alias, render-only template, ask data-only payload를 확인했다.
+- 당시 production 배포 후 MCP smoke로 tool descriptor, resource alias, render-only template, ask data-only payload를 확인했다.
 - ChatGPT 관리 화면에서 `render_hvdc_answer_card`와 `ui://hvdc/answer-card-v6.html` template 노출을 확인했다.
 - ChatGPT 화면에서 `Failed to fetch template` 없이 Daily KPI 카드가 표시되는 것을 확인했다.
 

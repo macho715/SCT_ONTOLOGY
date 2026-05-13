@@ -5,26 +5,36 @@
   "type": "module",
   "description": "ChatGPT Apps SDK + MCP server for HVDC ontology-grounded logistics answers.",
   "scripts": {
-    "dev": "tsx server/src/index.ts",
-    "start": "tsx server/src/index.ts",
-    "claude:dev": "tsx server/src/claude-server.ts",
-    "claude:start": "tsx server/src/claude-server.ts",
-    "claude:stdio": "tsx server/src/claude-server.ts --stdio",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\"",
+    "generate:worker-assets": "python scripts/generate_worker_assets.py",
+    "dev": "npm run generate:worker-assets && wrangler dev",
+    "start": "npm run dev",
+    "node:dev": "npm run generate:worker-assets && tsx server/src/index.ts",
+    "claude:dev": "mcp-remote https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp",
+    "claude:start": "mcp-remote https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp",
+    "claude:stdio": "mcp-remote https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp",
+    "claude:local": "tsx server/src/claude-server.ts",
+    "typecheck": "npm run generate:worker-assets && tsc --noEmit",
+    "test": "npm run generate:worker-assets && vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\"",
     "index": "python scripts/index_corpus.py",
-    "verify": "npm run typecheck && npm test"
+    "worker:dry-run": "npm run generate:worker-assets && wrangler deploy --dry-run",
+    "worker:deploy": "npm run verify && wrangler deploy",
+    "cloudflare:deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy_cloudflare.ps1",
+    "verify": "npm run typecheck && npm test && npm run worker:dry-run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.20.2",
     "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "agents": "^0.12.3",
     "tsx": "^4.20.4",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260511.1",
     "@types/node": "^24.3.0",
+    "mcp-remote": "^0.1.38",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.90.1"
   },
   "engines": {
     "node": ">=20.0.0"

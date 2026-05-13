@@ -1,10 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { EvidenceSnippet, ResolvedEntity, ShipmentRuleResult } from "./types.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SAMPLE_SHIPMENTS_PATH = path.resolve(__dirname, "../../data/sample_shipments.json");
+import { SAMPLE_SHIPMENTS } from "./generated/sample-shipments.js";
 
 type SampleShipment = {
   shipment_id: string;
@@ -34,15 +29,11 @@ function isValidShipment(item: unknown): item is SampleShipment {
   );
 }
 
-// Returns null on load/parse failure so caller emits WARN instead of false-negative INFO
+// Returns null on invalid generated data so caller emits WARN instead of false-negative INFO
 function loadSampleShipments(): SampleShipment[] | null {
-  try {
-    const raw = JSON.parse(fs.readFileSync(SAMPLE_SHIPMENTS_PATH, "utf8")) as unknown;
-    if (!Array.isArray(raw) || !raw.every(isValidShipment)) return null;
-    return raw;
-  } catch {
-    return null;
-  }
+  const raw = SAMPLE_SHIPMENTS as unknown;
+  if (!Array.isArray(raw) || !raw.every(isValidShipment)) return null;
+  return raw;
 }
 
 const KEY_PATTERNS =

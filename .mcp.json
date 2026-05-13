@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "hvdc-ontology": {
-      "command": "C:\\Users\\jichu\\Downloads\\HVDC Ontology Grounded\\start-hvdc-mcp.cmd",
-      "args": []
+      "type": "http",
+      "url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
     }
   }
 }

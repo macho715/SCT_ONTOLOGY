@@ -9,7 +9,7 @@ Scope: Convert the operating update into an implementable governance and regress
 
 ### 1.1 Problem Definition
 
-Current state: SCT_ONTOLOGY already has an MCP app, corpus-grounded answer rules, Phase 3 regression gates, GitHub Actions, and Railway deployment, but the new operating update is not yet mapped into repo governance files, schemas, rulebooks, evals, or approval gates.
+Current state: SCT_ONTOLOGY already has an MCP app, corpus-grounded answer rules, Phase 3 regression gates, GitHub Actions, and Cloudflare Workers deployment target, but the new operating update is not yet mapped into repo governance files, schemas, rulebooks, evals, or approval gates.
 
 Target state: `sct_ontology` becomes the documented team-standard LLM operating layer with a fixed mission statement, default HVDC logistics context policy, answer contract, evidence matrix, AMBER/ZERO rulebook, Golden Q&A eval, and governance checks.
 
@@ -54,7 +54,7 @@ Reason 1: It turns the operating update into enforceable repo governance without
 Reason 2: It matches the existing SCT_ONTOLOGY pattern: document the contract, add deterministic tests, then expand runtime behavior only when evidence is stable.
 Reason 3: It gives the team a measurable path to the stated targets: 100.00% answer contract compliance, 95.00%+ Golden Q&A verdict match, and 100.00% high-risk ZERO recall.
 
-Rollback strategy: Revert the new P1 governance files and their tests while leaving the existing MCP runtime, Phase 3 regression gates, and Railway deployment unchanged.
+Rollback strategy: Revert the new P1 governance files and their tests while leaving the existing MCP runtime, Phase 3 regression gates, and Cloudflare deployment target unchanged.
 
 ### 1.4 Approval Request
 

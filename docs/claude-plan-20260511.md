@@ -1,4 +1,4 @@
-# Claude 전용 HVDC Ontology App — 구현 계획
+# Claude HVDC Ontology App — historical implementation plan
 
 | 항목 | 값 |
 |---|---|
@@ -9,13 +9,26 @@
 
 ---
 
+## Current status update - 2026-05-13
+
+This document is the original 2026-05-11 Claude layer plan and is kept as history.
+The current primary connection model is no longer a separate local Claude runtime.
+Claude Code, Claude Desktop, and claude.ai now use the Cloudflare remote MCP endpoint:
+
+```text
+https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp
+```
+
+`claude:dev`, `claude:start`, and `claude:stdio` now run an `mcp-remote` bridge to Cloudflare.
+`claude:local` is the only local debugging fallback.
+
 ## Phase 1 — CEO Review
 
 ### 1.1 문제 정의
 
-**현재 상태**: HVDC Ontology 답변 앱은 ChatGPT 전용으로만 동작한다. `@modelcontextprotocol/ext-apps`, `ui://hvdc/` 리소스 URI, `openai/outputTemplate` 메타 등 ChatGPT SDK 의존 요소가 하드코딩되어 있어 Claude Desktop / Claude Code에서는 tool이 노출되지 않고 위젯 렌더링이 불가능하다.
+**2026-05-11 당시 상태**: HVDC Ontology 답변 앱은 ChatGPT 전용으로만 동작했다. `@modelcontextprotocol/ext-apps`, `ui://hvdc/` 리소스 URI, `openai/outputTemplate` 메타 등 ChatGPT SDK 의존 요소가 하드코딩되어 있어 Claude Desktop / Claude Code에서는 tool이 노출되지 않고 위젯 렌더링이 불가능했다.
 
-**목표 상태**: 동일한 corpus·answer 코어를 유지하면서 Claude 전용 MCP 서버 레이어를 추가한다. Claude 클라이언트에서 6개 tool을 즉시 사용하고, ChatGPT 포맷과 Claude 포맷 양쪽 응답을 파싱하는 공통 렌더러를 확보한다.
+**현재 목표 상태**: 동일한 corpus·answer 코어를 유지하면서 Claude 계열 클라이언트가 Cloudflare remote MCP의 6개 tool을 사용한다. `server/src/claude-server.ts`는 운영 주경로가 아니라 legacy/local fallback과 포맷 테스트용으로만 남긴다.
 
 **영향 범위**: HVDC Project Logistics 사용자 全員 — ChatGPT 미사용자·Claude Code 사용자(개발팀 포함) 포함.
 
@@ -25,7 +38,7 @@
 
 | 옵션 | 설명 | 공수(일) | 리스크 | 비용 |
 |---|---|---|---|---|
-| **A — 별도 Claude 서버 (추천)** | `server/src/claude-server.ts` 신규 작성. 표준 MCP SDK만 사용. ChatGPT 서버(8787)와 포트 분리(8788). 양쪽 포맷 파싱용 `claude-render.ts` 추가 | **2** | 낮음 — 공유 코어 무변경 | 0 AED (내부) |
+| **A — Cloudflare remote MCP bridge (현재 기준)** | Claude Code, Claude Desktop, claude.ai가 Cloudflare MCP URL을 직접 사용한다. stdio-only client는 `mcp-remote` bridge를 사용한다. `claude-render.ts`는 포맷 테스트와 fallback 렌더링에 남긴다. | **완료** | 낮음 — 공유 코어 무변경 | 0 AED (내부) |
 | **B — 단일 서버 분기** | `server/src/index.ts`에 `CLIENT_TYPE` 환경변수 분기 추가. ChatGPT/Claude를 같은 파일에서 처리 | 1 | 중간 — 기존 ChatGPT 동작 회귀 위험, descriptor.test.ts 파괴 가능 | 0 AED |
 | **C — Proxy 서버** | 기존 ChatGPT 서버 앞에 Claude 전용 proxy를 두어 메타 변환 | 3 | 높음 — 운영 복잡도 증가, 추가 배포 환경 필요 | 0 AED |
 
@@ -33,9 +46,9 @@
 
 ### 1.3 추천 & 근거
 
-**옵션 A 추천**. 공유 코어(`answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`)를 그대로 재사용하면서 Claude 전용 서버를 독립 파일로 분리하기 때문에 기존 ChatGPT 동작·테스트가 전혀 영향받지 않는다. 포트 분리로 두 클라이언트를 동시에 연결할 수 있다.
+**현재 추천**: Cloudflare remote MCP를 단일 운영 경로로 사용한다. 공유 코어(`answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`)를 Worker에서 재사용하므로 ChatGPT, Claude, Cursor 연결 기준이 하나로 통일된다.
 
-**롤백 전략**: `claude-server.ts`만 삭제하면 완전 원복. 기존 `index.ts` / `chatgpt-app-submission.json` 무변경이므로 ChatGPT 연결 즉시 복원 가능.
+**롤백 전략**: Cloudflare remote MCP에 문제가 생기면 Node fallback과 legacy/local Claude fallback을 디버깅 경로로 사용한다. 운영 문서는 production URL 기준을 유지한다.
 
 ---
 
@@ -59,16 +72,16 @@ graph TD
     TYPES["server/src/types.ts"]
   end
 
-  subgraph ChatGPT 레이어 (기존 유지)
-    CGT_IDX["server/src/index.ts<br/>(registerAppTool, ext-apps)"]
+  subgraph ChatGPT 레이어 (Cloudflare Workers)
+    CGT_IDX["server/src/worker.ts<br/>(createMcpHandler / /mcp)"]
     CGT_UI["server/src/ui.ts"]
     CGT_WIDGET["public/hvdc-answer-widget.html<br/>ui://hvdc/answer-card-v6.html"]
     CGT_SUB["chatgpt-app-submission.json"]
   end
 
-  subgraph Claude 레이어 (신규)
-    CL_SERVER["server/src/claude-server.ts<br/>(표준 MCP SDK, 포트 8788)"]
-    CL_RENDER["server/src/claude-render.ts<br/>(양쪽 포맷 파서 + 마크다운 렌더러)"]
+  subgraph Claude 레이어 (Cloudflare remote MCP)
+    CL_SERVER["Cloudflare MCP URL<br/>same /mcp endpoint"]
+    CL_RENDER["server/src/claude-render.ts<br/>(legacy/local fallback parser)"]
     CL_SUB["claude-app-submission.json"]
     CL_DOC["docs/CONNECT_CLAUDE.md"]
   end
@@ -104,7 +117,7 @@ graph TD
 
 | 파일 | 변경 유형 | 설명 |
 |---|---|---|
-| `server/src/claude-server.ts` | **create** | Claude 전용 MCP 서버. 표준 `@modelcontextprotocol/sdk` `server.tool()` 사용. `ext-apps` 없음. 포트 `CLAUDE_PORT \|\| 8788`. 6개 tool 등록. |
+| `server/src/claude-server.ts` | **legacy/local fallback** | 기존 fallback 파일이다. 현재 운영 연결 기준은 Cloudflare remote MCP다. |
 | `server/src/claude-render.ts` | **create** | `GroundedAnswer` → 마크다운 카드 렌더러. ChatGPT format(openai 메타 포함) + Claude format 양쪽 파싱. |
 | `claude-app-submission.json` | **create** | Claude 앱 설정. `chatgpt-app-submission.json`과 병렬 구조. `claude_desktop_config.json` 스니펫 포함. |
 | `docs/CONNECT_CLAUDE.md` | **create** | Claude Desktop / Claude Code 연결 가이드. 테스트 프롬프트 5개. |
@@ -113,7 +126,7 @@ graph TD
 | `AGENTS.md` | **modify** | Claude 전용 섹션 추가 (tool 목록, 포트, 파싱 계약). |
 
 > **⚠️ 파일명 충돌 체크**:
-> - `claude-server.ts`: `server/src/` 내 없음 — 안전
+> - `claude-server.ts`: 현재는 legacy/local fallback 파일로 존재한다.
 > - `claude-render.ts`: `server/src/` 내 없음 — 안전 (기존 `ui.ts`는 ChatGPT 전용 유지)
 > - `claude-app-submission.json`: 루트 내 없음 — 안전
 > - `docs/CONNECT_CLAUDE.md`: `docs/` 내 없음 — 안전
@@ -125,8 +138,8 @@ graph TD
 
 ```
 1. server/src/claude-render.ts    ← TYPES 의존만 있음. 독립 작성 가능.
-2. server/src/claude-server.ts    ← claude-render.ts 완료 후 작성.
-3. claude-app-submission.json     ← claude-server.ts tool 목록 확정 후 작성.
+2. claude-app-submission.json     ← Cloudflare MCP URL과 6개 tool 목록 기준.
+3. start-hvdc-mcp.cmd             ← stdio-only client용 `mcp-remote` bridge.
 4. tests/claude-descriptor.test.ts ← 2, 3 완료 후 작성.
 5. docs/CONNECT_CLAUDE.md         ← 2 완료 후 작성 (포트·URL 확정).
 6. package.json 수정              ← 2 완료 후 스크립트 추가.
@@ -146,7 +159,7 @@ graph TD
   → _meta 제거, structuredContent.ui 제거
   → GroundedAnswer 추출 → 마크다운 렌더링
 
-입력 B — Claude format (ask_hvdc_ontology 또는 claude-server.ts 응답):
+입력 B — Claude format (Cloudflare remote MCP 또는 legacy/local fallback 응답):
   {
     structuredContent: { ...GroundedAnswer }   // ui 없음
   }
@@ -168,7 +181,7 @@ graph TD
 
 ---
 
-### 2.5 `claude-server.ts` tool 등록 방식
+### 2.5 legacy/local fallback tool 등록 방식
 
 ```typescript
 // ChatGPT: registerAppTool(server, name, descriptor, handler)
@@ -206,11 +219,11 @@ server.tool(
 
 | 테스트 | 파일 | 커버 범위 |
 |---|---|---|
-| Claude tool descriptor parity | `tests/claude-descriptor.test.ts` | `claude-app-submission.json` tool 이름 ↔ `claude-server.ts` tool 목록 일치 |
+| Claude tool descriptor parity | `tests/claude-descriptor.test.ts` | `claude-app-submission.json` tool 이름과 fallback tool 목록 일치 |
 | ChatGPT format 파싱 | `tests/claude-descriptor.test.ts` | `_meta["openai/outputTemplate"]` 포함 입력 → GroundedAnswer 추출 성공 |
 | Claude format 파싱 | `tests/claude-descriptor.test.ts` | `ui` 없는 순수 GroundedAnswer → 마크다운 렌더 성공 |
 | 마크다운 카드 필수 필드 | `tests/claude-descriptor.test.ts` | verdict, route, evidence count, actions 포함 여부 |
-| **기존 테스트 영향 없음** | `tests/descriptor.test.ts`, `tests/pipeline.test.ts`, `tests/evals.test.ts`, `tests/widget.test.ts` | ChatGPT 서버 코드 무변경이므로 기존 43개 테스트 전원 통과 유지 |
+| **전체 회귀 테스트** | `npm run verify` | TypeScript typecheck, Vitest 7 files / 110 tests, Worker dry-run 통과 |
 
 ---
 
@@ -227,15 +240,13 @@ server.tool(
     "category": "BUSINESS"
   },
   "mcp_server": {
-    "local_url": "http://localhost:8788/mcp",
-    "production_url": "https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp"
+    "production_url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
   },
   "claude_desktop_config": {
     "mcpServers": {
       "hvdc-ontology": {
-        "command": "npm",
-        "args": ["run", "claude:start"],
-        "cwd": "<repo-path>"
+        "type": "http",
+        "url": "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp"
       }
     }
   },
@@ -251,9 +262,9 @@ server.tool(
 
 | 리스크 | 영향 | 완화 |
 |---|---|---|
-| Claude `server.tool()` API가 `@modelcontextprotocol/sdk ^1.20.2`에서 변경됨 | Claude 서버 기동 실패 | `claude-server.ts` 작성 전 SDK 버전 확인, 기존 `McpServer.tool()` 패턴 사용 |
+| Cloudflare remote MCP URL이 문서와 설정에서 달라짐 | Claude/Cursor/ChatGPT 연결 혼선 | 모든 연결 문서는 `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`를 기준으로 유지 |
 | `claude-render.ts`가 ChatGPT format 입력을 잘못 파싱 | 답변 데이터 누락 | `parseGroundedAnswer` 함수에 format discriminator (`_meta["openai/outputTemplate"]` 존재 여부)로 분기 |
-| 포트 8788 충돌 | Claude 서버 기동 실패 | `CLAUDE_PORT` 환경변수로 override 가능하도록 구현 |
+| stdio bridge와 HTTP 설정이 서로 달라짐 | 일부 Claude client만 연결 실패 | `start-hvdc-mcp.cmd`와 Claude HTTP 설정을 같은 Cloudflare URL로 맞춘다 |
 | 기존 descriptor.test.ts가 Claude 서버 파일을 인식해 ChatGPT 파일 목록 오판 | false fail | `descriptor.test.ts`는 `chatgpt-app-submission.json`만 검사하므로 영향 없음 — 단, import 범위 확인 필요 |
 | `package.json` 스크립트 추가 후 `npm run verify`에 `claude:dev` 포함 여부 오해 | CI 혼선 | `verify` 스크립트 변경 없이 `claude:dev` / `claude:start`만 추가 |
 
@@ -266,9 +277,9 @@ server.tool(
 > 계획이 확정되었습니다. **`/review`**로 코드 리뷰 체크리스트를 준비하거나, 바로 구현을 시작하시겠습니까?
 
 구현 순서 요약:
-1. `claude-render.ts` → 2. `claude-server.ts` → 3. `claude-app-submission.json` → 4. `tests/claude-descriptor.test.ts` → 5. `docs/CONNECT_CLAUDE.md` → 6. `package.json` → 7. `AGENTS.md`
+1. `claude-app-submission.json` → 2. `.mcp.json` / Claude settings → 3. `start-hvdc-mcp.cmd` → 4. `docs/CONNECT_CLAUDE.md` → 5. `package.json` → 6. tests/docs verification
 
 검증:
 ```bash
-npm run verify   # 기존 43개 테스트 유지 확인
+npm run verify   # 7개 test file / 110개 테스트와 Worker dry-run 확인
 ```

@@ -5,14 +5,14 @@ Created: 2026-05-10
 Status: Draft
 Owner: HVDC Logistics / App Platform Team
 Input: `docs/operations/plan.md` Phase 1 Business Review
-Last Updated: 2026-05-11
-Version: v0.1.1
+Last Updated: 2026-05-13
+Version: v0.1.2
 
 ## Summary
 
 ### Problem
 
-The HVDC Ontology ChatGPT App is published to GitHub and has a baseline verification workflow, but ontology document changes, ChatGPT Apps SDK submission quality, evidence UI, evaluation coverage, security monitoring, and work tracking are not yet managed as one repeatable operating process.
+The HVDC Ontology ChatGPT App is published to GitHub and deployed as a Cloudflare Workers MCP endpoint. The remaining operational problem is to manage ontology document changes, ChatGPT Apps SDK submission quality, evidence UI, evaluation coverage, security monitoring, and work tracking as one repeatable operating process.
 
 ### Goals
 
@@ -31,7 +31,7 @@ The HVDC Ontology ChatGPT App is published to GitHub and has a baseline verifica
 - NG3: Do not deploy automatically to production until deployment secrets, rollback, and human approval gates are explicitly approved.
 - NG4: Do not remove existing corpus-grounding safeguards to improve UX speed.
 - NG5: Do not treat GitHub Projects or security alerts as runtime answer evidence.
-- NG6: Do not implement GitHub Projects board automation, Railway auto-deploy, or release/approval workflow automation in Option B.
+- NG6: Do not implement GitHub Projects board automation, Cloudflare auto-deploy, or release/approval workflow automation in Option B.
 
 ## User Scenarios & Testing
 
@@ -109,7 +109,7 @@ Acceptance Scenarios:
 
 Ontology updates should be tracked with status, owner, verification result, and release readiness.
 
-Why this priority: The team needs to know whether a document change is only edited locally, verified in CI, deployed to Railway, or ready for ChatGPT app submission.
+Why this priority: The team needs to know whether a document change is only edited locally, verified in CI, deployed to Cloudflare Workers, or ready for ChatGPT app submission.
 
 Independent Test: Create a sample ontology update issue, PR checklist item, or markdown status row and confirm it records source document, reviewer, verification link, and release status.
 
@@ -135,9 +135,9 @@ Acceptance Scenarios:
 
 ### Edge Cases
 
-- EC1: GitHub Actions passes but Railway still serves an old deployment -> show deployment status as separate from CI status.
+- EC1: GitHub Actions passes but Cloudflare Workers still serves an old deployment -> show deployment status as separate from CI status.
 - EC2: GitHub security features are unavailable for the repository plan -> document the unavailable feature and fallback check.
-- EC3: Evaluation prompts pass locally but fail on Railway -> keep local, CI, and live MCP validation as separate evidence.
+- EC3: Evaluation prompts pass locally but fail on Cloudflare Workers -> keep local, CI, and live MCP validation as separate evidence.
 - EC4: Evidence UI cannot render in ChatGPT -> provide text fallback with evidence IDs and validation status.
 - EC5: `data/index/` is generated from a different corpus version -> fail validation if inventory/hash mismatch is detected.
 
@@ -155,7 +155,7 @@ Acceptance Scenarios:
 - FR-008: The evaluation suite MUST include golden prompts for AGI M130 closure, Flow Code WHP-only use, NO_EVIDENCE behavior, stale-source compliance, and invoice/cost human-gate behavior.
 - FR-009: The security setup MUST document whether Secret Scanning, Dependabot alerts, and Code Scanning are enabled, unavailable, or pending.
 - FR-010: Ontology work tracking MUST capture source file, reason for change, owner, verification link, and release status, but Option B MUST NOT require GitHub Projects automation.
-- FR-011: Railway production deployment MUST remain separate from CI verification until an explicit deployment approval gate is defined.
+- FR-011: Cloudflare Workers production deployment MUST remain separate from CI verification until an explicit deployment approval gate is defined.
 - FR-012: The repository MUST keep public disclosure status visible for files under `ontology/`, `data/corpus/`, docs, and `.docx` artifacts.
 - FR-013: `data/index/` MUST stay committed as reviewable generated artifacts for Option B; `corpus_index.json` and `corpus_inventory.csv` MUST be regenerated from `data/corpus/`, while explicitly documented mapping files such as `source_role_map.json` MAY remain manually maintained.
 
@@ -182,7 +182,7 @@ Acceptance Scenarios:
 - D1: GitHub Actions for CI execution.
 - D2: GitHub repository security settings for Secret Scanning, Dependabot alerts, and Code Scanning.
 - D3: OpenAI Apps SDK and MCP server descriptor behavior.
-- D4: Railway deployment state for live MCP validation.
+- D4: Cloudflare Workers deployment state for live MCP validation.
 - D5: HVDC ontology corpus files under `ontology/` and `data/corpus/`.
 
 ## Success Criteria
@@ -201,17 +201,17 @@ Acceptance Scenarios:
 
 ### Resolved Decisions
 
-- Q1: Resolved. Railway production deployment MUST remain manual for Option B. CI MUST rebuild the corpus index and run verification after ontology, corpus, app contract, or workflow changes, but CI MUST NOT deploy automatically to Railway. A Railway deployment MAY start only after local verification passes, GitHub Actions verification passes, the release owner records explicit deployment approval, and required deployment secrets and rollback steps are confirmed outside the public repository. CI-based Railway deployment is deferred to Option C or a later approved change.
+- Q1: Resolved. Cloudflare Workers production deployment MUST remain manual for Option B. CI MUST rebuild the corpus index and run verification after ontology, corpus, app contract, or workflow changes, but CI MUST NOT deploy automatically to Cloudflare. A Cloudflare deployment MAY start only after local verification passes, GitHub Actions verification passes, the release owner records explicit deployment approval, and required deployment secrets and rollback steps are confirmed outside the public repository. CI-based Cloudflare deployment is deferred to Option C or a later approved change.
 - Q2: Resolved. `data/index/` MUST stay committed as reviewable generated artifacts for Option B. The files are derived from `data/corpus/` and MUST NOT be hand-edited except for explicitly documented mapping files such as `source_role_map.json`. CI MUST run `npm run index` before verification and MUST fail if regenerated `data/index/corpus_index.json` or `data/index/corpus_inventory.csv` differs from the committed files. Deployment SHOULD regenerate the index during build or verify that the committed index matches the current corpus before serving.
 - Q3: Resolved. The repository is public, so the Option B security baseline can use GitHub public-repository security features without treating the GitHub plan as a blocker. Current observed status from `gh api`: Secret Scanning is enabled, Secret Scanning Push Protection is enabled, Dependabot security updates are disabled, secret scanning non-provider patterns are disabled, and secret scanning validity checks are disabled. Dependabot alerts status and Code Scanning configuration still require setup or explicit owner-approved deferral during implementation. Non-provider patterns and validity checks are optional hardening, not Option B blockers.
-- Q4: Resolved. GitHub Projects is deferred to Option C. Option B will define only lightweight tracking fields through GitHub Issues, PR checklist, or a simple markdown status table. Option B must not require GitHub Projects board automation, Railway auto-deploy, or release/approval workflow automation.
+- Q4: Resolved. GitHub Projects is deferred to Option C. Option B will define only lightweight tracking fields through GitHub Issues, PR checklist, or a simple markdown status table. Option B must not require GitHub Projects board automation, Cloudflare auto-deploy, or release/approval workflow automation.
 
 ### Clarifications Log
 
 - 2026-05-10 Session:
   - Q: Should the repository upload all files or only a minimum public scope? -> A: User requested full upload.
   - Q: Which improvement option should be specified first? -> A: `docs/operations/plan.md` recommends Option B, pending approval.
-  - Q: Should Railway deploy automatically from CI in Option B? -> A: No. Railway production deployment remains manual and approval-gated.
+  - Q: Should Cloudflare deploy automatically from CI in Option B? -> A: No. Cloudflare production deployment remains manual and approval-gated.
   - Q: Should `data/index/` remain committed? -> A: Yes. It remains committed as reviewable generated evidence, with CI drift checks required.
   - Q: Which GitHub security features are confirmed now? -> A: Secret Scanning and Push Protection are enabled; Dependabot security updates are disabled; Code Scanning setup remains pending.
   - Q: Should GitHub Projects be included in Option B? -> A: No. GitHub Projects automation is deferred to Option C; Option B keeps lightweight tracking fields only.
@@ -219,7 +219,7 @@ Acceptance Scenarios:
 ## Risks & Mitigations
 
 - R1: Public repository exposes operational documents. -> Mitigation: keep public disclosure visible and add secret/PII scanning checks.
-- R2: CI passes but live Railway deployment is stale. -> Mitigation: track CI status and live MCP status separately.
+- R2: CI passes but live Cloudflare deployment is stale. -> Mitigation: track CI status and live MCP status separately.
 - R3: Evidence UI changes break ChatGPT rendering. -> Mitigation: require text fallback and browser/component smoke checks.
 - R4: Golden evals become too brittle. -> Mitigation: validate verdict, evidence requirements, and blocking behavior instead of exact prose.
 - R5: GitHub security features are account-dependent. -> Mitigation: document enabled/unavailable/pending state with evidence.

@@ -48,7 +48,7 @@ Assumption: The stable runtime behavior we want is official Apps SDK separation:
 
 - Changing ontology corpus semantics.
 - Changing reasonCode definitions.
-- Changing Railway project settings.
+- Changing Cloudflare project settings.
 - Adding new external integrations.
 - Changing UI visual design beyond the render path fix.
 - Removing existing untracked UIUX draft files.
@@ -100,14 +100,14 @@ Expected result:
 
 ### Phase 4: Verification And Deploy
 
-Run automated tests, local MCP smoke, GitHub Actions, Railway deployment, and production MCP smoke.
+Run automated tests, local MCP smoke, GitHub Actions, Cloudflare Workers deployment, and production MCP smoke.
 
 Expected result:
 
 - `npm run verify` passes.
 - Local MCP shows `ask_hvdc_ontology` has no UI template.
 - Local MCP shows `render_hvdc_answer_card` has the UI template.
-- Production MCP shows the same contract after Railway deploy.
+- Production MCP shows the same contract after Cloudflare deploy.
 
 ## Tasks
 
@@ -120,7 +120,7 @@ Expected result:
 | 5 | Patch docs | User-facing docs match implementation |
 | 6 | Run local checks | `npm run verify`, JSON validation, MCP smoke |
 | 7 | Commit and push | One focused commit |
-| 8 | Deploy to Railway | Production app updated |
+| 8 | Deploy to Cloudflare Workers | Production app updated |
 | 9 | Run production smoke | Contract verified at live MCP endpoint |
 
 ## Risks
@@ -155,5 +155,5 @@ Expected result:
 - Updated tests.
 - Updated docs.
 - GitHub commit and push.
-- Railway production deployment.
+- Cloudflare Workers production deployment.
 - Production smoke evidence.

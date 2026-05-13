@@ -91,7 +91,7 @@ const answerOutputSchema = {
     z.object({
       actionType: z.string(),
       ownerRole: z.string(),
-      parameters: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])),
+      parameters: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
       humanGateRequired: z.boolean(),
       dueAt: z.string().nullable()
     })

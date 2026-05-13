@@ -6,22 +6,25 @@
 ## 폴더 관계 그래프
 
 아래 그래프는 주요 폴더가 어떤 역할로 연결되는지 보여준다.
-런타임 검색 기준은 `data/corpus/*.md`이고, `data/index`는 런타임 직접 입력이 아니라 생성, 검토, 재현을 위한 산출물이다.
+런타임 검색 기준은 `server/src/generated/corpus-data.ts`이고, `data/corpus`는 generated module을 만드는 승인 원본이다. `data/index`는 생성, 검토, 재현을 위한 산출물이다.
 
 ```mermaid
 flowchart TD
   RootDocs["루트 문서<br/>README, CHANGELOG, LAYOUT, SYSTEM_ARCHITECTURE"]
-  RootConfig["루트 실행 설정<br/>AGENTS, package, tsconfig, railway<br/>chatgpt-app-submission.json<br/>claude-app-submission.json"]
+  RootConfig["루트 실행 설정<br/>AGENTS, package, tsconfig, wrangler<br/>chatgpt-app-submission.json<br/>claude-app-submission.json"]
 
-  subgraph ServerChatGPT["ChatGPT 레이어 (포트 8787)"]
-    IndexTs["server/src/index.ts<br/>registerAppTool / registerAppResource"]
+  subgraph ServerChatGPT["ChatGPT 레이어 (Cloudflare Workers)"]
+    WorkerTs["server/src/worker.ts<br/>createMcpHandler / /mcp"]
+    HvdcServerTs["server/src/hvdc-server.ts<br/>registerAppTool / registerAppResource"]
+    GeneratedTs["server/src/generated<br/>corpus / widget / sample data"]
     UiTs["server/src/ui.ts"]
     Public["public<br/>hvdc-answer-widget.html"]
   end
 
-  subgraph ServerClaude["Claude 레이어 (포트 8788)"]
-    ClaudeServer["server/src/claude-server.ts<br/>McpServer.tool()"]
-    ClaudeRender["server/src/claude-render.ts<br/>양방향 파싱 + 마크다운 렌더러"]
+  subgraph ServerClaude["Claude 레이어 (Cloudflare remote MCP)"]
+    ClaudeConfig[".mcp.json / Claude settings<br/>HTTP URL"]
+    ClaudeBridge["start-hvdc-mcp.cmd<br/>mcp-remote stdio bridge"]
+    ClaudeRender["server/src/claude-render.ts<br/>legacy fallback parser"]
   end
 
   subgraph SharedCore["공유 코어"]
@@ -29,10 +32,10 @@ flowchart TD
     Corpus["server/src/corpus.ts"]
     Router["server/src/router.ts"]
     Types["server/src/types.ts"]
-    CorpusFiles["data/corpus/*.md"]
+    CorpusFiles["server/src/generated/corpus-data.ts"]
   end
 
-  Tests["tests<br/>71개 테스트<br/>(ChatGPT 43 + Claude 28)"]
+  Tests["tests<br/>110개 테스트<br/>Cloudflare dry-run 포함"]
   Scripts["scripts<br/>corpus 점검과 index 생성 도구"]
   Index["data/index<br/>생성/검토/repro artifact"]
   Ontology["ontology<br/>원본 또는 참조용 온톨로지 묶음"]
@@ -44,16 +47,18 @@ flowchart TD
   Workflows[".github/workflows<br/>GitHub 자동 검증"]
 
   RootDocs -->|"제품 범위와 작업 규칙 설명"| ServerChatGPT
-  RootDocs -->|"Claude 레이어 설명"| ServerClaude
+  RootDocs -->|"Claude Cloudflare 연결 설명"| ServerClaude
   RootDocs -->|"검증 기준 설명"| Tests
   RootConfig -->|"chatgpt-submission"| ServerChatGPT
-  RootConfig -->|"claude-submission"| ServerClaude
+  RootConfig -->|"claude Cloudflare connector"| ServerClaude
   DocsConnect -->|"연결 방법 안내"| ServerChatGPT
   DocsConnect -->|"연결 방법 안내"| ServerClaude
 
-  IndexTs --> SharedCore
-  ClaudeServer --> SharedCore
-  ClaudeServer --> ClaudeRender
+  WorkerTs --> HvdcServerTs
+  HvdcServerTs --> SharedCore
+  GeneratedTs --> SharedCore
+  ClaudeConfig --> WorkerTs
+  ClaudeBridge --> WorkerTs
   ClaudeRender --> Types
   UiTs --> Types
   SharedCore --> CorpusFiles
@@ -77,12 +82,12 @@ flowchart TD
 - `CHANGELOG.md`: 변경 이력을 기록하는 문서다.
 - `LAYOUT.md`: 현재 저장소 구조와 미커밋 변경 범위를 설명하는 이 문서다.
 - `SYSTEM_ARCHITECTURE.md`: 시스템 구조를 설명하는 문서다. ChatGPT/Claude 양쪽 아키텍처 포함.
-- `package.json`: Node.js 앱 이름, 의존성, 실행 스크립트를 정의한다. `claude:dev`, `claude:start` 스크립트 포함.
+- `package.json`: 앱 이름, Cloudflare Worker 실행 스크립트, Node fallback, Claude Cloudflare bridge 실행 스크립트를 정의한다.
 - `package-lock.json`: npm 의존성 잠금 파일이다.
 - `tsconfig.json`: TypeScript 컴파일 설정이다.
-- `railway.json`: Railway 배포 설정 파일이다.
+- `wrangler.toml`: Cloudflare Workers, R2, D1 배포 설정 파일이다.
 - `chatgpt-app-submission.json`: ChatGPT 앱 제출용 메타데이터 파일이다.
-- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. `claude_desktop_config` 스니펫, 6개 tool, Claude 전용 테스트 케이스 포함.
+- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. Cloudflare MCP URL, `claude_desktop_config` HTTP 스니펫, 6개 tool, Claude 전용 테스트 케이스 포함.
 - `.gitignore`: Git 추적에서 제외할 폴더와 파일 패턴을 정한다.
 
 ## docs
@@ -94,7 +99,7 @@ flowchart TD
 - `docs/SECURITY_PRIVACY.md`: 보안과 개인정보 처리 기준이다.
 - `docs/QA_REPORT.md`: 검증 결과와 품질 확인 내용을 기록한다.
 - `docs/CONNECT_CHATGPT.md`: ChatGPT 연결 방법을 설명한다.
-- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code 연결 방법을 설명한다. 포트 8788, `claude_desktop_config.json` 예시, 테스트 프롬프트 5개 포함.
+- `docs/CONNECT_CLAUDE.md`: Claude Desktop / Claude Code / claude.ai를 Cloudflare MCP에 연결하는 방법을 설명한다. `claude_desktop_config.json` HTTP 예시와 테스트 프롬프트 5개 포함.
 - `docs/CODEX_SETUP.md`: Codex 작업 환경 설정 안내다.
 - `docs/SPEC_IMPROVEMENTS.md`: 사양 개선 메모다.
 - `docs/claude-plan-20260511.md`: Claude App Layer 구현 계획 문서다 (Phase 1 CEO review, Phase 2 Engineering review 포함).
@@ -111,17 +116,21 @@ flowchart TD
 
 ### 공유 코어 (ChatGPT/Claude 공통)
 - `server/src/answer.ts`: 검색 결과를 근거로 답변을 구성하는 로직을 담는다.
-- `server/src/corpus.ts`: 런타임에서 `data/corpus/*.md`를 직접 읽고 검색하는 로직을 담는다.
+- `server/src/corpus.ts`: Worker 번들에 포함된 generated corpus를 검색하는 로직을 담는다.
 - `server/src/router.ts`: 질문을 HVDC 도메인 라우트로 분류하는 로직을 담는다.
 - `server/src/redact.ts`: 이메일과 전화번호 같은 민감정보를 가리는 로직을 담는다.
 - `server/src/types.ts`: 서버 내부에서 공유하는 타입을 정의한다.
 
 ### ChatGPT 레이어
-- `server/src/index.ts`: ChatGPT 전용 서버 진입점. `@modelcontextprotocol/ext-apps`의 `registerAppTool`, `registerAppResource` 사용. 포트 `PORT || 8787`.
+- `server/src/worker.ts`: Cloudflare Worker 진입점. `agents/mcp`의 `createMcpHandler`로 `/mcp`를 처리한다.
+- `server/src/hvdc-server.ts`: ChatGPT 전용 MCP server factory. `@modelcontextprotocol/ext-apps`의 `registerAppTool`, `registerAppResource` 사용.
+- `server/src/index.ts`: Node fallback 진입점. 로컬 디버깅이 필요할 때 `npm run node:dev`로 실행한다.
 - `server/src/ui.ts`: ChatGPT 위젯 UI 상태 빌더. `ui://hvdc/answer-card-v7.html` 등록 헬퍼.
 
 ### Claude 레이어
-- `server/src/claude-server.ts`: Claude 전용 서버. 표준 `McpServer.tool()`만 사용. `ext-apps` 없음. 포트 `CLAUDE_PORT || 8788`.
+- `.mcp.json`: Claude Code project 설정이다. `hvdc-ontology`을 Cloudflare HTTP MCP URL로 연결한다.
+- `start-hvdc-mcp.cmd`: stdio만 지원하는 client를 위한 bridge다. 로컬 서버가 아니라 `mcp-remote`로 Cloudflare MCP에 연결한다.
+- `server/src/claude-server.ts`: legacy/local fallback과 tool parity 테스트용 서버다. 운영 연결 기준은 Cloudflare remote MCP다.
 - `server/src/claude-render.ts`: ChatGPT format(`_meta` 포함)과 Claude format(직접 GroundedAnswer) 양쪽 파싱 후 마크다운 카드 렌더링.
 
 ## public
@@ -132,7 +141,7 @@ flowchart TD
 
 ## tests
 
-`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 71개 테스트가 통과한다.
+`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 110개 테스트가 통과한다.
 
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
 - `tests/descriptor.test.ts`: ChatGPT 앱 descriptor와 `chatgpt-app-submission.json` 일치를 검증한다.
@@ -166,7 +175,7 @@ flowchart TD
 
 ## data/index
 
-`data/index/`는 corpus 변경을 리뷰하고 재현하기 위한 index 산출물과 역할 매핑 데이터를 담는다. 현재 런타임 검색은 `data/corpus/*.md`를 직접 읽는다.
+`data/index/`는 corpus 변경을 리뷰하고 재현하기 위한 index 산출물과 역할 매핑 데이터를 담는다. 현재 런타임 검색은 `server/src/generated/corpus-data.ts`를 읽는다.
 
 - `data/index/corpus_index.json`: corpus 문서와 section preview를 담는 생성 산출물이다.
 - `data/index/corpus_inventory.csv`: corpus 파일 목록과 해시 같은 inventory 데이터다.
@@ -209,37 +218,17 @@ flowchart TD
 
 - `.github/workflows/hvdc-verify.yml`: TypeScript와 테스트 검증을 실행하는 GitHub Actions workflow다.
 
-## 현재 미커밋 변경: Option B
+## 현재 미커밋 변경: Cloudflare remote MCP 전환
 
-현재 작업 트리에는 사용자가 지칭한 Option B 변경으로 보이는 미커밋 변경이 있다.
-이 문서는 해당 변경을 되돌리거나 수정하지 않고, 현재 상태만 기록한다.
+현재 작업 트리에는 Cloudflare Workers/R2/D1 remote MCP 전환 변경이 있다.
+이 문서는 해당 변경을 되돌리지 않고, 현재 상태를 기록한다.
 
-- 수정됨: `.github/workflows/hvdc-verify.yml`
-- 수정됨: `.gitignore`
-- 수정됨: `README.md`
-- 수정됨: `LAYOUT.md`
-- 수정됨: `CHANGELOG.md`
-- 수정됨: `docs/PLAN.md`
-- 수정됨: `docs/SPEC_IMPROVEMENTS.md`
-- 수정됨: `docs/SECURITY_PRIVACY.md`
-- 수정됨: `public/hvdc-answer-widget.html`
-- 수정됨: `server/src/answer.ts`
-- 수정됨: `server/src/index.ts`
-- 수정됨: `tests/golden_prompts.json`
-- 새 파일: `CHANGELOG.md`
-- 새 파일: `SYSTEM_ARCHITECTURE.md`
-- 새 파일: `docs/operations/plan.md`
-- 새 파일: `docs/uiux/HVDC_Ontology_Grounded_ChatGPT_App_UIUX_Spec_2026-05-10.md`
-- 새 파일: `docs/uiux/HVDC_Ontology_Grounded_ChatGPT_App_UIUX_Spec_2026-05-10.docx`
-- 새 파일: `docs/archive/root-originals/HVDC_Ontology_Grounded_ChatGPT_App_PLAN_2026-05-10.md`
-- 새 파일: `docs/archive/root-originals/HVDC_Ontology_Grounded_ChatGPT_App_Spec.md`
-- 새 파일: `docs/codex/AGENTS.patched.md`
-- 새 파일: `scripts/check_index_drift.py`
-- 새 파일: `tests/descriptor.test.ts`
-- 새 파일: `tests/evals.test.ts`
-- 새 파일: `tests/widget.test.ts`
-
-이번 요청으로 루트 문서와 실행 필수 파일을 제외한 문서성 파일은 `docs/` 아래 관련 폴더로 이동했다.
+- Cloudflare runtime: `server/src/worker.ts`, `server/src/hvdc-server.ts`, `wrangler.toml`
+- Cloudflare storage: `migrations/0001_mcp_audit_logs.sql`, R2 binding `HVDC_FILES`, D1 binding `MCP_AUDIT_DB`
+- Generated runtime assets: `server/src/generated/`, `scripts/generate_worker_assets.py`
+- Claude/Cursor 연결: `.mcp.json`, `start-hvdc-mcp.cmd`, `C:\Users\jichu\.cursor\mcp.json`, Claude 설정 파일
+- 제거된 Railway 설정: `railway.json`, `.railwayignore`
+- 검증: `npm run verify`, remote `/healthz`, remote MCP `tools/list`, `ask_hvdc_ontology`, D1 audit count
 
 ## 무시된 폴더와 파일
 
@@ -268,7 +257,7 @@ flowchart TD
 
 - `server/src/types.ts`: `EvidenceTraceItem` and `GroundedAnswer.evidenceTrace` define the trace contract.
 - `server/src/answer.ts`: answer composition builds trace entries for summary, business impact, details, and actions.
-- `server/src/index.ts`: ChatGPT render schema accepts `evidenceTrace` and defaults legacy input to an empty array.
+- `server/src/hvdc-server.ts`: ChatGPT render schema accepts `evidenceTrace` and defaults legacy input to an empty array.
 - `server/src/claude-server.ts`: Claude render schema accepts the same trace field.
 - `server/src/claude-render.ts`: Claude markdown renders an `Evidence Trace` section and strips UI-only fields.
 - `public/hvdc-answer-widget.html`: ChatGPT widget shows trace chips, `No direct evidence`, raw evidence IDs, and connected answer statements.
@@ -287,9 +276,9 @@ flowchart TD
 
 Latest observed local verification for this addendum:
 - Command: `npm run verify`
-- Result: TypeScript check passed, and Vitest passed 5 test files with 78 tests.
+- Result: TypeScript check passed, Vitest passed 7 test files with 110 tests, and Wrangler Worker dry-run passed.
 
 ### Stale-count warning
 
-Older sections in this file may still mention the earlier 71-test snapshot.
-For Evidence Trace Mode, use the latest verification note above as the current local evidence.
+Older archived files may still mention earlier 71/78-test snapshots.
+For the active repository, use the latest 110-test verification note above as the current local evidence.

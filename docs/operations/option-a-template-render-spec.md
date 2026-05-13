@@ -118,7 +118,7 @@ Independent test:
 - NFR-003: The change MUST preserve existing answer grounding, evidence, validation, PII masking, and audit behavior.
 - NFR-004: The implementation MUST not delete files except replacing stale planning/spec content when explicitly updating those docs.
 - NFR-005: The implementation MUST not commit untracked local draft files unless explicitly requested.
-- NFR-006: The production deployment MUST be verified through the live Railway MCP URL.
+- NFR-006: The production deployment MUST be verified through the live Cloudflare Workers MCP URL.
 
 ## Assumptions & Dependencies
 
@@ -127,7 +127,7 @@ Independent test:
 - Assumption: `ui://hvdc/answer-card-v5.html` remains a legacy fetch alias, and `ui://hvdc/render_hvdc_answer_card.html` remains a render-name compatibility alias.
 - Assumption: Existing `ask_hvdc_ontology` private audit hash logging remains in scope, so `readOnlyHint` may remain `false`.
 - Dependency: `@modelcontextprotocol/ext-apps` provides `registerAppResource`, `registerAppTool`, and `RESOURCE_MIME_TYPE`.
-- Dependency: Railway production MCP URL remains `https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp`.
+- Dependency: Cloudflare Workers production MCP URL remains `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
 - Dependency: `npm run verify` remains the repository verification gate.
 
 ## Success Criteria
@@ -141,7 +141,7 @@ Independent test:
 - SC-006: Local MCP confirms `render_hvdc_answer_card` has `_meta.ui.resourceUri`.
 - SC-007: Local MCP confirms `render_hvdc_answer_card` has `_meta["openai/outputTemplate"]`.
 - SC-008: Local MCP confirms `search_ontology_corpus` has no UI resource.
-- SC-009: Production MCP confirms the same decoupled contract after Railway deploy.
+- SC-009: Production MCP confirms the same decoupled contract after Cloudflare deploy.
 - SC-010: Production `ask_hvdc_ontology` daily KPI prompt returns operations KPI routing, not CostGuard summary.
 - SC-011: Production MCP v6 widget resource contains overflow-safe CSS.
 - SC-012: ChatGPT UI confirms the Daily KPI card loads without `Failed to fetch template`.

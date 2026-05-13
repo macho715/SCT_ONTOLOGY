@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import type {
   ActionRecommendation,
   EvidenceTraceItem,
@@ -568,7 +566,6 @@ export function answerQuestion(args: {
     generatedAt
   };
 
-  auditToolCall("ask_hvdc_ontology", args, answer, answer.piiMasked);
   return answer;
 }
 
@@ -594,19 +591,24 @@ export function answerToText(answer: GroundedAnswer): string {
   return lines.join("\n");
 }
 
-export function auditToolCall(toolName: string, input: unknown, output: unknown, piiMasked: boolean): void {
-  try {
-    const outDir = path.resolve(process.cwd(), "out");
-    fs.mkdirSync(outDir, { recursive: true });
-    const record = {
-      toolName,
-      inputHash: sha256(JSON.stringify(input)),
-      outputHash: sha256(JSON.stringify(output)),
-      timestamp: new Date().toISOString(),
-      piiMasked
-    };
-    fs.appendFileSync(path.join(outDir, "audit.jsonl"), `${JSON.stringify(record)}\n`, "utf8");
-  } catch {
-    // Audit failure must not expose sensitive input in errors. Production should route this to secure logging.
-  }
+export type AuditRecord = {
+  toolName: string;
+  inputHash: string;
+  outputHash: string;
+  timestamp: string;
+  piiMasked: boolean;
+};
+
+export function buildAuditRecord(toolName: string, input: unknown, output: unknown, piiMasked: boolean): AuditRecord {
+  return {
+    toolName,
+    inputHash: sha256(JSON.stringify(input)),
+    outputHash: sha256(JSON.stringify(output)),
+    timestamp: new Date().toISOString(),
+    piiMasked
+  };
+}
+
+export function auditRecordToJsonLine(record: AuditRecord): string {
+  return `${JSON.stringify(record)}\n`;
 }

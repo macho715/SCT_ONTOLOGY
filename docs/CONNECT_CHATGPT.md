@@ -1,30 +1,29 @@
 # Connect to ChatGPT
 
-## Local run
+## Production connector
+
+Use this Cloudflare MCP endpoint:
+
+```text
+https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp
+```
+
+## ChatGPT settings
+
+1. Settings -> Apps & Connectors -> Advanced settings -> Developer mode ON.
+2. Settings -> Apps & Connectors -> Create.
+3. Connector URL: `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
+4. Add the connector to a new chat from the `+` -> More menu.
+
+## Optional local debugging only
 
 ```bash
 npm install
 npm run dev
 ```
 
-## HTTPS tunnel
-
-```bash
-ngrok http 8787
-```
-
-## ChatGPT settings
-
-1. Settings → Apps & Connectors → Advanced settings → Developer mode ON.
-2. Settings → Apps & Connectors → Create.
-3. Connector URL: `https://<subdomain>.ngrok.app/mcp`.
-4. Add the connector to a new chat from the `+` → More menu.
-
-Production connector URL:
-
-```text
-https://hvdc-ontology-chatgpt-app-production.up.railway.app/mcp
-```
+Use local Wrangler only when testing an undeployed local Worker build.
+Do not register a local or tunnel URL as the production connector.
 
 If the action list or template list looks stale, use **Refresh** in the connector management screen or disconnect/reconnect the app, then start a new chat.
 

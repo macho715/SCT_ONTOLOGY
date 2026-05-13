@@ -1,6 +1,6 @@
 # QA Report
 
-Current verification date: 2026-05-11
+Current verification date: 2026-05-13
 
 ## Current verified state
 
@@ -28,9 +28,9 @@ Latest local verification:
 npm run verify
 ```
 
-Result: TypeScript typecheck passed, Vitest 4 files / 43 tests passed.
+Result: TypeScript typecheck passed, Vitest 7 files / 110 tests passed, and `wrangler deploy --dry-run` passed.
 
-Production smoke checked the live Railway MCP URL and confirmed the v6 widget resource returns the overflow-safe CSS.
+Current Cloudflare production verification: `/healthz`, MCP `initialize`, MCP `tools/list`, `ask_hvdc_ontology`, and D1 audit logging were checked against `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
 
 ## Golden prompts
 
