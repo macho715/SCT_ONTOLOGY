@@ -58,6 +58,10 @@ function randomId(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function normalizeContainerNo(containerNo: string | null | undefined): string {
+  return (containerNo ?? "").trim().toUpperCase();
+}
+
 export function checkDocGuardian(documents: DocumentInput[]): DocGuardianResult {
   const docIds = documents.map((d) => d.docId);
   const auditRecordId = `ARD-${randomId()}`;
@@ -119,15 +123,24 @@ export function checkDocGuardian(documents: DocumentInput[]): DocGuardianResult 
 
   // Container number consistency
   const docsWithContainer = documents.filter((d) => d.containerNo);
-  const containerValues = new Set(docsWithContainer.map((d) => (d.containerNo ?? "").trim().toUpperCase()));
-  if (docsWithContainer.length > 1 && containerValues.size > 1) {
+  const containerGroups = new Map<string, DocumentInput[]>();
+  for (const doc of docsWithContainer) {
+    const value = normalizeContainerNo(doc.containerNo);
+    if (!value) continue;
+    containerGroups.set(value, [...(containerGroups.get(value) ?? []), doc]);
+  }
+  const containerValues = Array.from(containerGroups.keys());
+  if (docsWithContainer.length > 1 && containerValues.length > 1) {
+    const [expectedValue, expectedDocs] = Array.from(containerGroups.entries()).sort((a, b) => b[1].length - a[1].length)[0];
+    const [actualValue, actualDocs] =
+      Array.from(containerGroups.entries()).find(([value]) => value !== expectedValue) ?? [expectedValue, expectedDocs];
     totalChecks++;
     crossDocIssues.push({
       field: "containerNo",
-      sourceDoc: docsWithContainer[0].docId,
-      targetDoc: docsWithContainer[1].docId,
-      sourceValue: docsWithContainer[0].containerNo ?? "",
-      targetValue: docsWithContainer[1].containerNo ?? "",
+      sourceDoc: expectedDocs[0].docId,
+      targetDoc: actualDocs[0].docId,
+      sourceValue: expectedValue,
+      targetValue: actualValue,
       delta: "MISMATCH",
       severity: "BLOCK"
     });

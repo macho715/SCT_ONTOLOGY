@@ -170,6 +170,28 @@ describe("Document Guardian cross-doc consistency", () => {
     expect(result.crossDocIssues.some((i) => i.field === "containerNo")).toBe(true);
   });
 
+  it("reports the actual mismatching container document and value when later documents diverge", () => {
+    const result = checkDocGuardian([
+      { docId: "EVD-CI-001", docType: "CI", qty: 10, weight: 12500, containerNo: "TCLU1234567", packageCount: 10 },
+      { docId: "EVD-PL-001", docType: "PL", qty: 10, weight: 12500, containerNo: "TCLU1234567", packageCount: 10 },
+      { docId: "EVD-DO-001", docType: "DO", qty: 10, weight: 12500, containerNo: "TCLU1234567", packageCount: 10 },
+      { docId: "EVD-BL-001", docType: "BL", qty: 10, weight: 12500, containerNo: "TGHU7654321", packageCount: 10 }
+    ]);
+
+    const issue = result.crossDocIssues.find((i) => i.field === "containerNo");
+
+    expect(result.verificationStatus).toBe("BLOCK");
+    expect(result.numericIntegrityPct).toBe(92.86);
+    expect(issue).toMatchObject({
+      sourceDoc: "EVD-CI-001",
+      targetDoc: "EVD-BL-001",
+      sourceValue: "TCLU1234567",
+      targetValue: "TGHU7654321",
+      delta: "MISMATCH",
+      severity: "BLOCK"
+    });
+  });
+
   it("WARN when CI and PL packageCount differ", () => {
     const result = checkDocGuardian([
       { docId: "CI-003", docType: "CI", packageCount: 24 },
