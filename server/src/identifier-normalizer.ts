@@ -1,0 +1,60 @@
+export type IdentifierVariant = {
+  raw: string;
+  normalized: string;
+};
+
+const TOKEN_PATTERN = /[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g;
+const HVDC_ADOPT_PATTERN = /^HVDC[-_ ]ADOPT[-_ ]([A-Z]{2,8})[-_ ]0*(\d{1,8})$/i;
+const SHORT_ADOPT_PATTERN = /^([A-Z]{2,8})[-_ ]?0*(\d{1,8})$/i;
+
+function unique(values: string[]): string[] {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+export function normalizeLookupToken(value: string): string {
+  return value.trim().toUpperCase().replace(/\s+/g, "-").replace(/_/g, "-");
+}
+
+function compactToken(value: string): string {
+  return normalizeLookupToken(value).replace(/[-./]/g, "");
+}
+
+function canonicalHvdcAdoptCode(prefix: string, digits: string): string {
+  const numeric = String(Number.parseInt(digits, 10));
+  const padded = numeric === "NaN" ? digits : numeric.padStart(4, "0");
+  return `HVDC-ADOPT-${prefix.toUpperCase()}-${padded}`;
+}
+
+export function expandIdentifierVariants(raw: string): IdentifierVariant[] {
+  const normalized = normalizeLookupToken(raw);
+  const compact = compactToken(raw);
+  const variants = [normalized, compact];
+
+  const fullMatch = HVDC_ADOPT_PATTERN.exec(normalized);
+  if (fullMatch) {
+    variants.push(canonicalHvdcAdoptCode(fullMatch[1], fullMatch[2]));
+    variants.push(`${fullMatch[1].toUpperCase()}${String(Number.parseInt(fullMatch[2], 10)).padStart(4, "0")}`);
+  }
+
+  const shortMatch = SHORT_ADOPT_PATTERN.exec(normalized) ?? SHORT_ADOPT_PATTERN.exec(compact);
+  if (shortMatch) {
+    variants.push(canonicalHvdcAdoptCode(shortMatch[1], shortMatch[2]));
+    variants.push(`${shortMatch[1].toUpperCase()}${String(Number.parseInt(shortMatch[2], 10)).padStart(4, "0")}`);
+  }
+
+  return unique(variants).map((variant) => ({
+    raw,
+    normalized: variant
+  }));
+}
+
+export function extractIdentifierLookupVariants(input: string): IdentifierVariant[] {
+  const rawTokens = input.match(TOKEN_PATTERN) ?? [];
+  const variants = rawTokens.flatMap(expandIdentifierVariants);
+  const seen = new Set<string>();
+  return variants.filter((variant) => {
+    if (seen.has(variant.normalized)) return false;
+    seen.add(variant.normalized);
+    return true;
+  });
+}

@@ -17,6 +17,7 @@ import {
   type WriteFileDryRunInput,
   type WriteFileDryRunResult
 } from "./hvdc-server.js";
+import { extractIdentifierLookupVariants, normalizeLookupToken } from "./identifier-normalizer.js";
 import type { MilestoneRecord } from "./mosb-gate.js";
 import type { ActionProposal } from "./team-action-router.js";
 import type { ResolvedEntity } from "./types.js";
@@ -224,15 +225,6 @@ function storageUnavailable(message: string) {
   };
 }
 
-function normalizeLookupToken(value: string): string {
-  return value.trim().toUpperCase();
-}
-
-function extractLookupTokens(input: string): string[] {
-  const matches = input.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? [];
-  return Array.from(new Set(matches.map(normalizeLookupToken))).slice(0, 8);
-}
-
 function shipmentRowToUnit(row: ControlTowerShipmentRow): ControlTowerShipmentUnit {
   return {
     shipmentUnitId: row.shipment_unit_id,
@@ -245,8 +237,8 @@ function shipmentRowToUnit(row: ControlTowerShipmentRow): ControlTowerShipmentUn
   };
 }
 
-function shipmentRowToResolvedEntity(row: ControlTowerShipmentRow, token: string): ResolvedEntity {
-  const tokenUpper = normalizeLookupToken(token);
+function shipmentRowToResolvedEntity(row: ControlTowerShipmentRow, raw: string, matchedToken: string): ResolvedEntity {
+  const tokenUpper = normalizeLookupToken(matchedToken);
   let identifierScheme = "ShipmentUnit";
   let identifierValue = row.shipment_unit_id;
 
@@ -264,7 +256,7 @@ function shipmentRowToResolvedEntity(row: ControlTowerShipmentRow, token: string
   return {
     entityType: "ShipmentUnit",
     identifierScheme,
-    identifierValue,
+    identifierValue: identifierValue === row.shipment_unit_id ? raw : identifierValue,
     normalizedValue: tokenUpper,
     targetRid: row.shipment_unit_id,
     confidence: 0.98
@@ -295,7 +287,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
       const candidates: ResolvedEntity[] = [];
       const seen = new Set<string>();
 
-      for (const token of extractLookupTokens(identifierOrQuestion)) {
+      for (const { raw, normalized: token } of extractIdentifierLookupVariants(identifierOrQuestion).slice(0, 16)) {
         const rows = await db.prepare(
           `SELECT shipment_unit_id, source_line_id, invoice_no, po_no, declared_destination_set,
                   current_stage, current_location, routing_pattern, latest_receipt_dt, missing_required_destination
@@ -313,7 +305,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
           const key = `${row.shipment_unit_id}:${token}`;
           if (seen.has(key)) continue;
           seen.add(key);
-          candidates.push(shipmentRowToResolvedEntity(row, token));
+          candidates.push(shipmentRowToResolvedEntity(row, raw, token));
         }
       }
 

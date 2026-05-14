@@ -1,4 +1,5 @@
 import type { DomainHint, IntentRoute, ResolvedEntity } from "./types.js";
+import { expandIdentifierVariants } from "./identifier-normalizer.js";
 import { sha256 } from "./redact.js";
 
 export const FMC_ROLE_DOC = "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined";
@@ -133,6 +134,28 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
 export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
   const text = identifierOrQuestion;
   const candidates: ResolvedEntity[] = [];
+  const seen = new Set<string>();
+
+  function pushCandidate(candidate: ResolvedEntity): void {
+    const key = `${candidate.entityType}|${candidate.identifierScheme}|${candidate.normalizedValue}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    candidates.push(candidate);
+  }
+
+  for (const rawToken of text.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? []) {
+    for (const variant of expandIdentifierVariants(rawToken)) {
+      if (!/^HVDC-ADOPT-[A-Z]{2,8}-\d{4,}$/.test(variant.normalized)) continue;
+      pushCandidate({
+        entityType: "ShipmentUnit",
+        identifierScheme: "HVDC_CODE",
+        identifierValue: variant.raw,
+        normalizedValue: variant.normalized,
+        targetRid: `rid_${sha256(`HVDC_CODE:${variant.normalized}`).slice(0, 12)}`,
+        confidence: 0.95
+      });
+    }
+  }
 
   const patterns: Array<{ scheme: string; entityType: ResolvedEntity["entityType"]; regex: RegExp }> = [
     { scheme: "BL", entityType: "Document", regex: /\bBL[-_ ]?[A-Z0-9-]{3,}\b/gi },
@@ -148,7 +171,7 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
     for (const match of text.matchAll(regex)) {
       const raw = match[0];
       const normalized = raw.toUpperCase().replace(/\s+/g, "-");
-      candidates.push({
+      pushCandidate({
         entityType,
         identifierScheme: scheme,
         identifierValue: raw,
