@@ -1,0 +1,17 @@
+# Logistics dataset build summary
+source: data/raw/logistics_status.xlsx
+generated: 2026-05-14T14:18:24.935848Z
+
+shipment_unit rows         : 916
+destination_requirement    : 1310
+receipt_event              : 2053
+milestone_event            : 8179
+validation_log             : 1089
+action_queue               : 790
+
+# Required vs received gap (site receipts)
+site,required,received,gap
+SHU,376,371,5
+DAS,307,297,10
+MIR,333,328,5
+AGI,294,251,43
