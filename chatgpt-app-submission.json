@@ -139,6 +139,54 @@
         "open_world_justification": "Does not publish content or change public internet state or third-party systems.",
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
       }
+    },
+    "check_cost_guard": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Pure computation engine - validates invoice delta percentages without writing to any external system.",
+        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, or mutate any operational truth."
+      }
+    },
+    "check_mosb_gate": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Pure rule evaluation - checks MOSB milestone chain without writing to any external system.",
+        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, or mutate any operational truth."
+      }
+    },
+    "check_doc_guardian": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Pure cross-document consistency check - validates numeric fields without writing to any external system.",
+        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, or mutate any operational truth."
+      }
+    },
+    "get_team_actions": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Pure role routing - produces ActionProposals from an inline matrix without writing to any external system.",
+        "open_world_justification": "Does not publish content or change public internet state or external third-party systems.",
+        "destructive_justification": "Does not delete, overwrite, or mutate any operational truth. PII always masked."
+      }
     }
   },
   "test_cases": [

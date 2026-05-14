@@ -181,3 +181,9 @@ export type CorpusChunk = {
   docHash: string;
   domains: DomainHint[];
 };
+
+// Re-exports from dual-MCP engine modules
+export type { CostGuardBand, CostGuardVerdict, CostGuardLineResult, CostGuardResult, InvoiceLineInput } from "./cost-guard.js";
+export type { RouteGateStatus, RouteGateCard, MilestoneRecord } from "./mosb-gate.js";
+export type { DocGuardianStatus, CrossDocIssue, DocGuardianResult, DocumentInput } from "./doc-guardian.js";
+export type { ActionProposal, TeamActionResult } from "./team-action-router.js";

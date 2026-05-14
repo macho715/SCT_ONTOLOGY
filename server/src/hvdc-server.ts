@@ -7,8 +7,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { answerQuestion, answerToText, buildAuditRecord, type AuditRecord, validateGrounding } from "./answer.js";
 import { searchCorpus } from "./corpus.js";
+import { calcCostGuard } from "./cost-guard.js";
+import { checkDocGuardian } from "./doc-guardian.js";
 import { DEFAULT_WIDGET_HTML } from "./generated/widget-html.js";
+import { checkMosbGate } from "./mosb-gate.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
+import { routeTeamAction } from "./team-action-router.js";
 import type { DomainHint, GroundedAnswer } from "./types.js";
 import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
 
@@ -591,6 +595,171 @@ export const HVDC_TOOL_DESCRIPTORS = {
     outputSchema: writeCommitOutputSchema,
     _meta: {},
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  check_cost_guard: {
+    title: "Check HVDC invoice COST-GUARD",
+    description:
+      "Run the COST-GUARD engine on invoice lines. Returns per-line delta%, band (PASS/WARN/HIGH/CRITICAL), rate-mismatch flags, and human-gate requirement. Human gate fires when invoice total > 100,000 AED or band is HIGH/CRITICAL.",
+    inputSchema: {
+      invoiceNo: z.string().min(1),
+      currency: z.enum(["AED", "USD"]).default("AED").optional(),
+      lines: z.array(
+        z.object({
+          lineNo: z.string(),
+          item: z.string().optional(),
+          qty: z.number(),
+          rate: z.number(),
+          draftAmount: z.number(),
+          standardAmount: z.number().nullable().optional(),
+          currency: z.enum(["AED", "USD"]).optional(),
+          evidenceIds: z.array(z.string()).optional()
+        })
+      )
+    },
+    outputSchema: {
+      invoiceNo: z.string(),
+      lines: z.array(z.object({
+        lineNo: z.string(),
+        item: z.string(),
+        qty: z.number(),
+        rate: z.number(),
+        draftAmount: z.number(),
+        standardAmount: z.number(),
+        expectedByRate: z.number(),
+        currency: z.enum(["AED", "USD"]),
+        deltaPct: z.number().nullable(),
+        band: z.enum(["PASS", "WARN", "HIGH", "CRITICAL"]),
+        rateMismatch: z.boolean(),
+        zeroStandard: z.boolean(),
+        missingEvidence: z.boolean(),
+        verdict: z.enum(["PASS", "BLOCK_FOR_REVIEW"]),
+        humanGateRequired: z.boolean(),
+        ruleViolations: z.array(z.string()),
+        evidenceIds: z.array(z.string())
+      })),
+      invoiceTotalDraft: z.number(),
+      invoiceTotalStandard: z.number(),
+      invoiceTotalDeltaPct: z.number().nullable(),
+      currency: z.enum(["AED", "USD"]),
+      overallBand: z.enum(["PASS", "WARN", "HIGH", "CRITICAL"]),
+      overallVerdict: z.enum(["PASS", "BLOCK_FOR_REVIEW"]),
+      humanGateRequired: z.boolean(),
+      blockReasons: z.array(z.string()),
+      evidenceIds: z.array(z.string()),
+      generatedAt: z.string()
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  check_mosb_gate: {
+    title: "Check MOSB route gate (V-AGIDAS-001)",
+    description:
+      "Validate AGI/DAS offshore MOSB milestone chain. BLOCK if M130 is closed but M115 MOSB Staged evidence is missing. WARN if M116/M117 are absent without approved exception.",
+    inputSchema: {
+      shipmentUnitId: z.string().min(1),
+      declaredDestination: z.string().min(1),
+      routingPattern: z.string().min(1),
+      milestones: z.array(
+        z.object({
+          code: z.string(),
+          actualDt: z.string().nullable().optional(),
+          approvedExceptionRef: z.string().nullable().optional()
+        })
+      )
+    },
+    outputSchema: {
+      shipmentUnitId: z.string(),
+      declaredDestination: z.string(),
+      routingPattern: z.string(),
+      status: z.enum(["PASS", "WARN", "BLOCK"]),
+      appliedRule: z.string().nullable(),
+      missingMilestones: z.array(z.string()),
+      requiredEvidence: z.array(z.string()),
+      ownerRole: z.string(),
+      nextAction: z.string(),
+      humanGateRequired: z.boolean(),
+      message: z.string(),
+      generatedAt: z.string()
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  check_doc_guardian: {
+    title: "Check document guardian cross-doc consistency",
+    description:
+      "Cross-validate a set of HVDC shipment documents (CI, PL, BL, BOE, DO, MRR, etc.) for numeric integrity: qty, weight, containerNo, and packageCount consistency. Returns NumericIntegrityPct and BLOCK/WARN/PASS findings.",
+    inputSchema: {
+      documents: z.array(
+        z.object({
+          docId: z.string(),
+          docType: z.string(),
+          docNo: z.string().optional(),
+          docHash: z.string().optional(),
+          shipmentUnitId: z.string().optional(),
+          qty: z.number().nullable().optional(),
+          weight: z.number().nullable().optional(),
+          currency: z.enum(["AED", "USD"]).optional(),
+          amount: z.number().nullable().optional(),
+          containerNo: z.string().nullable().optional(),
+          packageCount: z.number().nullable().optional()
+        })
+      )
+    },
+    outputSchema: {
+      docIds: z.array(z.string()),
+      verificationStatus: z.enum(["PASS", "WARN", "BLOCK"]),
+      crossDocIssues: z.array(
+        z.object({
+          field: z.string(),
+          sourceDoc: z.string(),
+          targetDoc: z.string(),
+          sourceValue: z.string(),
+          targetValue: z.string(),
+          delta: z.string(),
+          severity: z.enum(["WARN", "BLOCK"])
+        })
+      ),
+      numericIntegrityPct: z.number(),
+      evidenceAssertions: z.array(z.string()),
+      auditRecordId: z.string(),
+      humanGateRequired: z.boolean(),
+      message: z.string(),
+      generatedAt: z.string()
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  get_team_actions: {
+    title: "Get HVDC team action proposals",
+    description:
+      "Route a shipment milestone and domain to the correct owner role and produce ActionProposals with required documents and due dates. PII is always masked (role-first, no raw contacts).",
+    inputSchema: {
+      shipmentUnitId: z.string().min(1),
+      milestoneCode: z.string().min(1),
+      domain: z.string().min(1),
+      openExceptions: z.array(z.string()).optional()
+    },
+    outputSchema: {
+      shipmentUnitId: z.string(),
+      milestoneCode: z.string(),
+      domain: z.string(),
+      proposals: z.array(
+        z.object({
+          actionType: z.string(),
+          targetObject: z.string(),
+          ownerRole: z.string(),
+          backupRole: z.string().nullable(),
+          humanGateRequired: z.boolean(),
+          dueAt: z.string().nullable(),
+          requiredDocs: z.array(z.string()),
+          piiMasked: z.literal(true)
+        })
+      ),
+      message: z.string(),
+      generatedAt: z.string()
+    },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
   }
 };
 
@@ -917,6 +1086,62 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
       return {
         structuredContent,
         content: [{ type: "text", text: JSON.stringify(structuredContent) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "check_cost_guard",
+    HVDC_TOOL_DESCRIPTORS.check_cost_guard,
+    async ({ invoiceNo, currency, lines }) => {
+      const result = calcCostGuard(invoiceNo, lines, currency ?? "AED");
+      await options.audit?.(buildAuditRecord("check_cost_guard", { invoiceNo, currency, lineCount: lines.length }, result, true));
+      return {
+        structuredContent: result,
+        content: [{ type: "text", text: JSON.stringify({ invoiceNo, overallBand: result.overallBand, humanGateRequired: result.humanGateRequired, blockReasons: result.blockReasons }) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "check_mosb_gate",
+    HVDC_TOOL_DESCRIPTORS.check_mosb_gate,
+    async ({ shipmentUnitId, declaredDestination, routingPattern, milestones }) => {
+      const result = checkMosbGate(shipmentUnitId, declaredDestination, routingPattern, milestones);
+      await options.audit?.(buildAuditRecord("check_mosb_gate", { shipmentUnitId, declaredDestination, routingPattern }, result, true));
+      return {
+        structuredContent: result,
+        content: [{ type: "text", text: JSON.stringify({ status: result.status, appliedRule: result.appliedRule, missingMilestones: result.missingMilestones, humanGateRequired: result.humanGateRequired }) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "check_doc_guardian",
+    HVDC_TOOL_DESCRIPTORS.check_doc_guardian,
+    async ({ documents }) => {
+      const result = checkDocGuardian(documents);
+      await options.audit?.(buildAuditRecord("check_doc_guardian", { docCount: documents.length }, result, true));
+      return {
+        structuredContent: result,
+        content: [{ type: "text", text: JSON.stringify({ verificationStatus: result.verificationStatus, numericIntegrityPct: result.numericIntegrityPct, issueCount: result.crossDocIssues.length }) }]
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "get_team_actions",
+    HVDC_TOOL_DESCRIPTORS.get_team_actions,
+    async ({ shipmentUnitId, milestoneCode, domain, openExceptions }) => {
+      const result = routeTeamAction(shipmentUnitId, milestoneCode, domain, openExceptions ?? []);
+      await options.audit?.(buildAuditRecord("get_team_actions", { shipmentUnitId, milestoneCode, domain }, result, true));
+      return {
+        structuredContent: result,
+        content: [{ type: "text", text: JSON.stringify({ proposalCount: result.proposals.length, message: result.message }) }]
       };
     }
   );

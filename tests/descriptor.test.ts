@@ -25,8 +25,12 @@ type Submission = {
 const APPROVED_V1_TOOL_NAMES = [
   "ask_hvdc_ontology",
   "attach_uploaded_file",
+  "check_cost_guard",
+  "check_doc_guardian",
+  "check_mosb_gate",
   "complete_upload",
   "create_upload_url",
+  "get_team_actions",
   "render_hvdc_answer_card",
   "route_question",
   "search_ontology_corpus",
