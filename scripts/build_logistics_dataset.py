@@ -135,7 +135,14 @@ def line_id(row_idx: int) -> str:
 # ---------------------------------------------------------------------------
 def main() -> None:
     wb = openpyxl.load_workbook(SRC, read_only=True, data_only=True)
-    ws = wb["시트1"]
+    expected_sheet = "시트1"
+    if expected_sheet not in wb.sheetnames:
+        available_sheets = ", ".join(wb.sheetnames) if wb.sheetnames else "(none)"
+        raise ValueError(
+            f"Worksheet '{expected_sheet}' not found in {SRC}. "
+            f"Available sheets: {available_sheets}"
+        )
+    ws = wb[expected_sheet]
 
     dest_rows: list[dict] = []
     rec_rows: list[dict] = []
