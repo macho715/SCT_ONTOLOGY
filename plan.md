@@ -185,3 +185,74 @@ test expectations:
 coordination recommendation:
 
 - Use `pipeline-coordinator` if all three options remain open after approval, because Option A/B/C affect shared answer-policy boundaries.
+
+## 2026-05-14 Plan Update: Operating Documentation Sync
+
+Purpose: keep the root PLAN aligned with the current code and operating evidence while preserving the earlier Phase 2 Validation Signal Merge plan above.
+
+Current baseline:
+
+- Repository: `C:\Users\jichu\Downloads\HVDC Ontology Grounded`
+- Local HEAD and `origin/main` HEAD: `97837da9af12a32a62e4e8ef19373f64674ecc53`
+- Scope of this update: planning documentation only; implementation code is already present in the current tree.
+
+### Done
+
+- Cloudflare MCP operation is now the active operating lane. The server exposes the Cloudflare Worker MCP entrypoint and keeps the remote MCP endpoint as the deployment-facing path.
+- The MCP tool surface is documented as a 15-tool operating set through `server/src/hvdc-server.ts` and descriptor tests.
+- `resolve_any_key` now covers the D1 Control Tower lookup path before local fallback resolution. This makes shipment-unit lookup available from the Cloudflare D1 dataset when bindings are present.
+- The HVDC code resolver is suffix-aware. It preserves split-shipment suffixes such as `HE68-1`, `SIM5-2A`, and `SEI17-03` and normalizes them into full `HVDC-ADOPT-*` codes.
+- R2/D1 protected upload and write operations are part of the operating plan. Upload URL creation, upload completion, file attachment, write proposal, and write commit remain guarded by OAuth Bearer scopes and Human-gate approval language.
+- Dual-MCP engines remain in scope. The operating plan keeps the Cloudflare Worker MCP path and the local/Claude MCP compatibility path separated instead of treating them as one runtime.
+
+### Remaining
+
+- Root documentation sync still needs to stay coordinated with parallel edits in `README.md`, `SYSTEM_ARCHITECTURE.md`, `LAYOUT.md`, and `CHANGELOG.md`. This `plan.md` section records the operating plan, but those other files are owned by separate agents in this work cycle.
+- Production-like verification depends on Cloudflare bindings. Local tests can confirm descriptors, resolver behavior, and mocked D1 lookup behavior, but live R2/D1 behavior still depends on the deployed Worker environment and configured bindings.
+- The previous Phase 2 validation-signal plan remains preserved above. It should not be treated as deleted or replaced by this operating sync section.
+
+### Verification
+
+Current verification evidence to keep attached to this operating plan:
+
+- Code evidence:
+  - `server/src/identifier-normalizer.ts` defines suffix-aware identifier normalization and lookup variant expansion.
+  - `server/src/worker.ts` wires Cloudflare D1 Control Tower lookup, R2/D1 storage operations, and Worker MCP handling.
+  - `server/src/hvdc-server.ts` defines the MCP tool descriptors, `resolve_any_key`, protected upload/write tools, and Dual-MCP-compatible server registration.
+- Test evidence:
+  - `tests/control-tower-d1.test.ts` verifies D1 Control Tower lookup preference for `resolve_any_key` and D1 action queue routing behavior.
+  - `tests/identifier-normalizer.test.ts` verifies suffix-aware HVDC code normalization for `HE68-1`, `SIM5-2A`, and `SEI17-03`.
+  - `tests/descriptor.test.ts` verifies Cloudflare Worker MCP entrypoint behavior and OAuth-protected upload/write tool descriptors.
+- ChatGPT operating smoke evidence:
+  - `resolve_any_key` direct calls passed for `SIM5-2A`.
+  - `resolve_any_key` direct calls passed for `HE68-1`.
+  - `resolve_any_key` direct calls passed for `SEI17-03`.
+
+### Operating documentation workflow
+
+```mermaid
+graph TD
+  A["Current code state<br/>HEAD 97837da"] --> B["plan.md operating sync"]
+  B --> C["Document current MCP lane<br/>Cloudflare Worker MCP + Dual-MCP compatibility"]
+  B --> D["Document data lookup lane<br/>D1 Control Tower before local fallback"]
+  B --> E["Document identifier lane<br/>suffix-aware HVDC resolver"]
+  B --> F["Document protected write lane<br/>OAuth + Human-gate + R2/D1"]
+  C --> G["README / architecture / layout / changelog parallel sync"]
+  D --> G
+  E --> G
+  F --> G
+  G --> H["Verification lane<br/>descriptor + D1 + identifier tests"]
+```
+
+### Next execution lane
+
+Run the documentation verification lane after all parallel documentation edits land:
+
+```powershell
+npm test -- tests/control-tower-d1.test.ts tests/identifier-normalizer.test.ts tests/descriptor.test.ts
+```
+
+Exit condition:
+
+- The three focused tests pass.
+- The documentation set consistently describes Cloudflare MCP 15 tools, D1 Control Tower lookup, suffix-aware HVDC code resolving, protected R2/D1 upload/write, and Dual-MCP operation.

@@ -106,3 +106,26 @@ Run focused tests and full repository verification before claiming completion.
 - Focused test result for `tests/pipeline.test.ts` and `tests/descriptor.test.ts`.
 - Full `npm run verify` result.
 - Commit containing only Phase 3 contract/regression-gate changes.
+
+## 2026-05-14 Operating Sync Addendum
+
+쉽게 말하면: 이 Phase 3 계획은 기존 6-tool contract를 잠그는 계획으로 보존한다. 현재 운영 MCP는 이후 Cloudflare/Dual-MCP 확장으로 15개 tool을 노출하므로, 이 문서는 과거 regression gate의 기준선으로 읽어야 한다.
+
+| 항목 | 현재 해석 |
+|---|---|
+| Preserved scope | Phase 3 당시 `ask_hvdc_ontology`와 `render_hvdc_answer_card`의 역할 분리 기준 |
+| Current runtime | Cloudflare Worker `/mcp` 운영 surface |
+| Current tool count | 15개 MCP tool |
+| New evidence added after this plan | D1 Control Tower lookup, suffix-aware `resolve_any_key`, protected R2/D1 upload/write, Dual-MCP engines |
+| Current focused validation | `tests/control-tower-d1.test.ts`, `tests/identifier-normalizer.test.ts`, `tests/descriptor.test.ts` |
+
+```mermaid
+flowchart LR
+  Phase3["Phase 3 baseline<br/>six-tool contract gates"] --> Descriptor["descriptor regression<br/>tests/descriptor.test.ts"]
+  Phase3 --> Pipeline["pipeline regression<br/>tests/pipeline.test.ts"]
+  Descriptor --> Current["Current Cloudflare MCP<br/>15 tools"]
+  Pipeline --> Current
+  Current --> D1["D1 Control Tower lookup"]
+  Current --> R2["R2/D1 protected writes"]
+  Current --> Resolver["suffix-aware resolve_any_key"]
+```

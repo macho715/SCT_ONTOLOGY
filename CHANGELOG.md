@@ -4,6 +4,25 @@
 
 ## Unreleased - 2026-05-14 Dual-MCP main, Cloudflare, and root documentation synchronization
 
+### Addendum - 2026-05-14 current main and ChatGPT operations smoke
+
+- Preserved the earlier `15472eac` Worker deployment and 150-test record below as a historical snapshot, then added this current operating note for local/origin `main` HEAD `97837da9af12a32a62e4e8ef19373f64674ecc53`.
+- Confirmed the latest operational scope: suffix-aware HVDC code resolver, D1 Control Tower lookup, 15 MCP tools, protected R2/D1 upload and write paths, and Dual-MCP engines.
+- Code evidence for this operating state is concentrated in `server/src/identifier-normalizer.ts`, `server/src/worker.ts`, and `server/src/hvdc-server.ts`.
+- Test evidence for this operating state is tracked by `tests/control-tower-d1.test.ts`, `tests/identifier-normalizer.test.ts`, and `tests/descriptor.test.ts`.
+- ChatGPT operations smoke confirmed direct `resolve_any_key` calls for suffixed and abbreviated HVDC codes:
+  `SIM5-2A` -> `HVDC-ADOPT-SIM-0005-2A`,
+  `HE68-1` -> `HVDC-ADOPT-HE-0068-1`,
+  `SEI17-03` -> `HVDC-ADOPT-SEI-0017-03`.
+
+```mermaid
+flowchart LR
+  A["Code patch: suffix-aware resolver, D1 lookup, protected R2/D1 writes"] --> B["Tests: control-tower-d1, identifier-normalizer, descriptor"]
+  B --> C["GitHub main: 97837da9af12a32a62e4e8ef19373f64674ecc53"]
+  C --> D["Cloudflare Worker: 15 MCP tools and Dual-MCP engines"]
+  D --> E["ChatGPT smoke: resolve_any_key direct calls PASS"]
+```
+
 ### Changed
 
 - Updated the root README with a 2026-05-14 operating snapshot that separates Cloudflare Workers MCP production behavior from local Python/Fuseki reference work.
@@ -17,6 +36,10 @@
 - `Invoke-RestMethod https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/healthz` returned Cloudflare Workers runtime, R2 enabled, D1 audit enabled, protected write tools enabled, and token configured.
 - Remote MCP `initialize` and `tools/list` returned 15 tools.
 - Remote MCP `check_cost_guard` smoke returned `overallBand=WARN` for a 3.00% invoice total delta.
+- ChatGPT connector direct `resolve_any_key` smoke passed for suffixed / abbreviated HVDC codes:
+  `SIM5-2A` → `HVDC-ADOPT-SIM-0005-2A`,
+  `HE68-1` → `HVDC-ADOPT-HE-0068-1`,
+  `SEI17-03` → `HVDC-ADOPT-SEI-0017-03`.
 - `npm run worker:deploy` passed `npm run verify` with 10 test files and 150 tests, completed Worker dry-run, and deployed Cloudflare Worker Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8`.
 - Remote D1 migration `0003_dual_mcp_tables.sql` was applied and created `identifier_index`, `milestone_event`, and `team_role_matrix`; `team_role_matrix` contains 6 seed rows.
 - `git rev-parse HEAD` and `git ls-remote origin refs/heads/main` matched `44d6c68bcd1821f2c59e325816d95793cc12d33e` before this documentation patch.

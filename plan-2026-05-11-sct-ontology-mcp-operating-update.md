@@ -214,3 +214,26 @@ Verification:
 - Result: 1 test file passed, 6 tests passed.
 - `npm run verify`
 - Result: TypeScript typecheck passed, 6 test files passed, 96 tests passed.
+
+## 2026-05-14 Operating Sync Addendum
+
+쉽게 말하면: 이 계획은 `sct_ontology` 운영 규칙을 repo governance로 옮긴 기록이다. 현재 운영 MCP는 같은 governance를 Cloudflare Worker `/mcp`와 15개 tool surface 위에서 적용한다.
+
+| 항목 | 현재 연결 |
+|---|---|
+| Original governance files | mission, default context, answer contract, evidence matrix, AMBER/ZERO rulebook, golden QA |
+| Current runtime | Cloudflare Workers remote MCP |
+| Current storage boundary | D1 audit/control tower lookup, R2 managed file storage |
+| Current resolver boundary | suffix-aware `resolve_any_key` for short HVDC codes such as `SIM5-2A`, `HE68-1`, `SEI17-03` |
+| Current validation focus | descriptor parity, D1-backed lookup, identifier normalizer, protected tool metadata |
+
+```mermaid
+flowchart LR
+  Governance["sct_ontology governance"] --> Contract["answer contract and evidence matrix"]
+  Contract --> Runtime["Cloudflare MCP /mcp"]
+  Runtime --> ReadTools["read and validation tools"]
+  Runtime --> DualTools["Dual-MCP analysis tools"]
+  Runtime --> ProtectedTools["R2/D1 protected upload/write"]
+  ReadTools --> Audit["D1 audit and Control Tower"]
+  ProtectedTools --> R2["R2 managed files"]
+```

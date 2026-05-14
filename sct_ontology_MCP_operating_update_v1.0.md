@@ -75,3 +75,26 @@ User question
 - High-risk ZERO recall 100.00%
 - Hallucination incident 0.00건
 - Audit log coverage 100.00%
+
+## 2026-05-14 Operating Sync Addendum
+
+쉽게 말하면: 이 운영 업데이트의 Answer Contract와 evidence gate는 현재 Cloudflare MCP 운영 문서와 같은 방향이다. 최신 운영 surface는 15개 tool, D1 Control Tower lookup, R2/D1 protected write, suffix-aware identifier resolver를 포함한다.
+
+| 항목 | 최신 반영 기준 |
+|---|---|
+| Operating layer | `sct_ontology` remains the default HVDC logistics context layer |
+| Runtime surface | Cloudflare Worker `/mcp` |
+| Current tool surface | 15 MCP tools |
+| Evidence lookup | ontology corpus plus D1 Control Tower tables |
+| Identifier examples | `SIM5-2A`, `HE68-1`, `SEI17-03` normalize to canonical `HVDC-ADOPT-*` codes |
+| Write boundary | protected R2/D1 managed storage only; no ERP/WMS/Foundry mutation |
+
+```mermaid
+flowchart LR
+  User["HVDC logistics question"] --> SCT["sct_ontology context"]
+  SCT --> Resolver["suffix-aware resolve_any_key"]
+  Resolver --> Evidence["ontology corpus + D1 Control Tower"]
+  Evidence --> Gate["AMBER/ZERO and evidence gate"]
+  Gate --> Answer["structured answer"]
+  Gate --> Audit["D1 audit log"]
+```

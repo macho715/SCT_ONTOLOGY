@@ -62,3 +62,26 @@ Vercel은 MCP runtime이 아니라 dashboard/admin UI로만 쓰는 것이 안전
 - [ ] Phase 1 승인
 
 승인 후 Phase 2에서 Mermaid 구조도, 파일 변경 목록, 작업 순서, 테스트 전략, 위험 완화안을 작성한다.
+
+## 2026-05-14 Operating Sync Addendum
+
+쉽게 말하면: 이 migration plan은 Cloudflare 선택과 전환 근거를 보존한다. 현재 운영 상태는 Cloudflare Worker `/mcp`, R2, D1 audit/control tower, protected upload/write, 15개 MCP tool까지 확장된 상태다.
+
+| 항목 | 현재 상태 |
+|---|---|
+| Migration decision | Cloudflare Workers/R2/D1 우선안 유지 |
+| Current endpoint | `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` |
+| Current clients | ChatGPT, Claude, Cursor 모두 같은 remote MCP URL 기준 |
+| Current D1 use | audit log와 Control Tower `shipment_unit`, `milestone_event`, `action_queue` lookup |
+| Current R2 use | managed evidence upload/write proposal storage |
+| Current follow-up boundary | live ERP/WMS/Foundry write-back은 여전히 운영 범위 밖 |
+
+```mermaid
+flowchart TD
+  Plan["Cloudflare migration plan"] --> Worker["Cloudflare Worker /mcp"]
+  Worker --> Tools["15 MCP tools"]
+  Tools --> Read["ontology read and validation"]
+  Tools --> D1["D1 audit + Control Tower"]
+  Tools --> R2["R2 managed files"]
+  D1 --> Smoke["resolve_any_key smoke<br/>SIM5-2A / HE68-1 / SEI17-03"]
+```

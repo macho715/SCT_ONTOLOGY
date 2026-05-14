@@ -4,6 +4,41 @@
 
 현재 상태는 Cloudflare Workers 운영 기준입니다. MCP 서버, 15개 tool, Dual-MCP 검증 엔진, 온톨로지 corpus 번들, Evidence Drawer 위젯, OAuth Bearer 보호 upload/write 도구, D1 감사 로그, R2 파일 저장소, golden eval, GitHub Actions 검증이 들어 있습니다.
 
+## 2026-05-14 Current Operating Addendum
+
+쉽게 말하면: 현재 루트 README 기준은 Cloudflare 운영 MCP와 실제 Worker 코드입니다. 아래 `2026-05-14 운영 문서 동기화` 섹션의 Worker Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8` 기록은 삭제하지 않고 이전 배포 snapshot으로 보존합니다.
+
+| 항목 | 현재 기준 | 코드 또는 검증 근거 |
+|---|---|---|
+| Repository baseline | local/origin `main` HEAD `97837da9af12a32a62e4e8ef19373f64674ecc53` | 현재 운영 문서 업데이트 기준 commit |
+| Production MCP endpoint | `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` | Cloudflare Worker `hvdc-ontology-chatgpt-app`의 `/mcp` surface |
+| MCP tool count | 15개 tool | `server/src/hvdc-server.ts`에서 `resolve_any_key`, `check_cost_guard`, `check_mosb_gate`, `check_doc_guardian`, `get_team_actions` 등 등록 |
+| Control Tower lookup | Cloudflare D1 기반 lookup | `server/src/worker.ts`의 `createControlTowerLookup` |
+| Protected file operations | R2/D1 보호 upload/write | `create_upload_url`, `complete_upload`, `attach_uploaded_file`, `write_file_dry_run`, `write_file_commit`는 관리 저장소 경로에만 적용 |
+| MCP transport | Cloudflare Worker `/mcp` handler | `server/src/worker.ts`의 `createMcpHandler` |
+| Dual-MCP engines | CostGuard, MOSB Gate, Doc Guardian, Team Actions | `server/src/hvdc-server.ts`의 Dual-MCP analysis tools |
+| Suffix-aware HVDC code resolver | short code와 suffix를 canonical HVDC-ADOPT code로 정규화 | `server/src/identifier-normalizer.ts`의 `HVDC_ADOPT_PATTERN`, `SHORT_ADOPT_PATTERN`, `compactHvdcAdoptCode` |
+| ChatGPT smoke examples | `SIM5-2A` -> `HVDC-ADOPT-SIM-0005-2A`; `HE68-1` -> `HVDC-ADOPT-HE-0068-1`; `SEI17-03` -> `HVDC-ADOPT-SEI-0017-03` | 운영 smoke에서 `resolve_any_key` direct calls 통과 |
+| Regression coverage | Control Tower D1, identifier normalizer, descriptor contract | `tests/control-tower-d1.test.ts`, `tests/identifier-normalizer.test.ts`, `tests/descriptor.test.ts` |
+
+```mermaid
+flowchart LR
+  ChatGPT["ChatGPT"] --> Worker["Cloudflare Worker<br/>/mcp"]
+  Claude["Claude"] --> Worker
+  Cursor["Cursor"] --> Worker
+  Worker --> Handler["createMcpHandler"]
+  Handler --> McpTools["15 MCP tools"]
+  McpTools --> Resolver["resolve_any_key<br/>suffix-aware HVDC resolver"]
+  McpTools --> ControlTower["Control Tower lookup"]
+  McpTools --> DualEngines["Dual-MCP engines<br/>CostGuard / MOSB Gate<br/>Doc Guardian / Team Actions"]
+  McpTools --> ProtectedWrite["protected upload/write"]
+  ControlTower --> D1["Cloudflare D1"]
+  DualEngines --> D1
+  ProtectedWrite --> D1
+  ProtectedWrite --> R2["Cloudflare R2"]
+  Resolver --> Corpus["ontology corpus / identifiers"]
+```
+
 ## 2026-05-14 운영 문서 동기화
 
 쉽게 말하면: 루트 문서의 현재 기준은 Cloudflare 운영 MCP입니다. 로컬 Python/Fuseki 폴더는 운영 런타임이 아니라 `ontology-insight-upgrade/` 참조 구현과 향후 `invoice_risk_scan` 계획 자료로 분리합니다.
@@ -21,6 +56,8 @@
 | Planning docs | `20260514_project-upgrade-report.md` and `20260514_plan-doc.md` are root planning inputs | not yet registered as root GSD `.planning/phases/*` execution plans |
 
 Document alignment rule: README, SYSTEM_ARCHITECTURE, LAYOUT, and CHANGELOG must describe the same boundary. Cloudflare Worker is the public MCP surface. `ontology-insight-upgrade/` is a checked-in local reference implementation and planning source, not proof that Fuseki, Flask, or `invoice_risk_scan` is deployed.
+
+2026-05-14 note: the table above is preserved as an earlier deployment and verification snapshot. The current documentation sync baseline is the `Current Operating Addendum` section above.
 
 ## 현재 구현 범위
 

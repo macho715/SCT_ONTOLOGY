@@ -254,3 +254,25 @@ This spec has no open questions blocking execution review, and all Phase 3 succe
 - v0.1.0: Initial Phase 3 Spec drafted from `phase3-plan.md`.
 - v0.1.1: Resolved OQ-001 and OQ-002, added compatibility widget alias success criterion, and updated approval readiness.
 - v0.1.2: Marked Phase 3 complete with local verification and GitHub Actions success evidence.
+
+## 2026-05-14 Operating Sync Addendum
+
+쉽게 말하면: 이 spec은 Phase 3 완료 기준을 보존한다. 현재 운영 MCP는 Phase 3 이후 Cloudflare Worker, D1 Control Tower lookup, R2/D1 protected file tools, Dual-MCP engines까지 확장됐다.
+
+| 항목 | 현재 문서 기준 |
+|---|---|
+| Preserved spec status | Phase 3 `Completed` 기록은 유지 |
+| Current operating endpoint | `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` |
+| Current source baseline | local/origin `main` HEAD `97837da9af12a32a62e4e8ef19373f64674ecc53` |
+| Current direct smoke examples | `SIM5-2A`, `HE68-1`, `SEI17-03` direct `resolve_any_key` 통과 |
+| Current code evidence | `server/src/identifier-normalizer.ts`, `server/src/worker.ts`, `server/src/hvdc-server.ts` |
+
+```mermaid
+flowchart TD
+  Spec["Phase 3 completed spec"] --> Guard["contract and regression gates"]
+  Guard --> Runtime["Cloudflare Worker /mcp"]
+  Runtime --> Tools["15 MCP tools"]
+  Tools --> Resolver["suffix-aware resolver"]
+  Tools --> ControlTower["D1 Control Tower"]
+  Tools --> DualMcp["CostGuard / MOSB / Doc Guardian / Team Actions"]
+```

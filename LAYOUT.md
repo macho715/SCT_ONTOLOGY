@@ -19,6 +19,156 @@
 
 문서 간 기준: README, SYSTEM_ARCHITECTURE, LAYOUT, CHANGELOG는 모두 Cloudflare `/mcp`를 public surface로 설명해야 한다. localhost, Fuseki, Flask, ngrok, GPTs Actions는 로컬 참조나 마이그레이션 자료로만 설명한다.
 
+## 2026-05-14 Current Layout Addendum
+
+쉽게 말하면: 현재 운영 기준은 Cloudflare Worker MCP가 `/mcp`를 받고, D1 Control Tower와 R2 파일 저장소를 `server/src/worker.ts`에서 연결하는 구조다.
+
+현재 기준점:
+
+- repo root: `C:\Users\jichu\Downloads\HVDC Ontology Grounded`
+- current local/origin main HEAD: `97837da9af12a32a62e4e8ef19373f64674ecc53`
+- 운영 MCP URL: `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`
+- Worker entrypoint: `server/src/worker.ts`
+- MCP tool factory: `server/src/hvdc-server.ts`
+- Cloudflare binding 설정: `wrangler.toml`
+
+### Runtime wiring
+
+| 영역 | 실제 위치 | 현재 역할 |
+|---|---|---|
+| Cloudflare Worker MCP | `server/src/worker.ts` | `/mcp` 요청 처리, OAuth protected-resource metadata, D1 audit, R2 upload/write, Control Tower lookup 연결 |
+| MCP tool registration | `server/src/hvdc-server.ts` | ChatGPT Apps SDK MCP tool과 resource 등록, shared core tool contract 유지 |
+| D1 Control Tower lookup | `server/src/worker.ts`의 `createControlTowerLookup` | `shipment_unit`, `milestone_event`, `action_queue` 기반으로 any-key lookup과 gate/action tool 입력을 보강 |
+| Short-code resolver | `server/src/identifier-normalizer.ts` | `SCT001`, `SIM5-2A` 같은 짧은 현장 코드와 HVDC ADOPT 계열 lookup variant 생성 |
+| Static resolver fallback | `server/src/router.ts` | D1 후보가 없을 때 BL, BOE, DO, invoice, HVDC code, site, milestone 후보를 정규화 |
+| CostGuard | `server/src/cost-guard.ts` | invoice line delta, band, Human-gate 판정 계산 |
+| MOSB Gate | `server/src/mosb-gate.ts` | AGI/DAS MOSB milestone chain 검증 |
+| Document Guardian | `server/src/doc-guardian.ts` | CI/BL/PL/DO 교차 검증 |
+| Team Action Router | `server/src/team-action-router.ts` | milestone/domain 기반 role-first action proposal 생성 |
+| Answer pipeline | `server/src/answer.ts`, `server/src/corpus.ts`, `server/src/router.ts` | corpus 검색, 라우팅, 근거 기반 답변 생성 |
+
+### Cloudflare storage layout
+
+| 저장소 | 설정 또는 schema 위치 | 런타임 의미 |
+|---|---|---|
+| D1 binding `MCP_AUDIT_DB` | `wrangler.toml` | audit log, upload/write metadata, Dual-MCP metadata, Control Tower dataset 조회에 사용 |
+| R2 binding `HVDC_FILES` | `wrangler.toml` | protected upload/write object 저장소 |
+| D1 audit/upload schema | `migrations/0001_mcp_audit_logs.sql`, `migrations/0002_mcp_upload_write.sql` | MCP audit와 protected upload/write 흐름의 저장 구조 |
+| Dual-MCP schema | `migrations/0003_dual_mcp_tables.sql` | ChatGPT/Claude MCP metadata 확장 구조 |
+| Control Tower schema | `migrations/0004_control_tower_datasets.sql` | `shipment_unit`, `milestone_event`, `action_queue` dataset 구조 |
+| Control Tower seed script | `scripts/seed_control_tower_d1.py` | `data/datasets` CSV를 remote D1 Control Tower dataset으로 적재 |
+
+### Source data and generated runtime assets
+
+| 폴더 | 실제 역할 |
+|---|---|
+| `data/corpus/` | 승인된 온톨로지 corpus 원본이다. 런타임 검색 데이터의 기준 입력이다. |
+| `data/index/` | corpus inventory와 index review artifact를 담는다. 런타임 직접 입력이 아니라 검토와 재현 근거다. |
+| `data/datasets/` | Control Tower용 CSV dataset이다. `shipment_unit`, `milestone_event`, `receipt_event`, `action_queue`, `destination_requirement`, `validation_log`를 포함한다. |
+| `server/src/generated/` | `scripts/generate_worker_assets.py`가 만드는 Worker bundle 입력이다. `corpus-data.ts`, `sample-shipments.ts`, `widget-html.ts`를 포함한다. |
+| `scripts/` | corpus index 생성, Worker asset 생성, Cloudflare deploy, D1 seed, validation 보조 스크립트를 담는다. |
+| `docs/plans/` | 현재 운영 변경과 향후 migration 계획 문서를 담는다. 루트의 현재 운영 설명과 분리된 계획 보관 위치다. |
+
+### Data-to-runtime type graph
+
+아래 Mermaid 그래프는 저장소의 데이터 원본이 Cloudflare MCP 런타임으로 이어지는 실제 배치를 보여준다.
+
+```mermaid
+classDiagram
+  class RootDocs {
+    README_md
+    SYSTEM_ARCHITECTURE_md
+    LAYOUT_md
+    CHANGELOG_md
+  }
+  class DocsPlans {
+    plan_documents
+    migration_notes
+  }
+  class DataCorpus {
+    CONSOLIDATED_00_to_09
+    Team_role_matrix
+    FMC_role_evidence
+  }
+  class DataDatasets {
+    shipment_unit_csv
+    milestone_event_csv
+    action_queue_csv
+    destination_requirement_csv
+  }
+  class Scripts {
+    generate_worker_assets_py
+    seed_control_tower_d1_py
+    deploy_cloudflare_ps1
+  }
+  class ServerGenerated {
+    corpus_data_ts
+    sample_shipments_ts
+    widget_html_ts
+  }
+  class Worker {
+    mcp_fetch_handler
+    D1_audit_writer
+    R2_upload_write_handlers
+    createControlTowerLookup
+  }
+  class HvdcServer {
+    registerAppTool
+    registerAppResource
+    resolve_any_key
+    Control_Tower_aware_tools
+  }
+  class IdentifierNormalizer {
+    short_code_variants
+    normalized_lookup_tokens
+  }
+  class Migrations {
+    audit_tables
+    upload_write_tables
+    dual_MCP_tables
+    control_tower_tables
+  }
+  class CloudflareRuntime {
+    MCP_URL
+    D1_MCP_AUDIT_DB
+    R2_HVDC_FILES
+  }
+  class Tests {
+    control_tower_d1_test_ts
+    identifier_normalizer_test_ts
+    dual_mcp_test_ts
+    descriptor_test_ts
+  }
+
+  RootDocs --> DocsPlans : references plans without replacing runtime truth
+  DataCorpus --> Scripts : source for generated Worker corpus
+  Scripts --> ServerGenerated : writes bundle assets
+  DataDatasets --> Scripts : source for D1 seed
+  Scripts --> CloudflareRuntime : seeds D1 and deploys Worker
+  Migrations --> CloudflareRuntime : defines D1 schema
+  ServerGenerated --> HvdcServer : corpus and widget inputs
+  IdentifierNormalizer --> Worker : lookup variants for Control Tower
+  Worker --> HvdcServer : passes audit, storage, controlTower options
+  HvdcServer --> CloudflareRuntime : serves MCP tools and resources
+  Tests --> Worker : validates D1 and descriptor contracts
+  Tests --> IdentifierNormalizer : validates short-code normalization
+```
+
+### Current verification files and operating smoke scope
+
+기존 `tests` 섹션의 150개 테스트 표기는 삭제하지 않는다.
+현재 Cloudflare MCP 운영 상태를 볼 때는 전체 개수 표기와 별도로 아래 파일군을 우선 확인한다.
+
+| 검증 파일군 | 확인 의미 |
+|---|---|
+| `tests/control-tower-d1.test.ts` | D1 `shipment_unit` any-key lookup과 `action_queue` 우선 사용을 확인한다. |
+| `tests/identifier-normalizer.test.ts` | short-code resolver와 identifier variant 생성을 확인한다. |
+| `tests/dual-mcp.test.ts` | CostGuard, MOSB Gate, Document Guardian, Team Action Router 공통 규칙을 확인한다. |
+| `tests/descriptor.test.ts` | Worker가 `agents/mcp`, `/mcp`, `MCP_AUDIT_DB` 등 운영 descriptor 계약을 유지하는지 확인한다. |
+
+운영 smoke 범위는 production URL에서 `/mcp` surface가 살아 있는지, OAuth metadata가 보호 resource로 노출되는지, `tools/list`에서 현재 tool descriptor가 보이는지 확인하는 것이다.
+이 smoke 확인은 로컬 Vitest 개수와 다르며, D1/R2 binding이 있는 Cloudflare 환경 기준 확인이다.
+
 ## 폴더 관계 그래프
 
 아래 그래프는 주요 폴더가 어떤 역할로 연결되는지 보여준다.

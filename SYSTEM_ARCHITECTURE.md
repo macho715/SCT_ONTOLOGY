@@ -20,6 +20,90 @@
 
 `ontology-insight-upgrade/`는 로컬 Python/Fuseki 참조 구현이다. 이 폴더의 Phase 1~5 산출물과 README 정직성 패치는 GitHub에 들어갔지만, 그 자체가 Cloudflare Worker에 `invoice_risk_scan`이나 Fuseki bridge가 배포됐다는 뜻은 아니다.
 
+2026-05-14 note: the deployment and verification rows above are preserved as an earlier snapshot. The latest documentation sync baseline is separated in the `Operating Architecture Addendum` below.
+
+### 2026-05-14 Operating Architecture Addendum
+
+이 추가 섹션은 기존 배포 기록을 지우지 않고, 2026-05-14 현재 운영 MCP snapshot을 최신 기준으로 구분한다.
+
+| 구분 | 상태 | 의미 |
+| --- | --- | --- |
+| Latest operating snapshot | local/origin `main` HEAD `97837da9af12a32a62e4e8ef19373f64674ecc53`, Worker `hvdc-ontology-chatgpt-app`, MCP URL `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` | ChatGPT, Claude, Cursor가 같은 Cloudflare remote MCP surface를 바라보는 운영 기준이다. |
+| Previous deployment snapshot | Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8` | 기존 배포 version 기록이다. 삭제하지 않고 이전 배포 증거로 유지한다. |
+
+운영 MCP는 15개 tool을 같은 `/mcp` endpoint에서 노출한다. `server/src/hvdc-server.ts`가 tool descriptor와 registration을 담당하고, `server/src/worker.ts`가 Cloudflare Worker request boundary, D1 lookup, R2/D1 protected write boundary를 담당한다.
+
+ChatGPT, Claude, Cursor는 클라이언트가 다르지만 운영 기준 endpoint는 같다.
+
+- ChatGPT는 App tool descriptor와 `ui://hvdc/answer-card-v7.html` resource metadata를 사용한다.
+- Claude는 remote MCP HTTP 또는 `mcp-remote` stdio bridge를 통해 같은 `/mcp`에 연결한다.
+- Cursor는 MCP client 설정이 이 URL을 가리킬 때 같은 Worker-hosted tool inventory를 본다.
+
+Cloudflare D1 Control Tower lookup은 세 개의 운영 테이블을 읽는다.
+
+- `shipment_unit`: `resolve_any_key`의 shipment candidate와 routing context를 제공한다.
+- `milestone_event`: `check_mosb_gate`가 입력 누락 시 MOSB milestone chain을 보강한다.
+- `action_queue`: `get_team_actions`가 static role routing보다 우선하는 운영 action proposal을 제공한다.
+
+R2/D1 protected upload/write 경계는 read-only 질의와 분리된다. `create_upload_url`, `complete_upload`, `attach_uploaded_file`, `write_file_dry_run`, `write_file_commit`은 OAuth Bearer scope와 Human-gate approval이 있어야 R2 `uploads/`, `writes/proposals/`, `managed/` object와 D1 metadata를 변경한다.
+
+Suffix-aware HVDC code resolver는 `server/src/identifier-normalizer.ts`의 pattern 처리와 `compactHvdcAdoptCode`가 담당한다. 운영 smoke에서 `resolve_any_key` direct call은 `SIM5-2A`를 `HVDC-ADOPT-SIM-0005-2A`, `HE68-1`을 `HVDC-ADOPT-HE-0068-1`, `SEI17-03`을 `HVDC-ADOPT-SEI-0017-03`으로 정규화했다.
+
+```mermaid
+flowchart LR
+  subgraph Clients["MCP clients"]
+    ChatGPT["ChatGPT App"]
+    Claude["Claude / mcp-remote"]
+    Cursor["Cursor MCP client"]
+  end
+
+  subgraph Worker["Cloudflare Worker: hvdc-ontology-chatgpt-app"]
+    Endpoint["/mcp<br/>server/src/worker.ts"]
+    Handler["createMcpHandler"]
+    Tools["15 MCP tools<br/>server/src/hvdc-server.ts"]
+    Resolver["suffix-aware resolver<br/>server/src/identifier-normalizer.ts"]
+    HumanGate["OAuth Bearer scope<br/>+ Human-gate approval"]
+  end
+
+  subgraph Data["Cloudflare data boundary"]
+    D1Shipment["D1 shipment_unit"]
+    D1Milestone["D1 milestone_event"]
+    D1Actions["D1 action_queue"]
+    D1Audit["D1 mcp_audit_logs / metadata"]
+    R2Files["R2 uploads / proposals / managed files"]
+  end
+
+  subgraph ToolBoundary["Tool behavior boundary"]
+    ReadTools["Read and analysis tools<br/>ask/search/route/resolve/validate<br/>CostGuard/MOSB/DocGuardian/actions"]
+    WriteTools["Protected upload/write tools"]
+  end
+
+  ChatGPT --> Endpoint
+  Claude --> Endpoint
+  Cursor --> Endpoint
+  Endpoint --> Handler
+  Handler --> Tools
+  Tools --> ReadTools
+  Tools --> WriteTools
+  ReadTools --> Resolver
+  ReadTools --> D1Shipment
+  ReadTools --> D1Milestone
+  ReadTools --> D1Actions
+  ReadTools --> D1Audit
+  WriteTools --> HumanGate
+  HumanGate --> R2Files
+  HumanGate --> D1Audit
+```
+
+검증 근거는 코드와 테스트 양쪽에 있다.
+
+- `server/src/worker.ts`의 `createControlTowerLookup`은 `shipment_unit`, `milestone_event`, `action_queue` 조회 경계를 구현한다.
+- `server/src/worker.ts`의 `createMcpHandler` 사용은 Worker `/mcp` endpoint를 MCP server로 연결한다.
+- `server/src/hvdc-server.ts`는 15개 MCP tool registration과 protected tool fail-closed 경계를 가진다.
+- `tests/control-tower-d1.test.ts`는 D1-backed `resolve_any_key`, `check_mosb_gate`, `get_team_actions` 동작을 검증한다.
+- `tests/identifier-normalizer.test.ts`는 suffix code normalization을 검증한다.
+- `tests/descriptor.test.ts`는 tool exposure와 Worker handler import를 검증한다.
+
 ### ChatGPT 레이어 (Cloudflare Workers)
 - 런타임 서버는 `server/src/worker.ts`에 있다.
 - MCP HTTP 경로는 `/mcp`이다. 루트 `/`와 `/healthz`는 Cloudflare health response를 돌려준다.
