@@ -4,6 +4,22 @@
 
 ## 현재 구현 범위
 
+### 2026-05-14 운영 기준
+
+현재 공개 런타임은 Cloudflare Workers remote MCP이다.
+
+| 구성 | 현재 상태 | 증거 |
+|---|---|---|
+| Worker | `hvdc-ontology-chatgpt-app` | `/healthz`에서 `service=hvdc-ontology-chatgpt-app`, `runtime=cloudflare-workers` 확인 |
+| MCP path | `/mcp` | remote MCP `initialize`와 `tools/list` 확인 |
+| Tool inventory | 15개 tool | 기존 read/validation 6개, protected upload/write 5개, Dual-MCP analysis 4개 확인 |
+| Storage | Cloudflare R2 + D1 | `/healthz`에서 `r2=true`, `d1Audit=true` 확인. remote D1 migration `0003_dual_mcp_tables.sql` 적용 완료 |
+| Auth | upload/write 보호 활성 | `/healthz`에서 `protectedWriteTools=true`, `tokenConfigured=true` 확인 |
+| Deployment | Cloudflare Worker deployed | Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8` |
+| Verification | current local release gate pass | `npm run verify`에서 10 files / 150 tests 통과, `wrangler deploy --dry-run` 통과 |
+
+`ontology-insight-upgrade/`는 로컬 Python/Fuseki 참조 구현이다. 이 폴더의 Phase 1~5 산출물과 README 정직성 패치는 GitHub에 들어갔지만, 그 자체가 Cloudflare Worker에 `invoice_risk_scan`이나 Fuseki bridge가 배포됐다는 뜻은 아니다.
+
 ### ChatGPT 레이어 (Cloudflare Workers)
 - 런타임 서버는 `server/src/worker.ts`에 있다.
 - MCP HTTP 경로는 `/mcp`이다. 루트 `/`와 `/healthz`는 Cloudflare health response를 돌려준다.
@@ -135,7 +151,7 @@ flowchart TD
 
 ## 등록된 App tool
 
-Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claude bridge가 동일한 11개 tool 이름을 사용한다.
+Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claude bridge가 동일한 15개 tool 이름을 사용한다.
 
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
@@ -150,6 +166,10 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 | `attach_uploaded_file` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | D1 attachment metadata 작성 | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
 | `write_file_dry_run` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | R2/D1 managed write proposal 작성 | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
 | `write_file_commit` | `server/src/hvdc-server.ts`, `server/src/worker.ts` | 승인된 proposal을 R2 `managed/`에 commit | Cloudflare MCP structured result 또는 local fallback `AUTH_REQUIRED` |
+| `check_cost_guard` | `server/src/cost-guard.ts` | invoice line Δ%, band, Human-gate 판단 | Cloudflare MCP structured result |
+| `check_mosb_gate` | `server/src/mosb-gate.ts` | AGI/DAS MOSB milestone chain gate | Cloudflare MCP structured result |
+| `check_doc_guardian` | `server/src/doc-guardian.ts` | CI/BL/PL/DO 교차 정합성 검증 | Cloudflare MCP structured result |
+| `get_team_actions` | `server/src/team-action-router.ts` | milestone/domain 기반 role action routing | Cloudflare MCP structured result |
 
 ### Claude format 파싱 계약 (`server/src/claude-render.ts`)
 
@@ -216,6 +236,17 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 - 매칭 domain이 없으면 operations context로 fallback한다.
 - BL, BOE, DO, INVOICE, HVDC_CODE, SITE, MILESTONE pattern을 추출한다.
 - Site와 Milestone 후보는 현재 `targetRid`가 `null`이다.
+
+### Dual-MCP 엔진 모듈
+
+Dual-MCP 엔진은 운영 source of truth를 직접 바꾸지 않는다. 각 tool은 evidence-backed 검증 결과와 ActionProposal만 반환한다.
+
+| Module | Tool | 역할 |
+|---|---|---|
+| `server/src/cost-guard.ts` | `check_cost_guard` | 인보이스 line 금액, 표준금액 대비 Δ%, band, Human-gate를 계산한다. |
+| `server/src/mosb-gate.ts` | `check_mosb_gate` | AGI/DAS 행선지에서 M115/M116/M117/M130 chain과 승인 예외를 확인한다. |
+| `server/src/doc-guardian.ts` | `check_doc_guardian` | 문서 간 수량, 중량, 컨테이너 번호 불일치를 찾는다. |
+| `server/src/team-action-router.ts` | `get_team_actions` | milestone과 domain을 owner role, backup role, required evidence로 연결한다. |
 
 ### `server/src/redact.ts`
 
@@ -399,14 +430,16 @@ classDiagram
 - `npm run claude:start`: Cloudflare remote MCP로 연결하는 `mcp-remote` bridge를 실행한다.
 - `npm run claude:local`: legacy/local Claude fallback 서버를 실행한다.
 
-현재 test 파일은 아래 역할을 가진다. **총 113개 테스트 통과** (2026-05-13 기준).
+현재 test 파일은 아래 역할을 가진다. **총 150개 테스트 통과** (2026-05-14 `npm run verify` 기준).
 
 | Test file | 테스트 수 | 확인하는 내용 |
 | --- | --- | --- |
 | `tests/pipeline.test.ts` | 25 | AGI/DAS M130 block, Flow Code WHP-only, currentness warning, PII masking을 확인한다. |
-| `tests/evals.test.ts` | 15 | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
+| `tests/evals.test.ts` | 17 | `tests/golden_prompts.json`의 golden prompt별 verdict, rule, required docs, evidence 조건을 확인한다. |
+| `tests/fmc-role-corpus.test.ts` | 5 | FMC 역할 분석 corpus가 사람·담당자·milestone owner 질문에서 검색되는지 확인한다. |
 | `tests/descriptor.test.ts` | 12 | server tool descriptor와 `chatgpt-app-submission.json` tool 목록 및 annotation parity를 확인한다. |
 | `tests/write-upload-tools.test.ts` | 2 | OAuth Bearer 보호 upload/write tool의 fail-closed와 승인된 dry-run/commit 경로를 확인한다. |
+| `tests/dual-mcp.test.ts` | 30 | CostGuard, MOSB Gate, Document Guardian, Team Action Router의 정상/경계/차단 규칙을 확인한다. |
 | `tests/widget.test.ts` | 14 | public widget의 section 순서, evidence fields, fallback/accessibility, 외부 fetch/resource 부재를 확인한다. |
 | `tests/claude-descriptor.test.ts` | 29 | Claude tool parity, `parseGroundedAnswer` 양방향 포맷 파싱, `renderAnswerMarkdown` 필수 필드를 확인한다. |
 | `tests/sct-operating-contract.test.ts` | 6 | SCT 운영 계약을 확인한다. |

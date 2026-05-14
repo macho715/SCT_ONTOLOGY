@@ -2,6 +2,30 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+## Unreleased - 2026-05-14 Dual-MCP main, Cloudflare, and root documentation synchronization
+
+### Changed
+
+- Updated the root README with a 2026-05-14 operating snapshot that separates Cloudflare Workers MCP production behavior from local Python/Fuseki reference work.
+- Updated SYSTEM_ARCHITECTURE with the current Cloudflare Worker, R2, D1, OAuth protected-tool, Dual-MCP engine, and 150-test verification boundary.
+- Updated LAYOUT with the 15-tool runtime layout, Dual-MCP module files, 150-test baseline, and current D1 migration boundary.
+- Documented the four new Dual-MCP tools: `check_cost_guard`, `check_mosb_gate`, `check_doc_guardian`, and `get_team_actions`.
+- Kept `ontology-insight-upgrade/` classified as a local reference implementation and planning source, not as proof of deployed Fuseki bridge or `invoice_risk_scan` production behavior.
+
+### Verified
+
+- `Invoke-RestMethod https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/healthz` returned Cloudflare Workers runtime, R2 enabled, D1 audit enabled, protected write tools enabled, and token configured.
+- Remote MCP `initialize` and `tools/list` returned 15 tools.
+- Remote MCP `check_cost_guard` smoke returned `overallBand=WARN` for a 3.00% invoice total delta.
+- `npm run worker:deploy` passed `npm run verify` with 10 test files and 150 tests, completed Worker dry-run, and deployed Cloudflare Worker Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8`.
+- Remote D1 migration `0003_dual_mcp_tables.sql` was applied and created `identifier_index`, `milestone_event`, and `team_role_matrix`; `team_role_matrix` contains 6 seed rows.
+- `git rev-parse HEAD` and `git ls-remote origin refs/heads/main` matched `44d6c68bcd1821f2c59e325816d95793cc12d33e` before this documentation patch.
+
+### Risks
+
+- `20260514_project-upgrade-report.md` and `20260514_plan-doc.md` are planning inputs only until converted into root GSD `.planning/phases/*` plans.
+- `invoice_risk_scan`, Cloudflare Tunnel to Fuseki, and `/mcp/staging` canary are planned work, not deployed runtime behavior.
+
 ## Unreleased - 2026-05-13 FMC role evidence corpus
 
 ### Added

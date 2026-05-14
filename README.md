@@ -2,7 +2,25 @@
 
 쉽게 말하면: 이 저장소는 HVDC 물류 질문에 대해 먼저 온톨로지 corpus를 찾고, 근거가 있을 때만 Cloudflare Workers 기반 ChatGPT App MCP 서버에서 답변합니다.
 
-현재 상태는 Cloudflare Workers 전환 기준입니다. MCP 서버, 11개 tool, 온톨로지 corpus 번들, Evidence Drawer 위젯, OAuth Bearer 보호 upload/write 도구, D1 감사 로그, R2 파일 저장소, golden eval, GitHub Actions 검증이 들어 있습니다.
+현재 상태는 Cloudflare Workers 운영 기준입니다. MCP 서버, 15개 tool, Dual-MCP 검증 엔진, 온톨로지 corpus 번들, Evidence Drawer 위젯, OAuth Bearer 보호 upload/write 도구, D1 감사 로그, R2 파일 저장소, golden eval, GitHub Actions 검증이 들어 있습니다.
+
+## 2026-05-14 운영 문서 동기화
+
+쉽게 말하면: 루트 문서의 현재 기준은 Cloudflare 운영 MCP입니다. 로컬 Python/Fuseki 폴더는 운영 런타임이 아니라 `ontology-insight-upgrade/` 참조 구현과 향후 `invoice_risk_scan` 계획 자료로 분리합니다.
+
+| 항목 | 현재 기준 | 확인 방법 |
+|---|---|---|
+| Runtime code baseline | Dual-MCP engine commit `44d6c68bcd1821f2c59e325816d95793cc12d33e` | pushed to `macho715/SCT_ONTOLOGY` main before this documentation patch |
+| Cloudflare runtime | `hvdc-ontology-chatgpt-app` on Cloudflare Workers | `/healthz` returns `runtime=cloudflare-workers` |
+| MCP endpoint | `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` | MCP `initialize` and `tools/list` smoke |
+| MCP tools | 15 tools: 6 read/validation tools, 5 protected upload/write tools, 4 Dual-MCP analysis tools | `tools/list` returned 15 names |
+| Storage | R2 `HVDC_FILES`, D1 `MCP_AUDIT_DB` | `/healthz` reports `r2=true`, `d1Audit=true`; remote D1 migration `0003_dual_mcp_tables.sql` applied |
+| Auth state | protected write tools require OAuth Bearer scope and human-gate approval | `/healthz` reports `tokenConfigured=true`, protected tools fail closed without scope |
+| Cloudflare deploy | Worker Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8` | `npm run worker:deploy` uploaded and deployed the Worker |
+| Verification | 10 test files, 150 tests, Worker dry-run passed | `npm run verify` |
+| Planning docs | `20260514_project-upgrade-report.md` and `20260514_plan-doc.md` are root planning inputs | not yet registered as root GSD `.planning/phases/*` execution plans |
+
+Document alignment rule: README, SYSTEM_ARCHITECTURE, LAYOUT, and CHANGELOG must describe the same boundary. Cloudflare Worker is the public MCP surface. `ontology-insight-upgrade/` is a checked-in local reference implementation and planning source, not proof that Fuseki, Flask, or `invoice_risk_scan` is deployed.
 
 ## 현재 구현 범위
 
@@ -62,7 +80,7 @@
 
 ## MCP tools
 
-Cloudflare Workers 원격 MCP와 Claude stdio bridge가 동일한 11개 tool 이름을 공유합니다.
+Cloudflare Workers 원격 MCP와 Claude stdio bridge가 동일한 15개 tool 이름을 공유합니다.
 
 읽기/검증 tool:
 
@@ -83,6 +101,13 @@ Cloudflare Workers 원격 MCP와 Claude stdio bridge가 동일한 11개 tool 이
 
 보호된 tool은 ERP, WMS, ATLP, Foundry 같은 외부 운영 시스템을 변경하지 않습니다.
 
+Dual-MCP 분석 tool:
+
+- `check_cost_guard`: 인보이스 line별 `qty × rate`, 표준금액 대비 Δ%, PASS/WARN/HIGH/CRITICAL band, Human-gate 필요 여부를 계산합니다.
+- `check_mosb_gate`: AGI/DAS offshore route에서 M115/M116/M117/M130 milestone chain과 승인 예외 여부를 확인합니다.
+- `check_doc_guardian`: CI, BL, PL, DO 같은 문서 간 수량, 중량, 컨테이너 번호 정합성을 검증합니다.
+- `get_team_actions`: milestone과 domain을 담당 role, backup role, required evidence, ActionProposal로 연결합니다.
+
 ## 전체 흐름
 
 쉽게 말하면: ChatGPT 사용자의 질문은 `/mcp` 서버로 들어오고, `ask_hvdc_ontology`가 `data/corpus/` 근거를 찾습니다. 같은 tool 결과가 `ui://hvdc/answer-card-v7.html` 카드 UI를 바로 연결합니다. 카드 template 로딩이 실패해도 `verdict`, `validationStatus`, `evidenceIds`, `actions`는 바꾸지 않고 텍스트 fallback을 보여줍니다.
@@ -97,6 +122,7 @@ flowchart LR
   Mcp --> Resolve["resolve_any_key"]
   Mcp --> Validate["validate_answer"]
   Mcp --> UploadWrite["protected upload/write tools"]
+  Mcp --> DualMcp["Dual-MCP analysis tools<br/>CostGuard / MOSB Gate<br/>Doc Guardian / Team Actions"]
   Ask --> Route
   Route --> Search
   Route --> Resolve
@@ -108,6 +134,7 @@ flowchart LR
   Ask --> Render
   UploadWrite --> R2["Cloudflare R2"]
   UploadWrite --> D1["Cloudflare D1 audit/metadata"]
+  DualMcp --> D1
   Render --> Drawer["Evidence Drawer"]
   Drawer --> Review["검증 흐름"]
   Review --> User
@@ -269,7 +296,7 @@ Human-gate가 필요한 작업:
 - token-like 문자열은 노출하지 않습니다.
 - Cloudflare 운영 감사 로그는 D1 `mcp_audit_logs`에 hash 기반으로 기록합니다. Node fallback 실행은 `out/audit.jsonl`을 사용합니다.
 
-Codex Skills는 개발 지침입니다. `.agents/skills/*/SKILL.md`는 runtime app tool이 아니며, ChatGPT App에서 직접 호출되는 tool은 위 11개 MCP tool뿐입니다.
+Codex Skills는 개발 지침입니다. `.agents/skills/*/SKILL.md`는 runtime app tool이 아니며, ChatGPT App에서 직접 호출되는 tool은 위 15개 MCP tool뿐입니다.
 
 ## Golden evals
 
@@ -302,7 +329,7 @@ Codex Skills는 개발 지침입니다. `.agents/skills/*/SKILL.md`는 runtime a
 - 보호된 upload/write tool은 `Authorization: Bearer` 토큰과 `files:upload` 또는 `files:write` scope가 없으면 `AUTH_REQUIRED` 또는 `INSUFFICIENT_SCOPE`로 멈춥니다.
 - Cloudflare production MCP는 `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`에서 smoke 확인되었습니다.
 - Claude Code, Claude Desktop, claude.ai는 Cloudflare remote MCP를 사용합니다. `server/src/claude-server.ts`는 legacy/local fallback과 format-parity 테스트용입니다.
-- `query_knowledge_graph`, `create_action_request`, `export_answer_report`는 계획 문서에 있는 확장 tool입니다. 현재 서버 tool 11개에는 포함되지 않습니다.
+- `query_knowledge_graph`, `create_action_request`, `export_answer_report`는 계획 문서에 있는 확장 tool입니다. 현재 서버 tool 15개에는 포함되지 않습니다.
 
 ## 문서 위치
 

@@ -3,6 +3,22 @@
 이 문서는 `rg --files`와 현재 `git status --short`로 확인한 실제 저장소 구조를 요약한다.
 새 경로를 가정하지 않고, 현재 루트에 있는 파일과 디렉터리만 적었다.
 
+## 2026-05-14 루트 문서 기준
+
+쉽게 말하면: 루트 폴더의 현재 문서 기준은 Cloudflare Worker MCP 운영 상태와 `ontology-insight-upgrade/` 참조 구현을 분리하는 것이다.
+
+| 위치 | 역할 | 운영 여부 |
+|---|---|---|
+| `server/src/worker.ts` | Cloudflare Worker MCP entrypoint | 운영 MCP |
+| `server/src/hvdc-server.ts` | 15개 MCP tool 등록과 공통 tool contract | 운영 MCP |
+| `wrangler.toml` | Worker, R2, D1 binding 설정 | 운영 배포 설정 |
+| `migrations/` | D1 audit/upload/write/Dual-MCP metadata schema | 운영 저장소 schema |
+| `ontology-insight-upgrade/` | Python/Fuseki, risk radar, local read-only MCP surface 참조 구현 | 로컬 참조, 운영 배포 아님 |
+| `20260514_project-upgrade-report.md` | 업그레이드 아이디어와 AMBER bucket 보고서 | 루트 계획 입력 |
+| `20260514_plan-doc.md` | Option B 실행 설계 문서 | 루트 계획 입력, 아직 GSD phase 등록 전 |
+
+문서 간 기준: README, SYSTEM_ARCHITECTURE, LAYOUT, CHANGELOG는 모두 Cloudflare `/mcp`를 public surface로 설명해야 한다. localhost, Fuseki, Flask, ngrok, GPTs Actions는 로컬 참조나 마이그레이션 자료로만 설명한다.
+
 ## 폴더 관계 그래프
 
 아래 그래프는 주요 폴더가 어떤 역할로 연결되는지 보여준다.
@@ -35,7 +51,7 @@ flowchart TD
     CorpusFiles["server/src/generated/corpus-data.ts"]
   end
 
-  Tests["tests<br/>120개 테스트<br/>Cloudflare dry-run 포함"]
+  Tests["tests<br/>150개 테스트<br/>Cloudflare dry-run 포함"]
   Scripts["scripts<br/>corpus 점검과 index 생성 도구"]
   Index["data/index<br/>생성/검토/repro artifact"]
   Ontology["ontology<br/>원본 또는 참조용 온톨로지 묶음"]
@@ -80,14 +96,14 @@ flowchart TD
 - `AGENTS.md`: 작업 규칙과 HVDC 온톨로지 답변 앱의 안전 경계를 정한다. ChatGPT/Claude 양쪽 레이어 설명 포함.
 - `README.md`: 프로젝트 소개와 사용 흐름을 설명하는 루트 안내 문서다.
 - `CHANGELOG.md`: 변경 이력을 기록하는 문서다.
-- `LAYOUT.md`: 현재 저장소 구조와 미커밋 변경 범위를 설명하는 이 문서다.
+- `LAYOUT.md`: 현재 저장소 구조와 보관된 변경 이력을 설명하는 이 문서다.
 - `SYSTEM_ARCHITECTURE.md`: 시스템 구조를 설명하는 문서다. ChatGPT/Claude 양쪽 아키텍처 포함.
 - `package.json`: 앱 이름, Cloudflare Worker 실행 스크립트, Node fallback, Claude Cloudflare bridge 실행 스크립트를 정의한다.
 - `package-lock.json`: npm 의존성 잠금 파일이다.
 - `tsconfig.json`: TypeScript 컴파일 설정이다.
 - `wrangler.toml`: Cloudflare Workers, R2, D1 배포 설정 파일이다.
 - `chatgpt-app-submission.json`: ChatGPT 앱 제출용 메타데이터 파일이다.
-- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. Cloudflare MCP URL, `claude_desktop_config` HTTP 스니펫, 11개 tool, Claude 전용 테스트 케이스 포함.
+- `claude-app-submission.json`: Claude 앱 연결 설정 파일이다. Cloudflare MCP URL, `claude_desktop_config` HTTP 스니펫, 15개 tool, Claude 전용 테스트 케이스 포함.
 - `.gitignore`: Git 추적에서 제외할 폴더와 파일 패턴을 정한다.
 
 ## docs
@@ -120,6 +136,10 @@ flowchart TD
 - `server/src/router.ts`: 질문을 HVDC 도메인 라우트로 분류하는 로직을 담는다.
 - `server/src/redact.ts`: 이메일과 전화번호 같은 민감정보를 가리는 로직을 담는다.
 - `server/src/types.ts`: 서버 내부에서 공유하는 타입을 정의한다.
+- `server/src/cost-guard.ts`: `check_cost_guard`의 invoice line Δ%, band, Human-gate 계산 엔진이다.
+- `server/src/mosb-gate.ts`: `check_mosb_gate`의 AGI/DAS MOSB milestone chain 검증 엔진이다.
+- `server/src/doc-guardian.ts`: `check_doc_guardian`의 CI/BL/PL/DO 교차 검증 엔진이다.
+- `server/src/team-action-router.ts`: `get_team_actions`의 milestone/domain 기반 role action 라우터다.
 
 ### ChatGPT 레이어
 - `server/src/worker.ts`: Cloudflare Worker 진입점. `agents/mcp`의 `createMcpHandler`로 `/mcp`를 처리한다.
@@ -141,12 +161,13 @@ flowchart TD
 
 ## tests
 
-`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 120개 테스트가 통과한다.
+`tests/`는 Vitest 기반 자동 검증과 골든 프롬프트 데이터를 담는다. 현재 총 150개 테스트가 통과한다.
 
 - `tests/pipeline.test.ts`: 답변 파이프라인의 기본 동작을 검증한다.
 - `tests/fmc-role-corpus.test.ts`: FMC 역할 분석 corpus가 사람·담당자·milestone owner 질문에서 검색되는지 검증한다.
 - `tests/descriptor.test.ts`: ChatGPT 앱 descriptor와 `chatgpt-app-submission.json` 일치를 검증한다.
 - `tests/write-upload-tools.test.ts`: OAuth Bearer 보호 upload/write tool의 fail-closed 동작과 승인된 dry-run/commit 경로를 검증한다.
+- `tests/dual-mcp.test.ts`: CostGuard, MOSB Gate, Document Guardian, Team Action Router 검증 규칙 30개를 담는다.
 - `tests/evals.test.ts`: 평가 시나리오를 검증한다.
 - `tests/widget.test.ts`: 공개 위젯 HTML의 기대 요소, bridge fallback, 외부 fetch 금지, overflow-safe CSS를 검증한다.
 - `tests/claude-descriptor.test.ts`: Claude 서버 tool parity, 양방향 포맷 파싱(`parseGroundedAnswer`), 마크다운 렌더링 필수 필드를 검증한다. (29개 테스트)
@@ -221,10 +242,12 @@ flowchart TD
 
 - `.github/workflows/hvdc-verify.yml`: TypeScript와 테스트 검증을 실행하는 GitHub Actions workflow다.
 
-## 현재 미커밋 변경: Cloudflare protected upload/write tool
+## 이력: Cloudflare protected upload/write tool
 
-현재 작업 트리에는 Cloudflare Workers/R2/D1 기반 upload/write tool 후속 변경이 있다.
-이 문서는 해당 변경을 되돌리지 않고, 현재 상태를 기록한다.
+2026-05-14 업데이트: 이 섹션은 과거 작업 당시의 상태를 보존한 이력이다. 현재 protected upload/write tool은 GitHub main에 반영되어 있고 Cloudflare Worker 기준 `tools/list`에서도 5개 보호 tool이 보인다.
+
+당시 작업 트리에는 Cloudflare Workers/R2/D1 기반 upload/write tool 후속 변경이 있었다.
+이 문서는 해당 변경을 되돌리지 않고, 현재 완료된 상태와 관련 파일을 기록한다.
 
 - Protected runtime: `server/src/worker.ts`, `server/src/hvdc-server.ts`, `server/src/claude-server.ts`
 - Cloudflare storage: `migrations/0001_mcp_audit_logs.sql`, `migrations/0002_mcp_upload_write.sql`, R2 binding `HVDC_FILES`, D1 binding `MCP_AUDIT_DB`
