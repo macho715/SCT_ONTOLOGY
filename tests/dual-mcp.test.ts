@@ -127,6 +127,15 @@ describe("MOSB Route Gate (V-AGIDAS-001)", () => {
     expect(result.status).toBe("BLOCK");
     expect(result.appliedRule).toBe("V-AGIDAS-001");
   });
+
+  it("BLOCK when D1-style destination and routing strings imply AGI MOSB delivery", () => {
+    const result = checkMosbGate("SU-007", "AGI|MIR", "WH_MOSB_SITE", [
+      { code: "M130_SITE_RECEIVED", actualDt: "2025-01-10T00:00:00Z" }
+    ]);
+    expect(result.status).toBe("BLOCK");
+    expect(result.appliedRule).toBe("V-AGIDAS-001");
+    expect(result.missingMilestones).toContain("M115");
+  });
 });
 
 // ─── DOC GUARDIAN ────────────────────────────────────────────────────────────

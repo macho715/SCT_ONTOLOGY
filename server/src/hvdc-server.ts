@@ -10,10 +10,10 @@ import { searchCorpus } from "./corpus.js";
 import { calcCostGuard } from "./cost-guard.js";
 import { checkDocGuardian } from "./doc-guardian.js";
 import { DEFAULT_WIDGET_HTML } from "./generated/widget-html.js";
-import { checkMosbGate } from "./mosb-gate.js";
+import { checkMosbGate, type MilestoneRecord } from "./mosb-gate.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
-import { routeTeamAction } from "./team-action-router.js";
-import type { DomainHint, GroundedAnswer } from "./types.js";
+import { routeTeamAction, type ActionProposal } from "./team-action-router.js";
+import type { DomainHint, GroundedAnswer, ResolvedEntity } from "./types.js";
 import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
 
 export type HvdcServerOptions = {
@@ -22,9 +22,27 @@ export type HvdcServerOptions = {
   audit?: (record: AuditRecord) => void | Promise<void>;
   auth?: HvdcAuthContext;
   storage?: HvdcProtectedStorage;
+  controlTower?: HvdcControlTowerLookup;
 };
 
 const DEFAULT_WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev";
+
+export type ControlTowerShipmentUnit = {
+  shipmentUnitId: string;
+  declaredDestinationSet: string | null;
+  currentStage: string | null;
+  currentLocation: string | null;
+  routingPattern: string | null;
+  latestReceiptDt: string | null;
+  missingRequiredDestination: string | null;
+};
+
+export type HvdcControlTowerLookup = {
+  resolveAnyKey?: (identifierOrQuestion: string) => Promise<ResolvedEntity[]>;
+  getShipmentUnit?: (shipmentUnitId: string) => Promise<ControlTowerShipmentUnit | null>;
+  listMilestones?: (shipmentUnitId: string) => Promise<MilestoneRecord[]>;
+  listActionQueue?: (shipmentUnitId: string, milestoneCode?: string, domain?: string) => Promise<ActionProposal[]>;
+};
 
 export type HvdcAuthContext = {
   authenticated: boolean;
@@ -485,7 +503,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   },
   resolve_any_key: {
     title: "Resolve HVDC any-key",
-    description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, or milestone identifiers from a user question.",
+    description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, or milestone identifiers from a user question. Uses the Cloudflare D1 Control Tower shipment_unit dataset when available.",
     inputSchema: { identifierOrQuestion: z.string().min(1) },
     outputSchema: {
       candidates: z.array(
@@ -654,18 +672,18 @@ export const HVDC_TOOL_DESCRIPTORS = {
   check_mosb_gate: {
     title: "Check MOSB route gate (V-AGIDAS-001)",
     description:
-      "Validate AGI/DAS offshore MOSB milestone chain. BLOCK if M130 is closed but M115 MOSB Staged evidence is missing. WARN if M116/M117 are absent without approved exception.",
+      "Validate AGI/DAS offshore MOSB milestone chain. If milestone input is omitted, reads Cloudflare D1 milestone_event rows for the shipment. BLOCK if M130 is closed but M115 MOSB Staged evidence is missing. WARN if M116/M117 are absent without approved exception.",
     inputSchema: {
       shipmentUnitId: z.string().min(1),
-      declaredDestination: z.string().min(1),
-      routingPattern: z.string().min(1),
+      declaredDestination: z.string().min(1).optional(),
+      routingPattern: z.string().min(1).optional(),
       milestones: z.array(
         z.object({
           code: z.string(),
           actualDt: z.string().nullable().optional(),
           approvedExceptionRef: z.string().nullable().optional()
         })
-      )
+      ).optional()
     },
     outputSchema: {
       shipmentUnitId: z.string(),
@@ -732,7 +750,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   get_team_actions: {
     title: "Get HVDC team action proposals",
     description:
-      "Route a shipment milestone and domain to the correct owner role and produce ActionProposals with required documents and due dates. PII is always masked (role-first, no raw contacts).",
+      "Route a shipment milestone and domain to the correct owner role and produce ActionProposals with required documents and due dates. Reads Cloudflare D1 action_queue rows for the shipment when available. PII is always masked (role-first, no raw contacts).",
     inputSchema: {
       shipmentUnitId: z.string().min(1),
       milestoneCode: z.string().min(1),
@@ -788,6 +806,18 @@ function buildAskResultMeta(answer: GroundedAnswer): Record<string, unknown> {
       visibility: ["model", "app"]
     }
   };
+}
+
+function mergeResolvedEntities(primary: ResolvedEntity[], secondary: ResolvedEntity[]): ResolvedEntity[] {
+  const seen = new Set<string>();
+  const merged: ResolvedEntity[] = [];
+  for (const entity of [...primary, ...secondary]) {
+    const key = `${entity.entityType}|${entity.identifierScheme}|${entity.normalizedValue}|${entity.targetRid ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(entity);
+  }
+  return merged;
 }
 
 function currentAuth(options: HvdcServerOptions): HvdcAuthContext {
@@ -981,7 +1011,8 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "resolve_any_key",
     HVDC_TOOL_DESCRIPTORS.resolve_any_key,
     async ({ identifierOrQuestion }) => {
-      const candidates = resolveAnyKey(identifierOrQuestion);
+      const controlTowerCandidates = await options.controlTower?.resolveAnyKey?.(identifierOrQuestion) ?? [];
+      const candidates = mergeResolvedEntities(controlTowerCandidates, resolveAnyKey(identifierOrQuestion));
       return {
         structuredContent: { candidates },
         content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length }) }]
@@ -1109,7 +1140,16 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "check_mosb_gate",
     HVDC_TOOL_DESCRIPTORS.check_mosb_gate,
     async ({ shipmentUnitId, declaredDestination, routingPattern, milestones }) => {
-      const result = checkMosbGate(shipmentUnitId, declaredDestination, routingPattern, milestones);
+      const shipment = await options.controlTower?.getShipmentUnit?.(shipmentUnitId);
+      const d1Milestones = milestones && milestones.length > 0
+        ? milestones
+        : await options.controlTower?.listMilestones?.(shipmentUnitId) ?? [];
+      const result = checkMosbGate(
+        shipmentUnitId,
+        declaredDestination ?? shipment?.declaredDestinationSet ?? "UNKNOWN",
+        routingPattern ?? shipment?.routingPattern ?? "UNKNOWN",
+        d1Milestones
+      );
       await options.audit?.(buildAuditRecord("check_mosb_gate", { shipmentUnitId, declaredDestination, routingPattern }, result, true));
       return {
         structuredContent: result,
@@ -1137,7 +1177,17 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "get_team_actions",
     HVDC_TOOL_DESCRIPTORS.get_team_actions,
     async ({ shipmentUnitId, milestoneCode, domain, openExceptions }) => {
-      const result = routeTeamAction(shipmentUnitId, milestoneCode, domain, openExceptions ?? []);
+      const d1Proposals = await options.controlTower?.listActionQueue?.(shipmentUnitId, milestoneCode, domain) ?? [];
+      const result = d1Proposals.length > 0
+        ? {
+            shipmentUnitId,
+            milestoneCode,
+            domain,
+            proposals: d1Proposals,
+            message: `${d1Proposals.length} action proposal(s) loaded from Control Tower action_queue for ${shipmentUnitId}.`,
+            generatedAt: new Date().toISOString()
+          }
+        : routeTeamAction(shipmentUnitId, milestoneCode, domain, openExceptions ?? []);
       await options.audit?.(buildAuditRecord("get_team_actions", { shipmentUnitId, milestoneCode, domain }, result, true));
       return {
         structuredContent: result,

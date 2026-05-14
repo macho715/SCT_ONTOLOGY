@@ -6,8 +6,10 @@ import {
   type AttachUploadedFileResult,
   type CompleteUploadInput,
   type CompleteUploadResult,
+  type ControlTowerShipmentUnit,
   type CreateUploadUrlInput,
   type CreateUploadUrlResult,
+  type HvdcControlTowerLookup,
   type HvdcAuthContext,
   type HvdcProtectedStorage,
   type WriteFileCommitInput,
@@ -15,6 +17,9 @@ import {
   type WriteFileDryRunInput,
   type WriteFileDryRunResult
 } from "./hvdc-server.js";
+import type { MilestoneRecord } from "./mosb-gate.js";
+import type { ActionProposal } from "./team-action-router.js";
+import type { ResolvedEntity } from "./types.js";
 
 type Env = {
   ALLOWED_ORIGIN?: string;
@@ -139,7 +144,8 @@ function healthResponse(request: Request, env: Env): Response {
     mcpPath: MCP_PATH,
     storage: {
       r2: Boolean(env.HVDC_FILES),
-      d1Audit: Boolean(env.MCP_AUDIT_DB)
+      d1Audit: Boolean(env.MCP_AUDIT_DB),
+      controlTower: Boolean(env.MCP_AUDIT_DB)
     },
     auth: {
       oauthMetadata: "/.well-known/oauth-protected-resource/mcp",
@@ -181,11 +187,183 @@ type WriteProposalRow = {
   status: string;
 };
 
+type ControlTowerShipmentRow = {
+  shipment_unit_id: string;
+  source_line_id: string | null;
+  invoice_no: string | null;
+  po_no: string | null;
+  declared_destination_set: string | null;
+  current_stage: string | null;
+  current_location: string | null;
+  routing_pattern: string | null;
+  latest_receipt_dt: string | null;
+  missing_required_destination: string | null;
+};
+
+type ControlTowerMilestoneRow = {
+  milestone_code: string;
+  actual_dt: string | null;
+};
+
+type ControlTowerActionRow = {
+  action_id: string;
+  shipment_unit_id: string;
+  action_type: string;
+  owner_role: string;
+  target_location: string | null;
+  due_at: string | null;
+  status: string | null;
+  reason_code: string | null;
+};
+
 function storageUnavailable(message: string) {
   return {
     status: "STORAGE_UNAVAILABLE" as const,
     humanGateRequired: true as const,
     message
+  };
+}
+
+function normalizeLookupToken(value: string): string {
+  return value.trim().toUpperCase();
+}
+
+function extractLookupTokens(input: string): string[] {
+  const matches = input.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? [];
+  return Array.from(new Set(matches.map(normalizeLookupToken))).slice(0, 8);
+}
+
+function shipmentRowToUnit(row: ControlTowerShipmentRow): ControlTowerShipmentUnit {
+  return {
+    shipmentUnitId: row.shipment_unit_id,
+    declaredDestinationSet: row.declared_destination_set,
+    currentStage: row.current_stage,
+    currentLocation: row.current_location,
+    routingPattern: row.routing_pattern,
+    latestReceiptDt: row.latest_receipt_dt,
+    missingRequiredDestination: row.missing_required_destination
+  };
+}
+
+function shipmentRowToResolvedEntity(row: ControlTowerShipmentRow, token: string): ResolvedEntity {
+  const tokenUpper = normalizeLookupToken(token);
+  let identifierScheme = "ShipmentUnit";
+  let identifierValue = row.shipment_unit_id;
+
+  if (row.invoice_no && normalizeLookupToken(row.invoice_no) === tokenUpper) {
+    identifierScheme = "invoiceNo";
+    identifierValue = row.invoice_no;
+  } else if (row.po_no && normalizeLookupToken(row.po_no) === tokenUpper) {
+    identifierScheme = "poNo";
+    identifierValue = row.po_no;
+  } else if (row.source_line_id && normalizeLookupToken(row.source_line_id) === tokenUpper) {
+    identifierScheme = "sourceLineId";
+    identifierValue = row.source_line_id;
+  }
+
+  return {
+    entityType: "ShipmentUnit",
+    identifierScheme,
+    identifierValue,
+    normalizedValue: tokenUpper,
+    targetRid: row.shipment_unit_id,
+    confidence: 0.98
+  };
+}
+
+function actionRowToProposal(row: ControlTowerActionRow): ActionProposal {
+  return {
+    actionType: row.action_type,
+    targetObject: row.target_location
+      ? `ShipmentUnit:${row.shipment_unit_id}@${row.target_location}`
+      : `ShipmentUnit:${row.shipment_unit_id}`,
+    ownerRole: row.owner_role,
+    backupRole: row.owner_role === "Marine Supervisor" ? "Site Logistics" : null,
+    humanGateRequired: row.status !== "CLOSED",
+    dueAt: row.due_at,
+    requiredDocs: row.reason_code ? [row.reason_code] : [],
+    piiMasked: true
+  };
+}
+
+function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
+  const db = env.MCP_AUDIT_DB;
+  if (!db) return {};
+
+  return {
+    async resolveAnyKey(identifierOrQuestion: string): Promise<ResolvedEntity[]> {
+      const candidates: ResolvedEntity[] = [];
+      const seen = new Set<string>();
+
+      for (const token of extractLookupTokens(identifierOrQuestion)) {
+        const rows = await db.prepare(
+          `SELECT shipment_unit_id, source_line_id, invoice_no, po_no, declared_destination_set,
+                  current_stage, current_location, routing_pattern, latest_receipt_dt, missing_required_destination
+             FROM shipment_unit
+            WHERE upper(shipment_unit_id) = ?
+               OR upper(invoice_no) = ?
+               OR upper(po_no) = ?
+               OR upper(source_line_id) = ?
+            LIMIT 5`
+        )
+          .bind(token, token, token, token)
+          .all<ControlTowerShipmentRow>();
+
+        for (const row of rows.results ?? []) {
+          const key = `${row.shipment_unit_id}:${token}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          candidates.push(shipmentRowToResolvedEntity(row, token));
+        }
+      }
+
+      return candidates;
+    },
+
+    async getShipmentUnit(shipmentUnitId: string): Promise<ControlTowerShipmentUnit | null> {
+      const row = await db.prepare(
+        `SELECT shipment_unit_id, source_line_id, invoice_no, po_no, declared_destination_set,
+                current_stage, current_location, routing_pattern, latest_receipt_dt, missing_required_destination
+           FROM shipment_unit
+          WHERE shipment_unit_id = ?
+          LIMIT 1`
+      )
+        .bind(shipmentUnitId)
+        .first<ControlTowerShipmentRow>();
+
+      return row ? shipmentRowToUnit(row) : null;
+    },
+
+    async listMilestones(shipmentUnitId: string): Promise<MilestoneRecord[]> {
+      const rows = await db.prepare(
+        `SELECT milestone_code, actual_dt
+           FROM milestone_event
+          WHERE shipment_unit_id = ?
+          ORDER BY actual_dt, milestone_code`
+      )
+        .bind(shipmentUnitId)
+        .all<ControlTowerMilestoneRow>();
+
+      return (rows.results ?? []).map((row) => ({
+        code: row.milestone_code,
+        actualDt: row.actual_dt
+      }));
+    },
+
+    async listActionQueue(shipmentUnitId: string): Promise<ActionProposal[]> {
+      const rows = await db.prepare(
+        `SELECT action_id, shipment_unit_id, action_type, owner_role, target_location, due_at, status, reason_code
+           FROM action_queue
+          WHERE shipment_unit_id = ?
+            AND coalesce(status, 'OPEN') <> 'CLOSED'
+          ORDER BY action_id
+          LIMIT 20`
+      )
+        .bind(shipmentUnitId)
+        .all<ControlTowerActionRow>();
+
+      return (rows.results ?? []).map(actionRowToProposal);
+    }
   };
 }
 
@@ -515,7 +693,8 @@ export default {
       widgetDomain: env.WIDGET_DOMAIN ?? url.origin,
       audit: (record) => writeD1Audit(env, record),
       auth: authContext(request, env),
-      storage: createProtectedStorage(request, env)
+      storage: createProtectedStorage(request, env),
+      controlTower: createControlTowerLookup(env)
     });
     const handler = createMcpHandler(server, {
       route: MCP_PATH,

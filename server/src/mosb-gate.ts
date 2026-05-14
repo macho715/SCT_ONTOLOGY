@@ -32,15 +32,32 @@ function normalize(v: string): string {
   return v.trim().toUpperCase();
 }
 
+function milestoneMatches(actualCode: string, expectedCode: string): boolean {
+  const normalized = normalize(actualCode);
+  const expected = normalize(expectedCode);
+  return normalized === expected || normalized.startsWith(`${expected}_`) || normalized.startsWith(`${expected}-`);
+}
+
+function destinationRequiresMosbGate(declaredDestination: string): boolean {
+  const normalized = normalize(declaredDestination);
+  const parts = normalized.split(/[^A-Z0-9]+/).filter(Boolean);
+  return AGI_DAS_DESTINATIONS.has(normalized) || parts.some((part) => part === "AGI" || part === "DAS");
+}
+
+function routingRequiresMosbGate(routingPattern: string): boolean {
+  const normalized = normalize(routingPattern);
+  return MOSB_ROUTING_PATTERNS.has(normalized) || normalized.includes("MOSB");
+}
+
 function hasMilestoneWithDate(milestones: MilestoneRecord[], code: string): boolean {
   return milestones.some(
-    (m) => normalize(m.code) === normalize(code) && Boolean(m.actualDt)
+    (m) => milestoneMatches(m.code, code) && Boolean(m.actualDt)
   );
 }
 
 function hasApprovedExceptionFor(milestones: MilestoneRecord[], code: string): boolean {
   return milestones.some(
-    (m) => normalize(m.code) === normalize(code) && Boolean(m.approvedExceptionRef)
+    (m) => milestoneMatches(m.code, code) && Boolean(m.approvedExceptionRef)
   );
 }
 
@@ -60,7 +77,7 @@ export function checkMosbGate(
   };
 
   // Not an AGI/DAS MOSB route — no rule applies
-  if (!AGI_DAS_DESTINATIONS.has(dest) || !MOSB_ROUTING_PATTERNS.has(routing)) {
+  if (!destinationRequiresMosbGate(dest) || !routingRequiresMosbGate(routing)) {
     return {
       ...base,
       status: "PASS",
