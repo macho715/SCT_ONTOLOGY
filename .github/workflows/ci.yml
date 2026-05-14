@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate worker assets
+        run: npm run generate:worker-assets
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit + Integration tests
+        run: npm test
+
+      - name: Coverage report
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: Coverage gate (lines >= 70%)
+        if: always()
+        run: |
+          if [ ! -f coverage/coverage-summary.json ]; then
+            echo "No coverage report found, skipping gate"
+            exit 0
+          fi
+          LINES=$(node -e "
+            const s = require('./coverage/coverage-summary.json');
+            console.log(s.total.lines.pct);
+          ")
+          echo "Line coverage: ${LINES}%"
+          if (( $(echo "$LINES < 70" | bc -l) )); then
+            echo "::error::Coverage ${LINES}% < 70% threshold"
+            exit 1
+          fi
+          echo "Coverage gate passed: ${LINES}%"

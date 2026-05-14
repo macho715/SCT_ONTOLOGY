@@ -1,4 +1,5 @@
 import { createMcpHandler } from "agents/mcp";
+import { instrument } from "@microlabs/otel-cf-workers";
 import type { AuditRecord } from "./answer.js";
 import {
   createHvdcServer,
@@ -25,6 +26,9 @@ type Env = {
   OAUTH_RESOURCE_ID?: string;
   MCP_AUDIT_DB?: D1Database;
   HVDC_FILES?: R2Bucket;
+  OTEL_ENABLED?: string;
+  OTEL_EXPORTER_OTLP_ENDPOINT?: string;
+  OTEL_EXPORTER_OTLP_HEADERS?: string;
 };
 
 const MCP_PATH = "/mcp";
@@ -495,7 +499,7 @@ async function handleDirectUpload(request: Request, env: Env): Promise<Response>
   );
 }
 
-export default {
+const handler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
@@ -517,7 +521,7 @@ export default {
       auth: authContext(request, env),
       storage: createProtectedStorage(request, env)
     });
-    const handler = createMcpHandler(server, {
+    const mcpHandler = createMcpHandler(server, {
       route: MCP_PATH,
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
@@ -529,6 +533,22 @@ export default {
       }
     });
 
-    return handler(request, env, ctx);
+    return mcpHandler(request, env, ctx);
   }
 };
+
+export default instrument(handler, (env: Env) => ({
+  exporter: {
+    url: env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "",
+    headers: env.OTEL_EXPORTER_OTLP_HEADERS
+      ? Object.fromEntries(
+          env.OTEL_EXPORTER_OTLP_HEADERS.split(",").map((h) => {
+            const idx = h.indexOf("=");
+            return [h.slice(0, idx), h.slice(idx + 1)];
+          })
+        )
+      : {}
+  },
+  service: { name: "hvdc-mcp", version: "1.0.0" },
+  enabled: (env as Record<string, unknown>).OTEL_ENABLED === "true"
+}));

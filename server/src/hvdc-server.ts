@@ -6,6 +6,7 @@ import {
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { answerQuestion, answerToText, buildAuditRecord, type AuditRecord, validateGrounding } from "./answer.js";
+import { withSpan } from "./telemetry.js";
 import { searchCorpus } from "./corpus.js";
 import { calcCostGuard } from "./cost-guard.js";
 import { checkDocGuardian } from "./doc-guardian.js";
@@ -906,13 +907,16 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "ask_hvdc_ontology",
     HVDC_TOOL_DESCRIPTORS.ask_hvdc_ontology,
     async ({ question, userRole, language }) => {
-      const answer = answerQuestion({ question, userRole, language });
-      await options.audit?.(buildAuditRecord("ask_hvdc_ontology", { question, userRole, language }, answer, answer.piiMasked));
-      return {
-        structuredContent: answer,
-        content: [{ type: "text", text: answerToText(answer) }],
-        _meta: buildAskResultMeta(answer)
-      };
+      return withSpan("ask_hvdc_ontology", async (span) => {
+        span.setAttribute("hvdc.user_role", userRole ?? "ops_user");
+        const answer = answerQuestion({ question, userRole, language });
+        await options.audit?.(buildAuditRecord("ask_hvdc_ontology", { question, userRole, language }, answer, answer.piiMasked));
+        return {
+          structuredContent: answer,
+          content: [{ type: "text", text: answerToText(answer) }],
+          _meta: buildAskResultMeta(answer)
+        };
+      });
     }
   );
 
@@ -963,16 +967,19 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "search_ontology_corpus",
     HVDC_TOOL_DESCRIPTORS.search_ontology_corpus,
     async ({ query, requiredDocs, domainHints, topK }) => {
-      const evidence = searchCorpus({
-        query,
-        requiredDocs,
-        domainHints: domainHints as DomainHint[] | undefined,
-        topK
+      return withSpan("search_ontology_corpus", async (span) => {
+        span.setAttribute("hvdc.query_length", String(query?.length ?? 0));
+        const evidence = searchCorpus({
+          query,
+          requiredDocs,
+          domainHints: domainHints as DomainHint[] | undefined,
+          topK
+        });
+        return {
+          structuredContent: { evidence },
+          content: [{ type: "text", text: JSON.stringify({ evidenceCount: evidence.length }) }]
+        };
       });
-      return {
-        structuredContent: { evidence },
-        content: [{ type: "text", text: JSON.stringify({ evidenceCount: evidence.length }) }]
-      };
     }
   );
 
@@ -981,11 +988,14 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "resolve_any_key",
     HVDC_TOOL_DESCRIPTORS.resolve_any_key,
     async ({ identifierOrQuestion }) => {
-      const candidates = resolveAnyKey(identifierOrQuestion);
-      return {
-        structuredContent: { candidates },
-        content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length }) }]
-      };
+      return withSpan("resolve_any_key", async (span) => {
+        span.setAttribute("hvdc.identifier", String(identifierOrQuestion ?? "").slice(0, 64));
+        const candidates = resolveAnyKey(identifierOrQuestion);
+        return {
+          structuredContent: { candidates },
+          content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length }) }]
+        };
+      });
     }
   );
 
@@ -994,14 +1004,17 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "validate_answer",
     HVDC_TOOL_DESCRIPTORS.validate_answer,
     async ({ question }) => {
-      const route = routeQuestion(question);
-      const evidence = searchCorpus({ query: question, requiredDocs: route.requiredDocs, domainHints: route.domains });
-      const resolvedEntities = resolveAnyKey(question);
-      const findings = validateGrounding({ question, route, evidence, resolvedEntities });
-      return {
-        structuredContent: { findings },
-        content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }) }]
-      };
+      return withSpan("validate_answer", async (span) => {
+        span.setAttribute("hvdc.question_length", String(question?.length ?? 0));
+        const route = routeQuestion(question);
+        const evidence = searchCorpus({ query: question, requiredDocs: route.requiredDocs, domainHints: route.domains });
+        const resolvedEntities = resolveAnyKey(question);
+        const findings = validateGrounding({ question, route, evidence, resolvedEntities });
+        return {
+          structuredContent: { findings },
+          content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }) }]
+        };
+      });
     }
   );
 
@@ -1095,12 +1108,14 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     "check_cost_guard",
     HVDC_TOOL_DESCRIPTORS.check_cost_guard,
     async ({ invoiceNo, currency, lines }) => {
-      const result = calcCostGuard(invoiceNo, lines, currency ?? "AED");
-      await options.audit?.(buildAuditRecord("check_cost_guard", { invoiceNo, currency, lineCount: lines.length }, result, true));
-      return {
-        structuredContent: result,
-        content: [{ type: "text", text: JSON.stringify({ invoiceNo, overallBand: result.overallBand, humanGateRequired: result.humanGateRequired, blockReasons: result.blockReasons }) }]
-      };
+      return withSpan("check_cost_guard", async (span) => {
+        const result = calcCostGuard(invoiceNo, lines, currency ?? "AED");
+        await options.audit?.(buildAuditRecord("check_cost_guard", { invoiceNo, currency, lineCount: lines.length }, result, true));
+        return {
+          structuredContent: result,
+          content: [{ type: "text", text: JSON.stringify({ invoiceNo, overallBand: result.overallBand, humanGateRequired: result.humanGateRequired, blockReasons: result.blockReasons }) }]
+        };
+      });
     }
   );
 
