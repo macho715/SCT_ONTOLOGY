@@ -145,7 +145,7 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
 
   for (const rawToken of text.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? []) {
     for (const variant of expandIdentifierVariants(rawToken)) {
-      if (!/^HVDC-ADOPT-[A-Z]{2,8}-\d{4,}$/.test(variant.normalized)) continue;
+      if (!/^HVDC-ADOPT-[A-Z]{2,8}-\d{4,}(?:-[A-Z0-9]{1,8})?$/.test(variant.normalized)) continue;
       pushCandidate({
         entityType: "ShipmentUnit",
         identifierScheme: "HVDC_CODE",

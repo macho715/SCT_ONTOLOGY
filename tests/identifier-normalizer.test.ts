@@ -3,13 +3,39 @@ import { expandIdentifierVariants, extractIdentifierLookupVariants } from "../se
 import { resolveAnyKey } from "../server/src/router.js";
 
 describe("HVDC identifier normalization", () => {
-  it("normalizes full and abbreviated HVDC ADOPT codes without hardcoded SCT mappings", () => {
-    for (const input of ["HVDC-ADOPT-SCT-0001", "SCT0001", "SCT001", "sct001"]) {
-      const variants = expandIdentifierVariants(input).map((variant) => variant.normalized);
-      expect(variants).toContain("HVDC-ADOPT-SCT-0001");
-    }
+  it("normalizes full and abbreviated HVDC ADOPT codes across logistics_status prefixes", () => {
+    const cases = [
+      ["HVDC-ADOPT-SCT-0001", "HVDC-ADOPT-SCT-0001"],
+      ["SCT0001", "HVDC-ADOPT-SCT-0001"],
+      ["SCT001", "HVDC-ADOPT-SCT-0001"],
+      ["sct001", "HVDC-ADOPT-SCT-0001"],
+      ["PPL7", "HVDC-ADOPT-PPL-0007"],
+      ["HS1", "HVDC-ADOPT-HS-0001"],
+      ["HE85", "HVDC-ADOPT-HE-0085"],
+      ["SEI21", "HVDC-ADOPT-SEI-0021"],
+      ["SIM42", "HVDC-ADOPT-SIM-0042"],
+      ["ZEN19", "HVDC-ADOPT-ZEN-0019"]
+    ];
 
-    expect(expandIdentifierVariants("PPL7").map((variant) => variant.normalized)).toContain("HVDC-ADOPT-PPL-0007");
+    for (const [input, expected] of cases) {
+      const variants = expandIdentifierVariants(input).map((variant) => variant.normalized);
+      expect(variants).toContain(expected);
+    }
+  });
+
+  it("preserves logistics_status suffix patterns for split shipment codes", () => {
+    const cases = [
+      ["HVDC-ADOPT-HE-0068-1", "HVDC-ADOPT-HE-0068-1"],
+      ["HE68-1", "HVDC-ADOPT-HE-0068-1"],
+      ["sim5-2a", "HVDC-ADOPT-SIM-0005-2A"],
+      ["SEI17-03", "HVDC-ADOPT-SEI-0017-03"],
+      ["HVDC-ADOPT-SIM-0012-C", "HVDC-ADOPT-SIM-0012-C"]
+    ];
+
+    for (const [input, expected] of cases) {
+      const variants = expandIdentifierVariants(input).map((variant) => variant.normalized);
+      expect(variants).toContain(expected);
+    }
   });
 
   it("extracts unique lookup variants from mixed text", () => {
@@ -25,6 +51,17 @@ describe("HVDC identifier normalization", () => {
       identifierScheme: "HVDC_CODE",
       identifierValue: "SCT001",
       normalizedValue: "HVDC-ADOPT-SCT-0001",
+      confidence: 0.95
+    });
+  });
+
+  it("resolves suffixed split shipment codes as HVDC_CODE candidates", () => {
+    const candidates = resolveAnyKey("sim5-2a");
+    expect(candidates[0]).toMatchObject({
+      entityType: "ShipmentUnit",
+      identifierScheme: "HVDC_CODE",
+      identifierValue: "sim5-2a",
+      normalizedValue: "HVDC-ADOPT-SIM-0005-2A",
       confidence: 0.95
     });
   });
