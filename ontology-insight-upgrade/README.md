@@ -1,22 +1,32 @@
 # 🚀 HVDC 온톨로지 인사이트 시스템
 
-[![HVDC Audit Integrity & Smoke Test](https://github.com/macho715/ontology-insight/actions/workflows/audit-smoke.yml/badge.svg)](https://github.com/macho715/ontology-insight/actions/workflows/audit-smoke.yml)
+**삼성물산과 ADNOC·DSV 파트너십을 위한 HVDC 프로젝트 물류 온톨로지 참조 시스템**
 
-**삼성물산과 ADNOC·DSV 파트너십을 위한 엔터프라이즈급 HVDC 프로젝트 물류 온톨로지 시스템**
+## 현재 상태
+
+쉽게 말하면: 이 폴더는 Cloudflare 운영 MCP의 직접 런타임이 아니라, 로컬 Fuseki/SPARQL, Flask, Gateway, 감사 로그, risk radar 아이디어를 검증하고 Cloudflare MCP로 가져갈 내용을 정리한 참조 구현입니다.
+
+| 구분 | 현재 판정 | 의미 |
+|---|---|---|
+| GitHub 위치 | `macho715/SCT_ONTOLOGY`의 `ontology-insight-upgrade/` 하위 폴더 | 예전 독립 저장소 `macho715/ontology-insight`가 기준이 아닙니다. |
+| 운영 MCP | 부모 저장소의 Cloudflare Worker | 운영 endpoint는 `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`입니다. |
+| 이 폴더의 서버 | 개발/마이그레이션 참조용 | `5002`, `5010`, `8080`, `5003`, `3030` 포트는 로컬 검증용입니다. |
+| Phase 1~5 | 로컬 계약과 테스트 기준 완료 | Cloudflare 배포, OAuth 등록, ChatGPT/Claude/Cursor 등록을 이 폴더만으로 증명하지 않습니다. |
+| Read-only MCP surface | 로컬 deterministic contract | 실제 운영 MCP tool 배포 여부는 부모 Cloudflare Worker에서 따로 확인해야 합니다. |
 
 ## 🎯 시스템 개요
 
-본 시스템은 다음 기능을 제공합니다:
+본 폴더는 다음 기능의 로컬 참조 구현과 검증 자료를 제공합니다:
 
 - **🔧 비즈니스 규칙 엔진**: CostGuard, HS Risk, CertChk 검증
 - **🚀 안전한 Fuseki 배포**: 스테이징→검증→교체 (롤백 지원)
 - **🔍 자연어 쿼리**: NLQ→SPARQL 변환 및 안전성 검증
-- **📊 실시간 분석**: 고위험 송장 탐지, HVDC 코드 관리
-- **🔒 엔터프라이즈 보안**: PII 마스킹, 감사 추적, SHA-256 무결성
+- **📊 분석 참조**: 고위험 송장 탐지, HVDC 코드 관리
+- **🔒 보안 참조**: PII 마스킹, 감사 추적, SHA-256 무결성
 - **🌐 Gateway API 통합**: OpenAPI 3.1 스키마 지원, MRR/ETA/CostGuard
-- **🤖 Claude Native 브릿지**: MACHO-GPT v3.7 명령어 시스템 완전 통합
+- **🤖 Claude Native 브릿지**: MACHO-GPT v3.7 명령어 시스템 참조 구현
 
-## 🏗️ 시스템 아키텍처
+## 🏗️ 로컬 참조 아키텍처
 
 ```
 📝 자연어 입력 (Natural Language Input)
@@ -48,8 +58,8 @@
 
 ```bash
 # 저장소 복제
-git clone https://github.com/macho715/ontology-insight.git
-cd ontology-insight
+git clone https://github.com/macho715/SCT_ONTOLOGY.git
+cd SCT_ONTOLOGY/ontology-insight-upgrade
 
 # 의존성 설치
 pip install -r requirements.txt
@@ -63,6 +73,9 @@ python system_health_check.py
 ```
 
 ### 기본 사용법
+
+아래 서버는 모두 개발/마이그레이션 참조용입니다.
+운영 public surface는 부모 저장소 Cloudflare MCP입니다.
 
 ```bash
 # 1. 메인 API 서버 시작
@@ -157,7 +170,7 @@ Risk radar contract: `docs/OPERATIONAL-RISK-RADAR-CONTRACT.md`
 Phase 5 adds a local, deterministic MCP-style tool surface for V1 read-only use.
 It wraps the any-key resolver, operational risk radar, CostGuard evidence pack, evidence reference search, and output validation in structured tool envelopes.
 
-Available read-only tool contracts:
+Local-only available read-only tool contracts:
 
 - `resolve_operational_key`
 - `get_operational_risk_radar`
@@ -170,6 +183,7 @@ The tool envelopes mark `readOnly: true` and `mutationAllowed: false`.
 
 This is a local contract surface.
 It does not prove Cloudflare deployment, OAuth registration, ChatGPT connector registration, Claude registration, or Cursor registration.
+Use the parent repository Cloudflare Worker evidence for production MCP status.
 Future upload, write, graph mutation, approval, payment, dispute, e-mail, and escalation work remains outside V1 and requires separate scopes, human gates, audit records, rollback design, and tests.
 
 ```bash
@@ -210,7 +224,9 @@ POST /v1/costguard/estimate
 }
 ```
 
-## 📊 API 엔드포인트
+## 📊 로컬 개발 API 엔드포인트
+
+Development or migration reference only. These local endpoints are not a V1 production public surface. Cloudflare MCP is the production direction.
 
 ### 메인 API (포트 5002)
 
@@ -295,9 +311,10 @@ POST /v1/costguard/estimate
 - **repl**: 복잡한 계산, 데이터 분석, 예측 모델링
 - **artifacts**: 보고서 생성, 시각화, 대시보드 제작
 
-## 🚀 안전한 배포 시스템
+## 🚀 로컬 Fuseki 배포 참조
 
-Fuseki 배포 시스템은 무중단 업데이트를 보장합니다:
+Fuseki 배포 스크립트는 로컬 staging, validation, backup, swap, rollback 흐름을 보여주는 참조 구현입니다.
+이 문구는 Cloudflare 운영 배포 안전성을 보장한다는 뜻이 아닙니다.
 
 ```bash
 # 전체 검증과 함께 배포
@@ -334,31 +351,33 @@ python fuseki_swap_verify.py --rollback http://samsung.com/graph/EXTRACTED
 - **데이터 정화**: 입력 검증 및 출력 필터링
 - **접근 제어**: 역할 기반 권한 및 감사 추적
 
-## 🔐 v3.7 보안 강화 기능
+## 🔐 v3.7 보안 참조 기능
 
 ### 통합 보안 시스템
-- **제로 트러스트 아키텍처**: 모든 요청에 대한 다층 검증
-- **실시간 위협 탐지**: AI 기반 이상 행위 모니터링
-- **자동화된 규정 준수**: FANR, MOIAT, IMO, GDPR 자동 검증
-- **종단간 암호화**: 모든 데이터 전송 및 저장 암호화
+- **다층 검증 참조**: 입력 검증, evidence check, audit log를 분리합니다.
+- **위험 탐지 참조**: 로컬 규칙으로 이상 값과 누락 증빙을 찾습니다.
+- **규정 검토 참조**: FANR, MOIAT, IMO, GDPR 관련 rule placeholder와 evidence gate를 둡니다.
+- **보안 경계**: 운영 암호화와 접근 제어는 부모 Cloudflare MCP와 배포 환경에서 별도 검증해야 합니다.
 
 ### Claude Native 보안
 - **명령어 검증**: MACHO-GPT 명령어 실행 전 보안 검사
 - **도구 접근 제어**: web_search, google_drive_search 등 도구별 권한 관리
 - **세션 관리**: 사용자 세션 및 API 키 보안 관리
 
-## 📈 성능 지표
+## 📈 검증 상태
 
-| 지표 | 목표 | 달성 |
+아래 표는 로컬 검증 범위를 분리해서 보여줍니다.
+`100%` 표기는 전체 운영 품질 보장이 아니라, 해당 로컬 테스트 세트 안에서 실패가 없었다는 뜻입니다.
+
+| 지표 | 확인 범위 | 현재 상태 |
 |------|------|------|
-| **비즈니스 규칙 정확도** | >95% | 100% |
-| **NLQ 변환 성공률** | >80% | 100% |
-| **배포 안전성** | 무중단 | ✅ 보장됨 |
-| **응답 시간** | <3초 | <2초 |
-| **시스템 가용성** | >99% | ✅ 엔터프라이즈급 |
-| **Gateway API 통합** | 100% | ✅ 완료 |
-| **Claude Native 브릿지** | v3.7 | ✅ 구현됨 |
-| **테스트 커버리지** | >90% | 100% |
+| **비즈니스 규칙** | 로컬 fixture와 샘플 테스트 | 로컬 테스트 기준 통과 |
+| **NLQ 변환** | 로컬 SPARQL 변환 예제 | 운영 DB 품질 보장은 아님 |
+| **Fuseki 배포 안전성** | 로컬 staging/swap/rollback 참조 구현 | Cloudflare 운영 배포와 별개 |
+| **응답 시간** | 로컬 실행 환경 관찰값 | 운영 SLA로 사용 금지 |
+| **Gateway API 통합** | mock server와 샘플 요청 | 실제 ERP/WMS/Foundry 연결 아님 |
+| **Claude Native 브릿지** | 로컬 Flask bridge 참조 | Claude MCP 등록 증거 아님 |
+| **Read-only MCP surface** | `verify-readonly-mcp-surface.ps1` 계약 테스트 | 로컬 계약 검증 완료 |
 
 ## 🧪 테스트
 
@@ -397,17 +416,19 @@ python quick_demo.py
 /automate test-pipeline  # 프로젝트 CLI 규약 사용
 ```
 
-### 테스트 결과 요약
+### 테스트 결과 해석
 
-- ✅ **통합 테스트**: 100% 통과
-- ✅ **Gateway API 테스트**: 7/7 테스트 통과
-- ✅ **비즈니스 규칙**: 모든 시나리오 검증 완료
-- ✅ **보안 테스트**: PII 마스킹, 감사 로깅 검증
-- ✅ **성능 테스트**: 응답 시간 <2초 달성
+- 통합 테스트는 로컬 fixture 기준으로 확인합니다.
+- Gateway API 테스트는 mock server 기준으로 확인합니다.
+- 비즈니스 규칙 테스트는 샘플 시나리오 기준으로 확인합니다.
+- PII 마스킹과 감사 로깅은 로컬 출력 기준으로 확인합니다.
+- 응답 시간은 운영 SLA가 아니라 로컬 관찰값입니다.
 
-## 🔧 GitHub Actions CI/CD
+## 🔧 GitHub Actions 참고
 
-저장소에는 자동화된 테스트 및 배포 워크플로우가 포함되어 있습니다:
+이 폴더 안의 `.github/workflows/audit-smoke.yml`은 참조용 워크플로우입니다.
+현재 `SCT_ONTOLOGY` 루트 GitHub Actions로 자동 실행된다는 뜻이 아닙니다.
+루트 저장소 CI 상태는 부모 저장소 `.github/workflows/` 기준으로 확인해야 합니다.
 
 ### 수동 워크플로우 트리거
 
@@ -460,19 +481,19 @@ gh workflow run audit-smoke.yml \
 5. 브랜치에 푸시 (`git push origin feature/amazing-feature`)
 6. Pull Request 열기
 
-## 🆕 v3.7 주요 업데이트
+## 🆕 v3.7 참조 업데이트
 
 ### Gateway API 통합
-- ✅ OpenAPI 3.1 스키마 완전 구현
-- ✅ MRR 드래프트, ETA 예측, CostGuard 추정 기능
-- ✅ Mock 서버를 통한 완전한 테스트 환경
-- ✅ 7개 테스트 케이스 100% 통과
+- OpenAPI 3.1 스키마 참조 구현
+- MRR 드래프트, ETA 예측, CostGuard 추정 예제
+- Mock 서버 기반 테스트 환경
+- 7개 Gateway 샘플 테스트 기준 통과
 
 ### Claude Native 브릿지
-- ✅ MACHO-GPT v3.7 명령어 시스템 완전 통합
-- ✅ web_search, google_drive_search, repl, artifacts 도구 연동
-- ✅ 자동화된 워크플로우 및 도구 추천 시스템
-- ✅ 실시간 상태 모니터링 및 헬스체크
+- MACHO-GPT v3.7 명령어 시스템 참조 구현
+- web_search, google_drive_search, repl, artifacts 도구 연동 예제
+- 자동화된 워크플로우 및 도구 추천 예제
+- 로컬 상태 모니터링 및 헬스체크
 
 ## 🔐 Privacy Policy
 
@@ -485,16 +506,16 @@ For external API calls, only public or mock data is used.
 
 ## 📝 라이선스
 
-이 프로젝트는 삼성물산과 ADNOC·DSV 파트너십 물류 운영을 위해 개발된 독점 소프트웨어입니다.
+이 프로젝트는 HVDC 물류 운영 참조와 내부 검토를 위한 소프트웨어입니다.
 
 ## 🔧 지원
 
 기술 지원 및 배포 지원:
 
-- **이슈 트래커**: [GitHub Issues](https://github.com/macho715/ontology-insight/issues)
-- **문서화**: [Wiki](https://github.com/macho715/ontology-insight/wiki)
-- **CI/CD 상태**: [Actions](https://github.com/macho715/ontology-insight/actions)
+- **저장소**: [SCT_ONTOLOGY](https://github.com/macho715/SCT_ONTOLOGY)
+- **이슈 트래커**: [GitHub Issues](https://github.com/macho715/SCT_ONTOLOGY/issues)
+- **CI/CD 상태**: [Actions](https://github.com/macho715/SCT_ONTOLOGY/actions)
 
 ---
 
-**엔터프라이즈 물류 자동화를 위해 ❤️로 제작되었습니다** 🚀
+**HVDC 물류 evidence automation 참조 구현**
