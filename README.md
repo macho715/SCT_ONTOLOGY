@@ -435,3 +435,36 @@ Latest local verification observed for this feature:
 - Command: `npm run verify`
 - Result: TypeScript check passed, and Vitest passed 5 test files with 78 tests.
 - Meaning: the current implementation and tests agree on the Evidence Trace Mode contract.
+
+## 2026-05-15 Control Tower one-shot shipment report
+
+쉽게 말하면: 이제 사용자가 `SCT0001`, `HVDC-ADOPT-SCT-0001`, `SIM5-2A` 같은 shipment key를 물으면, 식별자만 맞추고 끝내지 않습니다. `resolve_any_key`가 Cloudflare D1 Control Tower 데이터를 같이 읽어서 shipment date, ETA/ATA, 화물정보, 현장입고, 검증 이슈를 한 번에 반환합니다.
+
+| 결과 영역 | 반환 위치 | 의미 |
+|---|---|---|
+| 식별자 후보 | `candidates[]` | 입력 key가 어떤 `ShipmentUnit`으로 resolve되는지 보여줍니다. |
+| 화물정보 | `controlTowerReports[].cargoSummary` | source line, vendor, category, PO, invoice, incoterms를 보여줍니다. |
+| Shipment date | `controlTowerReports[].shipmentDates` | ETD, ATD, ETA, ATA, attestation, DO, customs, final delivery date를 묶습니다. |
+| 현장입고 | `controlTowerReports[].siteReceipts` | SHU, MIR, AGI 같은 현장별 실제 입고일을 보여줍니다. |
+| 현장 완료 요약 | `controlTowerReports[].siteReceiptSummary` | required destination 수, receipt 수, latest receipt, completion rate를 보여줍니다. |
+| 검증 이슈 | `controlTowerReports[].validationFindings` | final delivery와 receipt date 충돌 같은 운영 risk를 같이 보여줍니다. |
+| 열려 있는 action | `controlTowerReports[].openActions` | D1 `action_queue`에 남은 follow-up action을 보여줍니다. |
+
+```mermaid
+flowchart LR
+  User["User input<br/>SCT0001 / SHPT / HVDC CODE"] --> Resolve["resolve_any_key"]
+  Resolve --> Candidate["ShipmentUnit candidates"]
+  Candidate --> Report["controlTowerReports"]
+  Report --> Dates["ETD / ATD / ETA / ATA"]
+  Report --> Cargo["Cargo summary"]
+  Report --> Receipt["Site receipts"]
+  Report --> Findings["Validation findings"]
+  Report --> Actions["Open actions"]
+  Report --> ChatGPT["One-shot operating answer"]
+```
+
+Implementation evidence:
+- `server/src/hvdc-server.ts` adds the `controlTowerReports` output schema and loads reports for resolved `ShipmentUnit` candidates.
+- `server/src/worker.ts` adds the D1 report join across `shipment_unit`, `milestone_event`, `receipt_event`, `destination_requirement`, `validation_log`, and `action_queue`.
+- `tests/control-tower-d1.test.ts` verifies that `resolve_any_key` returns ETA, ATA, cargo, and site receipt data in one result.
+- Operating smoke for `SCT0001` returned `reportCount=1`, `ETA=2024-03-22`, `ATA=2024-03-22`, and site receipts for `SHU=2024-03-28`, `MIR=2024-04-18`.

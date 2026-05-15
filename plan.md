@@ -256,3 +256,48 @@ Exit condition:
 
 - The three focused tests pass.
 - The documentation set consistently describes Cloudflare MCP 15 tools, D1 Control Tower lookup, suffix-aware HVDC code resolving, protected R2/D1 upload/write, and Dual-MCP operation.
+
+## 2026-05-15 Plan Addendum: Control Tower one-shot shipment report
+
+쉽게 말하면: 다음 문서와 검증 기준은 “SHIPMENT DATE, ETA, ATA, 화물정보, 현장입고 정보가 한 번에 나와야 한다”는 운영 요구를 기준으로 한다.
+
+### Goal
+
+`resolve_any_key` 한 번의 직접 호출로 사용자가 운영 보고서 초안을 만들 수 있게 한다.
+
+### Required output
+
+| Output | Required field |
+|---|---|
+| 식별자 resolve | `candidates[]` |
+| 화물정보 | `controlTowerReports[].cargoSummary` |
+| shipment date | `controlTowerReports[].shipmentDates` |
+| ETA / ATA | `controlTowerReports[].shipmentDates.eta`, `controlTowerReports[].shipmentDates.ata` |
+| 현장 입고 | `controlTowerReports[].siteReceipts` |
+| 현장 완료 요약 | `controlTowerReports[].siteReceiptSummary` |
+| 검증 이슈 | `controlTowerReports[].validationFindings` |
+| 후속 action | `controlTowerReports[].openActions` |
+
+```mermaid
+flowchart LR
+  P["User asks for shipment report"] --> R["resolve_any_key"]
+  R --> C["Resolve candidates"]
+  C --> D["Load D1 Control Tower report"]
+  D --> O["One structured output"]
+  O --> V["Verify ETA / ATA / cargo / site receipt"]
+  V --> A["Answer user with current limitations"]
+```
+
+### Acceptance checks
+
+- `tests/control-tower-d1.test.ts` must include one-shot report coverage.
+- `npm run verify` must pass before deployment.
+- Remote MCP smoke must show `controlTowerReports.length > 0` for a known D1 shipment key.
+- User-facing answer must separate confirmed D1 evidence from live ERP/WMS/Foundry state.
+
+### Current verification snapshot
+
+- Commit: `723ac40 feat: return control tower shipment reports`
+- Deploy: Cloudflare Worker Version ID `310d23b4-fb12-4757-a570-b9a905e4a853`
+- Smoke key: `SCT0001`
+- Confirmed report data: `ETA=2024-03-22`, `ATA=2024-03-22`, `SHU receipt=2024-03-28`, `MIR receipt=2024-04-18`

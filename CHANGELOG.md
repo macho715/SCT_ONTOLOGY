@@ -396,3 +396,39 @@ Commit: `48d606d Initial HVDC ontology ChatGPT app`
 
 - 초기 업로드는 넓은 범위의 scaffold다.
 - 실제 운영 사용 전에는 각 tool contract, corpus grounding, privacy gate 검증이 필요하다.
+
+## Unreleased - 2026-05-15 Control Tower one-shot shipment report
+
+### Added
+
+- Extended `resolve_any_key` so a resolved `ShipmentUnit` can return `controlTowerReports` in the same structured MCP result.
+- Added one-shot report fields for cargo summary, ETD, ATD, ETA, ATA, attestation, DO collected, customs started, customs closed, final delivered, site receipts, validation findings, and open actions.
+- Added D1 report composition in `server/src/worker.ts` across `shipment_unit`, `milestone_event`, `receipt_event`, `destination_requirement`, `validation_log`, and `action_queue`.
+- Added regression coverage in `tests/control-tower-d1.test.ts` for ETA, ATA, cargo, and site receipt data returned together.
+
+### Changed
+
+- Updated the `resolve_any_key` descriptor language so ChatGPT can use it for SHPT/HVDC CODE shipment report lookups, not only identifier matching.
+- Kept the MCP tool count unchanged. This is an extension of an existing read-only tool, not a new standalone tool.
+
+### Verified
+
+- `npm run verify` passed TypeScript, Vitest, and Worker dry-run.
+- Test result: 12 test files passed and 163 tests passed.
+- `git push origin main` pushed commit `723ac40 feat: return control tower shipment reports`.
+- `npm run worker:deploy` deployed Cloudflare Worker Version ID `310d23b4-fb12-4757-a570-b9a905e4a853`.
+- Remote MCP smoke for `SCT0001 ETA ATA shipment date cargo site receipt` returned `reportCount=1`, `targetRid=HVDC-ADOPT-SCT-0001`, `ETA=2024-03-22`, `ATA=2024-03-22`, and site receipts for `SHU=2024-03-28`, `MIR=2024-04-18`.
+
+```mermaid
+timeline
+  title Control Tower Shipment Report Timeline
+  Patch : Extend resolve_any_key structured output
+  Test : Add one-shot report regression coverage
+  Deploy : Cloudflare Worker version 310d23b4-fb12-4757-a570-b9a905e4a853
+  Smoke : SCT0001 returned ETA, ATA, cargo, and site receipts together
+```
+
+### Risks
+
+- ChatGPT connector UI may cache an older tool schema until the connector is refreshed.
+- The report is read-only D1 Control Tower evidence. It does not certify live ERP/WMS/Foundry state unless those feeds are loaded into D1.

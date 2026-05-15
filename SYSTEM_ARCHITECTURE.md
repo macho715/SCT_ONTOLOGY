@@ -644,3 +644,60 @@ Latest observed local verification:
 
 Evidence Trace Mode is an explanation layer.
 It is not a confidence scoring engine, live KG lineage system, ERP mutation trail, or external report approval mechanism.
+
+## 2026-05-15 Control Tower one-shot shipment report architecture
+
+쉽게 말하면: `resolve_any_key`는 이제 resolver만이 아니라 read-only Control Tower report entrypoint입니다. 하나의 shipment key로 후보 식별, shipment dates, cargo summary, site receipt, validation findings, open actions를 같은 structured result 안에 넣습니다.
+
+```mermaid
+flowchart TB
+  Client["ChatGPT / Claude / Cursor"] --> MCP["Cloudflare Worker MCP<br/>/mcp"]
+  MCP --> Tool["resolve_any_key"]
+  Tool --> Resolver["D1 + local identifier resolver"]
+  Resolver --> ReportLoader["loadControlTowerShipmentReports"]
+  ReportLoader --> WorkerLookup["createControlTowerLookup"]
+  WorkerLookup --> SU["D1 shipment_unit"]
+  WorkerLookup --> MS["D1 milestone_event"]
+  WorkerLookup --> DR["D1 destination_requirement"]
+  WorkerLookup --> RE["D1 receipt_event"]
+  WorkerLookup --> VL["D1 validation_log"]
+  WorkerLookup --> AQ["D1 action_queue"]
+  SU --> Result["controlTowerReports"]
+  MS --> Result
+  DR --> Result
+  RE --> Result
+  VL --> Result
+  AQ --> Result
+  Result --> UserAnswer["One-shot shipment status answer"]
+```
+
+### Data boundary
+
+- This lane is read-only.
+- It reads Cloudflare D1 Control Tower datasets.
+- It does not mutate ERP, WMS, TMS, Foundry, or live KG systems.
+- It does not replace protected write tools. R2/D1 write operations still require OAuth Bearer scope and Human-gate approval.
+
+### Runtime mapping
+
+| Layer | File | Responsibility |
+|---|---|---|
+| MCP tool contract | `server/src/hvdc-server.ts` | Adds `controlTowerReports` to `resolve_any_key` structured output. |
+| Worker data adapter | `server/src/worker.ts` | Reads D1 tables and builds one report per resolved ShipmentUnit. |
+| D1 schema | `migrations/0004_control_tower_datasets.sql` | Defines shipment, milestone, receipt, destination, validation, and action tables. |
+| D1 seeding | `scripts/seed_control_tower_d1.py` | Loads `data/datasets/*.csv` into Cloudflare D1. |
+| Regression test | `tests/control-tower-d1.test.ts` | Verifies ETA, ATA, cargo, and site receipt are returned together. |
+
+### SCT0001 operating smoke
+
+Remote MCP smoke against the production endpoint returned:
+
+| Field | Value |
+|---|---|
+| `targetRid` | `HVDC-ADOPT-SCT-0001` |
+| `reportCount` | `1` |
+| `reportStatus` | `BLOCK` |
+| `ETA` | `2024-03-22` |
+| `ATA` | `2024-03-22` |
+| `siteReceipts` | `SHU=2024-03-28`, `MIR=2024-04-18` |
+| `validationFindings` | `V-DEST-005`, `V-REC-004` |

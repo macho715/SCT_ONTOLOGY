@@ -457,3 +457,36 @@ Latest observed local verification for this addendum:
 
 Older archived files may still mention earlier 71/78-test snapshots.
 For the active repository, use the latest 113-test verification note above as the current local evidence.
+
+## 2026-05-15 Control Tower one-shot shipment report layout
+
+쉽게 말하면: shipment date, ETA/ATA, 화물정보, 현장입고 정보를 한 번에 보여주는 기능은 아래 파일들에 걸쳐 있습니다.
+
+| Path | Role |
+|---|---|
+| `server/src/hvdc-server.ts` | `resolve_any_key` output에 `controlTowerReports`를 추가하고 report schema를 정의합니다. |
+| `server/src/worker.ts` | Cloudflare D1에서 shipment, milestone, receipt, destination, validation, action 데이터를 읽어 report를 만듭니다. |
+| `migrations/0004_control_tower_datasets.sql` | D1 Control Tower dataset table 구조를 정의합니다. |
+| `scripts/seed_control_tower_d1.py` | `data/datasets/*.csv`를 D1로 seed합니다. |
+| `data/datasets/shipment_unit.csv` | 화물정보, 현재 단계, 현재 위치, 최종 배송, completion rate를 제공합니다. |
+| `data/datasets/milestone_event.csv` | ETD, ATD, ETA, ATA, DO, customs, final delivery milestone date를 제공합니다. |
+| `data/datasets/receipt_event.csv` | 현장별 실제 입고일을 제공합니다. |
+| `data/datasets/destination_requirement.csv` | 필수 현장 destination flag를 제공합니다. |
+| `data/datasets/validation_log.csv` | 운영 검증 이슈를 제공합니다. |
+| `data/datasets/action_queue.csv` | 남은 담당자 action을 제공합니다. |
+| `tests/control-tower-d1.test.ts` | one-shot report가 ETA, ATA, cargo, site receipt를 같이 반환하는지 검증합니다. |
+
+```mermaid
+flowchart TD
+  CSV["data/datasets/*.csv"] --> Seed["scripts/seed_control_tower_d1.py"]
+  Seed --> D1["Cloudflare D1<br/>0004 tables"]
+  D1 --> Worker["server/src/worker.ts<br/>getShipmentReport"]
+  Worker --> Server["server/src/hvdc-server.ts<br/>resolve_any_key"]
+  Server --> Test["tests/control-tower-d1.test.ts"]
+  Server --> Client["ChatGPT structured result<br/>controlTowerReports"]
+```
+
+Current file ownership:
+- `server/src/hvdc-server.ts` owns MCP schema and output shape.
+- `server/src/worker.ts` owns Cloudflare D1 query composition.
+- `tests/control-tower-d1.test.ts` owns regression coverage for one-shot operational report behavior.
