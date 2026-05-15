@@ -221,6 +221,24 @@
         `;
       }
 
+      function renderGraphPath(graphPath) {
+        if (!graphPath) return `<p class="empty">No graph path for this question.</p>`;
+        const edges = asArray(graphPath.edges);
+        const edgeHtml = edges.map((edge) => `
+          <li>${escapeHtml(edge.from)} -> <code>${escapeHtml(edge.relation)}</code> -> ${escapeHtml(edge.to)}</li>
+        `).join("") || `<li class="empty">No graph edges returned.</li>`;
+        return `
+          <dl class="meta">
+            <dt>Start node</dt><dd>${escapeHtml(displayValue(graphPath.startNode))}</dd>
+            <dt>End node</dt><dd>${escapeHtml(displayValue(graphPath.endNode))}</dd>
+            <dt>Path confidence</dt><dd>${escapeHtml(displayValue(graphPath.pathConfidence))}</dd>
+            <dt>Edge count</dt><dd>${edges.length}</dd>
+          </dl>
+          <h2>Ontology path edges</h2>
+          <ul>${edgeHtml}</ul>
+        `;
+      }
+
       function cssEscapeValue(value) {
         if (window.CSS?.escape) return window.CSS.escape(String(value));
         return String(value).replace(/["\\\]\[]/g, "\\$&");
@@ -450,9 +468,7 @@
         const routeHtml = asArray(answer.route?.requiredDocs).map((doc) => `<span>${escapeHtml(doc)}</span>`).join("") || `<span>No route document</span>`;
         const uiStatusHtml = renderUiState(answer);
 
-        const graphHtml = answer.graphPath ? `
-          <ul>${asArray(answer.graphPath.edges).map((edge) => `<li>${escapeHtml(edge.from)} -> <code>${escapeHtml(edge.relation)}</code> -> ${escapeHtml(edge.to)}</li>`).join("")}</ul>
-        ` : `<p class="empty">No graph path for this question.</p>`;
+        const graphHtml = renderGraphPath(answer.graphPath);
 
         root.innerHTML = `
           <div class="card">
@@ -505,7 +521,7 @@
               </div>
             </details>
             <details>
-              <summary>Ontology Path</summary>
+              <summary>ONTOLOGY PATH</summary>
               <div class="details-body">
                 ${graphHtml}
               </div>

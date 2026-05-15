@@ -352,4 +352,52 @@ describe("HVDC answer widget", () => {
     expect(html).not.toContain("sk-proj-abcdefghijklmnopqrstuvwxyz123456");
     expect(html).not.toContain("aaaabbbbccccddddeeee.ffffgggghhhhiiiijjjj.kkkkllllmmmmnnnnoooo");
   });
+
+  it("renders ONTOLOGY PATH graphPath start, edges, end, and confidence", () => {
+    const html = renderWidgetFixture({
+      answerId: "graph-path-fixture",
+      verdict: "PASS",
+      dataStatus: "OK",
+      businessResultVisible: true,
+      fallbackUsed: false,
+      summary: "Graph path available",
+      businessImpact: "Path traceability is visible in the card",
+      details: [],
+      evidenceIds: [],
+      validationStatus: "PASS",
+      route: { routeId: "r1", requiredDocs: ["CONSOLIDATED-00"], confidence: 0.95, routingReason: "fixture" },
+      evidence: [],
+      evidenceTrace: [],
+      validation: [],
+      actions: [],
+      graphPath: {
+        startNode: "HVDC-ANSWER",
+        edges: [
+          { from: "HVDC-ANSWER", relation: "routes_to", to: "CONSOLIDATED-00 Master Ontology" },
+          { from: "CONSOLIDATED-00 Master Ontology", relation: "grounds", to: "ShipmentUnit / Document / Invoice" },
+          { from: "ShipmentUnit / Document / Invoice", relation: "checks", to: "MilestoneEvent" },
+          { from: "MilestoneEvent", relation: "applies_to", to: "HVDC Logistics Question" }
+        ],
+        endNode: "HVDC Logistics Question",
+        pathConfidence: 0.88
+      },
+      piiMasked: false,
+      generatedAt: "2026-05-15T09:11:31Z"
+    });
+
+    expect(html).toContain("ONTOLOGY PATH");
+    expect(html).toContain("Start node");
+    expect(html).toContain("HVDC-ANSWER");
+    expect(html).toContain("End node");
+    expect(html).toContain("HVDC Logistics Question");
+    expect(html).toContain("Path confidence");
+    expect(html).toContain("0.88");
+    expect(html).toContain("Edge count");
+    expect(html).toContain("4");
+    expect(html).toContain("Ontology path edges");
+    expect(html).toContain("routes_to");
+    expect(html).toContain("grounds");
+    expect(html).toContain("checks");
+    expect(html).toContain("applies_to");
+  });
 });
