@@ -4,6 +4,38 @@
 
 현재 상태는 Cloudflare Workers 운영 기준입니다. MCP 서버, 15개 tool, Dual-MCP 검증 엔진, 온톨로지 corpus 번들, Evidence Drawer 위젯, OAuth Bearer 보호 upload/write 도구, D1 감사 로그, R2 파일 저장소, golden eval, GitHub Actions 검증이 들어 있습니다.
 
+## 2026-05-15 Latest Operating Snapshot
+
+쉽게 말하면: GitHub main 화면의 현재 기준은 Cloudflare 운영 Worker와 `main` commit `91f6329`입니다. 아래 표가 최신 source of truth이며, 이전 2026-05-14/2026-05-15 섹션은 과거 snapshot으로 보존합니다.
+
+| 항목 | 최신 기준 | 검증 또는 코드 근거 |
+|---|---|---|
+| GitHub main HEAD | `91f6329` | `origin/main`과 local `main`이 같은 merge commit을 가리킵니다. |
+| Cloudflare Worker | Version ID `1a1afb1d-bb7d-4a2e-99e8-e9c846fca28f` | `npm run worker:deploy`가 운영 Worker를 배포했습니다. |
+| MCP endpoint | `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp` | ChatGPT, Claude, Cursor가 같은 remote MCP endpoint를 사용합니다. |
+| Verification | 16 test files / 209 tests passed | `npm run worker:deploy` 내부의 `npm run verify` 결과입니다. |
+| Tool surface | 15 MCP tools | `server/src/hvdc-server.ts`의 read, validation, protected upload/write, Dual-MCP tool 등록 기준입니다. |
+| Control Tower report | `resolve_any_key` returns `controlTowerReports` | shipment date, ETA, ATA, cargo summary, site receipts, validation findings, open actions를 한 번에 반환합니다. |
+| Observability | `OTEL_ENABLED=true`; `hvdc.verdict`, `hvdc.validation_status` | `wrangler.toml`, `server/src/hvdc-server.ts`, `server/src/telemetry.ts` 기준입니다. |
+| CI quality gate | coverage gate 75% | `.github/workflows/ci.yml`의 coverage gate 기준입니다. |
+| D1 operations | seed and verify scripts added | `seed:local`, `seed:remote`, `seed:dry`, `verify:seed`, `verify:bindings`, `verify:full` scripts 기준입니다. |
+
+```mermaid
+flowchart LR
+  Client["ChatGPT / Claude / Cursor"] --> MCP["Cloudflare Worker MCP<br/>/mcp"]
+  MCP --> Tools["15 MCP tools"]
+  Tools --> Resolve["resolve_any_key"]
+  Resolve --> Reports["controlTowerReports"]
+  Reports --> Dates["Shipment dates<br/>ETA / ATA"]
+  Reports --> Cargo["Cargo summary"]
+  Reports --> Receipts["Site receipts"]
+  Reports --> Findings["Validation findings"]
+  MCP --> D1["Cloudflare D1<br/>Control Tower / audit"]
+  MCP --> R2["Cloudflare R2<br/>protected files"]
+  MCP --> OTel["OTel<br/>verdict / validation_status"]
+  Tests["CI / verify<br/>209 tests / 75% gate"] --> MCP
+```
+
 ## 2026-05-14 Current Operating Addendum
 
 쉽게 말하면: 현재 루트 README 기준은 Cloudflare 운영 MCP와 실제 Worker 코드입니다. 아래 `2026-05-14 운영 문서 동기화` 섹션의 Worker Version ID `15472eac-2698-4d9f-94e9-a7fa344f1fd8` 기록은 삭제하지 않고 이전 배포 snapshot으로 보존합니다.
