@@ -3,7 +3,7 @@ import { answerQuestion, validateGrounding } from "../server/src/answer.js";
 import { maskPii } from "../server/src/redact.js";
 import { evaluateShipmentRule } from "../server/src/shipment-rule.js";
 import { mergeShipmentValidation } from "../server/src/shipment-validation.js";
-import type { EvidenceSnippet, IntentRoute } from "../server/src/types.js";
+import type { EvidenceSnippet, IntentRoute, ShipmentRuleResult } from "../server/src/types.js";
 import { withUiState } from "../server/src/ui.js";
 
 function ask(question: string) {
@@ -451,5 +451,130 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(masked.piiMasked).toBe(true);
     expect(masked.text).not.toContain("user@example.com");
     expect(masked.text).not.toContain("+971 50 123 4567");
+  });
+});
+
+// ─── mergeShipmentValidation unit coverage ────────────────────────────────────
+
+describe("mergeShipmentValidation unit coverage", () => {
+  function makeRule(overrides: Partial<ShipmentRuleResult> = {}): ShipmentRuleResult {
+    return {
+      found: true,
+      source: "sample_shipment_rule_engine",
+      supportLevel: "SECONDARY_SAMPLE_VALIDATION",
+      status: "PASS",
+      matchedKey: "UNIT-001",
+      shipmentId: "UNIT-SHIP-001",
+      risks: [],
+      missingDocuments: [],
+      openExceptions: [],
+      invoiceAudit: [],
+      invoiceExposureAed: null,
+      humanGateRequired: false,
+      message: "Unit test stub.",
+      ...overrides
+    };
+  }
+
+  it("returns empty findings and actions when shipmentRule is undefined", () => {
+    const result = mergeShipmentValidation(undefined);
+    expect(result.findings).toHaveLength(0);
+    expect(result.actions).toHaveLength(0);
+  });
+
+  it("returns empty findings and actions when found is false", () => {
+    const result = mergeShipmentValidation(makeRule({ found: false }));
+    expect(result.findings).toHaveLength(0);
+    expect(result.actions).toHaveLength(0);
+  });
+
+  it("missing SITE_RECEIPT document produces BLOCK severity finding", () => {
+    const result = mergeShipmentValidation(makeRule({ missingDocuments: ["SITE_RECEIPT", "DN"] }));
+    const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-DOCS-001");
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("BLOCK");
+    expect(finding?.status).toBe("BLOCK");
+  });
+
+  it("missing document without SITE_RECEIPT produces WARN severity finding", () => {
+    const result = mergeShipmentValidation(makeRule({ missingDocuments: ["PACKING_LIST"] }));
+    const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-DOCS-001");
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("WARN");
+    expect(finding?.status).toBe("WARN");
+  });
+
+  it("invoice exposure exactly at 100000 does NOT trigger finance gate", () => {
+    const result = mergeShipmentValidation(makeRule({ invoiceExposureAed: "100000" }));
+    expect(result.findings.some((f) => f.ruleId === "V-SHIPMENT-INVOICE-001")).toBe(false);
+    expect(result.actions.some((a) => a.actionType === "REQUEST_FINANCE_GATE_REVIEW")).toBe(false);
+  });
+
+  it("invoice exposure above 100000 triggers finance gate finding and action", () => {
+    const result = mergeShipmentValidation(makeRule({ invoiceExposureAed: "100000.01" }));
+    const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-INVOICE-001");
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("BLOCK");
+    expect(result.actions.some((a) => a.actionType === "REQUEST_FINANCE_GATE_REVIEW")).toBe(true);
+  });
+
+  it("invoice audit with BLOCK severity triggers finance gate even when exposure is 0", () => {
+    const result = mergeShipmentValidation(makeRule({
+      invoiceAudit: [{ severity: "BLOCK", humanGate: false }]
+    }));
+    expect(result.findings.some((f) => f.ruleId === "V-SHIPMENT-INVOICE-001")).toBe(true);
+  });
+
+  it("invoice audit with CRITICAL severity triggers finance gate", () => {
+    const result = mergeShipmentValidation(makeRule({
+      invoiceAudit: [{ severity: "CRITICAL", humanGate: false }]
+    }));
+    expect(result.findings.some((f) => f.ruleId === "V-SHIPMENT-INVOICE-001")).toBe(true);
+  });
+
+  it("invoice audit with humanGate=true triggers finance gate", () => {
+    const result = mergeShipmentValidation(makeRule({
+      invoiceAudit: [{ severity: "INFO", humanGate: true }]
+    }));
+    expect(result.findings.some((f) => f.ruleId === "V-SHIPMENT-INVOICE-001")).toBe(true);
+  });
+
+  it("no risks and no missing documents produces no findings", () => {
+    const result = mergeShipmentValidation(makeRule());
+    expect(result.findings).toHaveLength(0);
+    expect(result.actions).toHaveLength(0);
+  });
+
+  it("AGI/DAS MOSB Gate risk produces BLOCK finding and human gate action", () => {
+    const result = mergeShipmentValidation(makeRule({
+      risks: [{ rule: "AGI/DAS MOSB Gate check", detail: "Missing M115 evidence." }]
+    }));
+    const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-AGIDAS-001");
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("BLOCK");
+    expect(finding?.reasonCode).toBe("SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED");
+    const action = result.actions.find((a) => a.actionType === "REQUEST_SHIPMENT_RULE_HUMAN_GATE");
+    expect(action).toBeDefined();
+    expect(action?.humanGateRequired).toBe(true);
+  });
+
+  it("all rule findings always carry empty evidenceIds array", () => {
+    const result = mergeShipmentValidation(makeRule({
+      risks: [{ rule: "AGI/DAS MOSB Gate check", detail: "Missing chain." }],
+      missingDocuments: ["SITE_RECEIPT"],
+      invoiceExposureAed: "200000"
+    }));
+    for (const finding of result.findings) {
+      expect(finding.evidenceIds).toEqual([]);
+    }
+  });
+
+  it("missing documents finding message contains the shipment ID", () => {
+    const result = mergeShipmentValidation(makeRule({
+      shipmentId: "HVDC-UNIT-999",
+      missingDocuments: ["DN"]
+    }));
+    const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-DOCS-001");
+    expect(finding?.message).toContain("HVDC-UNIT-999");
   });
 });
