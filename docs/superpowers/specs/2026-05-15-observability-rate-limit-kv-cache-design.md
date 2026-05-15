@@ -2,7 +2,7 @@
 
 Feature ID: `observability-rate-limit-kv-cache`
 Created: 2026-05-15
-Status: Draft for user review
+Status: Approved for implementation planning
 Owner: HVDC Ontology / MCP maintainer
 Input Plan: `20260515_plan-doc.md`
 Scope Option: C - spec document only, no implementation in this step
@@ -48,6 +48,25 @@ The input plan is directionally useful, but the implementation must adjust these
    - endpoint: `https://api.axiom.co/v1/traces`
    - headers: `Authorization=Bearer <token>,X-Axiom-Dataset=<dataset>`
 5. Cloudflare API plugin access was not verified in this Codex session because the Cloudflare MCP tool required auth. Resource creation must therefore be done through Wrangler CLI or a logged-in Cloudflare dashboard session.
+
+### Approved Decision
+
+Approved on 2026-05-15:
+
+```text
+Application code uses only generic OTLP env names.
+Axiom values are injected only through Cloudflare secrets or an observability destination.
+Release order is traces-only canary -> rate limit high-threshold canary -> single-read-path KV cache.
+```
+
+Implementation implications:
+
+1. Keep `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_HEADERS` as the application runtime contract.
+2. Do not add `AXIOM_TOKEN` or `AXIOM_DATASET` to application runtime types.
+3. Keep Axiom-specific token and dataset values outside source code.
+4. Start with traces export only. Do not enable logs export until redaction and log content are reviewed.
+5. Roll out rate limiting with high initial thresholds and fail-open behavior for missing bindings.
+6. Start KV caching with one read path, preferably `resolve_any_key`, before extending to MOSB/action reads.
 
 ## Goals
 
@@ -367,13 +386,13 @@ Files likely changed:
 
 Start with `resolve_any_key` only. Extend to MOSB/action reads after the first cache path is verified.
 
-## Approval Question
+## Approval Record
 
-Before implementation, confirm this decision:
+The approval question is resolved.
 
 ```text
 Use generic OTLP env names already present in the Worker
 instead of adding Axiom-specific application env names.
 ```
 
-Recommended answer: yes.
+Decision: yes.
