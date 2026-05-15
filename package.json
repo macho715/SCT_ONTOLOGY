@@ -23,7 +23,10 @@
     "seed:remote": "SEED_DRY_RUN=false tsx scripts/seed-d1.ts --remote",
     "seed:dry": "SEED_DRY_RUN=true tsx scripts/seed-d1.ts",
     "test:coverage": "npm run generate:worker-assets && vitest run --coverage --exclude \"docs/archive/**\" --exclude \".claude/**\"",
-    "verify": "npm run typecheck && npm test && npm run worker:dry-run"
+    "verify": "npm run typecheck && npm test && npm run worker:dry-run",
+    "verify:bindings": "tsx scripts/verify-bindings.ts",
+    "verify:seed": "tsx scripts/verify-seed.ts",
+    "verify:full": "npm run verify:bindings && npm run verify:seed"
   },
   "dependencies": {
     "@microlabs/otel-cf-workers": "1.0.0-rc.52",
