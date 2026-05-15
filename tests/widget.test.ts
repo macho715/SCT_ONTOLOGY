@@ -137,6 +137,7 @@ describe("HVDC answer widget", () => {
 
   it("keeps the iframe HTML resource-URI agnostic for compatibility aliases", () => {
     for (const resourceUri of [
+      "ui://hvdc/answer-card-v8.html",
       "ui://hvdc/answer-card-v7.html",
       "ui://hvdc/answer-card-v6.html",
       "ui://hvdc/answer-card-v5.html",
@@ -217,7 +218,7 @@ describe("HVDC answer widget", () => {
         businessResultVisible: true,
         fallbackUsed: true,
         cardEnabled: false,
-        templateVersion: "answer-card-v7",
+        templateVersion: "answer-card-v8",
         schemaVersion: "1.0.0",
         errorCode: "CARD_TEMPLATE_RENDER_FAILED",
         errorMessage: "Fixture template failure",

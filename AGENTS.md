@@ -18,8 +18,8 @@ The repository contains a correct master-spine direction plus mixed legacy conte
 
 - Canonical authority: `CONSOLIDATED-00-master-ontology.md`
 - Evidence-only extension: `CONSOLIDATED-08-communication.md`
-- Runtime UI resource: `public/hvdc-answer-widget.html` is registered as `ui://hvdc/answer-card-v7.html`
-- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients
+- Runtime UI resource: `public/hvdc-answer-widget.html` is registered as `ui://hvdc/answer-card-v8.html`
+- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients
 - Files that often require semantic migration attention: `CONSOLIDATED-02`, `03`, `04`, `05`, `07`, `09`
 - `CONSOLIDATED-06` may contain both newer aligned patterns and older legacy fragments depending on section/example
 

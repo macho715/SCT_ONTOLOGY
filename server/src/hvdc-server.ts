@@ -15,7 +15,7 @@ import { checkMosbGate, type MilestoneRecord } from "./mosb-gate.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import { routeTeamAction, type ActionProposal } from "./team-action-router.js";
 import type { DomainHint, GroundedAnswer, ResolvedEntity } from "./types.js";
-import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
+import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, V5_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
 
 export type HvdcServerOptions = {
   widgetHtml?: string;
@@ -1134,7 +1134,7 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => createWidgetResource(WIDGET_URI));
   registerAppResource(
     server,
-    "hvdc-answer-widget-v6-compat",
+    "hvdc-answer-widget-v7-compat",
     PREVIOUS_WIDGET_URI,
     {},
     async () => createWidgetResource(PREVIOUS_WIDGET_URI)
@@ -1145,6 +1145,13 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     LEGACY_WIDGET_URI,
     {},
     async () => createWidgetResource(LEGACY_WIDGET_URI)
+  );
+  registerAppResource(
+    server,
+    "hvdc-answer-widget-v5-compat",
+    V5_WIDGET_URI,
+    {},
+    async () => createWidgetResource(V5_WIDGET_URI)
   );
   registerAppResource(
     server,
