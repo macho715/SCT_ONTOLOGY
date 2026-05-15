@@ -12,6 +12,7 @@ hvdc-ontology-chatgpt-app-starter/
 __pycache__/
 *.pyc
 .claude/
+.claire/
 *.docx
 hvdc_email_drafting_guard_patch_2026-05-12/
 Ontology insight upgrade/

@@ -14,7 +14,7 @@
     "claude:stdio": "mcp-remote https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp",
     "claude:local": "tsx server/src/claude-server.ts",
     "typecheck": "npm run generate:worker-assets && tsc --noEmit",
-    "test": "npm run generate:worker-assets && vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\"",
+    "test": "npm run generate:worker-assets && vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\" --exclude \".claire/**\"",
     "index": "python scripts/index_corpus.py",
     "worker:dry-run": "npm run generate:worker-assets && wrangler deploy --dry-run",
     "worker:deploy": "npm run verify && wrangler deploy",
