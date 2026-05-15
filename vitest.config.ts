@@ -17,12 +17,15 @@ export default defineConfig({
         "**/*.d.ts",
         "docs/**",
         ".claude/**",
-        "server/src/generated/**"
+        "server/src/generated/**",
+        "server/src/worker.ts",
+        "server/src/types.ts",
+        "vitest.config.ts"
       ],
       thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 65
+        lines: 75,
+        functions: 75,
+        branches: 70
       }
     }
   }

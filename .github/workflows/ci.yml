@@ -30,7 +30,6 @@ jobs:
 
       - name: Coverage report
         run: npm run test:coverage
-        continue-on-error: true
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -39,7 +38,7 @@ jobs:
           name: coverage-report
           path: coverage/
 
-      - name: Coverage gate (lines >= 70%)
+      - name: Coverage gate (lines >= 75%)
         if: always()
         run: |
           if [ ! -f coverage/coverage-summary.json ]; then
@@ -51,8 +50,8 @@ jobs:
             console.log(s.total.lines.pct);
           ")
           echo "Line coverage: ${LINES}%"
-          if (( $(echo "$LINES < 70" | bc -l) )); then
-            echo "::error::Coverage ${LINES}% < 70% threshold"
+          if (( $(echo "$LINES < 75" | bc -l) )); then
+            echo "::error::Coverage ${LINES}% < 75% threshold"
             exit 1
           fi
           echo "Coverage gate passed: ${LINES}%"
