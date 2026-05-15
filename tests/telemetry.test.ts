@@ -1,5 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { trace, SpanStatusCode } from "@opentelemetry/api";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { createHvdcServer } from "../server/src/index.js";
 import { withSpan } from "../server/src/telemetry.js";
 
 describe("withSpan", () => {
@@ -103,5 +106,93 @@ describe("withSpan", () => {
 
     expect(getTracerSpy).toHaveBeenCalledWith("hvdc-mcp");
     vi.restoreAllMocks();
+  });
+});
+
+// ─── OTel span attributes on ask_hvdc_ontology ───────────────────────────────
+
+describe("ask_hvdc_ontology span attributes (PR-E)", () => {
+  it("withSpan callback receives span that accepts multiple attribute calls", async () => {
+    const attrs: Record<string, string> = {};
+    const mockSpan = {
+      setAttribute: vi.fn((k: string, v: unknown) => { attrs[k] = String(v); }),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+      recordException: vi.fn()
+    };
+    const mockTracer = {
+      startActiveSpan: vi.fn(async (_n: string, fn: (s: unknown) => Promise<unknown>) => fn(mockSpan))
+    };
+    vi.spyOn(trace, "getTracer").mockReturnValue(mockTracer as never);
+
+    await withSpan("ask_hvdc_ontology", async (span) => {
+      span.setAttribute("hvdc.user_role", "ops_user");
+      span.setAttribute("hvdc.verdict", "PASS");
+      span.setAttribute("hvdc.validation_status", "PASS");
+      return "ok";
+    });
+
+    expect(attrs["hvdc.verdict"]).toBe("PASS");
+    expect(attrs["hvdc.validation_status"]).toBe("PASS");
+    expect(attrs["hvdc.user_role"]).toBe("ops_user");
+    vi.restoreAllMocks();
+  });
+
+  it("hvdc.verdict and hvdc.validation_status are set by ask_hvdc_ontology tool call", async () => {
+    const allAttrs: Array<[string, unknown]> = [];
+    const makeSpan = () => ({
+      setAttribute: vi.fn((k: string, v: unknown) => { allAttrs.push([k, v]); }),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+      recordException: vi.fn()
+    });
+    const mockTracer = {
+      startActiveSpan: vi.fn(async (_n: string, fn: (s: unknown) => Promise<unknown>) => fn(makeSpan()))
+    };
+    vi.spyOn(trace, "getTracer").mockReturnValue(mockTracer as never);
+
+    const server = createHvdcServer({});
+    const client = new Client({ name: "span-attr-test", version: "0.0.1" });
+    const [cT, sT] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(sT), client.connect(cT)]);
+
+    await client.callTool({ name: "ask_hvdc_ontology", arguments: { question: "상태 확인", userRole: "test", language: "ko" } });
+
+    await client.close();
+    await server.close();
+    vi.restoreAllMocks();
+
+    const keys = allAttrs.map(([k]) => k);
+    expect(keys).toContain("hvdc.verdict");
+    expect(keys).toContain("hvdc.validation_status");
+  });
+
+  it("hvdc.verdict attribute value matches the answer verdict field", async () => {
+    const verdictAttrs: string[] = [];
+    const makeSpan = () => ({
+      setAttribute: vi.fn((k: string, v: unknown) => { if (k === "hvdc.verdict") verdictAttrs.push(String(v)); }),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+      recordException: vi.fn()
+    });
+    const mockTracer = {
+      startActiveSpan: vi.fn(async (_n: string, fn: (s: unknown) => Promise<unknown>) => fn(makeSpan()))
+    };
+    vi.spyOn(trace, "getTracer").mockReturnValue(mockTracer as never);
+
+    const server = createHvdcServer({});
+    const client = new Client({ name: "verdict-attr-test", version: "0.0.1" });
+    const [cT, sT] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(sT), client.connect(cT)]);
+
+    const res = await client.callTool({ name: "ask_hvdc_ontology", arguments: { question: "상태 확인", userRole: "test", language: "ko" } });
+
+    await client.close();
+    await server.close();
+    vi.restoreAllMocks();
+
+    const answerVerdict = (res.structuredContent as { verdict?: string })?.verdict;
+    expect(verdictAttrs).toHaveLength(1);
+    expect(verdictAttrs[0]).toBe(answerVerdict);
   });
 });

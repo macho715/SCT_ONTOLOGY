@@ -910,6 +910,8 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
       return withSpan("ask_hvdc_ontology", async (span) => {
         span.setAttribute("hvdc.user_role", userRole ?? "ops_user");
         const answer = answerQuestion({ question, userRole, language });
+        span.setAttribute("hvdc.verdict", answer.verdict);
+        span.setAttribute("hvdc.validation_status", answer.validationStatus);
         await options.audit?.(buildAuditRecord("ask_hvdc_ontology", { question, userRole, language }, answer, answer.piiMasked));
         return {
           structuredContent: answer,
