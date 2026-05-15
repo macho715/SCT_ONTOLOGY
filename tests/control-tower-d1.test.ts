@@ -18,12 +18,105 @@ async function withClient(fn: (client: Client) => Promise<void>) {
       ],
       getShipmentUnit: async (shipmentUnitId) => ({
         shipmentUnitId,
+        sourceLineId: "LS-000123",
+        vendor: "Dong Yang",
+        category: "Elec",
+        poNo: "5000761114",
+        invoiceNo: "HVDC-ADOPT-PPL-0003",
+        incoterms: "FOB",
         declaredDestinationSet: "AGI|MIR",
+        declaredDestinationCount: 2,
         currentStage: "M140_FINAL_DELIVERED",
         currentLocation: "AGI",
         routingPattern: "WH_MOSB_SITE",
         latestReceiptDt: "2024-02-26",
-        missingRequiredDestination: null
+        finalDeliveryDt: "2024-02-25",
+        siteCompletionRate: 1,
+        missingRequiredDestination: null,
+        receivedWithoutFlag: null
+      }),
+      getShipmentReport: async (shipmentUnitId) => ({
+        shipmentUnitId,
+        cargoSummary: {
+          sourceLineId: "LS-000123",
+          vendor: "Dong Yang",
+          category: "Elec",
+          poNo: "5000761114",
+          invoiceNo: "HVDC-ADOPT-PPL-0003",
+          incoterms: "FOB"
+        },
+        shipment: {
+          shipmentUnitId,
+          sourceLineId: "LS-000123",
+          vendor: "Dong Yang",
+          category: "Elec",
+          poNo: "5000761114",
+          invoiceNo: "HVDC-ADOPT-PPL-0003",
+          incoterms: "FOB",
+          declaredDestinationSet: "AGI|MIR",
+          declaredDestinationCount: 2,
+          currentStage: "M140_FINAL_DELIVERED",
+          currentLocation: "AGI",
+          routingPattern: "WH_MOSB_SITE",
+          latestReceiptDt: "2024-02-26",
+          finalDeliveryDt: "2024-02-25",
+          siteCompletionRate: 1,
+          missingRequiredDestination: null,
+          receivedWithoutFlag: null
+        },
+        shipmentDates: {
+          etd: "2024-01-10",
+          atd: "2024-01-11",
+          eta: "2024-02-20",
+          ata: "2024-02-21",
+          attestation: null,
+          doCollected: "2024-02-23",
+          customsStarted: "2024-02-24",
+          customsClosed: "2024-02-24",
+          finalDelivered: "2024-02-25"
+        },
+        milestones: [
+          { milestoneCode: "M60_ETA", occurredAt: "2024-02-20", sourceColumn: "BG", sourceLineId: "LS-000123" },
+          { milestoneCode: "M70_ATA", occurredAt: "2024-02-21", sourceColumn: "BH", sourceLineId: "LS-000123" }
+        ],
+        destinationRequirements: [
+          {
+            requirementId: "REQ-LS-000123-AGI",
+            destinationCode: "AGI",
+            requiredFlag: true,
+            sourceColumn: "K",
+            sourceLineId: "LS-000123",
+            validationStatus: "PASS",
+            reasonCode: null
+          }
+        ],
+        siteReceipts: [
+          {
+            receiptEventId: "RE-LS-000123-AGI",
+            locationCode: "AGI",
+            locationType: "PROJECT_SITE",
+            actualReceiptDt: "2024-02-26",
+            sourceColumn: "BP",
+            sourceLineId: "LS-000123",
+            matchedRequiredDestination: true,
+            validationStatus: "PASS",
+            reasonCode: null
+          }
+        ],
+        siteReceiptSummary: {
+          requiredDestinationCount: 2,
+          receivedDestinationCount: 1,
+          latestReceiptDt: "2024-02-26",
+          finalDeliveryDt: "2024-02-25",
+          siteCompletionRate: 1,
+          missingRequiredDestination: null,
+          receivedWithoutFlag: null
+        },
+        validationFindings: [],
+        openActions: [],
+        reportStatus: "PASS",
+        message: `Control Tower shipment report loaded for ${shipmentUnitId}.`,
+        generatedAt: "2026-05-15T00:00:00.000Z"
       }),
       listMilestones: async () => [
         { code: "M130_SITE_RECEIVED", actualDt: "2024-02-26" }
@@ -67,6 +160,41 @@ describe("Control Tower D1 MCP lookup integration", () => {
       expect(candidates[0]).toMatchObject({
         targetRid: "HVDC-ADOPT-PPL-0003",
         confidence: 0.98
+      });
+    });
+  });
+
+  it("returns a one-shot D1 shipment report with shipment dates, cargo, and site receipts", async () => {
+    await withClient(async (client) => {
+      const result = await client.callTool({
+        name: "resolve_any_key",
+        arguments: { identifierOrQuestion: "HVDC-ADOPT-PPL-0003 ETA ATA receipt cargo" }
+      });
+
+      const content = result.structuredContent as {
+        controlTowerReports: Array<{
+          shipmentDates: { eta: string; ata: string };
+          cargoSummary: { vendor: string; poNo: string };
+          siteReceipts: Array<{ locationCode: string; actualReceiptDt: string }>;
+          siteReceiptSummary: { latestReceiptDt: string };
+        }>;
+      };
+      expect(content.controlTowerReports[0]).toMatchObject({
+        shipmentDates: {
+          eta: "2024-02-20",
+          ata: "2024-02-21"
+        },
+        cargoSummary: {
+          vendor: "Dong Yang",
+          poNo: "5000761114"
+        },
+        siteReceiptSummary: {
+          latestReceiptDt: "2024-02-26"
+        }
+      });
+      expect(content.controlTowerReports[0].siteReceipts[0]).toMatchObject({
+        locationCode: "AGI",
+        actualReceiptDt: "2024-02-26"
       });
     });
   });

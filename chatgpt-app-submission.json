@@ -123,7 +123,7 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Parses identifiers from user text and returns local resolution candidates without changing data.",
+        "read_only_justification": "Parses identifiers from user text and returns local resolution candidates plus D1 Control Tower shipment report data without changing data.",
         "open_world_justification": "Does not contact or modify any public or third-party system.",
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
       }

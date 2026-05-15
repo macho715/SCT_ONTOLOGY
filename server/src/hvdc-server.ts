@@ -29,17 +29,113 @@ const DEFAULT_WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.worker
 
 export type ControlTowerShipmentUnit = {
   shipmentUnitId: string;
+  sourceLineId: string | null;
+  vendor: string | null;
+  category: string | null;
+  poNo: string | null;
+  invoiceNo: string | null;
+  incoterms: string | null;
   declaredDestinationSet: string | null;
+  declaredDestinationCount: number | null;
   currentStage: string | null;
   currentLocation: string | null;
   routingPattern: string | null;
   latestReceiptDt: string | null;
+  finalDeliveryDt: string | null;
+  siteCompletionRate: number | null;
   missingRequiredDestination: string | null;
+  receivedWithoutFlag: string | null;
+};
+
+export type ControlTowerMilestoneEvent = {
+  milestoneCode: string;
+  occurredAt: string | null;
+  sourceColumn: string | null;
+  sourceLineId: string | null;
+};
+
+export type ControlTowerDestinationRequirement = {
+  requirementId: string;
+  destinationCode: string;
+  requiredFlag: boolean;
+  sourceColumn: string | null;
+  sourceLineId: string | null;
+  validationStatus: string | null;
+  reasonCode: string | null;
+};
+
+export type ControlTowerReceiptEvent = {
+  receiptEventId: string;
+  locationCode: string;
+  locationType: string | null;
+  actualReceiptDt: string | null;
+  sourceColumn: string | null;
+  sourceLineId: string | null;
+  matchedRequiredDestination: boolean;
+  validationStatus: string | null;
+  reasonCode: string | null;
+};
+
+export type ControlTowerValidationFinding = {
+  validationId: string;
+  ruleId: string;
+  severity: string | null;
+  field: string | null;
+  value: string | null;
+  reasonCode: string | null;
+};
+
+export type ControlTowerShipmentDates = {
+  etd: string | null;
+  atd: string | null;
+  eta: string | null;
+  ata: string | null;
+  attestation: string | null;
+  doCollected: string | null;
+  customsStarted: string | null;
+  customsClosed: string | null;
+  finalDelivered: string | null;
+};
+
+export type ControlTowerCargoSummary = {
+  sourceLineId: string | null;
+  vendor: string | null;
+  category: string | null;
+  poNo: string | null;
+  invoiceNo: string | null;
+  incoterms: string | null;
+};
+
+export type ControlTowerSiteReceiptSummary = {
+  requiredDestinationCount: number | null;
+  receivedDestinationCount: number;
+  latestReceiptDt: string | null;
+  finalDeliveryDt: string | null;
+  siteCompletionRate: number | null;
+  missingRequiredDestination: string | null;
+  receivedWithoutFlag: string | null;
+};
+
+export type ControlTowerShipmentReport = {
+  shipmentUnitId: string;
+  cargoSummary: ControlTowerCargoSummary;
+  shipment: ControlTowerShipmentUnit | null;
+  shipmentDates: ControlTowerShipmentDates;
+  milestones: ControlTowerMilestoneEvent[];
+  destinationRequirements: ControlTowerDestinationRequirement[];
+  siteReceipts: ControlTowerReceiptEvent[];
+  siteReceiptSummary: ControlTowerSiteReceiptSummary;
+  validationFindings: ControlTowerValidationFinding[];
+  openActions: ActionProposal[];
+  reportStatus: "PASS" | "WARN" | "BLOCK" | "NO_EVIDENCE";
+  message: string;
+  generatedAt: string;
 };
 
 export type HvdcControlTowerLookup = {
   resolveAnyKey?: (identifierOrQuestion: string) => Promise<ResolvedEntity[]>;
   getShipmentUnit?: (shipmentUnitId: string) => Promise<ControlTowerShipmentUnit | null>;
+  getShipmentReport?: (shipmentUnitId: string) => Promise<ControlTowerShipmentReport | null>;
   listMilestones?: (shipmentUnitId: string) => Promise<MilestoneRecord[]>;
   listActionQueue?: (shipmentUnitId: string, milestoneCode?: string, domain?: string) => Promise<ActionProposal[]>;
 };
@@ -314,6 +410,125 @@ const routeSchema = z.object({
   routingReason: z.string()
 });
 
+const resolvedEntitySchema = z.object({
+  entityType: z.string(),
+  identifierScheme: z.string(),
+  identifierValue: z.string(),
+  normalizedValue: z.string(),
+  targetRid: z.string().nullable(),
+  confidence: z.number()
+});
+
+const actionProposalSchema = z.object({
+  actionType: z.string(),
+  targetObject: z.string(),
+  ownerRole: z.string(),
+  backupRole: z.string().nullable(),
+  humanGateRequired: z.boolean(),
+  dueAt: z.string().nullable(),
+  requiredDocs: z.array(z.string()),
+  piiMasked: z.literal(true)
+});
+
+const controlTowerShipmentReportSchema = z.object({
+  shipmentUnitId: z.string(),
+  cargoSummary: z.object({
+    sourceLineId: z.string().nullable(),
+    vendor: z.string().nullable(),
+    category: z.string().nullable(),
+    poNo: z.string().nullable(),
+    invoiceNo: z.string().nullable(),
+    incoterms: z.string().nullable()
+  }),
+  shipment: z
+    .object({
+      shipmentUnitId: z.string(),
+      sourceLineId: z.string().nullable(),
+      vendor: z.string().nullable(),
+      category: z.string().nullable(),
+      poNo: z.string().nullable(),
+      invoiceNo: z.string().nullable(),
+      incoterms: z.string().nullable(),
+      declaredDestinationSet: z.string().nullable(),
+      declaredDestinationCount: z.number().nullable(),
+      currentStage: z.string().nullable(),
+      currentLocation: z.string().nullable(),
+      routingPattern: z.string().nullable(),
+      latestReceiptDt: z.string().nullable(),
+      finalDeliveryDt: z.string().nullable(),
+      siteCompletionRate: z.number().nullable(),
+      missingRequiredDestination: z.string().nullable(),
+      receivedWithoutFlag: z.string().nullable()
+    })
+    .nullable(),
+  shipmentDates: z.object({
+    etd: z.string().nullable(),
+    atd: z.string().nullable(),
+    eta: z.string().nullable(),
+    ata: z.string().nullable(),
+    attestation: z.string().nullable(),
+    doCollected: z.string().nullable(),
+    customsStarted: z.string().nullable(),
+    customsClosed: z.string().nullable(),
+    finalDelivered: z.string().nullable()
+  }),
+  milestones: z.array(
+    z.object({
+      milestoneCode: z.string(),
+      occurredAt: z.string().nullable(),
+      sourceColumn: z.string().nullable(),
+      sourceLineId: z.string().nullable()
+    })
+  ),
+  destinationRequirements: z.array(
+    z.object({
+      requirementId: z.string(),
+      destinationCode: z.string(),
+      requiredFlag: z.boolean(),
+      sourceColumn: z.string().nullable(),
+      sourceLineId: z.string().nullable(),
+      validationStatus: z.string().nullable(),
+      reasonCode: z.string().nullable()
+    })
+  ),
+  siteReceipts: z.array(
+    z.object({
+      receiptEventId: z.string(),
+      locationCode: z.string(),
+      locationType: z.string().nullable(),
+      actualReceiptDt: z.string().nullable(),
+      sourceColumn: z.string().nullable(),
+      sourceLineId: z.string().nullable(),
+      matchedRequiredDestination: z.boolean(),
+      validationStatus: z.string().nullable(),
+      reasonCode: z.string().nullable()
+    })
+  ),
+  siteReceiptSummary: z.object({
+    requiredDestinationCount: z.number().nullable(),
+    receivedDestinationCount: z.number(),
+    latestReceiptDt: z.string().nullable(),
+    finalDeliveryDt: z.string().nullable(),
+    siteCompletionRate: z.number().nullable(),
+    missingRequiredDestination: z.string().nullable(),
+    receivedWithoutFlag: z.string().nullable()
+  }),
+  validationFindings: z.array(
+    z.object({
+      validationId: z.string(),
+      ruleId: z.string(),
+      severity: z.string().nullable(),
+      field: z.string().nullable(),
+      value: z.string().nullable(),
+      reasonCode: z.string().nullable()
+    })
+  ),
+  openActions: z.array(actionProposalSchema),
+  reportStatus: z.enum(["PASS", "WARN", "BLOCK", "NO_EVIDENCE"]),
+  message: z.string(),
+  generatedAt: z.string()
+});
+
 const evidenceTraceSchema = z.object({
   targetType: z.enum(["summary", "businessImpact", "detail", "action"]),
   targetIndex: z.number().nullable(),
@@ -357,16 +572,7 @@ const answerOutputSchema = {
   evidenceIds: z.array(z.string()),
   validationStatus: z.enum(["PASS", "WARN", "BLOCK", "NO_EVIDENCE"]),
   route: routeSchema,
-  resolvedEntities: z.array(
-    z.object({
-      entityType: z.string(),
-      identifierScheme: z.string(),
-      identifierValue: z.string(),
-      normalizedValue: z.string(),
-      targetRid: z.string().nullable(),
-      confidence: z.number()
-    })
-  ),
+  resolvedEntities: z.array(resolvedEntitySchema),
   evidence: z.array(evidenceSchema),
   evidenceTrace: z.array(evidenceTraceSchema).default([]),
   shipmentRule: shipmentRuleSchema,
@@ -503,19 +709,11 @@ export const HVDC_TOOL_DESCRIPTORS = {
   },
   resolve_any_key: {
     title: "Resolve HVDC any-key",
-    description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, or milestone identifiers from a user question. Uses the Cloudflare D1 Control Tower shipment_unit dataset when available.",
+    description: "Use this to resolve BL, BOE, DO, invoice, HVDC code, site, SHPT, or milestone identifiers from a user question. When the resolved object is a ShipmentUnit, return the Cloudflare D1 Control Tower one-shot shipment report with ETD/ATD/ETA/ATA, cargo summary, destination requirements, site receipt dates, validation findings, and open actions.",
     inputSchema: { identifierOrQuestion: z.string().min(1) },
     outputSchema: {
-      candidates: z.array(
-        z.object({
-          entityType: z.string(),
-          identifierScheme: z.string(),
-          identifierValue: z.string(),
-          normalizedValue: z.string(),
-          targetRid: z.string().nullable(),
-          confidence: z.number()
-        })
-      )
+      candidates: z.array(resolvedEntitySchema),
+      controlTowerReports: z.array(controlTowerShipmentReportSchema).default([])
     },
     _meta: {},
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
@@ -820,6 +1018,30 @@ function mergeResolvedEntities(primary: ResolvedEntity[], secondary: ResolvedEnt
   return merged;
 }
 
+async function loadControlTowerShipmentReports(
+  controlTower: HvdcControlTowerLookup | undefined,
+  candidates: ResolvedEntity[]
+): Promise<ControlTowerShipmentReport[]> {
+  if (!controlTower?.getShipmentReport) return [];
+  const shipmentIds = [
+    ...new Set(
+      candidates
+        .filter((candidate) => candidate.entityType === "ShipmentUnit" && Boolean(candidate.targetRid))
+        .map((candidate) => candidate.targetRid as string)
+    )
+  ].slice(0, 3);
+  const reports = await Promise.all(
+    shipmentIds.map(async (shipmentUnitId) => {
+      try {
+        return await controlTower.getShipmentReport?.(shipmentUnitId);
+      } catch {
+        return null;
+      }
+    })
+  );
+  return reports.filter((report): report is ControlTowerShipmentReport => Boolean(report));
+}
+
 function currentAuth(options: HvdcServerOptions): HvdcAuthContext {
   return options.auth ?? { authenticated: false, scopes: [] };
 }
@@ -1013,9 +1235,10 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     async ({ identifierOrQuestion }) => {
       const controlTowerCandidates = await options.controlTower?.resolveAnyKey?.(identifierOrQuestion) ?? [];
       const candidates = mergeResolvedEntities(controlTowerCandidates, resolveAnyKey(identifierOrQuestion));
+      const controlTowerReports = await loadControlTowerShipmentReports(options.controlTower, candidates);
       return {
-        structuredContent: { candidates },
-        content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length }) }]
+        structuredContent: { candidates, controlTowerReports },
+        content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length, reportCount: controlTowerReports.length }) }]
       };
     }
   );

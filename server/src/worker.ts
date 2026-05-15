@@ -6,7 +6,14 @@ import {
   type AttachUploadedFileResult,
   type CompleteUploadInput,
   type CompleteUploadResult,
+  type ControlTowerDestinationRequirement,
+  type ControlTowerMilestoneEvent,
+  type ControlTowerReceiptEvent,
+  type ControlTowerShipmentDates,
+  type ControlTowerShipmentReport,
   type ControlTowerShipmentUnit,
+  type ControlTowerSiteReceiptSummary,
+  type ControlTowerValidationFinding,
   type CreateUploadUrlInput,
   type CreateUploadUrlResult,
   type HvdcControlTowerLookup,
@@ -191,19 +198,63 @@ type WriteProposalRow = {
 type ControlTowerShipmentRow = {
   shipment_unit_id: string;
   source_line_id: string | null;
+  vendor: string | null;
+  category: string | null;
   invoice_no: string | null;
   po_no: string | null;
+  incoterms: string | null;
   declared_destination_set: string | null;
+  declared_destination_count: number | null;
   current_stage: string | null;
   current_location: string | null;
   routing_pattern: string | null;
   latest_receipt_dt: string | null;
+  final_delivery_dt: string | null;
+  site_completion_rate: number | null;
   missing_required_destination: string | null;
+  received_without_flag: string | null;
 };
 
 type ControlTowerMilestoneRow = {
   milestone_code: string;
   actual_dt: string | null;
+};
+
+type ControlTowerMilestoneDetailRow = {
+  milestone_code: string;
+  actual_dt: string | null;
+  evidence_doc_id: string | null;
+};
+
+type ControlTowerDestinationRequirementRow = {
+  requirement_id: string;
+  destination_code: string;
+  required_flag: number;
+  source_column: string | null;
+  source_line_id: string | null;
+  validation_status: string | null;
+  reason_code: string | null;
+};
+
+type ControlTowerReceiptEventRow = {
+  receipt_event_id: string;
+  location_code: string;
+  location_type: string | null;
+  actual_receipt_dt: string | null;
+  source_column: string | null;
+  source_line_id: string | null;
+  matched_required_destination: number;
+  validation_status: string | null;
+  reason_code: string | null;
+};
+
+type ControlTowerValidationLogRow = {
+  validation_id: string;
+  rule_id: string;
+  severity: string | null;
+  field: string | null;
+  value: string | null;
+  reason_code: string | null;
 };
 
 type ControlTowerActionRow = {
@@ -225,16 +276,125 @@ function storageUnavailable(message: string) {
   };
 }
 
+const SHIPMENT_UNIT_COLUMNS = `shipment_unit_id, source_line_id, vendor, category, invoice_no, po_no,
+  incoterms, declared_destination_set, declared_destination_count, current_stage, current_location,
+  routing_pattern, latest_receipt_dt, final_delivery_dt, site_completion_rate,
+  missing_required_destination, received_without_flag`;
+
 function shipmentRowToUnit(row: ControlTowerShipmentRow): ControlTowerShipmentUnit {
   return {
     shipmentUnitId: row.shipment_unit_id,
+    sourceLineId: row.source_line_id,
+    vendor: row.vendor,
+    category: row.category,
+    poNo: row.po_no,
+    invoiceNo: row.invoice_no,
+    incoterms: row.incoterms,
     declaredDestinationSet: row.declared_destination_set,
+    declaredDestinationCount: row.declared_destination_count,
     currentStage: row.current_stage,
     currentLocation: row.current_location,
     routingPattern: row.routing_pattern,
     latestReceiptDt: row.latest_receipt_dt,
-    missingRequiredDestination: row.missing_required_destination
+    finalDeliveryDt: row.final_delivery_dt,
+    siteCompletionRate: row.site_completion_rate,
+    missingRequiredDestination: row.missing_required_destination,
+    receivedWithoutFlag: row.received_without_flag
   };
+}
+
+function milestoneRowToEvent(row: ControlTowerMilestoneDetailRow, sourceLineId: string | null): ControlTowerMilestoneEvent {
+  return {
+    milestoneCode: row.milestone_code,
+    occurredAt: row.actual_dt,
+    sourceColumn: row.evidence_doc_id,
+    sourceLineId
+  };
+}
+
+function destinationRowToRequirement(row: ControlTowerDestinationRequirementRow): ControlTowerDestinationRequirement {
+  return {
+    requirementId: row.requirement_id,
+    destinationCode: row.destination_code,
+    requiredFlag: row.required_flag === 1,
+    sourceColumn: row.source_column,
+    sourceLineId: row.source_line_id,
+    validationStatus: row.validation_status,
+    reasonCode: row.reason_code
+  };
+}
+
+function receiptRowToEvent(row: ControlTowerReceiptEventRow): ControlTowerReceiptEvent {
+  return {
+    receiptEventId: row.receipt_event_id,
+    locationCode: row.location_code,
+    locationType: row.location_type,
+    actualReceiptDt: row.actual_receipt_dt,
+    sourceColumn: row.source_column,
+    sourceLineId: row.source_line_id,
+    matchedRequiredDestination: row.matched_required_destination === 1,
+    validationStatus: row.validation_status,
+    reasonCode: row.reason_code
+  };
+}
+
+function validationRowToFinding(row: ControlTowerValidationLogRow): ControlTowerValidationFinding {
+  return {
+    validationId: row.validation_id,
+    ruleId: row.rule_id,
+    severity: row.severity,
+    field: row.field,
+    value: row.value,
+    reasonCode: row.reason_code
+  };
+}
+
+function firstMilestoneDate(milestones: ControlTowerMilestoneEvent[], suffix: string): string | null {
+  return milestones.find((milestone) => milestone.milestoneCode.toUpperCase().endsWith(suffix))?.occurredAt ?? null;
+}
+
+function shipmentDatesFromMilestones(
+  milestones: ControlTowerMilestoneEvent[],
+  finalDeliveryDt: string | null
+): ControlTowerShipmentDates {
+  return {
+    etd: firstMilestoneDate(milestones, "_ETD"),
+    atd: firstMilestoneDate(milestones, "_ATD"),
+    eta: firstMilestoneDate(milestones, "_ETA"),
+    ata: firstMilestoneDate(milestones, "_ATA"),
+    attestation: firstMilestoneDate(milestones, "_ATTESTATION"),
+    doCollected: firstMilestoneDate(milestones, "_DO_COLLECTED"),
+    customsStarted: firstMilestoneDate(milestones, "_CUSTOMS_STARTED"),
+    customsClosed: firstMilestoneDate(milestones, "_CUSTOMS_CLOSED"),
+    finalDelivered: firstMilestoneDate(milestones, "_FINAL_DELIVERED") ?? finalDeliveryDt
+  };
+}
+
+function siteReceiptSummary(
+  shipment: ControlTowerShipmentUnit | null,
+  siteReceipts: ControlTowerReceiptEvent[]
+): ControlTowerSiteReceiptSummary {
+  return {
+    requiredDestinationCount: shipment?.declaredDestinationCount ?? null,
+    receivedDestinationCount: siteReceipts.length,
+    latestReceiptDt: shipment?.latestReceiptDt ?? null,
+    finalDeliveryDt: shipment?.finalDeliveryDt ?? null,
+    siteCompletionRate: shipment?.siteCompletionRate ?? null,
+    missingRequiredDestination: shipment?.missingRequiredDestination ?? null,
+    receivedWithoutFlag: shipment?.receivedWithoutFlag ?? null
+  };
+}
+
+function shipmentReportStatus(
+  shipment: ControlTowerShipmentUnit | null,
+  validationFindings: ControlTowerValidationFinding[],
+  openActions: ActionProposal[]
+): ControlTowerShipmentReport["reportStatus"] {
+  if (!shipment) return "NO_EVIDENCE";
+  if (validationFindings.some((finding) => (finding.severity ?? "").toUpperCase().includes("BLOCK"))) return "BLOCK";
+  if (shipment.missingRequiredDestination || openActions.length > 0) return "WARN";
+  if (validationFindings.some((finding) => (finding.severity ?? "").toUpperCase().includes("WARN"))) return "WARN";
+  return "PASS";
 }
 
 function shipmentRowToResolvedEntity(row: ControlTowerShipmentRow, raw: string, matchedToken: string): ResolvedEntity {
@@ -289,8 +449,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
 
       for (const { raw, normalized: token } of extractIdentifierLookupVariants(identifierOrQuestion).slice(0, 16)) {
         const rows = await db.prepare(
-          `SELECT shipment_unit_id, source_line_id, invoice_no, po_no, declared_destination_set,
-                  current_stage, current_location, routing_pattern, latest_receipt_dt, missing_required_destination
+          `SELECT ${SHIPMENT_UNIT_COLUMNS}
              FROM shipment_unit
             WHERE upper(shipment_unit_id) = ?
                OR upper(invoice_no) = ?
@@ -314,8 +473,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
 
     async getShipmentUnit(shipmentUnitId: string): Promise<ControlTowerShipmentUnit | null> {
       const row = await db.prepare(
-        `SELECT shipment_unit_id, source_line_id, invoice_no, po_no, declared_destination_set,
-                current_stage, current_location, routing_pattern, latest_receipt_dt, missing_required_destination
+        `SELECT ${SHIPMENT_UNIT_COLUMNS}
            FROM shipment_unit
           WHERE shipment_unit_id = ?
           LIMIT 1`
@@ -324,6 +482,97 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
         .first<ControlTowerShipmentRow>();
 
       return row ? shipmentRowToUnit(row) : null;
+    },
+
+    async getShipmentReport(shipmentUnitId: string): Promise<ControlTowerShipmentReport | null> {
+      const shipmentRow = await db.prepare(
+        `SELECT ${SHIPMENT_UNIT_COLUMNS}
+           FROM shipment_unit
+          WHERE shipment_unit_id = ?
+          LIMIT 1`
+      )
+        .bind(shipmentUnitId)
+        .first<ControlTowerShipmentRow>();
+
+      if (!shipmentRow) return null;
+
+      const shipment = shipmentRowToUnit(shipmentRow);
+
+      const [milestoneRows, destinationRows, receiptRows, validationRows, actionRows] = await Promise.all([
+        db.prepare(
+          `SELECT milestone_code, actual_dt, evidence_doc_id
+             FROM milestone_event
+            WHERE shipment_unit_id = ?
+            ORDER BY actual_dt, milestone_code`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerMilestoneDetailRow>(),
+        db.prepare(
+          `SELECT requirement_id, destination_code, required_flag, source_column, source_line_id, validation_status, reason_code
+             FROM destination_requirement
+            WHERE shipment_unit_id = ?
+            ORDER BY destination_code`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerDestinationRequirementRow>(),
+        db.prepare(
+          `SELECT receipt_event_id, location_code, location_type, actual_receipt_dt, source_column, source_line_id,
+                  matched_required_destination, validation_status, reason_code
+             FROM receipt_event
+            WHERE shipment_unit_id = ?
+            ORDER BY actual_receipt_dt, location_code`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerReceiptEventRow>(),
+        db.prepare(
+          `SELECT validation_id, rule_id, severity, field, value, reason_code
+             FROM validation_log
+            WHERE shipment_unit_id = ?
+            ORDER BY validation_id`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerValidationLogRow>(),
+        db.prepare(
+          `SELECT action_id, shipment_unit_id, action_type, owner_role, target_location, due_at, status, reason_code
+             FROM action_queue
+            WHERE shipment_unit_id = ?
+              AND coalesce(status, 'OPEN') <> 'CLOSED'
+            ORDER BY action_id
+            LIMIT 20`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerActionRow>()
+      ]);
+
+      const milestones = (milestoneRows.results ?? []).map((row) => milestoneRowToEvent(row, shipment.sourceLineId));
+      const destinationRequirements = (destinationRows.results ?? []).map(destinationRowToRequirement);
+      const siteReceipts = (receiptRows.results ?? []).map(receiptRowToEvent);
+      const validationFindings = (validationRows.results ?? []).map(validationRowToFinding);
+      const openActions = (actionRows.results ?? []).map(actionRowToProposal);
+      const reportStatus = shipmentReportStatus(shipment, validationFindings, openActions);
+
+      return {
+        shipmentUnitId,
+        cargoSummary: {
+          sourceLineId: shipment.sourceLineId,
+          vendor: shipment.vendor,
+          category: shipment.category,
+          poNo: shipment.poNo,
+          invoiceNo: shipment.invoiceNo,
+          incoterms: shipment.incoterms
+        },
+        shipment,
+        shipmentDates: shipmentDatesFromMilestones(milestones, shipment.finalDeliveryDt),
+        milestones,
+        destinationRequirements,
+        siteReceipts,
+        siteReceiptSummary: siteReceiptSummary(shipment, siteReceipts),
+        validationFindings,
+        openActions,
+        reportStatus,
+        message: `Control Tower shipment report loaded for ${shipmentUnitId}.`,
+        generatedAt: new Date().toISOString()
+      };
     },
 
     async listMilestones(shipmentUnitId: string): Promise<MilestoneRecord[]> {
