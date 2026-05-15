@@ -23,6 +23,16 @@ describe("HVDC identifier normalization", () => {
     }
   });
 
+  it("keeps SCT0001 mapping but rejects zero-sequence prefix input", () => {
+    const validVariants = expandIdentifierVariants("SCT0001").map((variant) => variant.normalized);
+    const zeroVariants = expandIdentifierVariants("SCT0").map((variant) => variant.normalized);
+
+    expect(validVariants).toContain("HVDC-ADOPT-SCT-0001");
+    expect(zeroVariants).toContain("SCT0");
+    expect(zeroVariants).not.toContain("HVDC-ADOPT-SCT-0000");
+    expect(zeroVariants).not.toContain("SCT0000");
+  });
+
   it("preserves logistics_status suffix patterns for split shipment codes", () => {
     const cases = [
       ["HVDC-ADOPT-HE-0068-1", "HVDC-ADOPT-HE-0068-1"],
@@ -53,6 +63,11 @@ describe("HVDC identifier normalization", () => {
       normalizedValue: "HVDC-ADOPT-SCT-0001",
       confidence: 0.95
     });
+  });
+
+  it("does not emit a fake ShipmentUnit for zero sequence codes", () => {
+    expect(resolveAnyKey("SCT0")).toEqual([]);
+    expect(resolveAnyKey("HVDC-ADOPT-SCT-0000")).toEqual([]);
   });
 
   it("resolves suffixed split shipment codes as HVDC_CODE candidates", () => {

@@ -19,6 +19,11 @@ function compactToken(value: string): string {
   return normalizeLookupToken(value).replace(/[-./]/g, "");
 }
 
+function hasPositiveSequenceNumber(digits: string): boolean {
+  const parsed = Number.parseInt(digits, 10);
+  return Number.isFinite(parsed) && parsed > 0;
+}
+
 function canonicalHvdcAdoptCode(prefix: string, digits: string, suffix?: string): string {
   const parsed = Number.parseInt(digits, 10);
   const padded = Number.isFinite(parsed) ? String(parsed).padStart(4, "0") : digits;
@@ -39,13 +44,13 @@ export function expandIdentifierVariants(raw: string): IdentifierVariant[] {
   const variants = [normalized, compact];
 
   const fullMatch = HVDC_ADOPT_PATTERN.exec(normalized);
-  if (fullMatch) {
+  if (fullMatch && hasPositiveSequenceNumber(fullMatch[2])) {
     variants.push(canonicalHvdcAdoptCode(fullMatch[1], fullMatch[2], fullMatch[3]));
     variants.push(compactHvdcAdoptCode(fullMatch[1], fullMatch[2], fullMatch[3]));
   }
 
   const shortMatch = SHORT_ADOPT_PATTERN.exec(normalized) ?? SHORT_ADOPT_PATTERN.exec(compact);
-  if (shortMatch) {
+  if (shortMatch && hasPositiveSequenceNumber(shortMatch[2])) {
     variants.push(canonicalHvdcAdoptCode(shortMatch[1], shortMatch[2], shortMatch[3]));
     variants.push(compactHvdcAdoptCode(shortMatch[1], shortMatch[2], shortMatch[3]));
   }

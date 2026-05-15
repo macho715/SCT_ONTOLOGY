@@ -145,7 +145,9 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
 
   for (const rawToken of text.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? []) {
     for (const variant of expandIdentifierVariants(rawToken)) {
-      if (!/^HVDC-ADOPT-[A-Z]{2,8}-\d{4,}(?:-[A-Z0-9]{1,8})?$/.test(variant.normalized)) continue;
+      const hvdcCodeMatch = /^HVDC-ADOPT-[A-Z]{2,8}-(\d{4,})(?:-[A-Z0-9]{1,8})?$/.exec(variant.normalized);
+      if (!hvdcCodeMatch) continue;
+      if (Number.parseInt(hvdcCodeMatch[1], 10) <= 0) continue;
       pushCandidate({
         entityType: "ShipmentUnit",
         identifierScheme: "HVDC_CODE",
@@ -171,6 +173,10 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
     for (const match of text.matchAll(regex)) {
       const raw = match[0];
       const normalized = raw.toUpperCase().replace(/\s+/g, "-");
+      const hvdcAdoptMatch = scheme === "HVDC_CODE"
+        ? /^HVDC-ADOPT-[A-Z]{2,8}-(\d{4,})(?:-[A-Z0-9]{1,8})?$/.exec(normalized)
+        : null;
+      if (hvdcAdoptMatch && Number.parseInt(hvdcAdoptMatch[1], 10) <= 0) continue;
       pushCandidate({
         entityType,
         identifierScheme: scheme,
