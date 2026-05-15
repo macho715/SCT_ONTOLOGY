@@ -54,4 +54,54 @@ describe("withSpan", () => {
     expect(mockSpan.end).toHaveBeenCalled();
     vi.restoreAllMocks();
   });
+
+  it("sets mcp.tool.name attribute on the span with the exact tool name value", async () => {
+    const setAttributeCalls: Array<[string, unknown]> = [];
+    const mockSpan = {
+      setAttribute: vi.fn((key: string, val: unknown) => { setAttributeCalls.push([key, val]); }),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+      recordException: vi.fn()
+    };
+    const mockTracer = {
+      startActiveSpan: vi.fn(async (_name: string, fn: (span: unknown) => Promise<unknown>) => fn(mockSpan))
+    };
+    vi.spyOn(trace, "getTracer").mockReturnValue(mockTracer as never);
+
+    await withSpan("my_tool", async () => "result");
+
+    expect(setAttributeCalls).toContainEqual(["mcp.tool.name", "my_tool"]);
+    vi.restoreAllMocks();
+  });
+
+  it("calls span.end() exactly once on the success path", async () => {
+    const mockSpan = {
+      setAttribute: vi.fn(),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+      recordException: vi.fn()
+    };
+    const mockTracer = {
+      startActiveSpan: vi.fn(async (_name: string, fn: (span: unknown) => Promise<unknown>) => fn(mockSpan))
+    };
+    vi.spyOn(trace, "getTracer").mockReturnValue(mockTracer as never);
+
+    await withSpan("end_test", async () => 42);
+
+    expect(mockSpan.end).toHaveBeenCalledTimes(1);
+    vi.restoreAllMocks();
+  });
+
+  it("calls trace.getTracer with service name 'hvdc-mcp'", async () => {
+    const getTracerSpy = vi.spyOn(trace, "getTracer").mockReturnValue({
+      startActiveSpan: vi.fn(async (_name: string, fn: (span: unknown) => Promise<unknown>) =>
+        fn({ setAttribute: vi.fn(), setStatus: vi.fn(), end: vi.fn(), recordException: vi.fn() })
+      )
+    } as never);
+
+    await withSpan("svc_name_test", async () => "x");
+
+    expect(getTracerSpy).toHaveBeenCalledWith("hvdc-mcp");
+    vi.restoreAllMocks();
+  });
 });
