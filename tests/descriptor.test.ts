@@ -55,6 +55,7 @@ const submission = JSON.parse(
 ) as Submission;
 const serverSource = readFileSync(path.resolve("server", "src", "hvdc-server.ts"), "utf8");
 const workerSource = readFileSync(path.resolve("server", "src", "worker.ts"), "utf8");
+const rateLimitSource = readFileSync(path.resolve("server", "src", "rate-limit.ts"), "utf8");
 const rootAgentGuidance = readFileSync(path.resolve("AGENTS.md"), "utf8");
 const systemArchitecture = readFileSync(path.resolve("SYSTEM_ARCHITECTURE.md"), "utf8");
 const codexAgentGuidance = readFileSync(path.resolve("docs", "codex", "AGENTS.patched.md"), "utf8");
@@ -306,7 +307,8 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
 
   it("uses the Cloudflare Worker MCP entrypoint instead of a legacy deployment config", () => {
     expect(workerSource).toContain('import { createMcpHandler } from "agents/mcp"');
-    expect(workerSource).toContain('const MCP_PATH = "/mcp"');
+    expect(workerSource).toContain("MCP_PATH");
+    expect(rateLimitSource).toContain('export const MCP_PATH = "/mcp"');
     expect(workerSource).toContain("MCP_AUDIT_DB");
     expect(workerSource).toContain("HVDC_FILES");
   });
