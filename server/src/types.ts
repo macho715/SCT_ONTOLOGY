@@ -257,7 +257,9 @@ export type { ActionProposal, TeamActionResult } from "./team-action-router.js";
 // Re-exports from Decision Card v2 backend contract (Phase 1)
 export type {
   CardVerdict,
+  FinalGovernanceVerdict,
   PiiStatus,
+  SecurityStatus,
   EvidenceDomainStatus,
   ApprovalStatus,
   ActionStatus,
@@ -271,5 +273,7 @@ export type {
   ActionItem,
   DecisionCardTrace,
   RulePackExecutionItem,
+  VerdictMappingRule,
+  DecisionCardSecurity,
   DecisionCardPayload
 } from "./decision-card.js";

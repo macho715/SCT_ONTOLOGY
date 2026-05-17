@@ -1,12 +1,12 @@
 # Source Corpus PII/NDA Audit
 
-- generatedAt: 2026-05-17T22:12:37.599Z
+- generatedAt: 2026-05-17T22:32:35.953Z
 - command: npm run audit:source-pii
 - scope: data/corpus/*.md
 - status: PASS_NO_RAW_PATTERN
-- scannedFiles: 12
+- scannedFiles: 13
 - rawFindingCount: 0
-- reviewMarkerCount: 303
+- reviewMarkerCount: 311
 
 ## Scope
 
@@ -44,6 +44,8 @@ They are not treated as leakage by themselves.
 | data/corpus/CONSOLIDATED-08-communication.md | PII_POLICY_MARKER | 107 | 6 |
 | data/corpus/CONSOLIDATED-09-operations.md | NDA_POLICY_MARKER | 1 | 441 |
 | data/corpus/CONSOLIDATED-09-operations.md | PII_POLICY_MARKER | 8 | 428 |
+| data/corpus/CONSOLIDATED-10-card-governance.md | NDA_POLICY_MARKER | 2 | 90 |
+| data/corpus/CONSOLIDATED-10-card-governance.md | PII_POLICY_MARKER | 6 | 34 |
 | data/corpus/HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md | PERSON_NAME_MARKER | 27 | 322 |
 | data/corpus/HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md | PII_POLICY_MARKER | 79 | 6 |
 | data/corpus/Team_역할분담_매트릭스.md | PERSON_NAME_MARKER | 2 | 205 |

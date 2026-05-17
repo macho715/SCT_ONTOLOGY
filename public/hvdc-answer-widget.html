@@ -622,6 +622,8 @@
               <div class="decision-card-panel"><strong>Generated at</strong>${escapeHtml(displayValue(trace.generatedAt))}</div>
               <div class="decision-card-panel"><strong>Route ID</strong>${escapeHtml(displayValue(trace.routeId))}</div>
               <div class="decision-card-panel"><strong>RulePack version</strong>${escapeHtml(displayValue(trace.rulePackVersion))}</div>
+              <div class="decision-card-panel"><strong>Schema patch</strong>${escapeHtml(displayValue(trace.schemaPatchVersion))}</div>
+              <div class="decision-card-panel"><strong>Source corpus version</strong>${escapeHtml(displayValue(trace.sourceCorpusVersion))}</div>
               <div class="decision-card-panel"><strong>Prompt version</strong>${escapeHtml(displayValue(trace.promptVersion))}</div>
               <div class="decision-card-panel"><strong>RulePacks</strong>${escapeHtml(asArray(trace.rulePackIds).join(", ") || "Not provided")}</div>
               <div class="decision-card-panel"><strong>Source hash</strong>${escapeHtml(displayValue(trace.sourceHash))}</div>
@@ -654,9 +656,13 @@
             <h3>Security</h3>
             <div class="decision-card-grid">
               <div class="decision-card-panel"><strong>Detection scope</strong>input, output, DecisionCard, trace</div>
+              <div class="decision-card-panel"><strong>PII status</strong>${escapeHtml(displayValue(card.security?.piiStatus ?? card.piiStatus))}</div>
+              <div class="decision-card-panel"><strong>NDA status</strong>${escapeHtml(displayValue(card.security?.ndaStatus))}</div>
+              <div class="decision-card-panel"><strong>Source corpus audit</strong>${escapeHtml(displayValue(card.security?.sourceCorpusAuditStatus))}</div>
               <div class="decision-card-panel"><strong>Masked fields</strong>${escapeHtml(maskedFields)}</div>
               <div class="decision-card-panel"><strong>Data class</strong>${escapeHtml(displayValue(card.dataClass))}</div>
               <div class="decision-card-panel"><strong>External share status</strong>${escapeHtml(externalShareStatus)}</div>
+              <div class="decision-card-panel"><strong>Audit rules</strong>${escapeHtml(asArray(card.security?.auditRuleIds).join(", ") || "Not provided")}</div>
               <div class="decision-card-panel"><strong>PII/NDA reason</strong>${escapeHtml(displayValue(card.primaryReason))}</div>
               <div class="decision-card-panel"><strong>Sensitive accessed</strong>${escapeHtml(displayValue(trace.sensitiveAccessed))}</div>
             </div>
@@ -692,7 +698,9 @@
             <div class="decision-card-grid">
               <div class="decision-card-panel"><strong>Intent</strong>${escapeHtml(displayValue(card.intent))}</div>
               <div class="decision-card-panel"><strong>Intent group</strong>${escapeHtml(displayValue(card.intentGroup))}</div>
+              <div class="decision-card-panel"><strong>Governance verdict</strong>${escapeHtml(displayValue(card.finalGovernanceVerdict))}</div>
               <div class="decision-card-panel"><strong>Next action</strong>${escapeHtml(displayValue(card.nextAction))}</div>
+              <div class="decision-card-panel"><strong>Verdict mapping</strong>${escapeHtml(displayValue(card.verdictMappingRule?.reason))}</div>
               <div class="decision-card-panel"><strong>Human gate</strong>${escapeHtml(displayValue(card.humanGateState))}</div>
               <div class="decision-card-panel"><strong>Unblock summary</strong>${escapeHtml(displayValue(card.unblockSummary))}</div>
               <div class="decision-card-panel"><strong>Allowed now</strong>${escapeHtml(asArray(card.allowedNow ?? card.allowedActions).join(", ") || "Not provided")}</div>

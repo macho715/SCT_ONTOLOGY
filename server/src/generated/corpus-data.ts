@@ -5499,6 +5499,102 @@ export const CORPUS_CHUNKS = [
     ]
   },
   {
+    "id": "CONSOLIDATED-10-card-governance#1",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "Document Root",
+    "text": "---\ntitle: \"HVDC Card Governance & RulePack Routing Ontology — Consolidated\"\ntype: \"system-governance-extension\"\ndomain: \"card-governance\"\nversion: \"2.1\"\ndate: \"2026-05-18\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\ncanonical_role: \"Decision Card rendering, SYSTEM_QA routing, RulePack firing audit, security audit, and governance verdict mapping\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - PROV-O\n  - DQV\nfinal_validation_status: \"PATCH-CANDIDATE\"\n---",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#2",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "1. Purpose",
+    "text": "This extension defines governance behavior for SCT_ONTOLOGY CARD runtime output.\n\nIt does not redefine the HVDC logistics master spine. `CONSOLIDATED-00-master-ontology.md` remains the semantic authority for shipment, milestone, Flow Code, MOSB, evidence, cost, document, and communication boundaries.",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#3",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.1 SYSTEM_QA Hard Negative Rule",
+    "text": "1. System inspection, card rendering audit, schema patch, validation check, and rulepack gap analysis must route to `intentGroup=SYSTEM_QA`.\n2. SYSTEM_QA requests may run `SYSTEM_QA_RULEPACK` and `PII_NDA_RULEPACK`.\n3. `COST_RULEPACK`, `COMM_RULEPACK`, and `ACTION_GATE_RULEPACK` must not fire unless the user explicitly requests operational mutation.\n4. SYSTEM_QA must block `email_draft`, `external_send`, `cost_approval`, `write_back`, and `shipment_execution`.\n5. RulePack execution must expose `rulePackId`, `fired`, `skippedReason`, `evidenceOnly`, and `blockedByRuleId`.\n6. Operational rulepacks referenced during SYSTEM_QA must be marked `evidenceOnly=true` unless the request includes an explicit operational object and mutation intent.",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#4",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.2 Governance Verdict Mapping",
+    "text": "| Condition | finalGovernanceVerdict |\n|---|---|\n| SYSTEM_QA isolated and all mutation paths blocked, all audit fields complete | PASS |\n| SYSTEM_QA isolated but evidence, audit, or prompt trace is incomplete | WARN |\n| Any mutation path is available or operational RulePack fires unexpectedly | BLOCK |\n| Required corpus evidence is missing for a high-risk governance decision | ZERO |\n\nThe operational card verdict may remain `DIAGNOSTIC` while `finalGovernanceVerdict` exposes the audit-facing PASS/WARN/BLOCK/ZERO result.",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#5",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.3 Flow Code RuleId Boundary",
+    "text": "Flow Code misuse must be blocked by `A-FLOW-001`.\n\nDo not use:\n\n- `SCT-SCHEMA-007` for Flow Code misuse.\n- Generic schema violation codes where `A-FLOW-001` applies.\n\nRequired display:\n\n- `blockedBy.ruleId = A-FLOW-001`\n- `blockedBy.ruleName = Flow Code WHP-only boundary`\n\nFlow Code remains valid only as `WarehouseHandlingProfile.confirmedFlowCode`.\n\nDo not use Flow Code for:\n\n- shipment route classification\n- customs stage classification\n- invoice bucket\n- operations KPI route bucket",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#6",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.4 Security Audit Fields",
+    "text": "Decision Card v2.1 must expose explicit security status:\n\n- `security.piiStatus`\n- `security.ndaStatus`\n- `security.sourceCorpusAuditStatus`\n- `security.sensitiveAccessed`\n- `security.piiMasked`\n- `security.rawContactExposed`\n- `security.internalRateExposed`\n- `security.auditRuleIds`\n\nRequired audit rules:\n\n| RuleId | Meaning |\n|---|---|\n| `SEC-PII-001` | Raw phone, email, token, or contact values must not be exposed. |\n| `SEC-NDA-001` | Internal rates, contract prices, and non-public approval material must not be exposed. |\n| `SRC-CORPUS-001` | Evidence IDs must come from canonical corpus or approved extensions. |\n| `SRC-HASH-001` | Source hash must be present. |\n| `PROMPT-VER-001` | Prompt version must not be `unknown`. |",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#7",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.5 SHACL/SPARQL Governance Contract",
+    "text": "Decision Card v2.1 must satisfy these logical constraints:\n\n- `schemaVersion = sct.card.v2.1`\n- `finalGovernanceVerdict in PASS, WARN, BLOCK, ZERO`\n- `trace.promptVersion != unknown`\n- SYSTEM_QA cards must block `email_draft`, `external_send`, `cost_approval`, and `write_back`\n- RulePack execution entries must include `fired`, `skippedReason`, `evidenceOnly`, and `blockedByRuleId`",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
+    "id": "CONSOLIDATED-10-card-governance#8",
+    "docId": "CONSOLIDATED-10-card-governance",
+    "title": "CONSOLIDATED-10 Card Governance",
+    "version": "2.1",
+    "sectionPath": "2.6 Regression Prompts",
+    "text": "| Prompt | Expected |\n|---|---|\n| Card Governance v2가 이메일 발송으로 오분류되지 않는가? | `SYSTEM_QA`, `COMM_RULEPACK.fired=false` |\n| Card Governance v2가 비용 승인으로 오분류되지 않는가? | `COST_RULEPACK.fired=false` |\n| 시스템 패치 요청을 shipment execution으로 실행하지 않는가? | `ACTION_GATE_RULEPACK.fired=false`, `write_back blocked` |\n| Flow Code를 route KPI로 쓰면? | `BLOCK`, `A-FLOW-001` |\n| NDA/PII 정보 포함 문서 카드 렌더링 | `PII_NDA_RULEPACK.fired=true`, masking boundary shown |\n| 근거 문서 없는 governance 질문 | `ZERO` or `WARN`, missing evidence shown |",
+    "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+    "domains": [
+      "master"
+    ]
+  },
+  {
     "id": "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined#1",
     "docId": "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined",
     "title": "HVDC FMC Role Analysis — Combined Final 10x Corpus",

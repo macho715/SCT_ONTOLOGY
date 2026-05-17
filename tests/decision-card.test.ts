@@ -363,7 +363,7 @@ describe("toDecisionCardPayload — adapter", () => {
       ]
     });
     const payload = toDecisionCardPayload({ answer });
-    expect(payload.schemaVersion).toBe("sct.card.v2");
+    expect(payload.schemaVersion).toBe("sct.card.v2.1");
     expect(payload.intent).toBe("GENERAL_ANSWER");
     expect(payload.verdict).toBe("BLOCK");
     expect(payload.primaryReason.length).toBeLessThanOrEqual(80);

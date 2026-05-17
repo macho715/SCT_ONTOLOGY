@@ -328,6 +328,7 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
     domains.delete("communication");
     docs.delete("CONSOLIDATED-05-invoice-cost");
     docs.delete("CONSOLIDATED-08-communication");
+    docs.add("CONSOLIDATED-10-card-governance");
     reasons.push(`system hard-negative intent: ${intent} cannot route to email draft, external send, or cost approval`);
   }
 

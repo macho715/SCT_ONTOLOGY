@@ -27,7 +27,9 @@ export type CardVerdict =
   | "WARN"
   | "BLOCK"
   | "ZERO";
+export type FinalGovernanceVerdict = "PASS" | "WARN" | "BLOCK" | "ZERO";
 export type PiiStatus = "None" | "Masked" | "Risk";
+export type SecurityStatus = "PASS" | "WARN" | "BLOCK";
 export type EvidenceDomainStatus = "PASS" | "WARN" | "BLOCK";
 export type ApprovalStatus =
   | "NotRequired"
@@ -214,6 +216,8 @@ export type DecisionCardTrace = {
   rulePackVersion: string;
   rulePackIds: string[];
   rulePackExecution: RulePackExecutionItem[];
+  schemaPatchVersion: string;
+  sourceCorpusVersion: string;
   promptVersion: string;
   approvalActor: string | null;
   approvalStatus: ApprovalStatus;
@@ -228,6 +232,26 @@ export type RulePackExecutionItem = {
   skippedReason: string | null;
   evidenceOnly: boolean;
   blockedByRuleId: string | null;
+  decisionImpact: string;
+  checkedAt: string;
+};
+
+export type VerdictMappingRule = {
+  ruleId: "CARD-GOV-VERDICT-001";
+  inputVerdict: CardVerdict;
+  mappedVerdict: FinalGovernanceVerdict;
+  reason: string;
+};
+
+export type DecisionCardSecurity = {
+  piiStatus: SecurityStatus;
+  ndaStatus: SecurityStatus;
+  sourceCorpusAuditStatus: SecurityStatus;
+  sensitiveAccessed: boolean;
+  piiMasked: boolean;
+  rawContactExposed: boolean;
+  internalRateExposed: boolean;
+  auditRuleIds: string[];
 };
 
 export type ActionGateEvaluation = {
@@ -241,19 +265,22 @@ export type ActionGateEvaluation = {
 };
 
 export type DecisionCardPayload = {
-  schemaVersion: "sct.card.v2";
+  schemaVersion: "sct.card.v2.1";
   cardId: string;
   routeId: string;
   intent: IntentCode;
   intentGroup: IntentGroup;
   generatedAt: string;
   verdict: CardVerdict;
+  finalGovernanceVerdict: FinalGovernanceVerdict;
+  verdictMappingRule: VerdictMappingRule;
   severity: "P0" | "P1" | "P2";
   primaryReason: string;
   nextAction: string;
   unblockSummary: string;
   piiStatus: PiiStatus;
   dataClass: DataClass;
+  security: DecisionCardSecurity;
   blockedBy: BlockedByEntry[];
   allowedActions: string[];
   blockedActions: string[];
@@ -598,6 +625,7 @@ function buildRulePackExecution(args: {
   blockedBy: readonly BlockedByEntry[];
   verdict: CardVerdict;
   approvalRequired: boolean;
+  generatedAt: string;
 }): RulePackExecutionItem[] {
   const intentGroup = deriveIntentGroup(args.intent);
   const blockedRuleIds = new Set(args.blockedBy.map((entry) => entry.ruleId));
@@ -614,7 +642,9 @@ function buildRulePackExecution(args: {
         fired: false,
         skippedReason: "SYSTEM_QA_HARD_NEGATIVE",
         evidenceOnly: false,
-        blockedByRuleId: "SYS-ROUTER-001"
+        blockedByRuleId: "SYS-ROUTER-001",
+        decisionImpact: `prevents ${rulePackId === "COST_RULEPACK" ? "cost approval" : "communication"} misclassification`,
+        checkedAt: args.generatedAt
       };
     }
 
@@ -624,7 +654,9 @@ function buildRulePackExecution(args: {
         fired: args.approvalRequired || args.verdict === "ZERO",
         skippedReason: args.approvalRequired || args.verdict === "ZERO" ? null : "READ_ONLY_NO_MUTATION",
         evidenceOnly: false,
-        blockedByRuleId: blockedRuleIds.has("SCT-APP-005") ? "SCT-APP-005" : null
+        blockedByRuleId: blockedRuleIds.has("SCT-APP-005") ? "SCT-APP-005" : "SYS-ROUTER-001",
+        decisionImpact: "prevents unauthorized write, send, export, or approval execution",
+        checkedAt: args.generatedAt
       };
     }
 
@@ -634,7 +666,9 @@ function buildRulePackExecution(args: {
         fired: true,
         skippedReason: null,
         evidenceOnly: false,
-        blockedByRuleId: rulePackId === "PII_NDA_RULEPACK" && blockedRuleIds.has("SCT-P2-004") ? "SCT-P2-004" : null
+        blockedByRuleId: rulePackId === "PII_NDA_RULEPACK" && blockedRuleIds.has("SCT-P2-004") ? "SCT-P2-004" : null,
+        decisionImpact: rulePackId === "SYSTEM_QA_RULEPACK" ? "governs diagnostic routing" : "checks PII and NDA exposure boundaries",
+        checkedAt: args.generatedAt
       };
     }
 
@@ -644,7 +678,9 @@ function buildRulePackExecution(args: {
         fired: false,
         skippedReason: "SYSTEM_QA_EVIDENCE_ONLY",
         evidenceOnly: true,
-        blockedByRuleId: blockedRuleIds.has("A-FLOW-001") && rulePackId === "WAREHOUSE_RULEPACK" ? "A-FLOW-001" : null
+        blockedByRuleId: blockedRuleIds.has("A-FLOW-001") && rulePackId === "WAREHOUSE_RULEPACK" ? "A-FLOW-001" : null,
+        decisionImpact: "keeps operational rulepack evidence-only during SYSTEM_QA review",
+        checkedAt: args.generatedAt
       };
     }
 
@@ -653,9 +689,74 @@ function buildRulePackExecution(args: {
       fired: true,
       skippedReason: null,
       evidenceOnly: false,
-      blockedByRuleId: null
+      blockedByRuleId: null,
+      decisionImpact: "operational rulepack executed for operational intent",
+      checkedAt: args.generatedAt
     };
   });
+}
+
+function deriveSecurity(args: {
+  piiStatus: PiiStatus;
+  sensitiveAccessed: boolean;
+  piiMasked: boolean;
+  dataClass: DataClass;
+  evidence: readonly EvidenceSnippet[];
+}): DecisionCardSecurity {
+  const sourceCorpusOnly = args.evidence.every((item) => item.sourceType === "ontology_corpus");
+  return {
+    piiStatus: args.piiStatus === "Risk" ? "BLOCK" : "PASS",
+    ndaStatus: args.sensitiveAccessed || args.dataClass === "P2" ? "WARN" : "PASS",
+    sourceCorpusAuditStatus: sourceCorpusOnly ? "PASS" : "WARN",
+    sensitiveAccessed: args.sensitiveAccessed,
+    piiMasked: args.piiMasked,
+    rawContactExposed: args.piiStatus === "Risk",
+    internalRateExposed: args.sensitiveAccessed && args.dataClass === "P2",
+    auditRuleIds: ["SEC-PII-001", "SEC-NDA-001", "SRC-CORPUS-001", "SRC-HASH-001", "PROMPT-VER-001"]
+  };
+}
+
+function mapGovernanceVerdict(args: {
+  verdict: CardVerdict;
+  intentGroup: IntentGroup;
+  blockedUntilApproved: readonly string[];
+  rulePackExecution: readonly RulePackExecutionItem[];
+  security: DecisionCardSecurity;
+  promptVersion: string;
+  evidenceCoverage: readonly EvidenceCoverageItem[];
+}): VerdictMappingRule {
+  const requiredBlockedActions = ["email_draft", "external_send", "cost_approval", "write_back"];
+  const blockedOk = requiredBlockedActions.every((action) => args.blockedUntilApproved.includes(action));
+  const byId = new Map(args.rulePackExecution.map((item) => [item.rulePackId, item]));
+  const costBlocked = byId.get("COST_RULEPACK")?.fired === false;
+  const commBlocked = byId.get("COMM_RULEPACK")?.fired === false;
+  const actionBlocked = byId.get("ACTION_GATE_RULEPACK")?.fired === false;
+  const auditComplete =
+    args.security.ndaStatus !== undefined &&
+    args.security.sourceCorpusAuditStatus !== undefined &&
+    args.promptVersion !== "unknown";
+  const directEvidenceOk = args.evidenceCoverage.length > 0 &&
+    args.evidenceCoverage.every((item) => item.directSupportRatio >= 0.8);
+  let mappedVerdict: FinalGovernanceVerdict = "WARN";
+  let reason = "SYSTEM_QA isolated, but direct evidence or audit completeness needs review";
+
+  if (args.verdict === "ZERO") {
+    mappedVerdict = "ZERO";
+    reason = "High-risk governance decision lacks safe evidence";
+  } else if (args.intentGroup !== "SYSTEM_QA" || !blockedOk || !costBlocked || !commBlocked || !actionBlocked) {
+    mappedVerdict = "BLOCK";
+    reason = "Operational mutation path or rulepack execution was not fully blocked";
+  } else if (auditComplete && directEvidenceOk && args.security.piiStatus === "PASS" && args.security.ndaStatus === "PASS") {
+    mappedVerdict = "PASS";
+    reason = "SYSTEM_QA isolated, mutation paths blocked, audit fields complete, and direct evidence is sufficient";
+  }
+
+  return {
+    ruleId: "CARD-GOV-VERDICT-001",
+    inputVerdict: args.verdict,
+    mappedVerdict,
+    reason
+  };
 }
 
 // --- Adapter ---
@@ -783,21 +884,51 @@ export function toDecisionCardPayload(args: {
   const blockedUntilApproved = Array.from(
     new Set([...answer.route.blockedActions, ...blockedActions])
   );
+  const intentGroup = deriveIntentGroup(answer.route.intent);
+  const dataClass = args.dataClass ?? (hasZeroFindings ? "P2" : "P1");
+  const promptVersion = args.promptVersion ?? "sct-card-governance-v2.1.0";
+  const rulePackExecution = buildRulePackExecution({
+    routeRulePackIds: answer.route.rulePackIds,
+    intent: answer.route.intent,
+    blockedBy,
+    verdict,
+    approvalRequired,
+    generatedAt: answer.generatedAt
+  });
+  const security = deriveSecurity({
+    piiStatus,
+    sensitiveAccessed: piiStatus !== "None" || hasZeroFindings,
+    piiMasked: answer.piiMasked,
+    dataClass,
+    evidence: answer.evidence
+  });
+  const verdictMappingRule = mapGovernanceVerdict({
+    verdict,
+    intentGroup,
+    blockedUntilApproved,
+    rulePackExecution,
+    security,
+    promptVersion,
+    evidenceCoverage
+  });
 
   return {
-    schemaVersion: "sct.card.v2",
+    schemaVersion: "sct.card.v2.1",
     cardId: args.cardId ?? `DC-${answer.answerId}`,
     routeId: answer.route.routeId,
     intent: answer.route.intent,
-    intentGroup: deriveIntentGroup(answer.route.intent),
+    intentGroup,
     generatedAt: answer.generatedAt,
     verdict,
+    finalGovernanceVerdict: verdictMappingRule.mappedVerdict,
+    verdictMappingRule,
     severity: pickHighestSeverity(blockedBy),
     primaryReason,
     nextAction: deriveNextAction(answer.actions, verdict),
     unblockSummary,
     piiStatus,
-    dataClass: args.dataClass ?? (hasZeroFindings ? "P2" : "P1"),
+    dataClass,
+    security,
     blockedBy,
     allowedActions,
     blockedActions,
@@ -810,14 +941,10 @@ export function toDecisionCardPayload(args: {
       sourceHash: deterministicSourceHash(answer.evidence),
       rulePackVersion: args.rulePackVersion ?? "2026.05",
       rulePackIds: answer.route.rulePackIds,
-      rulePackExecution: buildRulePackExecution({
-        routeRulePackIds: answer.route.rulePackIds,
-        intent: answer.route.intent,
-        blockedBy,
-        verdict,
-        approvalRequired
-      }),
-      promptVersion: args.promptVersion ?? "unknown",
+      rulePackExecution,
+      schemaPatchVersion: "sct-card-v2.1-patch-001",
+      sourceCorpusVersion: "HVDC_Logistics_Ontology_FINAL_5x_2026-04-27",
+      promptVersion,
       approvalActor: args.approvalState?.actor ?? null,
       approvalStatus,
       sensitiveAccessed: piiStatus !== "None" || hasZeroFindings,

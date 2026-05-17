@@ -100,19 +100,36 @@ const evidenceTraceSchema = z.object({
 });
 
 const decisionCardSchema = z.object({
-  schemaVersion: z.literal("sct.card.v2"),
+  schemaVersion: z.literal("sct.card.v2.1"),
   cardId: z.string(),
   routeId: z.string(),
   intent: intentEnum,
   intentGroup: z.enum(["SYSTEM_QA", "OPERATIONAL"]),
   generatedAt: z.string(),
   verdict: z.enum(["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "ZERO"]),
+  finalGovernanceVerdict: z.enum(["PASS", "WARN", "BLOCK", "ZERO"]),
+  verdictMappingRule: z.object({
+    ruleId: z.literal("CARD-GOV-VERDICT-001"),
+    inputVerdict: z.string(),
+    mappedVerdict: z.enum(["PASS", "WARN", "BLOCK", "ZERO"]),
+    reason: z.string()
+  }),
   severity: z.enum(["P0", "P1", "P2"]),
   primaryReason: z.string(),
   nextAction: z.string(),
   unblockSummary: z.string(),
   piiStatus: z.enum(["None", "Masked", "Risk"]),
   dataClass: z.enum(["P0", "P1", "P2"]),
+  security: z.object({
+    piiStatus: z.enum(["PASS", "WARN", "BLOCK"]),
+    ndaStatus: z.enum(["PASS", "WARN", "BLOCK"]),
+    sourceCorpusAuditStatus: z.enum(["PASS", "WARN", "BLOCK"]),
+    sensitiveAccessed: z.boolean(),
+    piiMasked: z.boolean(),
+    rawContactExposed: z.boolean(),
+    internalRateExposed: z.boolean(),
+    auditRuleIds: z.array(z.string())
+  }),
   blockedBy: z.array(
     z.object({
       ruleId: z.string(),
@@ -180,8 +197,12 @@ const decisionCardSchema = z.object({
       fired: z.boolean(),
       skippedReason: z.string().nullable(),
       evidenceOnly: z.boolean(),
-      blockedByRuleId: z.string().nullable()
+      blockedByRuleId: z.string().nullable(),
+      decisionImpact: z.string(),
+      checkedAt: z.string()
     })),
+    schemaPatchVersion: z.string(),
+    sourceCorpusVersion: z.string(),
     promptVersion: z.string(),
     approvalActor: z.string().nullable(),
     approvalStatus: z.enum(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]),
