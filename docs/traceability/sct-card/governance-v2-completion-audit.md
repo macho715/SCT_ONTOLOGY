@@ -1,6 +1,6 @@
 # SCT_ONTOLOGY CARD Governance v2 Completion Audit
 
-- audit date: 2026-05-18 02:01:38 +04:00
+- audit date: 2026-05-18 02:04:46 +04:00
 - objective file: `SCT_ONTOLOGY_CARD_GOVERNANCE_SPEC_v2.md`
 - session basis: current Windows Codex session
 - verdict: PARTIAL

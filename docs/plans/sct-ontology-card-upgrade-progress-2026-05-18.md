@@ -1,7 +1,7 @@
 # SCT_ONTOLOGY Card Upgrade Progress Report
 
 - 작성일: 2026-05-18 00:15:14 +04:00
-- 최신 갱신: 2026-05-18 02:01:38 +04:00
+- 최신 갱신: 2026-05-18 02:04:46 +04:00
 - 세션 기준: 현재 Windows Codex 세션
 - 작업 위치: `C:\Users\jichu\Downloads\HVDC Ontology Grounded`
 - 기준 사양: `SCT_ONTOLOGY_CARD_UPGRADE_SPEC_v1.0.md`, `SCT_ONTOLOGY_CARD_GOVERNANCE_SPEC_v2.md`

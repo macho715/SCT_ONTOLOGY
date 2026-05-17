@@ -1,7 +1,7 @@
 # QA Report
 
 Current verification date: 2026-05-18
-Latest documentation update: 2026-05-18 02:01:38 +04:00
+Latest documentation update: 2026-05-18 02:04:46 +04:00
 
 ## Current verified state
 
@@ -46,7 +46,7 @@ Latest local verification:
 npm run verify
 ```
 
-Result: TypeScript typecheck passed, Vitest 22 files / 297 tests passed, and `wrangler deploy --dry-run` passed. This was rerun after adding the browser smoke harness, browser report, and PII/NDA output-surface scanner.
+Result: TypeScript typecheck passed, Vitest 22 files / 297 tests passed, and `wrangler deploy --dry-run` passed. This was rerun after adding the browser smoke harness, browser report, PII/NDA output-surface scanner, and source-corpus PII/NDA audit.
 
 Note: the first `npm run verify` attempt failed inside the sandbox when Vitest tried to write a temporary config file under `node_modules\.vite-temp`. The same command was rerun with approved elevated execution and passed.
 
@@ -83,7 +83,7 @@ Latest PII/NDA output-surface verification:
 npm run scan:sct-pii
 ```
 
-Result: `PASS`, 13 scanned files, 0 findings. The report is `docs/traceability/sct-card/pii-nda-scan-report.md`. This scans SCT card output surfaces and generated traceability artifacts; it does not claim that every source corpus or evidence file in the repository is free of PII/NDA material.
+Result: `PASS`, 14 scanned files, 0 findings. The report is `docs/traceability/sct-card/pii-nda-scan-report.md`. This scans SCT card output surfaces and generated traceability artifacts; it does not claim that every source corpus or evidence file in the repository is free of PII/NDA material.
 
 Latest source-corpus PII/NDA audit:
 
