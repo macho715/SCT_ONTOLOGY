@@ -187,3 +187,20 @@ export type { CostGuardBand, CostGuardVerdict, CostGuardLineResult, CostGuardRes
 export type { RouteGateStatus, RouteGateCard, MilestoneRecord } from "./mosb-gate.js";
 export type { DocGuardianStatus, CrossDocIssue, DocGuardianResult, DocumentInput } from "./doc-guardian.js";
 export type { ActionProposal, TeamActionResult } from "./team-action-router.js";
+
+// Re-exports from Decision Card v2 backend contract (Phase 1)
+export type {
+  CardVerdict,
+  PiiStatus,
+  EvidenceDomainStatus,
+  ApprovalStatus,
+  ActionStatus,
+  DataClass,
+  ExportType,
+  DecisionRule,
+  BlockedByEntry,
+  EvidenceCoverageItem,
+  ActionItem,
+  DecisionCardTrace,
+  DecisionCardPayload
+} from "./decision-card.js";
