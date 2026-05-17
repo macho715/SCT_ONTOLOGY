@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HVDC Widget Browser Smoke</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #f3f4f6;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      iframe {
+        display: block;
+        width: 100vw;
+        min-height: 100vh;
+        border: 0;
+        background: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="widget-frame" title="HVDC answer widget browser smoke" src="../../public/hvdc-answer-widget.html"></iframe>
+    <script>
+      const fixture = {
+        answerId: "browser-smoke-action-gate",
+        verdict: "PENDING_APPROVAL",
+        dataStatus: "OK",
+        businessResultVisible: true,
+        fallbackUsed: false,
+        summary: "External send is blocked until approval is recorded.",
+        businessImpact: "No external email or write-back is executed by this card.",
+        details: ["ActionGate keeps the request in dry-run mode until approval."],
+        evidenceIds: ["ev-browser-1"],
+        validationStatus: "WARN",
+        route: {
+          routeId: "browser-smoke-route",
+          requiredDocs: ["CONSOLIDATED-00"],
+          confidence: 0.95,
+          routingReason: "browser smoke fixture"
+        },
+        evidence: [
+          {
+            id: "ev-browser-1",
+            docId: "CONSOLIDATED-00",
+            title: "Master ontology spine",
+            version: "2026-05-18",
+            sectionPath: "Governance / action gate",
+            snippet: "Write-back and external send require approval and audit trace.",
+            docHash: "sha256:browser-smoke",
+            confidence: 0.95,
+            sourceType: "ontology_corpus"
+          }
+        ],
+        evidenceTrace: [
+          {
+            targetType: "summary",
+            targetIndex: null,
+            answerText: "External send is blocked until approval is recorded.",
+            supportState: "SUPPORTED",
+            evidenceIds: ["ev-browser-1"]
+          }
+        ],
+        validation: [
+          {
+            ruleId: "A-ACTION-001",
+            reasonCode: "APPROVAL_REQUIRED",
+            severity: "WARN",
+            status: "WARN",
+            targetObject: "external_email_send",
+            evidenceIds: ["ev-browser-1"],
+            message: "External send requires a human approval gate and audit record."
+          }
+        ],
+        resolvedEntities: [
+          {
+            label: "ActionGate",
+            entityType: "SystemComponent",
+            identifierScheme: "systemComponent",
+            identifierValue: "ActionGate",
+            normalizedValue: "ActionGate",
+            sourceSystem: "SCT_ONTOLOGY_CARD",
+            isPrimary: true
+          }
+        ],
+        graphPath: {
+          startNodes: ["SystemComponent:ActionGate", "SystemComponent:Renderer"],
+          riskEdges: ["externalSendWithoutApproval", "missingAuditRecord"],
+          operationalObjects: [],
+          isMetaReview: true
+        },
+        actions: [
+          {
+            actionId: "ACT-SEND-001",
+            ownerRole: "Logistics Lead",
+            ownerNameMasked: null,
+            actionType: "REQUEST_EMAIL_SEND_APPROVAL",
+            actionLabel: "Request email send approval",
+            requiredInput: "Approval actor",
+            approvalRequired: true,
+            approvalStatus: "Pending",
+            status: "Pending Approval",
+            evidenceIds: ["ev-browser-1"],
+            blockedUntil: ["Approval actor"],
+            allowedNow: ["draft_only", "dry_run"],
+            blockedUntilApproved: ["external_send"],
+            humanGateRequired: true,
+            auditRecordRequired: true,
+            writeBackMode: "DRY_RUN",
+            dueBasis: "Before external send",
+            dueAt: null
+          }
+        ],
+        decisionCard: {
+          schemaVersion: "sct.card.v2",
+          cardId: "DC-browser-smoke",
+          routeId: "browser-smoke-route",
+          intent: "EMAIL_DRAFT",
+          generatedAt: "2026-05-18T01:20:00+04:00",
+          verdict: "PENDING_APPROVAL",
+          severity: "P1",
+          primaryReason: "External send requires approval before write-back.",
+          unblockSummary: "Record approval actor before external send.",
+          piiStatus: "Masked",
+          dataClass: "P1",
+          blockedBy: [
+            {
+              ruleId: "A-ACTION-001",
+              ruleName: "Action requires human gate",
+              reason: "External send is mutation-like and must remain dry-run until approval.",
+              requiredInputs: ["Approval actor", "Audit record"],
+              missingInputs: ["Approval actor"],
+              blockedActions: ["external_send"],
+              severity: "P1"
+            }
+          ],
+          allowedNow: ["draft_only", "dry_run"],
+          blockedUntilApproved: ["external_send"],
+          humanGateState: "APPROVAL_REQUESTED",
+          evidenceCoverage: [
+            { domain: "ActionGate", status: "WARN", required: 1, available: 1, directSupportRatio: 1 }
+          ],
+          actions: [
+            {
+              actionId: "ACT-SEND-001",
+              ownerRole: "Logistics Lead",
+              actionType: "REQUEST_EMAIL_SEND_APPROVAL",
+              actionLabel: "Request email send approval",
+              requiredInput: "Approval actor",
+              approvalRequired: true,
+              approvalStatus: "Pending",
+              status: "Pending Approval",
+              evidenceIds: ["ev-browser-1"],
+              blockedUntil: ["Approval actor"],
+              allowedNow: ["draft_only", "dry_run"],
+              blockedUntilApproved: ["external_send"],
+              humanGateRequired: true,
+              auditRecordRequired: true,
+              writeBackMode: "DRY_RUN",
+              dueBasis: "Before external send",
+              dueAt: null
+            }
+          ],
+          trace: {
+            sourceHash: "sha256:browser-smoke",
+            rulePackVersion: "2026.05",
+            rulePackIds: ["COMM_RULEPACK", "ACTION_GATE_RULEPACK"],
+            promptVersion: "browser-smoke",
+            approvalActor: null,
+            approvalStatus: "Pending",
+            sensitiveAccessed: false,
+            generatedAt: "2026-05-18T01:20:00+04:00",
+            routeId: "browser-smoke-route"
+          }
+        },
+        piiMasked: true,
+        generatedAt: "2026-05-18T01:20:00+04:00"
+      };
+
+      function sendFixture() {
+        const frame = document.getElementById("widget-frame");
+        frame.contentWindow.postMessage(
+          {
+            jsonrpc: "2.0",
+            method: "ui/notifications/tool-result",
+            params: {
+              structuredContent: fixture
+            }
+          },
+          "*"
+        );
+      }
+
+      document.getElementById("widget-frame").addEventListener("load", () => {
+        sendFixture();
+        window.setTimeout(sendFixture, 250);
+      });
+    </script>
+  </body>
+</html>

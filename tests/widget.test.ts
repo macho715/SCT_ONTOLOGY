@@ -75,6 +75,22 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("focus-visible");
   });
 
+  it("NFR-004: exposes verdict, status, and tab state as text/ARIA, not color alone", () => {
+    const html = renderWidgetFixture(decisionCardFixture());
+
+    expect(html).toContain("aria-label=\"Decision verdict BLOCK\"");
+    expect(html).toContain(">BLOCK</span>");
+    expect(html).toContain("Pending Approval");
+    expect(html).toContain("Human gate state");
+    expect(html).toContain("Approval is pending");
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain('role="tab"');
+    expect(html).toContain('role="tabpanel"');
+    expect(html).toContain('aria-selected="true"');
+    expect(html).toContain("aria-controls=");
+    expect(widgetHtml).toContain("focus-visible");
+  });
+
   it("separates template rendering warnings from business answer data", () => {
     expect(widgetHtml).toContain("Card UI warning");
     expect(widgetHtml).toContain("Data status");
@@ -411,6 +427,7 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("renderHumanGateBanner");
     expect(widgetHtml).toContain("renderEvidenceCoverage");
     expect(widgetHtml).toContain("renderActionTable");
+    expect(widgetHtml).toContain("renderDecisionSecurity");
     expect(widgetHtml).toContain("safeCardVerdict");
     expect(widgetHtml).toContain("truncateText");
     expect(widgetHtml).toContain("Human gate state");
@@ -465,6 +482,57 @@ describe("HVDC answer widget", () => {
     expect(html).not.toContain("<script>alert(1)</script>");
   });
 
+  it("renders ZERO decision cards without downgrading the verdict to BLOCK", () => {
+    const html = renderWidgetFixture({
+      ...decisionCardFixture({
+        verdict: "ZERO",
+        primaryReason: "P2 raw content exposure blocked",
+        piiStatus: "Risk",
+        dataClass: "P2",
+        blockedBy: [
+          {
+            ruleId: "SCT-P2-004",
+            ruleName: "P2 raw content must not be exposed",
+            reason: "P2 raw text / rate / internal link exposed",
+            requiredInputs: ["Material ID", "redacted snippet", "sourceHash"],
+            missingInputs: ["redacted snippet"],
+            blockedActions: ["Export", "Publish"],
+            severity: "P0"
+          }
+        ]
+      }),
+      verdict: "ZERO",
+      validationStatus: "BLOCK"
+    });
+
+    expect(html).toContain("aria-label=\"Decision verdict ZERO\"");
+    expect(html).toContain("SCT-P2-004");
+    expect(html).toContain("P2 raw content must not be exposed");
+    expect(html).toContain("BlockReasonBox");
+    expect(html).toContain("Security");
+    expect(html).toContain("Data class");
+    expect(html).toContain("External share status");
+    expect(html).toContain("raw sensitive content blocked");
+  });
+
+  it("renders DIAGNOSTIC decision cards without downgrading the verdict to BLOCK", () => {
+    const html = renderWidgetFixture({
+      ...decisionCardFixture({
+        verdict: "DIAGNOSTIC",
+        primaryReason: "System QA prompt isolated from operational action lanes",
+        blockedBy: [],
+        allowedNow: ["read", "diagnostic_report", "test_scenario"],
+        blockedUntilApproved: ["email_draft", "external_send", "cost_approval"]
+      }),
+      verdict: "DIAGNOSTIC",
+      validationStatus: "PASS"
+    });
+
+    expect(html).toContain("aria-label=\"Decision verdict DIAGNOSTIC\"");
+    expect(html).toContain("diagnostic_report");
+    expect(html).not.toContain("Decision verdict BLOCK");
+  });
+
   it("renders blocked-by rule fields and unblock checklist", () => {
     const html = renderWidgetFixture(decisionCardFixture());
 
@@ -514,7 +582,7 @@ describe("HVDC answer widget", () => {
 
     expect(html).toContain('role="tablist"');
     expect(html).toContain("Decision Card sections");
-    for (const tab of ["Decision", "Evidence", "Validation", "Entities", "Actions", "Trace"]) {
+    for (const tab of ["Decision", "Evidence", "Validation", "Entities", "Actions", "Security", "Trace"]) {
       expect(html).toContain(`>${tab}</button>`);
     }
     expect(html).toContain("EvidenceCoverageBar");
@@ -529,6 +597,9 @@ describe("HVDC answer widget", () => {
     expect(html).toContain("Approval actor");
     expect(html).toContain("Before approval-gated execution");
     expect(html).toContain("APPROVAL_REQUESTED");
+    expect(html).toContain("Detection scope");
+    expect(html).toContain("Masked fields");
+    expect(html).toContain("External share status");
   });
 
   it("escapes Decision Card v2 table and trace fields", () => {

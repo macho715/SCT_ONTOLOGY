@@ -41,10 +41,10 @@
       .card { border: 1px solid var(--line); border-radius: 8px; background: var(--card); padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; min-width: 0; margin-bottom: 28px; }
       .top { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
       .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 12px; border: 1px solid var(--line); }
-      .BLOCK, .NO_EVIDENCE { color: var(--block); }
-      .WARN { color: var(--warn); }
-      .PASS { color: var(--pass); }
-      .INFO { color: var(--info); }
+      .BLOCK, .NO_EVIDENCE, .ZERO { color: var(--block); }
+      .WARN, .AMBER, .NEEDS_INPUT, .PENDING_APPROVAL, .DRY_RUN_ONLY, .PASS_WITH_FINDINGS { color: var(--warn); }
+      .PASS, .DRAFT_READY { color: var(--pass); }
+      .INFO, .DIAGNOSTIC { color: var(--info); }
       h1 { margin: 8px 0 6px; font-size: 20px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
       h2 { font-size: 15px; margin: 18px 0 8px; }
       h3 { font-size: 14px; margin: 0 0 6px; }
@@ -122,6 +122,10 @@
       .decision-card-badge.BLOCK { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
       .decision-card-badge.WARN { background: #fef3c7; color: #92400e; border-color: #fbbf24; }
       .decision-card-badge.PASS { background: #dcfce7; color: #166534; border-color: #86efac; }
+      .decision-card-badge.ZERO { background: #111827; color: #f9fafb; border-color: #000; }
+      .decision-card-badge.DIAGNOSTIC { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+      .decision-card-badge.PASS_WITH_FINDINGS, .decision-card-badge.AMBER, .decision-card-badge.NEEDS_INPUT, .decision-card-badge.PENDING_APPROVAL, .decision-card-badge.DRY_RUN_ONLY { background: #fef3c7; color: #92400e; border-color: #fbbf24; }
+      .decision-card-badge.DRAFT_READY { background: #dcfce7; color: #166534; border-color: #86efac; }
       .decision-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 18px 0; }
       .decision-card-panel { border: 1px solid #9fb3cc; border-radius: 20px; padding: 18px; background: rgba(255, 255, 255, 0.95); color: #0f172a; overflow-wrap: anywhere; word-break: break-word; box-shadow: 0 10px 24px rgba(30, 41, 59, 0.06); }
       .decision-card-panel strong { display: block; color: #0f172a; margin-bottom: 8px; font-size: 0.98rem; }
@@ -196,7 +200,7 @@
     </main>
     <script>
       const root = document.getElementById("root");
-      const VALID_STATUSES = new Set(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]);
+      const VALID_STATUSES = new Set(["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "INFO", "NO_EVIDENCE", "ZERO"]);
       const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
       const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
       const TOKEN_RE = /\b(?:sk-[A-Za-z0-9_-]{16,}|sk-proj-[A-Za-z0-9_-]{16,}|[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,})\b/g;
@@ -235,7 +239,7 @@
         return VALID_STATUSES.has(status) ? status : fallback;
       }
 
-      const VALID_CARD_VERDICTS = new Set(["PASS", "WARN", "BLOCK"]);
+      const VALID_CARD_VERDICTS = new Set(["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "ZERO"]);
       const VALID_PII_STATUSES = new Set(["None", "Masked", "Risk"]);
       const VALID_APPROVAL_STATUSES = new Set(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]);
 
@@ -502,7 +506,8 @@
 
       function renderBlockReasonBox(card) {
         const blockedBy = asArray(card.blockedBy);
-        if (safeCardVerdict(card.verdict) !== "BLOCK" || blockedBy.length === 0) return "";
+        const verdict = safeCardVerdict(card.verdict);
+        if ((verdict !== "BLOCK" && verdict !== "ZERO") || blockedBy.length === 0) return "";
         const rows = blockedBy.map((item) => `
           <tr>
             <td>${escapeHtml(displayValue(item.ruleId))}</td>
@@ -616,6 +621,33 @@
         `;
       }
 
+      function renderDecisionSecurity(card) {
+        const trace = card.trace && typeof card.trace === "object" ? card.trace : {};
+        const blocked = asArray(card.blockedUntilApproved ?? card.blockedActions).join(", ");
+        const externalShareStatus = /external|share|send|publish|export/i.test(blocked)
+          ? "Blocked"
+          : "Not requested";
+        const piiStatus = safePiiStatus(card.piiStatus);
+        const maskedFields = piiStatus === "Masked"
+          ? "email, phone, token"
+          : piiStatus === "Risk"
+            ? "raw sensitive content blocked"
+            : "None";
+        return `
+          <section class="decision-trace" aria-label="Security">
+            <h3>Security</h3>
+            <div class="decision-card-grid">
+              <div class="decision-card-panel"><strong>Detection scope</strong>input, output, DecisionCard, trace</div>
+              <div class="decision-card-panel"><strong>Masked fields</strong>${escapeHtml(maskedFields)}</div>
+              <div class="decision-card-panel"><strong>Data class</strong>${escapeHtml(displayValue(card.dataClass))}</div>
+              <div class="decision-card-panel"><strong>External share status</strong>${escapeHtml(externalShareStatus)}</div>
+              <div class="decision-card-panel"><strong>PII/NDA reason</strong>${escapeHtml(displayValue(card.primaryReason))}</div>
+              <div class="decision-card-panel"><strong>Sensitive accessed</strong>${escapeHtml(displayValue(trace.sensitiveAccessed))}</div>
+            </div>
+          </section>
+        `;
+      }
+
       function renderDecisionEntities(answer) {
         const entities = asArray(answer?.resolvedEntities);
         const rows = entities.map((entity) => `
@@ -655,6 +687,7 @@
           ["validation", "Validation", renderBlockReasonBox(card)],
           ["entities", "Entities", renderDecisionEntities(answer)],
           ["actions", "Actions", renderActionTable(card)],
+          ["security", "Security", renderDecisionSecurity(card)],
           ["trace", "Trace", renderDecisionTrace(card)]
         ];
         const buttons = tabs.map(([id, label], index) => `

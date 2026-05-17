@@ -81,31 +81,73 @@ const SYSTEM_DIAGNOSTIC_TERMS =
   /(?:sct[_\s-]?ontology|ontology|card|decision\s*card|router|validation|evidence|schema|rulepack|renderer|rendering|widget|template|ui|mcp|answer\s*card|카드|위젯|템플릿|라우터|검증|근거|스키마|룰팩|렌더|점검|진단|감사|audit|diagnostic|health)/i;
 const SYSTEM_SUBJECT_TERMS =
   /(?:sct[_\s-]?ontology|ontology|system[_\s-]?qa[_\s-]?rulepack|system[_\s-]?diagnostic|card[_\s-]?rendering[_\s-]?audit|ontology[_\s-]?patch[_\s-]?review|decision\s*card|decisioncard|evidenceranker|actionplanner|humangate|zero\s*gate|sourcehash|approvaltrace|validationreport|card|router|validation|schema|rulepack|renderer|rendering|widget|template|ui|mcp|answer\s*card|카드|위젯|템플릿|라우터|스키마|룰팩|렌더)/i;
+const SYSTEM_MODULE_TERMS =
+  /(?:sct[_\s-]?ontology|ontology|system[_\s-]?qa[_\s-]?rulepack|system[_\s-]?diagnostic|card[_\s-]?rendering[_\s-]?audit|ontology[_\s-]?patch[_\s-]?review|decision\s*card|decisioncard|intentrouter|rulepackselector|evidenceranker|actionplanner|humangate|actiongate|validationengine|zero\s*gate|sourcehash|approvaltrace|validationreport|card|router|schema|rulepack|renderer|rendering|widget|template|ui|mcp|answer\s*card|카드|위젯|템플릿|라우터|스키마|룰팩|렌더)/i;
 const SYSTEM_HARD_NEGATIVE_TERMS =
   /점검|진단|패치|개선|업그레이드|upgrade|patch|audit|diagnostic|health|card|router|validation|evidence|schema|rulepack|renderer|rendering|widget|template|카드|라우터|검증|근거|스키마|룰팩|렌더|위젯/i;
+const OPERATIONAL_OBJECT_TERMS =
+  /\b(?:BL|BOE|DO|CI|PL|PO|INV|INVOICE|PKG)(?:[-_/#][A-Z0-9]+|\d{2,}|[A-Z]{2,}\d+)\b|\bHVDC[-_/][A-Z0-9-]+\b|\bM\d{2,3}\b|shipment|shipmentunit|container|site|warehouse|mosb|invoice|통관|창고|현장|선적|화물|자재/i;
 const CARD_RENDERING_TERMS =
-  /card|answer\s*card|decision\s*card|renderer|rendering|widget|template|ui|fallback|failed to fetch|카드|위젯|템플릿|렌더|화면|표시/i;
+  /card[_\s-]?rendering[_\s-]?audit|answer\s*card\s*(?:render|template)|decision\s*card\s*(?:render|template)|renderer|rendering|widget|template|ui|fallback|failed to fetch|위젯|템플릿|렌더|화면|표시/i;
 const PATCH_REVIEW_TERMS =
   /패치|개선|업그레이드|upgrade|patch|governance|rulepack|schema|acceptance criteria|backlog|roadmap|사양|spec|수정안/i;
+const RULEPACK_GAP_TERMS =
+  /rulepack.*(?:gap|coverage|matrix|selector|binding|분석|공백)|(?:gap|coverage|matrix|selector|binding|공백).*(?:rulepack|룰팩)|rulepack_gap_analysis/i;
+const ROUTER_QA_TERMS =
+  /intentrouter|intent\s*router|router|routing\s*qa|hard-negative|classification|오분류|라우터|분류/i;
+const EVIDENCE_QA_TERMS =
+  /evidenceranker|evidence\s*qa|evidence|directsupport|sourcehash|근거|증거/i;
+const SCHEMA_BOUNDARY_TERMS =
+  /schema_boundary_review|schema|contract|boundary|data\s*class|스키마|계약|경계/i;
+const VALIDATION_POLICY_TERMS =
+  /validation_policy_review|validation\s*policy|validation|rule\s*policy|policy|검증|정책/i;
 const EMAIL_DRAFT_TERMS =
-  /(?:email|e-mail|mail|thread|이메일|메일|회신|답장|수신자).*(?:draft|write|compose|reply|초안|작성|회신|답장)|(?:draft|write|compose|reply|초안|작성|회신|답장).*(?:email|e-mail|mail|thread|이메일|메일|수신자)/i;
+  /(?:email|e-mail|mail|thread|이메일|메일|회신|답장|수신자).*(?:draft|write|compose|reply|send|초안|작성|회신|답장|보내|발송|전송)|(?:draft|write|compose|reply|send|초안|작성|회신|답장|보내|발송|전송).*(?:email|e-mail|mail|thread|이메일|메일|수신자)/i;
 const COST_APPROVAL_ACTION_TERMS =
   /approve|approval|accept|pay|release|post|write|confirm|confirmed|승인|확정|반영|지급|릴리즈/i;
 const DOCUMENT_GUARDIAN_TERMS =
   /\b(?:ci|pl|bl|boe|do|ocr|coo|permit)\b|packing list|delivery order|첨부|서류|문서|통관/i;
 const LOGISTICS_DECISION_TERMS =
   /\b(?:eta|etd|ata|atd|berth|tide|wh|warehouse|customs|mosb|site|delivery|shipment|container|invoice|dem|det)\b|물류|통관|창고|현장|선적|배송|해상|비용/i;
+const P2_NDA_MARKER = /\bP2\b|보안등급\s*P2|P2\s*자료/i;
+const P2_NDA_RAW_TERMS =
+  /원문|원본|계약\s*단가|실명|내부\s*링크|raw\s+(?:text|content|contract|rate)|unit\s*price|contract\s*rate|unredacted|비식별\s*전/i;
+const P2_NDA_OUTPUT_TERMS =
+  /보여|출력|노출|포함|include|expose|render|export|publish|share|카드|card|붙여|그대로/i;
+const SYSTEM_COMPONENTS: Array<{ name: string; regex: RegExp }> = [
+  { name: "IntentRouter", regex: /\bintent\s*router\b|\bintentrouter\b|라우터/i },
+  { name: "RulePackSelector", regex: /\brule\s*pack\s*selector\b|\brulepackselector\b|\brulepack\b|룰팩/i },
+  { name: "EvidenceRanker", regex: /\bevidence\s*ranker\b|\bevidenceranker\b|\bdirectsupport\b|\bsourcehash\b|근거/i },
+  { name: "DecisionCard", regex: /\bdecision\s*card\b|\bdecisioncard\b|\banswer\s*card\b|\bcard\b|카드/i },
+  { name: "Renderer", regex: /\brenderer\b|\brendering\b|\bwidget\b|\btemplate\b|\bui\b|렌더|위젯|템플릿/i },
+  { name: "ActionGate", regex: /\baction\s*gate\b|\bactiongate\b|\bhuman\s*gate\b|\bhumangate\b|승인\s*게이트/i },
+  { name: "ValidationEngine", regex: /\bvalidation\s*engine\b|\bvalidationengine\b|\bvalidation\b|검증/i }
+];
 
 const SYSTEM_INTENTS = new Set<IntentCode>([
   "SYSTEM_DIAGNOSTIC",
   "ONTOLOGY_PATCH_REVIEW",
-  "CARD_RENDERING_AUDIT"
+  "CARD_RENDERING_AUDIT",
+  "RULEPACK_GAP_ANALYSIS",
+  "ROUTER_QA",
+  "EVIDENCE_QA",
+  "SCHEMA_BOUNDARY_REVIEW",
+  "VALIDATION_POLICY_REVIEW"
 ]);
 
 export const RULEPACK_REGISTRY: Readonly<Record<string, { domains: DomainHint[]; intents: IntentCode[] }>> = {
   SYSTEM_QA_RULEPACK: {
     domains: ["system", "master"],
-    intents: ["SYSTEM_DIAGNOSTIC", "ONTOLOGY_PATCH_REVIEW", "CARD_RENDERING_AUDIT"]
+    intents: [
+      "SYSTEM_DIAGNOSTIC",
+      "ONTOLOGY_PATCH_REVIEW",
+      "CARD_RENDERING_AUDIT",
+      "RULEPACK_GAP_ANALYSIS",
+      "ROUTER_QA",
+      "EVIDENCE_QA",
+      "SCHEMA_BOUNDARY_REVIEW",
+      "VALIDATION_POLICY_REVIEW"
+    ]
   },
   IDENTITY_RULEPACK: {
     domains: ["master", "material", "document"],
@@ -149,16 +191,28 @@ function isExplicitInvoiceCostAuditQuestion(question: string): boolean {
   return EXPLICIT_INVOICE_COST_AUDIT.test(question);
 }
 
+function isP2NdaExposureQuestion(question: string): boolean {
+  return P2_NDA_RAW_TERMS.test(question) && (P2_NDA_MARKER.test(question) || P2_NDA_OUTPUT_TERMS.test(question));
+}
+
 export function classifyIntent(question: string): IntentCode {
   const hasExplicitCostGuard =
     COST_DECISION_TERMS.test(question) &&
     (EXPLICIT_INVOICE_COST_AUDIT.test(question) || COST_APPROVAL_ACTION_TERMS.test(question));
   const hasSystemSubject = SYSTEM_SUBJECT_TERMS.test(question);
-  const hasSystemHardNegative = SYSTEM_HARD_NEGATIVE_TERMS.test(question) && hasSystemSubject;
+  const hasOperationalObject = OPERATIONAL_OBJECT_TERMS.test(question);
+  const hasSystemModule = SYSTEM_MODULE_TERMS.test(question);
+  const hasSystemHardNegative = SYSTEM_HARD_NEGATIVE_TERMS.test(question) && hasSystemSubject && (!hasOperationalObject || hasSystemModule);
 
   if (hasExplicitCostGuard && !hasSystemSubject) return "COST_GUARD";
 
+  if (hasSystemHardNegative && RULEPACK_GAP_TERMS.test(question)) return "RULEPACK_GAP_ANALYSIS";
+  if (hasSystemHardNegative && ROUTER_QA_TERMS.test(question) && !CARD_RENDERING_TERMS.test(question)) return "ROUTER_QA";
+  if (hasSystemHardNegative && EVIDENCE_QA_TERMS.test(question) && !CARD_RENDERING_TERMS.test(question)) return "EVIDENCE_QA";
+  if (hasSystemHardNegative && SCHEMA_BOUNDARY_TERMS.test(question) && !CARD_RENDERING_TERMS.test(question)) return "SCHEMA_BOUNDARY_REVIEW";
+  if (hasSystemHardNegative && VALIDATION_POLICY_TERMS.test(question) && !CARD_RENDERING_TERMS.test(question)) return "VALIDATION_POLICY_REVIEW";
   if (hasSystemHardNegative && CARD_RENDERING_TERMS.test(question)) return "CARD_RENDERING_AUDIT";
+  if (hasSystemHardNegative && /전반|overall|health/i.test(question)) return "SYSTEM_DIAGNOSTIC";
   if (hasSystemHardNegative && PATCH_REVIEW_TERMS.test(question)) return "ONTOLOGY_PATCH_REVIEW";
   if (hasSystemHardNegative) return "SYSTEM_DIAGNOSTIC";
 
@@ -175,6 +229,11 @@ function buildIntentActions(intent: IntentCode): Pick<IntentRoute, "allowedActio
   switch (intent) {
     case "SYSTEM_DIAGNOSTIC":
     case "CARD_RENDERING_AUDIT":
+    case "RULEPACK_GAP_ANALYSIS":
+    case "ROUTER_QA":
+    case "EVIDENCE_QA":
+    case "SCHEMA_BOUNDARY_REVIEW":
+    case "VALIDATION_POLICY_REVIEW":
       return {
         allowedActions: ["read", "diagnostic_report", "test_scenario"],
         blockedActions: ["email_draft", "external_send", "cost_approval", "write_back"]
@@ -272,6 +331,12 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
     reasons.push(`system hard-negative intent: ${intent} cannot route to email draft, external send, or cost approval`);
   }
 
+  if (isP2NdaExposureQuestion(question)) {
+    domains.add("document");
+    docs.add("CONSOLIDATED-03-document-ocr");
+    reasons.push("P2/NDA exposure marker: PII_NDA_RULEPACK required for raw content boundary");
+  }
+
   if (intent === "EMAIL_DRAFT") {
     domains.add("communication");
     docs.add("CONSOLIDATED-08-communication");
@@ -320,6 +385,18 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
     if (seen.has(key)) return;
     seen.add(key);
     candidates.push(candidate);
+  }
+
+  for (const component of SYSTEM_COMPONENTS) {
+    if (!component.regex.test(text)) continue;
+    pushCandidate({
+      entityType: "SystemComponent",
+      identifierScheme: "SYSTEM_COMPONENT",
+      identifierValue: component.name,
+      normalizedValue: component.name,
+      targetRid: `rid_${sha256(`SYSTEM_COMPONENT:${component.name}`).slice(0, 12)}`,
+      confidence: 0.9
+    });
   }
 
   for (const rawToken of text.match(/[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g) ?? []) {

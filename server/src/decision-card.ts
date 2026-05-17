@@ -4,7 +4,8 @@ import type {
   GroundedAnswer,
   IntentCode,
   ReasonCode,
-  ValidationFinding
+  ValidationFinding,
+  WriteBackMode
 } from "./types.js";
 
 // Decision Card v2 — Phase 1 backend contract.
@@ -14,7 +15,18 @@ import type {
 
 // --- Enums (Spec §"Enum Definitions") ---
 
-export type CardVerdict = "PASS" | "WARN" | "BLOCK";
+export type CardVerdict =
+  | "DIAGNOSTIC"
+  | "PASS"
+  | "PASS_WITH_FINDINGS"
+  | "DRAFT_READY"
+  | "AMBER"
+  | "NEEDS_INPUT"
+  | "PENDING_APPROVAL"
+  | "DRY_RUN_ONLY"
+  | "WARN"
+  | "BLOCK"
+  | "ZERO";
 export type PiiStatus = "None" | "Masked" | "Risk";
 export type EvidenceDomainStatus = "PASS" | "WARN" | "BLOCK";
 export type ApprovalStatus =
@@ -123,6 +135,7 @@ export const REASON_CODE_TO_RULE: Readonly<Record<string, string>> = {
   SCT_OOG_SAFETY_EVIDENCE_REQUIRED: "SCT-DOC-002",
   SCT_CLAIM_EVIDENCE_REQUIRED: "SCT-DOC-002",
   PII_MASKED: "SCT-PII-003",
+  P2_LEAKAGE_RISK: "SCT-P2-004",
   HUMAN_GATE_REQUIRED: "SCT-APP-005",
   SHIPMENT_INVOICE_HUMAN_GATE_REQUIRED: "SCT-APP-005",
   INSUFFICIENT_EVIDENCE: "SCT-SCHEMA-007",
@@ -165,6 +178,11 @@ export type ActionItem = {
   actionType: string;
   actionLabel: string;
   requiredInput: string | null;
+  allowedNow: string[];
+  blockedUntilApproved: string[];
+  humanGateRequired: boolean;
+  auditRecordRequired: boolean;
+  writeBackMode: WriteBackMode;
   approvalRequired: boolean;
   approvalStatus: ApprovalStatus;
   status: ActionStatus;
@@ -184,6 +202,16 @@ export type DecisionCardTrace = {
   sensitiveAccessed: boolean;
   generatedAt: string;
   routeId: string;
+};
+
+export type ActionGateEvaluation = {
+  allowedNow: string[];
+  blockedUntilApproved: string[];
+  humanGateRequired: boolean;
+  auditRecordRequired: boolean;
+  writeBackMode: WriteBackMode;
+  approvalRequired: boolean;
+  status: ActionStatus;
 };
 
 export type DecisionCardPayload = {
@@ -219,12 +247,18 @@ export function deriveVerdict(input: {
   lowConfidenceHighRisk: boolean;
   hasBlockingFindings: boolean;
   hasWarningFindings: boolean;
+  hasZeroFindings?: boolean;
+  hasDiagnosticVerdict?: boolean;
+  baseVerdict?: CardVerdict;
 }): CardVerdict {
+  if (input.hasZeroFindings) return "ZERO";
+  if (input.hasDiagnosticVerdict) return "DIAGNOSTIC";
   if (input.piiStatus === "Risk") return "BLOCK";
-  if (input.missingRequiredInputs.length > 0) return "BLOCK";
-  if (input.approvalRequired && input.approvalStatus !== "Approved") return "BLOCK";
   if (input.lowConfidenceHighRisk) return "BLOCK";
   if (input.hasBlockingFindings) return "BLOCK";
+  if (input.approvalRequired && input.approvalStatus !== "Approved") return "PENDING_APPROVAL";
+  if (input.missingRequiredInputs.length > 0) return "BLOCK";
+  if (input.baseVerdict && !["WARN", "BLOCK", "ZERO"].includes(input.baseVerdict)) return input.baseVerdict;
   if (input.hasWarningFindings) return "WARN";
   return "PASS";
 }
@@ -263,6 +297,14 @@ export function buildEvidenceCoverage(args: {
 }
 
 const PII_RISK_BLOCKED = ["Export", "Publish", "External Send"] as const;
+const ZERO_GATE_BLOCKED = [
+  "Export",
+  "Publish",
+  "Publish Report",
+  "External Send",
+  "External Share",
+  "Invoice approval"
+] as const;
 const APPROVAL_PENDING_BLOCKED = [
   "Invoice approval",
   "Publish Report",
@@ -277,6 +319,9 @@ export function buildBlockedActions(args: {
   baseBlockedActions: readonly string[];
 }): string[] {
   const collected = new Set<string>(args.baseBlockedActions);
+  if (args.verdict === "ZERO") {
+    for (const action of ZERO_GATE_BLOCKED) collected.add(action);
+  }
   if (args.piiStatus === "Risk") {
     for (const action of PII_RISK_BLOCKED) collected.add(action);
   }
@@ -303,6 +348,67 @@ export function deriveHumanGateState(args: {
     case "NotRequired":
       return "NEEDS_REVIEW";
   }
+}
+
+const MUTATING_ACTION_TERMS =
+  /WRITE|SEND|EXTERNAL|EXPORT|PUBLISH|APPROV|COMMIT|LOCK|CLOSE|REGISTER|ATTACH|UPLOAD|MUTAT|WRITE_BACK|전송|발송|승인|확정|반영|잠금/i;
+
+export function evaluateActionGate(args: {
+  actionType: string;
+  humanGateRequired: boolean;
+  approvalStatus: ApprovalStatus;
+  auditRecordRequired?: boolean;
+  writeBackMode?: WriteBackMode;
+}): ActionGateEvaluation {
+  const mutationLike = MUTATING_ACTION_TERMS.test(args.actionType);
+  const humanGateRequired = args.humanGateRequired || mutationLike;
+  const auditRecordRequired = args.auditRecordRequired ?? humanGateRequired;
+
+  if (!humanGateRequired) {
+    return {
+      allowedNow: ["READ_ONLY"],
+      blockedUntilApproved: [],
+      humanGateRequired: false,
+      auditRecordRequired,
+      writeBackMode: args.writeBackMode ?? "READ_ONLY",
+      approvalRequired: false,
+      status: "Open"
+    };
+  }
+
+  if (args.approvalStatus === "Approved") {
+    return {
+      allowedNow: ["DRY_RUN", "WRITE", "AUDIT_RECORD"],
+      blockedUntilApproved: [],
+      humanGateRequired: true,
+      auditRecordRequired: true,
+      writeBackMode: args.writeBackMode ?? "AUDIT_RECORD",
+      approvalRequired: true,
+      status: "Open"
+    };
+  }
+
+  if (args.approvalStatus === "Rejected" || args.approvalStatus === "Expired") {
+    return {
+      allowedNow: ["DRY_RUN"],
+      blockedUntilApproved: ["APPROVAL", "WRITE", "AUDIT_RECORD"],
+      humanGateRequired: true,
+      auditRecordRequired: true,
+      writeBackMode: "BLOCKED",
+      approvalRequired: true,
+      status: args.approvalStatus === "Rejected" ? "Rejected" : "Expired"
+    };
+  }
+
+  return {
+    allowedNow: ["DRY_RUN"],
+    blockedUntilApproved: ["APPROVAL", "WRITE", "AUDIT_RECORD"],
+    humanGateRequired: true,
+    auditRecordRequired: true,
+    writeBackMode: args.writeBackMode ?? "DRY_RUN",
+    approvalRequired: true,
+    status: "Pending Approval"
+  };
 }
 
 // --- Internal helpers ---
@@ -390,6 +496,17 @@ function mapActions(
       action.dueBasis ??
       firstStringParameter(action.parameters, ["dueBasis", "deadlineBasis"]) ??
       (action.humanGateRequired ? "Before approval-gated execution" : "Before operational use");
+    const gate = evaluateActionGate({
+      actionType: action.actionType,
+      humanGateRequired: action.humanGateRequired,
+      approvalStatus,
+      auditRecordRequired: action.auditRecordRequired,
+      writeBackMode: action.writeBackMode
+    });
+    const blockedUntil = [
+      ...(requiredInput ? [requiredInput] : []),
+      ...gate.blockedUntilApproved
+    ];
     return {
       actionId: `ACT-${String(index + 1).padStart(3, "0")}`,
       ownerRole: action.ownerRole,
@@ -399,11 +516,16 @@ function mapActions(
         ? `${action.actionType} — ${requiredInput}`
         : action.actionType,
       requiredInput,
-      approvalRequired: action.humanGateRequired,
-      approvalStatus: action.humanGateRequired ? approvalStatus : "NotRequired",
-      status: action.humanGateRequired && approvalStatus !== "Approved" ? "Pending Approval" : "Open",
+      allowedNow: gate.allowedNow,
+      blockedUntilApproved: gate.blockedUntilApproved,
+      humanGateRequired: gate.humanGateRequired,
+      auditRecordRequired: gate.auditRecordRequired,
+      writeBackMode: gate.writeBackMode,
+      approvalRequired: gate.approvalRequired,
+      approvalStatus: gate.approvalRequired ? approvalStatus : "NotRequired",
+      status: gate.status,
       evidenceIds: [],
-      blockedUntil: requiredInput ? [requiredInput] : [],
+      blockedUntil,
       dueBasis,
       dueAt: action.dueAt
     };
@@ -440,7 +562,7 @@ export function toDecisionCardPayload(args: {
   const approvalRequired =
     args.approvalState?.required ?? (hasHumanGateFinding || hasHumanGateAction);
   const approvalStatus: ApprovalStatus =
-    args.approvalState?.status ?? "NotRequired";
+    args.approvalState?.status ?? (approvalRequired ? "Pending" : "NotRequired");
 
   if (approvalRequired && approvalStatus !== "Approved" && !blockedBy.some((entry) => entry.ruleId === "SCT-APP-005")) {
     const rule = RULE_MATRIX["SCT-APP-005"];
@@ -468,6 +590,22 @@ export function toDecisionCardPayload(args: {
   const hasWarningFindings = answer.validation.some(
     (f) => f.severity === "WARN"
   );
+  const hasZeroFindings = answer.verdict === "ZERO" || answer.validation.some(
+    (f) => f.reasonCode === "P2_LEAKAGE_RISK"
+  );
+  const hasDiagnosticVerdict = answer.verdict === "DIAGNOSTIC";
+  const carryableBaseVerdict = new Set<CardVerdict>([
+    "PASS",
+    "PASS_WITH_FINDINGS",
+    "DRAFT_READY",
+    "AMBER",
+    "NEEDS_INPUT",
+    "PENDING_APPROVAL",
+    "DRY_RUN_ONLY"
+  ]);
+  const baseVerdict = carryableBaseVerdict.has(answer.verdict as CardVerdict)
+    ? (answer.verdict as CardVerdict)
+    : undefined;
 
   const verdict = deriveVerdict({
     missingRequiredInputs,
@@ -476,7 +614,10 @@ export function toDecisionCardPayload(args: {
     approvalStatus,
     lowConfidenceHighRisk: false,
     hasBlockingFindings,
-    hasWarningFindings
+    hasWarningFindings,
+    hasZeroFindings,
+    hasDiagnosticVerdict,
+    baseVerdict
   });
 
   const baseBlockedActions = Array.from(
@@ -504,7 +645,8 @@ export function toDecisionCardPayload(args: {
   const unblockSummary = buildUnblockSummary(missingRequiredInputs);
 
   const allowedActions: string[] = [];
-  if (verdict !== "BLOCK") allowedActions.push("Copy JSON");
+  if (verdict === "ZERO") allowedActions.push("Read redacted stop notice");
+  if (verdict !== "BLOCK" && verdict !== "ZERO") allowedActions.push("Copy JSON");
   if (verdict === "PASS" && approvalStatus === "Approved") {
     allowedActions.push("Publish Report");
   }
@@ -527,7 +669,7 @@ export function toDecisionCardPayload(args: {
     primaryReason,
     unblockSummary,
     piiStatus,
-    dataClass: args.dataClass ?? "P1",
+    dataClass: args.dataClass ?? (hasZeroFindings ? "P2" : "P1"),
     blockedBy,
     allowedActions,
     blockedActions,
@@ -543,7 +685,7 @@ export function toDecisionCardPayload(args: {
       promptVersion: args.promptVersion ?? "unknown",
       approvalActor: args.approvalState?.actor ?? null,
       approvalStatus,
-      sensitiveAccessed: piiStatus !== "None",
+      sensitiveAccessed: piiStatus !== "None" || hasZeroFindings,
       generatedAt: answer.generatedAt,
       routeId: answer.route.routeId
     }

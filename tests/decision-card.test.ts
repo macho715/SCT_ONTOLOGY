@@ -5,6 +5,7 @@ import {
   deriveHumanGateState,
   derivePiiStatus,
   deriveVerdict,
+  evaluateActionGate,
   REASON_CODE_TO_RULE,
   RULE_MATRIX,
   toDecisionCardPayload
@@ -67,6 +68,14 @@ describe("deriveVerdict — fail-safe BLOCK precedence", () => {
     ).toBe("BLOCK");
   });
 
+  it("returns ZERO when a zero-gate finding is present", () => {
+    expect(deriveVerdict({ ...baseDerive, hasZeroFindings: true })).toBe("ZERO");
+  });
+
+  it("returns DIAGNOSTIC for system QA verdicts", () => {
+    expect(deriveVerdict({ ...baseDerive, hasDiagnosticVerdict: true })).toBe("DIAGNOSTIC");
+  });
+
   it("FR-008: returns BLOCK when piiStatus is Risk", () => {
     expect(deriveVerdict({ ...baseDerive, piiStatus: "Risk" })).toBe("BLOCK");
   });
@@ -77,14 +86,14 @@ describe("deriveVerdict — fail-safe BLOCK precedence", () => {
     ).toBe("BLOCK");
   });
 
-  it("FR-009: returns BLOCK when approval required but status is Pending", () => {
+  it("FR-009: returns PENDING_APPROVAL when approval required but status is Pending", () => {
     expect(
       deriveVerdict({
         ...baseDerive,
         approvalRequired: true,
         approvalStatus: "Pending"
       })
-    ).toBe("BLOCK");
+    ).toBe("PENDING_APPROVAL");
   });
 
   it("FR-009: returns PASS when approval required and Approved", () => {
@@ -258,6 +267,37 @@ describe("buildBlockedActions", () => {
   });
 });
 
+describe("evaluateActionGate", () => {
+  it("FR-012: blocks write/send actions at DRY_RUN until approval and audit record", () => {
+    const gate = evaluateActionGate({
+      actionType: "REQUEST_EMAIL_SEND_APPROVAL",
+      humanGateRequired: true,
+      approvalStatus: "Pending"
+    });
+
+    expect(gate.allowedNow).toEqual(["DRY_RUN"]);
+    expect(gate.blockedUntilApproved).toEqual(["APPROVAL", "WRITE", "AUDIT_RECORD"]);
+    expect(gate.humanGateRequired).toBe(true);
+    expect(gate.auditRecordRequired).toBe(true);
+    expect(gate.writeBackMode).toBe("DRY_RUN");
+    expect(gate.status).toBe("Pending Approval");
+  });
+
+  it("FR-012: approved actions expose WRITE and AUDIT_RECORD stages", () => {
+    const gate = evaluateActionGate({
+      actionType: "WRITE_BACK_TO_FOUNDRY",
+      humanGateRequired: true,
+      approvalStatus: "Approved"
+    });
+
+    expect(gate.allowedNow).toEqual(["DRY_RUN", "WRITE", "AUDIT_RECORD"]);
+    expect(gate.blockedUntilApproved).toEqual([]);
+    expect(gate.auditRecordRequired).toBe(true);
+    expect(gate.writeBackMode).toBe("AUDIT_RECORD");
+    expect(gate.status).toBe("Open");
+  });
+});
+
 describe("deriveHumanGateState", () => {
   it("maps not-required approval to READ_ONLY", () => {
     expect(
@@ -301,6 +341,7 @@ describe("RULE_MATRIX and REASON_CODE_TO_RULE", () => {
   it("Spec required ReasonCodes are mapped", () => {
     expect(REASON_CODE_TO_RULE["SCT_COST_EVIDENCE_REQUIRED"]).toBe("SCT-COST-001");
     expect(REASON_CODE_TO_RULE["SCT_CUSTOMS_EVIDENCE_REQUIRED"]).toBe("SCT-DOC-002");
+    expect(REASON_CODE_TO_RULE["P2_LEAKAGE_RISK"]).toBe("SCT-P2-004");
     expect(REASON_CODE_TO_RULE["HUMAN_GATE_REQUIRED"]).toBe("SCT-APP-005");
   });
 });
@@ -397,8 +438,13 @@ describe("toDecisionCardPayload — adapter", () => {
     expect(payload.actions[0].actionType).toBe("REQUEST_INPUT");
     expect(payload.actions[0].requiredInput).toBe("RateRef");
     expect(payload.actions[0].dueBasis).toBe("Before approval-gated execution");
+    expect(payload.actions[0].allowedNow).toEqual(["DRY_RUN"]);
+    expect(payload.actions[0].blockedUntilApproved).toEqual(["APPROVAL", "WRITE", "AUDIT_RECORD"]);
+    expect(payload.actions[0].humanGateRequired).toBe(true);
+    expect(payload.actions[0].auditRecordRequired).toBe(true);
+    expect(payload.actions[0].writeBackMode).toBe("DRY_RUN");
     expect(payload.actions[0].status).toBe("Pending Approval");
-    expect(payload.humanGateState).toBe("NEEDS_REVIEW");
+    expect(payload.humanGateState).toBe("APPROVAL_REQUESTED");
   });
 
   it("AC-008: trace contains generatedAt, sourceHash, rulePackVersion, approvalStatus, routeId", () => {
@@ -435,6 +481,31 @@ describe("toDecisionCardPayload — adapter", () => {
     });
     const payload = toDecisionCardPayload({ answer });
     expect(payload.verdict).toBe("BLOCK");
+  });
+
+  it("maps P2 leakage findings to ZERO and SCT-P2-004", () => {
+    const answer = makeAnswer({
+      verdict: "ZERO",
+      validationStatus: "BLOCK",
+      validation: [
+        {
+          ruleId: "V-P2-PROMPT-001",
+          reasonCode: "P2_LEAKAGE_RISK",
+          severity: "BLOCK",
+          status: "BLOCK",
+          targetObject: "P2NdaBoundary",
+          evidenceIds: [],
+          message: "P2 raw content exposure blocked"
+        }
+      ]
+    });
+    const payload = toDecisionCardPayload({ answer });
+    expect(payload.verdict).toBe("ZERO");
+    expect(payload.dataClass).toBe("P2");
+    expect(payload.trace.sensitiveAccessed).toBe(true);
+    expect(payload.allowedActions).toEqual(["Read redacted stop notice"]);
+    expect(payload.blockedBy.some((entry) => entry.ruleId === "SCT-P2-004")).toBe(true);
+    expect(payload.blockedActions).toEqual(expect.arrayContaining(["Export", "Publish", "External Share"]));
   });
 
   it("EC7: 7 missing inputs → unblockSummary shows first 5 + ' +N more'", () => {

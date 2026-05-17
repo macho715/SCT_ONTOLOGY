@@ -18,13 +18,31 @@ export type IntentCode =
   | "SYSTEM_DIAGNOSTIC"
   | "ONTOLOGY_PATCH_REVIEW"
   | "CARD_RENDERING_AUDIT"
+  | "RULEPACK_GAP_ANALYSIS"
+  | "ROUTER_QA"
+  | "EVIDENCE_QA"
+  | "SCHEMA_BOUNDARY_REVIEW"
+  | "VALIDATION_POLICY_REVIEW"
   | "LOGISTICS_DECISION"
   | "EMAIL_DRAFT"
   | "COST_GUARD"
   | "DOCUMENT_GUARDIAN"
   | "GENERAL_ANSWER";
 
-export type Verdict = "PASS" | "WARN" | "BLOCK" | "INFO" | "NO_EVIDENCE";
+export type Verdict =
+  | "DIAGNOSTIC"
+  | "PASS"
+  | "PASS_WITH_FINDINGS"
+  | "DRAFT_READY"
+  | "AMBER"
+  | "NEEDS_INPUT"
+  | "PENDING_APPROVAL"
+  | "DRY_RUN_ONLY"
+  | "WARN"
+  | "BLOCK"
+  | "INFO"
+  | "NO_EVIDENCE"
+  | "ZERO";
 
 export type ReasonCode =
   | "MISSING_REQUIRED_DOC"
@@ -44,7 +62,8 @@ export type ReasonCode =
   | "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED"
   | "SHIPMENT_INVOICE_HUMAN_GATE_REQUIRED"
   | "SHIPMENT_MISSING_DOCUMENTS"
-  | "SYSTEM_DIAGNOSTIC_ROUTED";
+  | "SYSTEM_DIAGNOSTIC_ROUTED"
+  | "P2_LEAKAGE_RISK";
 
 export type EvidenceSnippet = {
   id: string;
@@ -84,7 +103,7 @@ export type IntentRoute = {
 };
 
 export type ResolvedEntity = {
-  entityType: "ShipmentUnit" | "Document" | "Invoice" | "PersonRole" | "Site" | "Unknown";
+  entityType: "ShipmentUnit" | "Document" | "Invoice" | "PersonRole" | "Site" | "SystemComponent" | "Unknown";
   identifierScheme: string;
   identifierValue: string;
   normalizedValue: string;
@@ -94,8 +113,12 @@ export type ResolvedEntity = {
 
 export type GraphPath = {
   startNode: string;
+  startNodes?: string[];
   edges: Array<{ from: string; relation: string; to: string }>;
+  riskEdges?: Array<{ from: string; risk: string; to: string; severity: "INFO" | "WARN" | "BLOCK" }>;
   endNode: string;
+  operationalObjects?: string[];
+  isMetaReview?: boolean;
   pathConfidence: number;
 };
 
@@ -114,9 +137,19 @@ export type ActionRecommendation = {
   ownerRole: string;
   parameters: Record<string, string | number | boolean | null>;
   humanGateRequired: boolean;
+  auditRecordRequired?: boolean;
+  writeBackMode?: WriteBackMode;
   dueBasis?: string | null;
   dueAt: string | null;
 };
+
+export type WriteBackMode =
+  | "READ_ONLY"
+  | "DRY_RUN"
+  | "APPROVAL_REQUIRED"
+  | "WRITE"
+  | "AUDIT_RECORD"
+  | "BLOCKED";
 
 export type EvidenceTraceItem = {
   targetType: "summary" | "businessImpact" | "detail" | "action";

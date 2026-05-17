@@ -19,7 +19,7 @@
   "properties": {
     "verdict": {
       "type": "string",
-      "enum": ["PASS", "INFO", "WARN", "BLOCK", "NO_EVIDENCE", "AMBER", "ZERO"]
+      "enum": ["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "INFO", "WARN", "BLOCK", "NO_EVIDENCE", "ZERO"]
     },
     "summary": {
       "type": "string",
@@ -104,6 +104,11 @@
           "actionType": { "type": "string" },
           "ownerRole": { "type": "string" },
           "humanGateRequired": { "type": "boolean" },
+          "auditRecordRequired": { "type": "boolean" },
+          "writeBackMode": {
+            "type": "string",
+            "enum": ["READ_ONLY", "DRY_RUN", "APPROVAL_REQUIRED", "WRITE", "AUDIT_RECORD", "BLOCKED"]
+          },
           "parameters": { "type": "object" }
         }
       }
@@ -135,6 +140,11 @@
             "SYSTEM_DIAGNOSTIC",
             "ONTOLOGY_PATCH_REVIEW",
             "CARD_RENDERING_AUDIT",
+            "RULEPACK_GAP_ANALYSIS",
+            "ROUTER_QA",
+            "EVIDENCE_QA",
+            "SCHEMA_BOUNDARY_REVIEW",
+            "VALIDATION_POLICY_REVIEW",
             "LOGISTICS_DECISION",
             "EMAIL_DRAFT",
             "COST_GUARD",
@@ -144,7 +154,7 @@
         },
         "verdict": {
           "type": "string",
-          "enum": ["PASS", "WARN", "BLOCK"]
+          "enum": ["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "ZERO"]
         },
         "severity": {
           "type": "string",
@@ -221,12 +231,26 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["actionId", "ownerRole", "actionType", "requiredInput", "approvalRequired", "approvalStatus", "status", "dueBasis"],
+            "required": ["actionId", "ownerRole", "actionType", "requiredInput", "allowedNow", "blockedUntilApproved", "humanGateRequired", "auditRecordRequired", "writeBackMode", "approvalRequired", "approvalStatus", "status", "dueBasis"],
             "properties": {
               "actionId": { "type": "string" },
               "ownerRole": { "type": "string" },
               "actionType": { "type": "string" },
               "requiredInput": { "type": ["string", "null"] },
+              "allowedNow": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "blockedUntilApproved": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "humanGateRequired": { "type": "boolean" },
+              "auditRecordRequired": { "type": "boolean" },
+              "writeBackMode": {
+                "type": "string",
+                "enum": ["READ_ONLY", "DRY_RUN", "APPROVAL_REQUIRED", "WRITE", "AUDIT_RECORD", "BLOCKED"]
+              },
               "approvalRequired": { "type": "boolean" },
               "approvalStatus": {
                 "type": "string",
@@ -261,6 +285,66 @@
             "routeId": { "type": "string" }
           }
         }
+      }
+    },
+    "resolvedEntities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entityType", "identifierScheme", "identifierValue", "normalizedValue", "targetRid", "confidence"],
+        "properties": {
+          "entityType": {
+            "type": "string",
+            "enum": ["ShipmentUnit", "Document", "Invoice", "PersonRole", "Site", "SystemComponent", "Unknown"]
+          },
+          "identifierScheme": { "type": "string" },
+          "identifierValue": { "type": "string" },
+          "normalizedValue": { "type": "string" },
+          "targetRid": { "type": ["string", "null"] },
+          "confidence": { "type": "number" }
+        }
+      }
+    },
+    "graphPath": {
+      "type": ["object", "null"],
+      "required": ["startNode", "edges", "endNode", "pathConfidence"],
+      "properties": {
+        "startNode": { "type": "string" },
+        "startNodes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "relation", "to"],
+            "properties": {
+              "from": { "type": "string" },
+              "relation": { "type": "string" },
+              "to": { "type": "string" }
+            }
+          }
+        },
+        "riskEdges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "risk", "to", "severity"],
+            "properties": {
+              "from": { "type": "string" },
+              "risk": { "type": "string" },
+              "to": { "type": "string" },
+              "severity": { "type": "string", "enum": ["INFO", "WARN", "BLOCK"] }
+            }
+          }
+        },
+        "operationalObjects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "isMetaReview": { "type": "boolean" },
+        "pathConfidence": { "type": "number" }
       }
     },
     "humanGateRequired": {

@@ -310,6 +310,11 @@ const intentEnum = z.enum([
   "SYSTEM_DIAGNOSTIC",
   "ONTOLOGY_PATCH_REVIEW",
   "CARD_RENDERING_AUDIT",
+  "RULEPACK_GAP_ANALYSIS",
+  "ROUTER_QA",
+  "EVIDENCE_QA",
+  "SCHEMA_BOUNDARY_REVIEW",
+  "VALIDATION_POLICY_REVIEW",
   "LOGISTICS_DECISION",
   "EMAIL_DRAFT",
   "COST_GUARD",
@@ -596,7 +601,7 @@ const decisionCardSchema = z.object({
   routeId: z.string(),
   intent: intentEnum,
   generatedAt: z.string(),
-  verdict: z.enum(["PASS", "WARN", "BLOCK"]),
+  verdict: z.enum(["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "ZERO"]),
   severity: z.enum(["P0", "P1", "P2"]),
   primaryReason: z.string(),
   unblockSummary: z.string(),
@@ -646,6 +651,11 @@ const decisionCardSchema = z.object({
       actionType: z.string(),
       actionLabel: z.string(),
       requiredInput: z.string().nullable(),
+      allowedNow: z.array(z.string()),
+      blockedUntilApproved: z.array(z.string()),
+      humanGateRequired: z.boolean(),
+      auditRecordRequired: z.boolean(),
+      writeBackMode: z.enum(["READ_ONLY", "DRY_RUN", "APPROVAL_REQUIRED", "WRITE", "AUDIT_RECORD", "BLOCKED"]),
       approvalRequired: z.boolean(),
       approvalStatus: z.enum(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]),
       status: z.enum(["Open", "Pending Input", "Pending Approval", "Done", "Rejected", "Expired", "Unassigned"]),
@@ -670,7 +680,7 @@ const decisionCardSchema = z.object({
 
 const answerOutputSchema = {
   answerId: z.string(),
-  verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
+  verdict: z.enum(["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "INFO", "NO_EVIDENCE", "ZERO"]),
   dataStatus: z.literal("OK"),
   businessResultVisible: z.boolean(),
   fallbackUsed: z.boolean(),
@@ -702,14 +712,26 @@ const answerOutputSchema = {
       ownerRole: z.string(),
       parameters: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
       humanGateRequired: z.boolean(),
+      auditRecordRequired: z.boolean().optional(),
+      writeBackMode: z.enum(["READ_ONLY", "DRY_RUN", "APPROVAL_REQUIRED", "WRITE", "AUDIT_RECORD", "BLOCKED"]).optional(),
+      dueBasis: z.string().nullable().optional(),
       dueAt: z.string().nullable()
     })
   ),
   graphPath: z
     .object({
       startNode: z.string(),
+      startNodes: z.array(z.string()).optional(),
       edges: z.array(z.object({ from: z.string(), relation: z.string(), to: z.string() })),
+      riskEdges: z.array(z.object({
+        from: z.string(),
+        risk: z.string(),
+        to: z.string(),
+        severity: z.enum(["INFO", "WARN", "BLOCK"])
+      })).optional(),
       endNode: z.string(),
+      operationalObjects: z.array(z.string()).optional(),
+      isMetaReview: z.boolean().optional(),
       pathConfidence: z.number()
     })
     .nullable(),

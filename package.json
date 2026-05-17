@@ -15,6 +15,9 @@
     "claude:local": "tsx server/src/claude-server.ts",
     "typecheck": "npm run generate:worker-assets && tsc --noEmit",
     "test": "npm run generate:worker-assets && vitest run --exclude \"docs/archive/**\" --exclude \".claude/**\" --exclude \".claire/**\"",
+    "report:sct-card": "tsx scripts/report-sct-card.ts",
+    "audit:source-pii": "node scripts/audit-source-corpus-pii.mjs",
+    "scan:sct-pii": "node scripts/scan-sct-card-pii.mjs",
     "index": "python scripts/index_corpus.py",
     "worker:dry-run": "npm run generate:worker-assets && wrangler deploy --dry-run",
     "worker:deploy": "npm run verify && wrangler deploy",
@@ -25,6 +28,7 @@
     "seed:dry": "SEED_DRY_RUN=true tsx scripts/seed-d1.ts",
     "test:coverage": "npm run generate:worker-assets && vitest run --coverage --exclude \"docs/archive/**\" --exclude \".claude/**\"",
     "verify": "npm run typecheck && npm test && npm run worker:dry-run",
+    "verify:governance": "npm run report:sct-card && npm run scan:sct-pii && npm run audit:source-pii && node --check scripts/serve-widget-smoke.mjs && node --check scripts/scan-sct-card-pii.mjs && node --check scripts/audit-source-corpus-pii.mjs && npx vitest run tests/intent-router.test.ts tests/decision-card.test.ts tests/pipeline.test.ts tests/sct-operating-contract.test.ts tests/widget.test.ts tests/p2-zero-gate.test.ts --exclude \"docs/archive/**\" --exclude \".claude/**\" --exclude \".claire/**\"",
     "verify:bindings": "tsx scripts/verify-bindings.ts",
     "verify:seed": "tsx scripts/verify-seed.ts",
     "verify:full": "npm run verify:bindings && npm run verify:seed"

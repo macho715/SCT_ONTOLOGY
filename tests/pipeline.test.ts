@@ -340,10 +340,13 @@ describe("HVDC ontology grounded answer pipeline", () => {
     );
 
     expect(answer.summary).toContain("HVDC 물류 이메일 답장 작성 요청");
+    expect(answer.verdict).toBe("DRAFT_READY");
+    expect(answer.decisionCard?.verdict).toBe("DRAFT_READY");
     expect(answer.summary).not.toContain("CostGuard evidence pack");
     expect(answer.summary).not.toContain("branch office에 Sponsor Emirates ID 또는 POA + Emirates ID");
     expect(answer.details.join(" ")).not.toContain("Dear Faiz");
     expect(answer.actions[0]?.actionType).toBe("DRAFT_CONTEXTUAL_EMAIL_REPLY");
+    expect(answer.actions[0]?.humanGateRequired).toBe(false);
     expect(answer.actions[0]?.parameters.draftSource).toBe("current user-provided email/thread only");
     expect(answer.actions[0]?.parameters.hardcodedPriorCase).toBe("forbidden");
     expect(answer.route.domains).toContain("communication");
@@ -358,12 +361,35 @@ describe("HVDC ontology grounded answer pipeline", () => {
     const answerText = [answer.summary, answer.businessImpact, ...answer.details, ...answer.actions.map((action) => action.actionType)].join(" ");
 
     expect(answer.summary).toContain("HVDC 물류 이메일 답장 작성 요청");
+    expect(answer.verdict).toBe("DRAFT_READY");
     expect(answerText).not.toContain("Sponsor Emirates ID");
     expect(answerText).not.toContain("POA + Emirates ID");
     expect(answerText).not.toContain("branch office");
     expect(answerText).not.toContain("Dear Faiz");
     expect(answer.actions[0]?.actionType).toBe("DRAFT_CONTEXTUAL_EMAIL_REPLY");
     expect(answer.route.domains).toContain("communication");
+  });
+
+  it("keeps external email send behind approval and audit gate", () => {
+    const answer = ask("이메일 보내줘");
+
+    expect(answer.route.intent).toBe("EMAIL_DRAFT");
+    expect(answer.verdict).toBe("PENDING_APPROVAL");
+    expect(answer.decisionCard?.verdict).toBe("PENDING_APPROVAL");
+    expect(answer.actions[0]?.actionType).toBe("REQUEST_EMAIL_SEND_APPROVAL");
+    expect(answer.actions[0]?.humanGateRequired).toBe(true);
+    expect(answer.actions[0]?.auditRecordRequired).toBe(true);
+    expect(answer.actions[0]?.writeBackMode).toBe("DRY_RUN");
+    expect(answer.decisionCard?.actions[0]).toEqual(
+      expect.objectContaining({
+        allowedNow: ["DRY_RUN"],
+        blockedUntilApproved: ["APPROVAL", "WRITE", "AUDIT_RECORD"],
+        humanGateRequired: true,
+        auditRecordRequired: true,
+        writeBackMode: "DRY_RUN",
+        status: "Pending Approval"
+      })
+    );
   });
 
   it("keeps business result status separate from render-only card UI status", () => {

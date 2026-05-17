@@ -28,9 +28,27 @@ const CLAIM_TERMS = /claim|claim letter|pod|survey|photo|mrr|bl clause|클레임
 const FLOW_CODE = /flow code|confirmedflowcode|confirmed flow code/i;
 const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classification|분류|경로|통관|비용|청구|지표/i;
 const ANY_KEY_AMBIGUITY = /ambiguous|ambiguity|unclear|multiple|duplicate|same|which|모호|중복|여러|둘 다|같은|어느|하나만/i;
+const P2_MARKER = /\bP2\b|보안등급\s*P2|P2\s*자료/i;
+const P2_RAW_CONTENT_TERMS =
+  /원문|원본|계약\s*단가|실명|내부\s*링크|raw\s+(?:text|content|contract|rate)|unit\s*price|contract\s*rate|unredacted|비식별\s*전/i;
+const P2_OUTPUT_ACTION_TERMS =
+  /보여|출력|노출|포함|include|expose|render|export|publish|share|카드|card|붙여|그대로/i;
 const HUMAN_GATE_TERMS =
-  /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|lock|locked|confirm|confirmed|whatsapp|email|청구|정산|승인|보고서|확정|잠금|전송|발송|내보내기/i;
-const SYSTEM_INTENTS = new Set(["SYSTEM_DIAGNOSTIC", "ONTOLOGY_PATCH_REVIEW", "CARD_RENDERING_AUDIT"]);
+  /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|lock|locked|confirm|confirmed|whatsapp|email|청구|정산|승인|보고서|확정|잠금|전송|발송|보내|이메일|메일|내보내기/i;
+const EMAIL_EXTERNAL_SEND_TERMS =
+  /(?:send|external\s+send|send\s+email|이메일\s*보내|메일\s*보내|보내줘|발송해|전송해|발송|전송)/i;
+const EMAIL_DRAFT_ONLY_TERMS =
+  /draft|compose|write|초안|작성|draft\s+reply|답장\s*작성|회신\s*작성/i;
+const SYSTEM_INTENTS = new Set([
+  "SYSTEM_DIAGNOSTIC",
+  "ONTOLOGY_PATCH_REVIEW",
+  "CARD_RENDERING_AUDIT",
+  "RULEPACK_GAP_ANALYSIS",
+  "ROUTER_QA",
+  "EVIDENCE_QA",
+  "SCHEMA_BOUNDARY_REVIEW",
+  "VALIDATION_POLICY_REVIEW"
+]);
 const GENERIC_QUERY_TERMS = new Set([
   "the",
   "and",
@@ -62,6 +80,14 @@ const TRACE_GENERIC_TERMS = new Set([
   "user"
 ]);
 
+function hasP2LeakageRisk(question: string): boolean {
+  return P2_RAW_CONTENT_TERMS.test(question) && (P2_MARKER.test(question) || P2_OUTPUT_ACTION_TERMS.test(question));
+}
+
+function isEmailExternalSendRequest(question: string): boolean {
+  return EMAIL_EXTERNAL_SEND_TERMS.test(question) && !EMAIL_DRAFT_ONLY_TERMS.test(question);
+}
+
 export function validateGrounding(args: {
   question: string;
   route: IntentRoute;
@@ -82,6 +108,18 @@ export function validateGrounding(args: {
       targetObject: "IntentRoute",
       evidenceIds,
       message: "System/card diagnostic intent is isolated from email draft, external send, and cost approval rulepacks."
+    });
+  }
+
+  if (hasP2LeakageRisk(args.question)) {
+    findings.push({
+      ruleId: "V-P2-PROMPT-001",
+      reasonCode: "P2_LEAKAGE_RISK",
+      severity: "BLOCK",
+      status: "BLOCK",
+      targetObject: "P2NdaBoundary",
+      evidenceIds,
+      message: "P2 raw text, rates, real names, and internal links must be redacted before any card, export, or publication output."
     });
   }
 
@@ -219,7 +257,11 @@ export function validateGrounding(args: {
     });
   }
 
-  if (!isSystemIntent && HUMAN_GATE_TERMS.test(args.question)) {
+  if (
+    !isSystemIntent &&
+    HUMAN_GATE_TERMS.test(args.question) &&
+    (args.route.intent !== "EMAIL_DRAFT" || isEmailExternalSendRequest(args.question))
+  ) {
     findings.push({
       ruleId: "A-ACTION-001",
       reasonCode: "HUMAN_GATE_REQUIRED",
@@ -252,7 +294,10 @@ function hasAmbiguousAnyKey(question: string, resolvedEntities: ResolvedEntity[]
   return schemes.size >= 2;
 }
 
-function deriveVerdict(evidence: EvidenceSnippet[], findings: ValidationFinding[]): Verdict {
+function deriveVerdict(evidence: EvidenceSnippet[], findings: ValidationFinding[], route: IntentRoute, question: string): Verdict {
+  if (findings.some((f) => f.reasonCode === "P2_LEAKAGE_RISK")) return "ZERO";
+  if (SYSTEM_INTENTS.has(route.intent)) return "DIAGNOSTIC";
+  if (route.intent === "EMAIL_DRAFT") return isEmailExternalSendRequest(question) ? "PENDING_APPROVAL" : "DRAFT_READY";
   if (evidence.length === 0) return "NO_EVIDENCE";
   if (findings.some((f) => f.status === "BLOCK")) return "BLOCK";
   if (findings.some((f) => f.status === "WARN")) return "WARN";
@@ -260,22 +305,63 @@ function deriveVerdict(evidence: EvidenceSnippet[], findings: ValidationFinding[
   return "PASS";
 }
 
-function buildGraphPath(question: string): GraphPath | null {
+function buildGraphPath(question: string, route: IntentRoute): GraphPath | null {
   const entities = resolveAnyKey(question);
+  const isMetaReview = SYSTEM_INTENTS.has(route.intent);
+  const systemComponents = entities.filter((item) => item.entityType === "SystemComponent");
+  const operationalObjects = entities
+    .filter((item) => item.entityType !== "SystemComponent")
+    .map((item) => item.normalizedValue);
+
+  if (isMetaReview) {
+    const startNodes = systemComponents.length > 0
+      ? systemComponents.map((item) => item.normalizedValue)
+      : ["SCT_ONTOLOGY CARD"];
+    const firstStart = startNodes[0];
+    return {
+      startNode: firstStart,
+      startNodes,
+      edges: [
+        { from: firstStart, relation: "diagnoses", to: route.intent },
+        { from: route.intent, relation: "selects", to: "SYSTEM_QA_RULEPACK" },
+        { from: "SYSTEM_QA_RULEPACK", relation: "blocks", to: "EMAIL_DRAFT / COST_APPROVAL / WRITE_BACK" },
+        { from: "SYSTEM_QA_RULEPACK", relation: "renders", to: "DecisionCard" }
+      ],
+      riskEdges: [
+        {
+          from: firstStart,
+          risk: "meta-review prompt could be misclassified as operational action without hard-negative routing",
+          to: "EMAIL_DRAFT / COST_APPROVAL / WRITE_BACK",
+          severity: "WARN"
+        }
+      ],
+      endNode: "DecisionCard DIAGNOSTIC",
+      operationalObjects,
+      isMetaReview: true,
+      pathConfidence: route.confidence
+    };
+  }
+
   const site = entities.find((item) => item.identifierScheme === "SITE")?.normalizedValue ?? "HVDC Logistics Question";
   const milestone = entities.find((item) => item.identifierScheme === "MILESTONE")?.normalizedValue ?? "MilestoneEvent";
 
   if (entities.length === 0 && !FLOW_CODE.test(question)) return null;
+  const startNodes = entities.length > 0
+    ? entities.map((item) => item.normalizedValue)
+    : ["WarehouseHandlingProfile.confirmedFlowCode"];
 
   return {
-    startNode: entities[0]?.normalizedValue ?? "Question",
+    startNode: startNodes[0] ?? "Question",
+    startNodes,
     edges: [
-      { from: entities[0]?.normalizedValue ?? "Question", relation: "routes_to", to: "CONSOLIDATED-00 Master Ontology" },
+      { from: startNodes[0] ?? "Question", relation: "routes_to", to: "CONSOLIDATED-00 Master Ontology" },
       { from: "CONSOLIDATED-00 Master Ontology", relation: "grounds", to: "ShipmentUnit / Document / Invoice" },
       { from: "ShipmentUnit / Document / Invoice", relation: "checks", to: milestone },
       { from: milestone, relation: "applies_to", to: site }
     ],
     endNode: site,
+    operationalObjects,
+    isMetaReview: false,
     pathConfidence: 0.88
   };
 }
@@ -352,6 +438,28 @@ function buildEvidenceTrace(args: {
 }
 
 function composeSummary(question: string, verdict: Verdict, route: IntentRoute): Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions"> {
+  if (verdict === "ZERO") {
+    return {
+      summary: "P2 원문, 계약 단가, 실명, 내부 링크 노출 요청은 중단했습니다. 비식별 요약과 sourceHash 기준으로 다시 요청해야 합니다.",
+      businessImpact: "P2 자료가 카드, export, publish 출력에 섞이면 NDA와 내부 보안 분리 원칙을 위반할 수 있습니다.",
+      details: [
+        "원문, 실명, 단가표, 내부 링크는 카드 본문이나 보고서 산출물에 그대로 넣지 않습니다.",
+        "필요한 경우 Material ID, redacted snippet, sourceHash만 남기고 원문은 Evidence Drawer 내부 보안 경계 밖으로 내보내지 않습니다.",
+        "ZERO 판정은 확정 산출, 외부 공유, publish, export를 차단합니다."
+      ],
+      actions: [
+        {
+          actionType: "REQUEST_REDACTED_P2_SUMMARY",
+          ownerRole: "Data Protection / Ontology Owner",
+          parameters: { requiredInput: "Material ID, redacted snippet, sourceHash" },
+          humanGateRequired: true,
+          dueBasis: "Before any redacted operational summary is reused",
+          dueAt: null
+        }
+      ]
+    };
+  }
+
   if (verdict === "NO_EVIDENCE") {
     return {
       summary: "관련 온톨로지 근거를 찾지 못해 업무 답변을 중단했습니다.",
@@ -438,13 +546,17 @@ function composeSummary(question: string, verdict: Verdict, route: IntentRoute):
     };
   }
 
-  if (route.intent === "SYSTEM_DIAGNOSTIC" || route.intent === "ONTOLOGY_PATCH_REVIEW" || route.intent === "CARD_RENDERING_AUDIT") {
-    const actionType =
-      route.intent === "CARD_RENDERING_AUDIT"
-        ? "RUN_CARD_RENDERING_AUDIT"
-        : route.intent === "ONTOLOGY_PATCH_REVIEW"
-          ? "REVIEW_ONTOLOGY_CARD_PATCH_SPEC"
-          : "RUN_SYSTEM_QA_RULEPACK";
+  if (SYSTEM_INTENTS.has(route.intent)) {
+    const actionByIntent: Partial<Record<IntentRoute["intent"], string>> = {
+      CARD_RENDERING_AUDIT: "RUN_CARD_RENDERING_AUDIT",
+      ONTOLOGY_PATCH_REVIEW: "REVIEW_ONTOLOGY_CARD_PATCH_SPEC",
+      RULEPACK_GAP_ANALYSIS: "RUN_RULEPACK_GAP_ANALYSIS",
+      ROUTER_QA: "RUN_ROUTER_QA",
+      EVIDENCE_QA: "RUN_EVIDENCE_QA",
+      SCHEMA_BOUNDARY_REVIEW: "REVIEW_SCHEMA_BOUNDARY",
+      VALIDATION_POLICY_REVIEW: "REVIEW_VALIDATION_POLICY"
+    };
+    const actionType = actionByIntent[route.intent] ?? "RUN_SYSTEM_QA_RULEPACK";
     return {
       summary: "SCT_ONTOLOGY CARD 시스템 점검 요청으로 분류했습니다. 이메일 초안이나 비용 승인으로 처리하지 않습니다.",
       businessImpact: "router, validation, evidence, schema 점검은 운영 판단 카드 품질을 확인하는 읽기/진단 작업입니다.",
@@ -470,24 +582,34 @@ function composeSummary(question: string, verdict: Verdict, route: IntentRoute):
   }
 
   if (route.intent === "EMAIL_DRAFT") {
+    const sendRequested = isEmailExternalSendRequest(question);
     return {
-      summary: "이 질문은 HVDC 물류 이메일 답장 작성 요청입니다. sct_ontology 검토 후 현재 제공된 이메일 문맥에 맞춰 초안을 분리해야 합니다.",
-      businessImpact: "이메일 초안 내용을 특정 과거 케이스로 고정하지 않으면 잘못된 수신자, 요청 문서, 운송 목적이 포함되는 리스크를 줄일 수 있습니다.",
+      summary: sendRequested
+        ? "이 질문은 HVDC 물류 이메일 외부 발송 요청입니다. 초안 검토와 승인 전에는 실제 발송하지 않습니다."
+        : "이 질문은 HVDC 물류 이메일 답장 작성 요청입니다. sct_ontology 검토 후 현재 제공된 이메일 문맥에 맞춰 초안을 분리해야 합니다.",
+      businessImpact: sendRequested
+        ? "승인 없는 외부 발송은 잘못된 수신자, 미검증 운영 지시, PII/NDA 노출로 이어질 수 있습니다."
+        : "이메일 초안 내용을 특정 과거 케이스로 고정하지 않으면 잘못된 수신자, 요청 문서, 운송 목적이 포함되는 리스크를 줄일 수 있습니다.",
       details: [
         "OntologyReview를 먼저 분리하고, 그 다음 EMAIL_ACTION_CARD와 Draft를 출력합니다.",
         "Draft는 현재 사용자가 제공한 이메일 본문, 첨부, 수신자, 요청 목적에만 근거해야 합니다.",
-        "이전 문의의 수신자, 증빙명, route, 목적 문구를 재사용하지 않습니다."
+        sendRequested
+          ? "외부 발송은 APPROVAL과 AUDIT_RECORD가 확인되기 전까지 DRY_RUN으로만 둡니다."
+          : "이전 문의의 수신자, 증빙명, route, 목적 문구를 재사용하지 않습니다."
       ],
       actions: [
         {
-          actionType: "DRAFT_CONTEXTUAL_EMAIL_REPLY",
+          actionType: sendRequested ? "REQUEST_EMAIL_SEND_APPROVAL" : "DRAFT_CONTEXTUAL_EMAIL_REPLY",
           ownerRole: "Ops User / Communication Owner",
           parameters: {
             requiredProcess: "OntologyReview -> EMAIL_ACTION_CARD -> Draft",
             draftSource: "current user-provided email/thread only",
-            hardcodedPriorCase: "forbidden"
+            hardcodedPriorCase: "forbidden",
+            nextGate: sendRequested ? "DRY_RUN -> APPROVAL -> WRITE -> AUDIT_RECORD" : "draft review only"
           },
-          humanGateRequired: true,
+          humanGateRequired: sendRequested,
+          auditRecordRequired: sendRequested,
+          writeBackMode: sendRequested ? "DRY_RUN" : "READ_ONLY",
           dueAt: null
         }
       ]
@@ -570,7 +692,7 @@ export function answerQuestion(args: {
   });
   const shipmentValidation = mergeShipmentValidation(shipmentRule);
   const mergedValidation = [...validation, ...shipmentValidation.findings];
-  const verdict = deriveVerdict(evidence, mergedValidation);
+  const verdict = deriveVerdict(evidence, mergedValidation, route, maskedQuestion.text);
   const core = composeSummary(maskedQuestion.text, verdict, route);
   // WARN-6: Build actions immutably to avoid shared reference between evidenceTrace and answer
   const baseActions = [...core.actions, ...shipmentValidation.actions];
@@ -585,7 +707,7 @@ export function answerQuestion(args: {
       }]
     : baseActions;
   const evidenceTrace = buildEvidenceTrace({ core: { ...core, actions }, evidence });
-  const graphPath = buildGraphPath(maskedQuestion.text);
+  const graphPath = buildGraphPath(maskedQuestion.text, route);
   const generatedAt = new Date().toISOString();
 
   const answer: GroundedAnswer = {
@@ -599,7 +721,14 @@ export function answerQuestion(args: {
     details: core.details,
     evidenceIds: evidence.map((item) => item.id),
     // WR-02: INFO is a boundary signal; surface as WARN rather than silent PASS
-    validationStatus: verdict === "NO_EVIDENCE" ? "NO_EVIDENCE" : verdict === "BLOCK" ? "BLOCK" : verdict === "WARN" || verdict === "INFO" ? "WARN" : "PASS",
+    validationStatus:
+      verdict === "NO_EVIDENCE"
+        ? "NO_EVIDENCE"
+        : verdict === "BLOCK" || verdict === "ZERO"
+          ? "BLOCK"
+          : ["WARN", "INFO", "AMBER", "PENDING_APPROVAL", "DRY_RUN_ONLY", "NEEDS_INPUT", "PASS_WITH_FINDINGS"].includes(verdict)
+            ? "WARN"
+            : "PASS",
     route,
     resolvedEntities,
     evidence,

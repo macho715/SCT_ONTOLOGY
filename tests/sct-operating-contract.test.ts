@@ -115,8 +115,63 @@ describe("sct_ontology operating contract", () => {
     const actionItems = decisionCard.properties.actions as {
       items: { required: string[]; properties: Record<string, unknown> };
     };
-    expect(actionItems.items.required).toContain("dueBasis");
-    expect(actionItems.items.properties.dueBasis).toBeDefined();
+    for (const field of ["allowedNow", "blockedUntilApproved", "humanGateRequired", "auditRecordRequired", "writeBackMode", "dueBasis"]) {
+      expect(actionItems.items.required).toContain(field);
+      expect(actionItems.items.properties[field], `decisionCard.actions[].${field} schema`).toBeDefined();
+    }
+
+    const resolvedEntities = schema.properties.resolvedEntities as {
+      items: { properties: Record<string, { enum?: string[] }> };
+    };
+    expect(resolvedEntities.items.properties.entityType.enum).toContain("SystemComponent");
+
+    const graphPath = schema.properties.graphPath as {
+      properties: Record<string, unknown>;
+    };
+    for (const field of ["startNodes", "riskEdges", "operationalObjects", "isMetaReview"]) {
+      expect(graphPath.properties[field], `graphPath.${field} schema`).toBeDefined();
+    }
+  });
+
+  it("covers governance v2 system QA intents and verdict vocabulary", () => {
+    const schema = JSON.parse(readRepoFile("schemas/sct-answer-contract.schema.json")) as {
+      properties: Record<string, unknown>;
+    };
+    const decisionCard = schema.properties.decisionCard as {
+      properties: Record<string, { enum?: string[] }>;
+    };
+    const rootVerdict = schema.properties.verdict as { enum: string[] };
+    const cardVerdict = decisionCard.properties.verdict as { enum: string[] };
+    const cardIntent = decisionCard.properties.intent as { enum: string[] };
+
+    for (const intent of [
+      "SYSTEM_DIAGNOSTIC",
+      "ONTOLOGY_PATCH_REVIEW",
+      "CARD_RENDERING_AUDIT",
+      "RULEPACK_GAP_ANALYSIS",
+      "ROUTER_QA",
+      "EVIDENCE_QA",
+      "SCHEMA_BOUNDARY_REVIEW",
+      "VALIDATION_POLICY_REVIEW"
+    ]) {
+      expect(cardIntent.enum).toContain(intent);
+    }
+
+    for (const verdict of [
+      "DIAGNOSTIC",
+      "PASS",
+      "PASS_WITH_FINDINGS",
+      "DRAFT_READY",
+      "AMBER",
+      "NEEDS_INPUT",
+      "PENDING_APPROVAL",
+      "DRY_RUN_ONLY",
+      "BLOCK",
+      "ZERO"
+    ]) {
+      expect(rootVerdict.enum).toContain(verdict);
+      expect(cardVerdict.enum).toContain(verdict);
+    }
   });
 
   it("covers every required risk domain in the evidence matrix", () => {
