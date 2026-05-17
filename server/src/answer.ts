@@ -14,6 +14,7 @@ import { isDailyLogisticsKpiQuestion, resolveAnyKey, routeQuestion } from "./rou
 import { maskPii, sha256 } from "./redact.js";
 import { evaluateShipmentRule } from "./shipment-rule.js";
 import { mergeShipmentValidation } from "./shipment-validation.js";
+import { toDecisionCardPayload } from "./decision-card.js";
 
 const CURRENTNESS_TERMS = /\b(?:moiat|fanr|dcd|adnoc|cicpa|permit|tariff|rate|law|regulation)\b|규정|허가|요율/i;
 const AGI_DAS_M130 = /\b(AGI|DAS)\b/i;
@@ -566,7 +567,7 @@ export function answerQuestion(args: {
     generatedAt
   };
 
-  return answer;
+  return { ...answer, decisionCard: toDecisionCardPayload({ answer }) };
 }
 
 export function answerToText(answer: GroundedAnswer): string {

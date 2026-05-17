@@ -401,4 +401,219 @@ describe("HVDC answer widget", () => {
     expect(html).toContain("checks");
     expect(html).toContain("applies_to");
   });
+
+  it("contains Decision Card v2 widget helpers and styles", () => {
+    expect(widgetHtml).toContain("decision-card-v2");
+    expect(widgetHtml).toContain("renderDecisionCard");
+    expect(widgetHtml).toContain("renderBlockReasonBox");
+    expect(widgetHtml).toContain("renderUnblockChecklist");
+    expect(widgetHtml).toContain("renderHumanGateBanner");
+    expect(widgetHtml).toContain("renderEvidenceCoverage");
+    expect(widgetHtml).toContain("renderActionTable");
+    expect(widgetHtml).toContain("safeCardVerdict");
+    expect(widgetHtml).toContain("truncateText");
+  });
+
+  it("does not render Decision Card v2 markup when decisionCard is absent", () => {
+    const html = renderWidgetFixture({
+      answerId: "no-decision-card",
+      verdict: "PASS",
+      dataStatus: "OK",
+      businessResultVisible: true,
+      fallbackUsed: false,
+      summary: "Legacy answer stays compact",
+      businessImpact: "No v2 card payload was provided",
+      details: [],
+      evidenceIds: [],
+      validationStatus: "PASS",
+      route: { routeId: "r1", requiredDocs: ["CONSOLIDATED-00"], confidence: 0.95, routingReason: "fixture" },
+      evidence: [],
+      evidenceTrace: [],
+      validation: [],
+      actions: [],
+      piiMasked: false,
+      generatedAt: "2026-05-17T00:00:00Z"
+    });
+
+    expect(html).not.toContain("decision-card-v2");
+    expect(html).toContain("Legacy answer stays compact");
+  });
+
+  it("renders Decision Card v2 before the legacy verdict title", () => {
+    const html = renderWidgetFixture(decisionCardFixture());
+    expect(html.indexOf("decision-card-v2")).toBeGreaterThan(-1);
+    expect(html.indexOf("decision-card-v2")).toBeLessThan(html.indexOf("verdict-title"));
+  });
+
+  it("renders text verdict, escaped primary reason, and accessible aria label", () => {
+    const html = renderWidgetFixture(decisionCardFixture({
+      primaryReason: "A".repeat(90) + "<script>alert(1)</script>"
+    }));
+
+    expect(html).toContain("Decision Card v2");
+    expect(html).toContain("aria-label=\"Decision verdict BLOCK\"");
+    expect(html).toContain("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    expect(html).toContain("…");
+    expect(html).not.toContain("<script>alert(1)</script>");
+  });
+
+  it("renders blocked-by rule fields and unblock checklist", () => {
+    const html = renderWidgetFixture(decisionCardFixture());
+
+    expect(html).toContain("BlockReasonBox");
+    expect(html).toContain("SCT-DOC-002");
+    expect(html).toContain("Operational document evidence required");
+    expect(html).toContain("BOE / DO / Port evidence required");
+    expect(html).toContain("Required inputs");
+    expect(html).toContain("BOE");
+    expect(html).toContain("DO");
+    expect(html).toContain("UnblockChecklist");
+    expect(html).toContain("BOE, DO, Port evidence");
+  });
+
+  it("renders HumanGateBanner only while approval is pending", () => {
+    const pending = renderWidgetFixture(decisionCardFixture());
+    const approved = renderWidgetFixture(decisionCardFixture({
+      trace: { approvalStatus: "Approved" },
+      actions: [
+        {
+          actionId: "ACT-001",
+          ownerRole: "Logistics Lead",
+          ownerNameMasked: null,
+          actionType: "Publish Report",
+          actionLabel: "Publish Report",
+          requiredInput: "Approval actor",
+          approvalRequired: true,
+          approvalStatus: "Approved",
+          status: "Open",
+          evidenceIds: ["ev1"],
+          blockedUntil: [],
+          dueAt: null
+        }
+      ]
+    }));
+
+    expect(pending).toContain("HumanGateBanner");
+    expect(pending).toContain("Approval is pending");
+    expect(approved).not.toContain("HumanGateBanner");
+  });
+
+  it("renders evidence coverage and action table with text statuses", () => {
+    const html = renderWidgetFixture(decisionCardFixture());
+
+    expect(html).toContain("EvidenceCoverageBar");
+    expect(html).toContain("Customs");
+    expect(html).toContain("BLOCK");
+    expect(html).toContain("0 / 1");
+    expect(html).toContain("ActionTable v2");
+    expect(html).toContain("Publish Report");
+    expect(html).toContain("Logistics Lead");
+    expect(html).toContain("Pending Approval");
+    expect(html).toContain("Approval actor");
+  });
+
+  it("escapes Decision Card v2 table and trace fields", () => {
+    const html = renderWidgetFixture(decisionCardFixture({
+      blockedBy: [
+        {
+          ruleId: "SCT-XSS-001",
+          ruleName: "<img src=x onerror=alert(1)>",
+          reason: "unsafe <b>reason</b>",
+          requiredInputs: ["<script>bad()</script>"],
+          missingInputs: ["<svg onload=bad()>"],
+          severity: "P0"
+        }
+      ],
+      trace: {
+        approvalStatus: "Pending",
+        approvalActor: "<script>actor</script>",
+        sourceHash: "hash<script>"
+      }
+    }));
+
+    expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+    expect(html).toContain("unsafe &lt;b&gt;reason&lt;/b&gt;");
+    expect(html).toContain("&lt;script&gt;bad()&lt;/script&gt;");
+    expect(html).toContain("&lt;script&gt;actor&lt;/script&gt;");
+    expect(html).not.toContain("<img src=x");
+    expect(html).not.toContain("<script>actor</script>");
+  });
 });
+
+function decisionCardFixture(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  const decisionCard = {
+    cardId: "DC-fixture",
+    routeId: "r1",
+    generatedAt: "2026-05-17T00:00:00Z",
+    verdict: "BLOCK",
+    severity: "P0",
+    primaryReason: "Missing customs evidence blocks publication",
+    unblockSummary: "BOE, DO, Port evidence",
+    piiStatus: "Masked",
+    dataClass: "P1",
+    blockedBy: [
+      {
+        ruleId: "SCT-DOC-002",
+        ruleName: "Operational document evidence required",
+        reason: "BOE / DO / Port evidence required",
+        requiredInputs: ["BOE", "DO", "Port evidence"],
+        missingInputs: ["BOE", "DO"],
+        severity: "P0"
+      }
+    ],
+    allowedActions: ["Copy JSON"],
+    blockedActions: ["Publish Report"],
+    evidenceCoverage: [
+      { domain: "Customs", status: "BLOCK", required: 1, available: 0 },
+      { domain: "Warehouse", status: "PASS", required: 1, available: 1 }
+    ],
+    actions: [
+      {
+        actionId: "ACT-001",
+        ownerRole: "Logistics Lead",
+        ownerNameMasked: null,
+        actionType: "Publish Report",
+        actionLabel: "Publish Report",
+        requiredInput: "Approval actor",
+        approvalRequired: true,
+        approvalStatus: "Pending",
+        status: "Pending Approval",
+        evidenceIds: ["ev1"],
+        blockedUntil: ["Approval actor"],
+        dueAt: "2026-05-18"
+      }
+    ],
+    trace: {
+      sourceHash: "sha256:fixture",
+      rulePackVersion: "2026.05",
+      promptVersion: "test",
+      approvalActor: null,
+      approvalStatus: "Pending",
+      sensitiveAccessed: true,
+      generatedAt: "2026-05-17T00:00:00Z",
+      routeId: "r1"
+    },
+    ...overrides
+  };
+
+  return {
+    answerId: "decision-card-fixture",
+    verdict: "BLOCK",
+    dataStatus: "OK",
+    businessResultVisible: true,
+    fallbackUsed: false,
+    summary: "Decision Card fixture",
+    businessImpact: "Publication is blocked until customs evidence and approval are present",
+    details: [],
+    evidenceIds: ["ev1"],
+    validationStatus: "BLOCK",
+    route: { routeId: "r1", requiredDocs: ["CONSOLIDATED-00"], confidence: 0.95, routingReason: "fixture" },
+    evidence: [],
+    evidenceTrace: [],
+    validation: [],
+    actions: [],
+    decisionCard,
+    piiMasked: true,
+    generatedAt: "2026-05-17T00:00:00Z"
+  };
+}

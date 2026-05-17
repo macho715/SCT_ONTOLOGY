@@ -1,3 +1,5 @@
+import type { DecisionCardPayload } from "./decision-card.js";
+
 export type DomainHint =
   | "master"
   | "warehouse"
@@ -166,6 +168,7 @@ export type GroundedAnswer = {
   validation: ValidationFinding[];
   actions: ActionRecommendation[];
   graphPath: GraphPath | null;
+  decisionCard?: DecisionCardPayload;
   ui?: UiAnswerState;
   piiMasked: boolean;
   generatedAt: string;

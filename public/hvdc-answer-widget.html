@@ -75,6 +75,48 @@
         overflow-wrap: anywhere;
         word-break: break-word;
       }
+      .decision-card-v2 {
+        border: 1px solid rgba(30, 64, 175, 0.24);
+        border-radius: 22px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.96));
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.09);
+      }
+      .decision-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+      .decision-card-title { margin: 0 0 6px; font-size: 1.12rem; color: #0f172a; }
+      .decision-card-reason { margin: 0; color: #334155; font-size: 0.92rem; line-height: 1.45; }
+      .decision-card-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 74px;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .decision-card-badge.BLOCK { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+      .decision-card-badge.WARN { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+      .decision-card-badge.PASS { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+      .decision-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 14px 0; }
+      .decision-card-panel { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: rgba(255, 255, 255, 0.86); }
+      .decision-card-panel strong { display: block; color: #0f172a; margin-bottom: 4px; }
+      .block-reason-box { border: 1px solid #fecaca; background: #fff1f2; border-radius: 16px; padding: 14px; margin: 14px 0; }
+      .human-gate-banner { border: 1px solid #fed7aa; background: #fff7ed; border-radius: 16px; padding: 14px; margin: 14px 0; }
+      .block-reason-box h3, .unblock-checklist h3, .human-gate-banner h3, .evidence-coverage h3, .action-table-wrap h3, .decision-trace h3 { margin: 0 0 10px; font-size: 0.98rem; color: #0f172a; }
+      .unblock-checklist, .evidence-coverage, .action-table-wrap, .decision-trace { margin-top: 14px; }
+      .unblock-checklist ol { margin: 0; padding-left: 20px; }
+      .evidence-coverage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+      .coverage-item { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: rgba(255, 255, 255, 0.82); }
+      .coverage-status { display: inline-block; margin-top: 6px; font-weight: 800; font-size: 0.78rem; color: #1e40af; }
+      .decision-card-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; background: rgba(255, 255, 255, 0.86); border-radius: 14px; overflow: hidden; }
+      .decision-card-table th, .decision-card-table td { text-align: left; border-bottom: 1px solid var(--line); padding: 8px; vertical-align: top; }
+      .decision-card-table th { color: #475569; background: rgba(241, 245, 249, 0.9); }
+      .decision-card-table tr:last-child td { border-bottom: none; }
       .evidence { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
       .evidence:first-of-type { border-top: none; }
       .trace-line { display: inline; }
@@ -164,6 +206,28 @@
       function safeStatus(value, fallback = "INFO") {
         const status = String(value ?? "").toUpperCase();
         return VALID_STATUSES.has(status) ? status : fallback;
+      }
+
+      const VALID_CARD_VERDICTS = new Set(["PASS", "WARN", "BLOCK"]);
+      const VALID_PII_STATUSES = new Set(["None", "Masked", "Risk"]);
+      const VALID_APPROVAL_STATUSES = new Set(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]);
+
+      function truncateText(value, maxLength) {
+        const text = String(displayValue(value));
+        if (text.length <= maxLength) return text;
+        return text.slice(0, Math.max(0, maxLength - 1)) + "…";
+      }
+
+      function safeCardVerdict(value) {
+        return VALID_CARD_VERDICTS.has(value) ? value : "BLOCK";
+      }
+
+      function safePiiStatus(value) {
+        return VALID_PII_STATUSES.has(value) ? value : "Risk";
+      }
+
+      function safeApprovalStatus(value) {
+        return VALID_APPROVAL_STATUSES.has(value) ? value : "Pending";
       }
 
       function displayValue(value, fallback = "Not provided") {
@@ -402,6 +466,141 @@
         return [...new Set(warnings)];
       }
 
+      function renderBlockReasonBox(card) {
+        const blockedBy = asArray(card.blockedBy);
+        if (safeCardVerdict(card.verdict) !== "BLOCK" || blockedBy.length === 0) return "";
+        const rows = blockedBy.map((item) => `
+          <tr>
+            <td>${escapeHtml(displayValue(item.ruleId))}</td>
+            <td>${escapeHtml(displayValue(item.ruleName))}</td>
+            <td>${escapeHtml(displayValue(item.reason))}</td>
+            <td>${escapeHtml(asArray(item.requiredInputs).map((value) => displayValue(value)).join(", ") || "Not provided")}</td>
+            <td>${escapeHtml(asArray(item.blockedActions).map((value) => displayValue(value)).join(", ") || "Not provided")}</td>
+          </tr>
+        `).join("");
+        return `
+          <section class="block-reason-box" aria-label="BlockReasonBox">
+            <h3>BlockReasonBox</h3>
+            <table class="decision-card-table">
+              <thead><tr><th>Rule</th><th>Name</th><th>Reason</th><th>Required inputs</th><th>Blocked actions</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </section>
+        `;
+      }
+
+      function renderUnblockChecklist(card) {
+        const items = asArray(card.unblockChecklist).length > 0 ? asArray(card.unblockChecklist) : [card.unblockSummary].filter(Boolean);
+        if (items.length === 0) return "";
+        return `
+          <section class="unblock-checklist" aria-label="UnblockChecklist">
+            <h3>UnblockChecklist</h3>
+            <ol>${items.map((item) => `<li>${escapeHtml(displayValue(item))}</li>`).join("")}</ol>
+          </section>
+        `;
+      }
+
+      function renderHumanGateBanner(card) {
+        const trace = card.trace && typeof card.trace === "object" ? card.trace : {};
+        const status = safeApprovalStatus(trace.approvalStatus);
+        if (status !== "Pending") return "";
+        return `
+          <section class="human-gate-banner" aria-label="HumanGateBanner">
+            <h3>HumanGateBanner</h3>
+            <p><strong>Approval is pending.</strong> Human approval is required before export or publish actions.</p>
+            <p>Approver: ${escapeHtml(displayValue(trace.approvalActor))}</p>
+          </section>
+        `;
+      }
+
+      function renderEvidenceCoverage(card) {
+        const coverage = asArray(card.evidenceCoverage);
+        if (coverage.length === 0) return "";
+        return `
+          <section class="evidence-coverage" aria-label="EvidenceCoverageBar">
+            <h3>EvidenceCoverageBar</h3>
+            <div class="evidence-coverage-grid">
+              ${coverage.map((item) => `
+                <div class="coverage-item">
+                  <strong>${escapeHtml(displayValue(item.domain))}</strong>
+                  <span class="coverage-status">${escapeHtml(displayValue(item.status))}</span>
+                  <div>${escapeHtml(item.available ?? item.coveredCount ?? "Not provided")} / ${escapeHtml(item.required ?? item.requiredCount ?? "Not provided")} evidence</div>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }
+
+      function renderActionTable(card) {
+        const actions = asArray(card.actions);
+        if (actions.length === 0) return "";
+        const rows = actions.map((action) => `
+          <tr>
+            <td>${escapeHtml(displayValue(action.owner ?? action.ownerRole ?? action.ownerNameMasked))}</td>
+            <td>${escapeHtml(displayValue(action.action ?? action.actionLabel ?? action.actionType))}</td>
+            <td>${escapeHtml(displayValue(action.requiredInput))}</td>
+            <td>${escapeHtml(displayValue(action.gate))}</td>
+            <td>${escapeHtml(displayValue(action.status))}</td>
+            <td>${escapeHtml(displayValue(action.dueAt))}</td>
+          </tr>
+        `).join("");
+        return `
+          <section class="action-table-wrap" aria-label="ActionTable v2">
+            <h3>ActionTable v2</h3>
+            <table class="decision-card-table">
+              <thead><tr><th>Owner</th><th>Action</th><th>Required input</th><th>Gate</th><th>Status</th><th>Due</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </section>
+        `;
+      }
+
+      function renderDecisionTrace(card) {
+        const trace = card.trace && typeof card.trace === "object" ? card.trace : {};
+        if (Object.keys(trace).length === 0) return "";
+        return `
+          <section class="decision-trace" aria-label="Decision trace">
+            <h3>Trace</h3>
+            <div class="decision-card-grid">
+              <div class="decision-card-panel"><strong>PII status</strong>${escapeHtml(safePiiStatus(trace.piiStatus))}</div>
+              <div class="decision-card-panel"><strong>Approval status</strong>${escapeHtml(safeApprovalStatus(trace.approvalStatus))}</div>
+              <div class="decision-card-panel"><strong>Approval actor</strong>${escapeHtml(displayValue(trace.approvalActor))}</div>
+              <div class="decision-card-panel"><strong>Source hash</strong>${escapeHtml(displayValue(trace.sourceHash))}</div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderDecisionCard(answer) {
+        const card = answer?.decisionCard && typeof answer.decisionCard === "object" ? answer.decisionCard : null;
+        if (!card) return "";
+        const verdict = safeCardVerdict(card.verdict);
+        const primaryReason = truncateText(card.primaryReason || card.reasonCode || "Decision requires review", 80);
+        return `
+          <section class="decision-card-v2" aria-label="Decision Card v2">
+            <div class="decision-card-header">
+              <div>
+                <h2 class="decision-card-title">Decision Card v2</h2>
+                <p class="decision-card-reason">${escapeHtml(primaryReason)}</p>
+              </div>
+              <span class="decision-card-badge ${escapeHtml(verdict)}" aria-label="Decision verdict ${escapeHtml(verdict)}">${escapeHtml(verdict)}</span>
+            </div>
+            <div class="decision-card-grid">
+              <div class="decision-card-panel"><strong>Reason code</strong>${escapeHtml(displayValue(card.reasonCode))}</div>
+              <div class="decision-card-panel"><strong>Unblock summary</strong>${escapeHtml(displayValue(card.unblockSummary))}</div>
+              <div class="decision-card-panel"><strong>Evidence freshness</strong>${escapeHtml(displayValue(card.evidenceFreshness))}</div>
+            </div>
+            ${renderBlockReasonBox(card)}
+            ${renderHumanGateBanner(card)}
+            ${renderUnblockChecklist(card)}
+            ${renderEvidenceCoverage(card)}
+            ${renderActionTable(card)}
+            ${renderDecisionTrace(card)}
+          </section>
+        `;
+      }
+
       function render(answer) {
         if (!answer || typeof answer !== "object") {
           renderFallback("malformed tool output", "The iframe received no readable structuredContent.");
@@ -472,6 +671,7 @@
 
         root.innerHTML = `
           <div class="card">
+            ${renderDecisionCard(answer)}
             <section aria-labelledby="verdict-title">
               <div class="top">
                 <div>
