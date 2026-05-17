@@ -1,0 +1,5 @@
+{
+  "gate": "PASS_WITH_LIMITS",
+  "limits": ["No automated screenshot diff was run", "Patch uses current screenshot and web reference search only"],
+  "canProceedToPatch": true
+}

@@ -1,0 +1,12 @@
+{
+  "scores": {
+    "hierarchy": 8,
+    "readability": 8,
+    "density": 7,
+    "statusClarity": 8,
+    "accessibilityContrast": 8,
+    "implementationRisk": 9,
+    "brandFit": 7
+  },
+  "verdict": "PASS_WITH_MANUAL_VISUAL_CHECK_REQUIRED"
+}

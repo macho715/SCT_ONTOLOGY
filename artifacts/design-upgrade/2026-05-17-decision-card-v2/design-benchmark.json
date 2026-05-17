@@ -1,0 +1,14 @@
+{
+  "surface": "Decision Card v2 widget",
+  "references": [
+    {"name": "GitHub Primer", "pattern": "cards labels tables status primitives", "url": "https://github.com/primer"},
+    {"name": "Stripe Dashboard", "pattern": "dashboard resource table and card organization", "url": "https://docs.stripe.com/dashboard/basics"},
+    {"name": "PatternFly Aggregate Status Card", "pattern": "status-card accent hierarchy", "url": "https://pf3.patternfly.org/v3/pattern-library/cards/aggregate-status-card"}
+  ],
+  "transferableElements": [
+    "status pill with text label",
+    "elevated white cards on calm surface",
+    "header-banded operational table",
+    "full-width trace code panel"
+  ]
+}

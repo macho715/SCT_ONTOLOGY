@@ -1,0 +1,9 @@
+{
+  "patchTargets": [
+    {"file": "public/hvdc-answer-widget.html", "selector": ".decision-card-v2", "change": "layered elevated surface and accent rail"},
+    {"file": "public/hvdc-answer-widget.html", "selector": ".decision-card-badge", "change": "larger semantic status pill"},
+    {"file": "public/hvdc-answer-widget.html", "selector": ".coverage-item, .coverage-status", "change": "dashboard status card treatment"},
+    {"file": "public/hvdc-answer-widget.html", "selector": ".decision-card-table", "change": "banded table header and row rhythm"},
+    {"file": "public/hvdc-answer-widget.html", "selector": ".decision-trace .decision-card-panel:last-child", "change": "full-width monospace hash panel"}
+  ]
+}
