@@ -671,6 +671,13 @@ const decisionCardSchema = z.object({
     sourceHash: z.string(),
     rulePackVersion: z.string(),
     rulePackIds: z.array(z.string()),
+    rulePackExecution: z.array(z.object({
+      rulePackId: z.string(),
+      fired: z.boolean(),
+      skippedReason: z.string().nullable(),
+      evidenceOnly: z.boolean(),
+      blockedByRuleId: z.string().nullable()
+    })),
     promptVersion: z.string(),
     approvalActor: z.string().nullable(),
     approvalStatus: z.enum(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]),

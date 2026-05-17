@@ -276,13 +276,27 @@
         },
         "trace": {
           "type": "object",
-          "required": ["sourceHash", "rulePackVersion", "rulePackIds", "promptVersion", "approvalStatus", "generatedAt", "routeId"],
+          "required": ["sourceHash", "rulePackVersion", "rulePackIds", "rulePackExecution", "promptVersion", "approvalStatus", "generatedAt", "routeId"],
           "properties": {
             "sourceHash": { "type": "string" },
             "rulePackVersion": { "type": "string" },
             "rulePackIds": {
               "type": "array",
               "items": { "type": "string" }
+            },
+            "rulePackExecution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["rulePackId", "fired", "skippedReason", "evidenceOnly", "blockedByRuleId"],
+                "properties": {
+                  "rulePackId": { "type": "string" },
+                  "fired": { "type": "boolean" },
+                  "skippedReason": { "type": ["string", "null"] },
+                  "evidenceOnly": { "type": "boolean" },
+                  "blockedByRuleId": { "type": ["string", "null"] }
+                }
+              }
             },
             "promptVersion": { "type": "string" },
             "approvalActor": { "type": ["string", "null"] },

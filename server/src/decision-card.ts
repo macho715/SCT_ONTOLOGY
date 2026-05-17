@@ -213,12 +213,21 @@ export type DecisionCardTrace = {
   sourceHash: string;
   rulePackVersion: string;
   rulePackIds: string[];
+  rulePackExecution: RulePackExecutionItem[];
   promptVersion: string;
   approvalActor: string | null;
   approvalStatus: ApprovalStatus;
   sensitiveAccessed: boolean;
   generatedAt: string;
   routeId: string;
+};
+
+export type RulePackExecutionItem = {
+  rulePackId: string;
+  fired: boolean;
+  skippedReason: string | null;
+  evidenceOnly: boolean;
+  blockedByRuleId: string | null;
 };
 
 export type ActionGateEvaluation = {
@@ -583,6 +592,72 @@ function deriveNextAction(actions: readonly ActionRecommendation[], verdict: Car
   return "Review evidence and proceed read-only";
 }
 
+function buildRulePackExecution(args: {
+  routeRulePackIds: readonly string[];
+  intent: IntentCode;
+  blockedBy: readonly BlockedByEntry[];
+  verdict: CardVerdict;
+  approvalRequired: boolean;
+}): RulePackExecutionItem[] {
+  const intentGroup = deriveIntentGroup(args.intent);
+  const blockedRuleIds = new Set(args.blockedBy.map((entry) => entry.ruleId));
+  const rulePackIds = new Set([
+    ...args.routeRulePackIds,
+    "ACTION_GATE_RULEPACK",
+    ...(intentGroup === "SYSTEM_QA" ? ["COST_RULEPACK", "COMM_RULEPACK"] : [])
+  ]);
+
+  return Array.from(rulePackIds).map((rulePackId) => {
+    if (intentGroup === "SYSTEM_QA" && (rulePackId === "COST_RULEPACK" || rulePackId === "COMM_RULEPACK")) {
+      return {
+        rulePackId,
+        fired: false,
+        skippedReason: "SYSTEM_QA_HARD_NEGATIVE",
+        evidenceOnly: false,
+        blockedByRuleId: "SYS-ROUTER-001"
+      };
+    }
+
+    if (rulePackId === "ACTION_GATE_RULEPACK") {
+      return {
+        rulePackId,
+        fired: args.approvalRequired || args.verdict === "ZERO",
+        skippedReason: args.approvalRequired || args.verdict === "ZERO" ? null : "READ_ONLY_NO_MUTATION",
+        evidenceOnly: false,
+        blockedByRuleId: blockedRuleIds.has("SCT-APP-005") ? "SCT-APP-005" : null
+      };
+    }
+
+    if (rulePackId === "SYSTEM_QA_RULEPACK" || rulePackId === "PII_NDA_RULEPACK") {
+      return {
+        rulePackId,
+        fired: true,
+        skippedReason: null,
+        evidenceOnly: false,
+        blockedByRuleId: rulePackId === "PII_NDA_RULEPACK" && blockedRuleIds.has("SCT-P2-004") ? "SCT-P2-004" : null
+      };
+    }
+
+    if (intentGroup === "SYSTEM_QA") {
+      return {
+        rulePackId,
+        fired: false,
+        skippedReason: "SYSTEM_QA_EVIDENCE_ONLY",
+        evidenceOnly: true,
+        blockedByRuleId: blockedRuleIds.has("A-FLOW-001") && rulePackId === "WAREHOUSE_RULEPACK" ? "A-FLOW-001" : null
+      };
+    }
+
+    return {
+      rulePackId,
+      fired: true,
+      skippedReason: null,
+      evidenceOnly: false,
+      blockedByRuleId: null
+    };
+  });
+}
+
 // --- Adapter ---
 
 export function toDecisionCardPayload(args: {
@@ -735,6 +810,13 @@ export function toDecisionCardPayload(args: {
       sourceHash: deterministicSourceHash(answer.evidence),
       rulePackVersion: args.rulePackVersion ?? "2026.05",
       rulePackIds: answer.route.rulePackIds,
+      rulePackExecution: buildRulePackExecution({
+        routeRulePackIds: answer.route.rulePackIds,
+        intent: answer.route.intent,
+        blockedBy,
+        verdict,
+        approvalRequired
+      }),
       promptVersion: args.promptVersion ?? "unknown",
       approvalActor: args.approvalState?.actor ?? null,
       approvalStatus,

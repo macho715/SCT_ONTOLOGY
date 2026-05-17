@@ -270,5 +270,6 @@ export type {
   EvidenceCoverageItem,
   ActionItem,
   DecisionCardTrace,
+  RulePackExecutionItem,
   DecisionCardPayload
 } from "./decision-card.js";

@@ -603,6 +603,15 @@
       function renderDecisionTrace(card) {
         const trace = card.trace && typeof card.trace === "object" ? card.trace : {};
         if (Object.keys(trace).length === 0) return "";
+        const executionRows = asArray(trace.rulePackExecution).map((item) => `
+          <tr>
+            <td>${escapeHtml(displayValue(item.rulePackId))}</td>
+            <td>${escapeHtml(displayValue(item.fired))}</td>
+            <td>${escapeHtml(displayValue(item.skippedReason))}</td>
+            <td>${escapeHtml(displayValue(item.evidenceOnly))}</td>
+            <td>${escapeHtml(displayValue(item.blockedByRuleId))}</td>
+          </tr>
+        `).join("");
         return `
           <section class="decision-trace" aria-label="Decision trace">
             <h3>Trace</h3>
@@ -616,6 +625,13 @@
               <div class="decision-card-panel"><strong>Prompt version</strong>${escapeHtml(displayValue(trace.promptVersion))}</div>
               <div class="decision-card-panel"><strong>RulePacks</strong>${escapeHtml(asArray(trace.rulePackIds).join(", ") || "Not provided")}</div>
               <div class="decision-card-panel"><strong>Source hash</strong>${escapeHtml(displayValue(trace.sourceHash))}</div>
+            </div>
+            <div class="action-table-wrap" aria-label="RulePack execution log">
+              <h3>RulePack execution</h3>
+              <table class="decision-card-table">
+                <thead><tr><th>RulePack</th><th>Fired</th><th>Skipped reason</th><th>Evidence only</th><th>Blocked by</th></tr></thead>
+                <tbody>${executionRows || `<tr><td colspan="5" class="empty">No rulepack execution log returned.</td></tr>`}</tbody>
+              </table>
             </div>
           </section>
         `;
