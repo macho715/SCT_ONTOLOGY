@@ -4,6 +4,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createHvdcServer } from "../server/src/index.js";
 import { withSpan } from "../server/src/telemetry.js";
+import { resolveTelemetryConfig } from "../server/src/telemetry.js";
 
 describe("withSpan", () => {
   it("creates a span named mcp.<toolName> and ends it on success", async () => {
@@ -106,6 +107,41 @@ describe("withSpan", () => {
 
     expect(getTracerSpy).toHaveBeenCalledWith("hvdc-mcp");
     vi.restoreAllMocks();
+  });
+});
+
+describe("resolveTelemetryConfig", () => {
+  it("returns Axiom endpoint and headers when AXIOM_TOKEN is provided", () => {
+    const config = resolveTelemetryConfig({
+      OTEL_ENABLED: "true",
+      AXIOM_TOKEN: "xyz123",
+      AXIOM_DATASET: "hvdc-test"
+    });
+    expect(config.enabled).toBe(true);
+    expect(config.exporter.url).toBe("https://api.axiom.co/v1/traces");
+    expect(config.exporter.headers.Authorization).toBe("Bearer xyz123");
+    expect(config.exporter.headers["X-Axiom-Dataset"]).toBe("hvdc-test");
+    expect(config.service.name).toBe("hvdc-mcp");
+    expect(config.service.version).toBe("1.0.0");
+  });
+
+  it("uses custom OTLP endpoint and preserves parsed headers", () => {
+    const config = resolveTelemetryConfig({
+      OTEL_ENABLED: "true",
+      OTEL_EXPORTER_OTLP_ENDPOINT: "https://otel.local/v1/traces",
+      OTEL_EXPORTER_OTLP_HEADERS: "x-test=abc, another=xyz",
+      AXIOM_TOKEN: "xyz123"
+    });
+    expect(config.exporter.url).toBe("https://otel.local/v1/traces");
+    expect(config.exporter.headers["x-test"]).toBe("abc");
+    expect(config.exporter.headers["another"]).toBe("xyz");
+    expect(config.exporter.headers.Authorization).toBe("Bearer xyz123");
+  });
+
+  it("keeps telemetry disabled when OTEL_ENABLED is false", () => {
+    const config = resolveTelemetryConfig({ OTEL_ENABLED: "false" });
+    expect(config.enabled).toBe(false);
+    expect(config.exporter.url).toBe("");
   });
 });
 

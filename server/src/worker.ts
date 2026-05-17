@@ -1,6 +1,8 @@
 import { createMcpHandler } from "agents/mcp";
 import { instrument } from "@microlabs/otel-cf-workers";
 import type { AuditRecord } from "./answer.js";
+import { resolveTelemetryConfig } from "./telemetry.js";
+import { MCP_PATH, applyRateLimit, parseMcpToolName, type RateLimitEnv } from "./rate-limit.js";
 import {
   createHvdcServer,
   type AttachUploadedFileInput,
@@ -30,7 +32,7 @@ import type { MilestoneRecord } from "./mosb-gate.js";
 import type { ActionProposal } from "./team-action-router.js";
 import type { ResolvedEntity } from "./types.js";
 
-type Env = {
+type Env = RateLimitEnv & {
   ALLOWED_ORIGIN?: string;
   WIDGET_DOMAIN?: string;
   MCP_AUTH_TOKEN?: string;
@@ -42,9 +44,10 @@ type Env = {
   OTEL_ENABLED?: string;
   OTEL_EXPORTER_OTLP_ENDPOINT?: string;
   OTEL_EXPORTER_OTLP_HEADERS?: string;
+  AXIOM_TOKEN?: string;
+  AXIOM_DATASET?: string;
 };
 
-const MCP_PATH = "/mcp";
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
 function corsOrigin(env: Env): string {
@@ -95,6 +98,7 @@ function authContext(request: Request, env: Env): HvdcAuthContext {
     .filter(Boolean);
   return { authenticated: true, subject: "oauth-bearer-client", scopes };
 }
+
 
 function oauthMetadata(request: Request, env: Env): Response {
   const url = new URL(request.url);
@@ -934,6 +938,10 @@ const handler = {
       return handleDirectUpload(request, env);
     }
 
+    const toolName = await parseMcpToolName(request);
+    const rateLimitResponse = await applyRateLimit(request, env, toolName);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const server = createHvdcServer({
       widgetDomain: env.WIDGET_DOMAIN ?? url.origin,
       audit: (record) => writeD1Audit(env, record),
@@ -957,18 +965,4 @@ const handler = {
   }
 };
 
-export default instrument(handler, (env: Env) => ({
-  exporter: {
-    url: env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "",
-    headers: env.OTEL_EXPORTER_OTLP_HEADERS
-      ? Object.fromEntries(
-          env.OTEL_EXPORTER_OTLP_HEADERS.split(",").map((h) => {
-            const idx = h.indexOf("=");
-            return [h.slice(0, idx), h.slice(idx + 1)];
-          })
-        )
-      : {}
-  },
-  service: { name: "hvdc-mcp", version: "1.0.0" },
-  enabled: (env as Record<string, unknown>).OTEL_ENABLED === "true"
-}));
+export default instrument(handler, resolveTelemetryConfig);
