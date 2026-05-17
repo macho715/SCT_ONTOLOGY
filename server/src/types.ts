@@ -263,6 +263,7 @@ export type {
   ActionStatus,
   DataClass,
   ExportType,
+  IntentGroup,
   HumanGateState,
   DecisionRule,
   BlockedByEntry,

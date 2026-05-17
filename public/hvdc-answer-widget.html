@@ -675,6 +675,8 @@
           ["decision", "Decision", `
             <div class="decision-card-grid">
               <div class="decision-card-panel"><strong>Intent</strong>${escapeHtml(displayValue(card.intent))}</div>
+              <div class="decision-card-panel"><strong>Intent group</strong>${escapeHtml(displayValue(card.intentGroup))}</div>
+              <div class="decision-card-panel"><strong>Next action</strong>${escapeHtml(displayValue(card.nextAction))}</div>
               <div class="decision-card-panel"><strong>Human gate</strong>${escapeHtml(displayValue(card.humanGateState))}</div>
               <div class="decision-card-panel"><strong>Unblock summary</strong>${escapeHtml(displayValue(card.unblockSummary))}</div>
               <div class="decision-card-panel"><strong>Allowed now</strong>${escapeHtml(asArray(card.allowedNow ?? card.allowedActions).join(", ") || "Not provided")}</div>
@@ -725,12 +727,16 @@
         if (!card) return "";
         const verdict = safeCardVerdict(card.verdict);
         const primaryReason = truncateText(card.primaryReason || card.reasonCode || "Decision requires review", 80);
+        const intentGroup = displayValue(card.intentGroup);
+        const nextAction = truncateText(card.nextAction || "Not provided", 120);
         return `
           <section class="decision-card-v2" aria-label="Decision Card v2">
             <div class="decision-card-header">
               <div>
                 <h2 class="decision-card-title">Decision Card v2</h2>
+                <p class="decision-card-kicker">${escapeHtml(intentGroup)}</p>
                 <p class="decision-card-reason">${escapeHtml(primaryReason)}</p>
+                <p class="decision-card-next"><strong>Next action:</strong> ${escapeHtml(nextAction)}</p>
               </div>
               <span class="decision-card-badge ${escapeHtml(verdict)}" aria-label="Decision verdict ${escapeHtml(verdict)}">${escapeHtml(verdict)}</span>
             </div>

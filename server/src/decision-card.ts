@@ -45,6 +45,7 @@ export type ActionStatus =
   | "Unassigned";
 export type DataClass = "P0" | "P1" | "P2";
 export type ExportType = "Copy JSON" | "Export PDF Draft" | "Publish Report";
+export type IntentGroup = "SYSTEM_QA" | "OPERATIONAL";
 export type HumanGateState =
   | "READ_ONLY"
   | "DRY_RUN"
@@ -124,6 +125,22 @@ export const RULE_MATRIX: Readonly<Record<string, DecisionRule>> = {
     requiredInputs: ["Valid DecisionCardPayload"],
     blockedActions: ["All high-risk actions"],
     severity: "P0"
+  },
+  "A-FLOW-001": {
+    ruleId: "A-FLOW-001",
+    ruleName: "Flow Code WHP-only boundary",
+    reason: "Flow Code is WHP-only and must not be used as route, customs, invoice, or KPI classification",
+    requiredInputs: ["WarehouseHandlingProfile.confirmedFlowCode"],
+    blockedActions: ["Route classification", "Customs classification", "Invoice bucket", "Operations KPI bucket"],
+    severity: "P0"
+  },
+  "SYS-ROUTER-001": {
+    ruleId: "SYS-ROUTER-001",
+    ruleName: "System QA intent isolation",
+    reason: "System/card diagnostic intent must remain isolated from operational action rulepacks",
+    requiredInputs: ["SYSTEM_QA intent group"],
+    blockedActions: ["email_draft", "external_send", "cost_approval", "write_back"],
+    severity: "P0"
   }
 };
 
@@ -143,12 +160,12 @@ export const REASON_CODE_TO_RULE: Readonly<Record<string, string>> = {
   MISSING_MASTER_EVIDENCE: "SCT-SCHEMA-007",
   STALE_SOURCE_RISK: "SCT-CONF-006",
   AMBIGUOUS_ANY_KEY: "SCT-CONF-006",
-  FLOW_CODE_SCOPE_VIOLATION: "SCT-SCHEMA-007",
-  FLOW_CODE_SCOPE_INFO: "SCT-SCHEMA-007",
+  FLOW_CODE_SCOPE_VIOLATION: "A-FLOW-001",
+  FLOW_CODE_SCOPE_INFO: "A-FLOW-001",
   M130_CHAIN_EVIDENCE_REQUIRED: "SCT-DOC-002",
   SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED: "SCT-DOC-002",
   SHIPMENT_MISSING_DOCUMENTS: "SCT-SCHEMA-007",
-  SYSTEM_DIAGNOSTIC_ROUTED: "SCT-SCHEMA-007"
+  SYSTEM_DIAGNOSTIC_ROUTED: "SYS-ROUTER-001"
 };
 
 // --- Output types (Spec §"DecisionCardPayload Contract") ---
@@ -219,10 +236,12 @@ export type DecisionCardPayload = {
   cardId: string;
   routeId: string;
   intent: IntentCode;
+  intentGroup: IntentGroup;
   generatedAt: string;
   verdict: CardVerdict;
   severity: "P0" | "P1" | "P2";
   primaryReason: string;
+  nextAction: string;
   unblockSummary: string;
   piiStatus: PiiStatus;
   dataClass: DataClass;
@@ -532,6 +551,38 @@ function mapActions(
   });
 }
 
+const SYSTEM_QA_INTENTS = new Set<IntentCode>([
+  "SYSTEM_DIAGNOSTIC",
+  "ONTOLOGY_PATCH_REVIEW",
+  "CARD_RENDERING_AUDIT",
+  "RULEPACK_GAP_ANALYSIS",
+  "ROUTER_QA",
+  "EVIDENCE_QA",
+  "SCHEMA_BOUNDARY_REVIEW",
+  "VALIDATION_POLICY_REVIEW"
+]);
+
+function deriveIntentGroup(intent: IntentCode): IntentGroup {
+  return SYSTEM_QA_INTENTS.has(intent) ? "SYSTEM_QA" : "OPERATIONAL";
+}
+
+function deriveNextAction(actions: readonly ActionRecommendation[], verdict: CardVerdict): string {
+  const firstAction = actions[0];
+  if (firstAction) {
+    const parameterHint =
+      firstAction.parameters.requiredInput ??
+      firstAction.parameters.requiredEvidence ??
+      firstAction.parameters.next ??
+      firstAction.parameters.semanticBoundary;
+    return typeof parameterHint === "string" && parameterHint.trim()
+      ? `${firstAction.actionType}: ${parameterHint}`
+      : firstAction.actionType;
+  }
+  if (verdict === "ZERO") return "Stop and provide redacted evidence only";
+  if (verdict === "BLOCK") return "Resolve blockedBy requirements before operational use";
+  return "Review evidence and proceed read-only";
+}
+
 // --- Adapter ---
 
 export function toDecisionCardPayload(args: {
@@ -663,10 +714,12 @@ export function toDecisionCardPayload(args: {
     cardId: args.cardId ?? `DC-${answer.answerId}`,
     routeId: answer.route.routeId,
     intent: answer.route.intent,
+    intentGroup: deriveIntentGroup(answer.route.intent),
     generatedAt: answer.generatedAt,
     verdict,
     severity: pickHighestSeverity(blockedBy),
     primaryReason,
+    nextAction: deriveNextAction(answer.actions, verdict),
     unblockSummary,
     piiStatus,
     dataClass: args.dataClass ?? (hasZeroFindings ? "P2" : "P1"),

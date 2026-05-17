@@ -1,6 +1,6 @@
 # SCT Card Simulation Log
 
-- generatedAt: 2026-05-17T22:03:49.485Z
+- generatedAt: 2026-05-17T22:12:36.723Z
 - command: npm run report:sct-card
 
 ## system-diagnostic: System diagnostic hard-negative
@@ -114,7 +114,7 @@ Output:
 - evidenceCount: 8
 - graphStartNodes: WarehouseHandlingProfile.confirmedFlowCode
 - graphRiskEdges: None
-- blockedBy: SCT-SCHEMA-007
+- blockedBy: A-FLOW-001
 - actions: KEEP_FLOW_CODE_WHP_ONLY (Open; mode=READ_ONLY; audit=false)
 
 ## p2-zero-gate: P2 raw exposure ZERO gate

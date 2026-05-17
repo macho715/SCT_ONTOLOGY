@@ -118,9 +118,11 @@
       "required": [
         "schemaVersion",
         "intent",
+        "intentGroup",
         "verdict",
         "severity",
         "primaryReason",
+        "nextAction",
         "blockedBy",
         "allowedNow",
         "blockedUntilApproved",
@@ -152,6 +154,10 @@
             "GENERAL_ANSWER"
           ]
         },
+        "intentGroup": {
+          "type": "string",
+          "enum": ["SYSTEM_QA", "OPERATIONAL"]
+        },
         "verdict": {
           "type": "string",
           "enum": ["DIAGNOSTIC", "PASS", "PASS_WITH_FINDINGS", "DRAFT_READY", "AMBER", "NEEDS_INPUT", "PENDING_APPROVAL", "DRY_RUN_ONLY", "WARN", "BLOCK", "ZERO"]
@@ -164,6 +170,10 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 80
+        },
+        "nextAction": {
+          "type": "string",
+          "minLength": 1
         },
         "blockedBy": {
           "type": "array",
