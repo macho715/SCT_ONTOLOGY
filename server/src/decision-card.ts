@@ -2,6 +2,7 @@ import type {
   ActionRecommendation,
   EvidenceSnippet,
   GroundedAnswer,
+  IntentCode,
   ReasonCode,
   ValidationFinding
 } from "./types.js";
@@ -32,6 +33,17 @@ export type ActionStatus =
   | "Unassigned";
 export type DataClass = "P0" | "P1" | "P2";
 export type ExportType = "Copy JSON" | "Export PDF Draft" | "Publish Report";
+export type HumanGateState =
+  | "READ_ONLY"
+  | "DRY_RUN"
+  | "APPROVAL_REQUESTED"
+  | "APPROVED_ACTION"
+  | "EXECUTED"
+  | "AUDITED"
+  | "DENIED"
+  | "CANCELLED"
+  | "EXPIRED"
+  | "NEEDS_REVIEW";
 
 // --- Rule matrix ---
 
@@ -122,7 +134,8 @@ export const REASON_CODE_TO_RULE: Readonly<Record<string, string>> = {
   FLOW_CODE_SCOPE_INFO: "SCT-SCHEMA-007",
   M130_CHAIN_EVIDENCE_REQUIRED: "SCT-DOC-002",
   SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED: "SCT-DOC-002",
-  SHIPMENT_MISSING_DOCUMENTS: "SCT-SCHEMA-007"
+  SHIPMENT_MISSING_DOCUMENTS: "SCT-SCHEMA-007",
+  SYSTEM_DIAGNOSTIC_ROUTED: "SCT-SCHEMA-007"
 };
 
 // --- Output types (Spec §"DecisionCardPayload Contract") ---
@@ -133,6 +146,7 @@ export type BlockedByEntry = {
   reason: string;
   requiredInputs: string[];
   missingInputs: string[];
+  blockedActions: string[];
   severity: "P0" | "P1" | "P2";
 };
 
@@ -141,6 +155,7 @@ export type EvidenceCoverageItem = {
   status: EvidenceDomainStatus;
   required: number;
   available: number;
+  directSupportRatio: number;
 };
 
 export type ActionItem = {
@@ -155,12 +170,14 @@ export type ActionItem = {
   status: ActionStatus;
   evidenceIds: string[];
   blockedUntil: string[];
+  dueBasis: string;
   dueAt: string | null;
 };
 
 export type DecisionCardTrace = {
   sourceHash: string;
   rulePackVersion: string;
+  rulePackIds: string[];
   promptVersion: string;
   approvalActor: string | null;
   approvalStatus: ApprovalStatus;
@@ -170,8 +187,10 @@ export type DecisionCardTrace = {
 };
 
 export type DecisionCardPayload = {
+  schemaVersion: "sct.card.v2";
   cardId: string;
   routeId: string;
+  intent: IntentCode;
   generatedAt: string;
   verdict: CardVerdict;
   severity: "P0" | "P1" | "P2";
@@ -182,6 +201,9 @@ export type DecisionCardPayload = {
   blockedBy: BlockedByEntry[];
   allowedActions: string[];
   blockedActions: string[];
+  allowedNow: string[];
+  blockedUntilApproved: string[];
+  humanGateState: HumanGateState;
   evidenceCoverage: EvidenceCoverageItem[];
   actions: ActionItem[];
   trace: DecisionCardTrace;
@@ -216,17 +238,26 @@ export function derivePiiStatus(args: {
 }
 
 export function buildEvidenceCoverage(args: {
-  evidence: ReadonlyArray<{ id: string; docId: string }>;
+  evidence: ReadonlyArray<{ id: string; docId: string; evidenceScore?: EvidenceSnippet["evidenceScore"] }>;
   requiredDocs: readonly string[];
 }): EvidenceCoverageItem[] {
   return args.requiredDocs.map((doc) => {
     const matches = args.evidence.filter((e) => e.docId.includes(doc));
     const available = matches.length;
+    const directSupportRatio = available === 0
+      ? 0
+      : Number(
+          (
+            matches.reduce((total, item) => total + (item.evidenceScore?.directSupport ?? 0), 0) /
+            available
+          ).toFixed(2)
+        );
     return {
       domain: doc,
       status: available > 0 ? ("PASS" as const) : ("BLOCK" as const),
       required: 1,
-      available
+      available,
+      directSupportRatio
     };
   });
 }
@@ -253,6 +284,25 @@ export function buildBlockedActions(args: {
     for (const action of APPROVAL_PENDING_BLOCKED) collected.add(action);
   }
   return Array.from(collected);
+}
+
+export function deriveHumanGateState(args: {
+  approvalRequired: boolean;
+  approvalStatus: ApprovalStatus;
+}): HumanGateState {
+  if (!args.approvalRequired) return "READ_ONLY";
+  switch (args.approvalStatus) {
+    case "Approved":
+      return "APPROVED_ACTION";
+    case "Pending":
+      return "APPROVAL_REQUESTED";
+    case "Rejected":
+      return "DENIED";
+    case "Expired":
+      return "EXPIRED";
+    case "NotRequired":
+      return "NEEDS_REVIEW";
+  }
 }
 
 // --- Internal helpers ---
@@ -302,6 +352,7 @@ function buildBlockedByEntries(findings: readonly ValidationFinding[]): BlockedB
       reason: rule.reason,
       requiredInputs: Array.from(rule.requiredInputs),
       missingInputs: Array.from(rule.requiredInputs),
+      blockedActions: Array.from(rule.blockedActions),
       severity: rule.severity
     });
   }
@@ -312,10 +363,33 @@ function mapActions(
   actions: readonly ActionRecommendation[],
   approvalStatus: ApprovalStatus
 ): ActionItem[] {
+  const firstStringParameter = (
+    parameters: ActionRecommendation["parameters"],
+    keys: readonly string[]
+  ): string | null => {
+    for (const key of keys) {
+      const value = parameters?.[key];
+      if (typeof value === "string" && value.trim()) return value;
+      if (typeof value === "number" || typeof value === "boolean") return String(value);
+    }
+    return null;
+  };
+
   return actions.map((action, index) => {
-    const requiredInputRaw = action.parameters?.["input"];
-    const requiredInput =
-      typeof requiredInputRaw === "string" ? requiredInputRaw : null;
+    const requiredInput = firstStringParameter(action.parameters, [
+      "input",
+      "requiredInput",
+      "requiredEvidence",
+      "requiredSource",
+      "reason",
+      "scope",
+      "next",
+      "semanticBoundary"
+    ]);
+    const dueBasis =
+      action.dueBasis ??
+      firstStringParameter(action.parameters, ["dueBasis", "deadlineBasis"]) ??
+      (action.humanGateRequired ? "Before approval-gated execution" : "Before operational use");
     return {
       actionId: `ACT-${String(index + 1).padStart(3, "0")}`,
       ownerRole: action.ownerRole,
@@ -327,9 +401,10 @@ function mapActions(
       requiredInput,
       approvalRequired: action.humanGateRequired,
       approvalStatus: action.humanGateRequired ? approvalStatus : "NotRequired",
-      status: "Open",
+      status: action.humanGateRequired && approvalStatus !== "Approved" ? "Pending Approval" : "Open",
       evidenceIds: [],
       blockedUntil: requiredInput ? [requiredInput] : [],
+      dueBasis,
       dueAt: action.dueAt
     };
   });
@@ -351,10 +426,7 @@ export function toDecisionCardPayload(args: {
 }): DecisionCardPayload {
   const { answer } = args;
 
-  const blockedBy = buildBlockedByEntries(answer.validation);
-  const missingRequiredInputs = Array.from(
-    new Set(blockedBy.flatMap((entry) => entry.requiredInputs))
-  );
+  let blockedBy = buildBlockedByEntries(answer.validation);
 
   const piiStatus = derivePiiStatus({
     piiMasked: answer.piiMasked,
@@ -369,6 +441,26 @@ export function toDecisionCardPayload(args: {
     args.approvalState?.required ?? (hasHumanGateFinding || hasHumanGateAction);
   const approvalStatus: ApprovalStatus =
     args.approvalState?.status ?? "NotRequired";
+
+  if (approvalRequired && approvalStatus !== "Approved" && !blockedBy.some((entry) => entry.ruleId === "SCT-APP-005")) {
+    const rule = RULE_MATRIX["SCT-APP-005"];
+    blockedBy = [
+      ...blockedBy,
+      {
+        ruleId: rule.ruleId,
+        ruleName: rule.ruleName,
+        reason: rule.reason,
+        requiredInputs: Array.from(rule.requiredInputs),
+        missingInputs: Array.from(rule.requiredInputs),
+        blockedActions: Array.from(rule.blockedActions),
+        severity: rule.severity
+      }
+    ];
+  }
+
+  const missingRequiredInputs = Array.from(
+    new Set(blockedBy.flatMap((entry) => entry.requiredInputs))
+  );
 
   const hasBlockingFindings = answer.validation.some(
     (f) => f.severity === "BLOCK"
@@ -399,13 +491,13 @@ export function toDecisionCardPayload(args: {
   });
 
   const evidenceCoverage = buildEvidenceCoverage({
-    evidence: answer.evidence.map((e) => ({ id: e.id, docId: e.docId })),
+    evidence: answer.evidence.map((e) => ({ id: e.id, docId: e.docId, evidenceScore: e.evidenceScore })),
     requiredDocs: answer.route.requiredDocs
   });
 
   const primaryReason = (() => {
     const firstBlock = answer.validation.find((f) => f.severity === "BLOCK");
-    const source = firstBlock?.message ?? "No blocking finding";
+    const source = firstBlock?.message ?? blockedBy[0]?.reason ?? (verdict === "BLOCK" ? "Blocked by decision card consistency validator" : "No blocking finding");
     return truncate(source, 80);
   })();
 
@@ -416,10 +508,19 @@ export function toDecisionCardPayload(args: {
   if (verdict === "PASS" && approvalStatus === "Approved") {
     allowedActions.push("Publish Report");
   }
+  if (verdict === "BLOCK") allowedActions.push("Copy JSON");
+
+  const humanGateState = deriveHumanGateState({ approvalRequired, approvalStatus });
+  const allowedNow = Array.from(new Set([...answer.route.allowedActions, ...allowedActions]));
+  const blockedUntilApproved = Array.from(
+    new Set([...answer.route.blockedActions, ...blockedActions])
+  );
 
   return {
+    schemaVersion: "sct.card.v2",
     cardId: args.cardId ?? `DC-${answer.answerId}`,
     routeId: answer.route.routeId,
+    intent: answer.route.intent,
     generatedAt: answer.generatedAt,
     verdict,
     severity: pickHighestSeverity(blockedBy),
@@ -430,11 +531,15 @@ export function toDecisionCardPayload(args: {
     blockedBy,
     allowedActions,
     blockedActions,
+    allowedNow,
+    blockedUntilApproved,
+    humanGateState,
     evidenceCoverage,
     actions: mapActions(answer.actions, approvalStatus),
     trace: {
       sourceHash: deterministicSourceHash(answer.evidence),
       rulePackVersion: args.rulePackVersion ?? "2026.05",
+      rulePackIds: answer.route.rulePackIds,
       promptVersion: args.promptVersion ?? "unknown",
       approvalActor: args.approvalState?.actor ?? null,
       approvalStatus,

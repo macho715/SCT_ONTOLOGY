@@ -58,8 +58,12 @@ const minimalAnswer: GroundedAnswer = {
   validationStatus: "PASS",
   route: {
     routeId: "r1",
+    intent: "DOCUMENT_GUARDIAN",
     domains: ["document"],
     requiredDocs: ["CONSOLIDATED-00"],
+    rulePackIds: ["DOCUMENT_RULEPACK"],
+    allowedActions: ["read"],
+    blockedActions: ["customs_submission_without_approval"],
     confidence: 0.9,
     routingReason: "Test route"
   },

@@ -86,10 +86,37 @@ describe("sct_ontology operating contract", () => {
       properties: Record<string, unknown>;
     };
 
-    for (const field of ["verdict", "evidence", "evidenceIds", "validationStatus", "validation", "actions", "humanGateRequired", "audit"]) {
+    for (const field of ["verdict", "evidence", "evidenceIds", "validationStatus", "validation", "actions", "decisionCard", "humanGateRequired", "audit"]) {
       expect(schema.required).toContain(field);
       expect(schema.properties[field], `${field} schema`).toBeDefined();
     }
+
+    const decisionCard = schema.properties.decisionCard as {
+      required: string[];
+      properties: Record<string, unknown>;
+    };
+    for (const field of ["schemaVersion", "intent", "blockedBy", "allowedNow", "blockedUntilApproved", "humanGateState", "trace"]) {
+      expect(decisionCard.required).toContain(field);
+      expect(decisionCard.properties[field], `decisionCard.${field} schema`).toBeDefined();
+    }
+
+    const evidence = schema.properties.evidence as {
+      items: { required: string[]; properties: Record<string, unknown> };
+    };
+    expect(evidence.items.required).toContain("evidenceScore");
+    expect(evidence.items.properties.evidenceScore).toBeDefined();
+
+    const evidenceCoverage = (decisionCard.properties.evidenceCoverage as {
+      items: { required: string[]; properties: Record<string, unknown> };
+    });
+    expect(evidenceCoverage.items.required).toContain("directSupportRatio");
+    expect(evidenceCoverage.items.properties.directSupportRatio).toBeDefined();
+
+    const actionItems = decisionCard.properties.actions as {
+      items: { required: string[]; properties: Record<string, unknown> };
+    };
+    expect(actionItems.items.required).toContain("dueBasis");
+    expect(actionItems.items.properties.dueBasis).toBeDefined();
   });
 
   it("covers every required risk domain in the evidence matrix", () => {

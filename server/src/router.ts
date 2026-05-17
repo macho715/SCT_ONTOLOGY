@@ -1,4 +1,4 @@
-import type { DomainHint, IntentRoute, ResolvedEntity } from "./types.js";
+import type { DomainHint, IntentCode, IntentRoute, ResolvedEntity } from "./types.js";
 import { expandIdentifierVariants } from "./identifier-normalizer.js";
 import { sha256 } from "./redact.js";
 
@@ -75,6 +75,71 @@ const DAILY_LOGISTICS_KPI =
   /daily report|daily logistics|daily kpi|kpi dashboard|delivery\/collection|delivery|collection|customs clearance|new eta|\bETA\b|det\/dem|dem\/det|sr\b|lifting inspection|vessel movement|packing list|return\/rectification|rectification|scrap|owner|next action|risk|locked|confirmed|원장|확정|잠금|일일|데일리|날짜별|물류\s*kpi|운영\s*kpi/i;
 const EXPLICIT_INVOICE_COST_AUDIT =
   /invoice audit|costguard|overcharge|과청구|invoice line|rateref|rate ref|tariffref|tariff ref|line amount|invoice total|청구서\s*검토|비용\s*감사|정산\s*승인/i;
+const COST_DECISION_TERMS =
+  /\b(?:invoice|cost|costguard|rate|rateref|tariff|tariffref|dem|det|demurrage|detention|aed|usd)\b|청구|정산|비용|요율/i;
+const SYSTEM_DIAGNOSTIC_TERMS =
+  /(?:sct[_\s-]?ontology|ontology|card|decision\s*card|router|validation|evidence|schema|rulepack|renderer|rendering|widget|template|ui|mcp|answer\s*card|카드|위젯|템플릿|라우터|검증|근거|스키마|룰팩|렌더|점검|진단|감사|audit|diagnostic|health)/i;
+const SYSTEM_SUBJECT_TERMS =
+  /(?:sct[_\s-]?ontology|ontology|system[_\s-]?qa[_\s-]?rulepack|system[_\s-]?diagnostic|card[_\s-]?rendering[_\s-]?audit|ontology[_\s-]?patch[_\s-]?review|decision\s*card|decisioncard|evidenceranker|actionplanner|humangate|zero\s*gate|sourcehash|approvaltrace|validationreport|card|router|validation|schema|rulepack|renderer|rendering|widget|template|ui|mcp|answer\s*card|카드|위젯|템플릿|라우터|스키마|룰팩|렌더)/i;
+const SYSTEM_HARD_NEGATIVE_TERMS =
+  /점검|진단|패치|개선|업그레이드|upgrade|patch|audit|diagnostic|health|card|router|validation|evidence|schema|rulepack|renderer|rendering|widget|template|카드|라우터|검증|근거|스키마|룰팩|렌더|위젯/i;
+const CARD_RENDERING_TERMS =
+  /card|answer\s*card|decision\s*card|renderer|rendering|widget|template|ui|fallback|failed to fetch|카드|위젯|템플릿|렌더|화면|표시/i;
+const PATCH_REVIEW_TERMS =
+  /패치|개선|업그레이드|upgrade|patch|governance|rulepack|schema|acceptance criteria|backlog|roadmap|사양|spec|수정안/i;
+const EMAIL_DRAFT_TERMS =
+  /(?:email|e-mail|mail|thread|이메일|메일|회신|답장|수신자).*(?:draft|write|compose|reply|초안|작성|회신|답장)|(?:draft|write|compose|reply|초안|작성|회신|답장).*(?:email|e-mail|mail|thread|이메일|메일|수신자)/i;
+const COST_APPROVAL_ACTION_TERMS =
+  /approve|approval|accept|pay|release|post|write|confirm|confirmed|승인|확정|반영|지급|릴리즈/i;
+const DOCUMENT_GUARDIAN_TERMS =
+  /\b(?:ci|pl|bl|boe|do|ocr|coo|permit)\b|packing list|delivery order|첨부|서류|문서|통관/i;
+const LOGISTICS_DECISION_TERMS =
+  /\b(?:eta|etd|ata|atd|berth|tide|wh|warehouse|customs|mosb|site|delivery|shipment|container|invoice|dem|det)\b|물류|통관|창고|현장|선적|배송|해상|비용/i;
+
+const SYSTEM_INTENTS = new Set<IntentCode>([
+  "SYSTEM_DIAGNOSTIC",
+  "ONTOLOGY_PATCH_REVIEW",
+  "CARD_RENDERING_AUDIT"
+]);
+
+export const RULEPACK_REGISTRY: Readonly<Record<string, { domains: DomainHint[]; intents: IntentCode[] }>> = {
+  SYSTEM_QA_RULEPACK: {
+    domains: ["system", "master"],
+    intents: ["SYSTEM_DIAGNOSTIC", "ONTOLOGY_PATCH_REVIEW", "CARD_RENDERING_AUDIT"]
+  },
+  IDENTITY_RULEPACK: {
+    domains: ["master", "material", "document"],
+    intents: ["LOGISTICS_DECISION", "DOCUMENT_GUARDIAN", "GENERAL_ANSWER"]
+  },
+  MARINE_RULEPACK: {
+    domains: ["marine"],
+    intents: ["LOGISTICS_DECISION"]
+  },
+  CUSTOMS_RULEPACK: {
+    domains: ["document", "port", "compliance"],
+    intents: ["LOGISTICS_DECISION", "DOCUMENT_GUARDIAN"]
+  },
+  COST_RULEPACK: {
+    domains: ["cost"],
+    intents: ["COST_GUARD"]
+  },
+  DOCUMENT_RULEPACK: {
+    domains: ["document"],
+    intents: ["DOCUMENT_GUARDIAN", "LOGISTICS_DECISION"]
+  },
+  WAREHOUSE_RULEPACK: {
+    domains: ["warehouse"],
+    intents: ["LOGISTICS_DECISION"]
+  },
+  COMM_RULEPACK: {
+    domains: ["communication"],
+    intents: ["EMAIL_DRAFT"]
+  },
+  PII_NDA_RULEPACK: {
+    domains: ["communication", "document", "cost"],
+    intents: ["EMAIL_DRAFT", "COST_GUARD", "DOCUMENT_GUARDIAN", "LOGISTICS_DECISION"]
+  }
+};
 
 export function isDailyLogisticsKpiQuestion(question: string): boolean {
   return DAILY_LOGISTICS_KPI.test(question) && /kpi|dashboard|report|보고서|대시보드|관점|추출|정리/i.test(question);
@@ -84,11 +149,93 @@ function isExplicitInvoiceCostAuditQuestion(question: string): boolean {
   return EXPLICIT_INVOICE_COST_AUDIT.test(question);
 }
 
+export function classifyIntent(question: string): IntentCode {
+  const hasExplicitCostGuard =
+    COST_DECISION_TERMS.test(question) &&
+    (EXPLICIT_INVOICE_COST_AUDIT.test(question) || COST_APPROVAL_ACTION_TERMS.test(question));
+  const hasSystemSubject = SYSTEM_SUBJECT_TERMS.test(question);
+  const hasSystemHardNegative = SYSTEM_HARD_NEGATIVE_TERMS.test(question) && hasSystemSubject;
+
+  if (hasExplicitCostGuard && !hasSystemSubject) return "COST_GUARD";
+
+  if (hasSystemHardNegative && CARD_RENDERING_TERMS.test(question)) return "CARD_RENDERING_AUDIT";
+  if (hasSystemHardNegative && PATCH_REVIEW_TERMS.test(question)) return "ONTOLOGY_PATCH_REVIEW";
+  if (hasSystemHardNegative) return "SYSTEM_DIAGNOSTIC";
+
+  if (EMAIL_DRAFT_TERMS.test(question)) return "EMAIL_DRAFT";
+
+  if (hasExplicitCostGuard) return "COST_GUARD";
+
+  if (DOCUMENT_GUARDIAN_TERMS.test(question)) return "DOCUMENT_GUARDIAN";
+  if (LOGISTICS_DECISION_TERMS.test(question)) return "LOGISTICS_DECISION";
+  return "GENERAL_ANSWER";
+}
+
+function buildIntentActions(intent: IntentCode): Pick<IntentRoute, "allowedActions" | "blockedActions"> {
+  switch (intent) {
+    case "SYSTEM_DIAGNOSTIC":
+    case "CARD_RENDERING_AUDIT":
+      return {
+        allowedActions: ["read", "diagnostic_report", "test_scenario"],
+        blockedActions: ["email_draft", "external_send", "cost_approval", "write_back"]
+      };
+    case "ONTOLOGY_PATCH_REVIEW":
+      return {
+        allowedActions: ["read", "patch_spec", "backlog", "acceptance_criteria"],
+        blockedActions: ["email_draft", "write_back_without_approval", "external_send", "cost_approval"]
+      };
+    case "EMAIL_DRAFT":
+      return {
+        allowedActions: ["read", "internal_draft"],
+        blockedActions: ["external_send_without_approval", "kg_mutation_without_explicit_instruction"]
+      };
+    case "COST_GUARD":
+      return {
+        allowedActions: ["read", "dry_run", "variance_report"],
+        blockedActions: ["invoice_approval_without_rateref_tariffref", "write_back_without_approval"]
+      };
+    case "DOCUMENT_GUARDIAN":
+      return {
+        allowedActions: ["read", "extract", "compare", "missing_field_list"],
+        blockedActions: ["customs_submission_without_approval", "write_back_without_approval"]
+      };
+    case "LOGISTICS_DECISION":
+      return {
+        allowedActions: ["read", "dry_run", "risk_memo", "input_request"],
+        blockedActions: ["final_authority_decision_without_evidence", "write_back_without_approval"]
+      };
+    case "GENERAL_ANSWER":
+      return {
+        allowedActions: ["read", "evidence_review"],
+        blockedActions: ["external_send", "write_back", "publish"]
+      };
+  }
+}
+
+export function resolveRulePackIds(intent: IntentCode, domains: Iterable<DomainHint>): string[] {
+  const domainSet = new Set(domains);
+  const selected = new Set<string>();
+
+  for (const [rulePackId, entry] of Object.entries(RULEPACK_REGISTRY)) {
+    if (entry.intents.includes(intent) || entry.domains.some((domain) => domainSet.has(domain))) {
+      selected.add(rulePackId);
+    }
+  }
+
+  if (SYSTEM_INTENTS.has(intent)) {
+    selected.delete("COST_RULEPACK");
+    selected.delete("COMM_RULEPACK");
+  }
+
+  return Array.from(selected);
+}
+
 export function routeQuestion(question: string, userRole = "ops_user", language = "auto"): IntentRoute {
   const domains = new Set<DomainHint>(["master"]);
   const docs = new Set<string>(["CONSOLIDATED-00-master-ontology"]);
   const reasons: string[] = [];
   const dailyKpiQuestion = isDailyLogisticsKpiQuestion(question);
+  const intent = classifyIntent(question);
 
   for (const rule of DOMAIN_RULES) {
     if (rule.patterns.some((pattern) => pattern.test(question))) {
@@ -116,16 +263,48 @@ export function routeQuestion(question: string, userRole = "ops_user", language 
     reasons.push("daily logistics KPI override: DET/DEM treated as operations risk, not CostGuard audit");
   }
 
+  if (SYSTEM_INTENTS.has(intent)) {
+    domains.add("system");
+    domains.delete("cost");
+    domains.delete("communication");
+    docs.delete("CONSOLIDATED-05-invoice-cost");
+    docs.delete("CONSOLIDATED-08-communication");
+    reasons.push(`system hard-negative intent: ${intent} cannot route to email draft, external send, or cost approval`);
+  }
+
+  if (intent === "EMAIL_DRAFT") {
+    domains.add("communication");
+    docs.add("CONSOLIDATED-08-communication");
+    domains.delete("cost");
+    docs.delete("CONSOLIDATED-05-invoice-cost");
+    reasons.push("email draft intent: communication evidence lane only; send remains human-gated");
+  }
+
+  if (intent === "COST_GUARD") {
+    domains.add("cost");
+    domains.add("document");
+    docs.add("CONSOLIDATED-05-invoice-cost");
+    docs.add("CONSOLIDATED-03-document-ocr");
+    reasons.push("cost guard intent: cost rulepack requires explicit audit or approval action");
+  }
+
   if (domains.size === 1) {
     domains.add("operations");
     docs.add("CONSOLIDATED-09-operations");
     reasons.push("fallback: operations context");
   }
 
+  const actions = buildIntentActions(intent);
+  const rulePackIds = resolveRulePackIds(intent, domains);
+
   return {
     routeId: `route_${sha256(`${question}|${userRole}|${language}`).slice(0, 10)}`,
+    intent,
     domains: Array.from(domains),
     requiredDocs: Array.from(docs),
+    rulePackIds,
+    allowedActions: actions.allowedActions,
+    blockedActions: actions.blockedActions,
     confidence: Number(Math.min(0.98, 0.72 + reasons.length * 0.04).toFixed(2)),
     routingReason: reasons.join("; ")
   };

@@ -30,6 +30,7 @@ const FLOW_CODE_MISUSE = /route|routing|customs|invoice|kpi|bucket|classificatio
 const ANY_KEY_AMBIGUITY = /ambiguous|ambiguity|unclear|multiple|duplicate|same|which|모호|중복|여러|둘 다|같은|어느|하나만/i;
 const HUMAN_GATE_TERMS =
   /write[- ]?back|send|export|publish|approve|approval|invoice|cost|rate|tariff|report|lock|locked|confirm|confirmed|whatsapp|email|청구|정산|승인|보고서|확정|잠금|전송|발송|내보내기/i;
+const SYSTEM_INTENTS = new Set(["SYSTEM_DIAGNOSTIC", "ONTOLOGY_PATCH_REVIEW", "CARD_RENDERING_AUDIT"]);
 const GENERIC_QUERY_TERMS = new Set([
   "the",
   "and",
@@ -70,6 +71,19 @@ export function validateGrounding(args: {
 }): ValidationFinding[] {
   const findings: ValidationFinding[] = [];
   const evidenceIds = args.evidence.map((item) => item.id);
+  const isSystemIntent = SYSTEM_INTENTS.has(args.route.intent);
+
+  if (isSystemIntent) {
+    findings.push({
+      ruleId: "SYS-ROUTER-001",
+      reasonCode: "SYSTEM_DIAGNOSTIC_ROUTED",
+      severity: "INFO",
+      status: "PASS",
+      targetObject: "IntentRoute",
+      evidenceIds,
+      message: "System/card diagnostic intent is isolated from email draft, external send, and cost approval rulepacks."
+    });
+  }
 
   if (!args.route.requiredDocs.some((doc) => doc.includes("CONSOLIDATED-00"))) {
     findings.push({
@@ -145,7 +159,7 @@ export function validateGrounding(args: {
     });
   }
 
-  if (COST_DECISION_TERMS.test(args.question) && COST_FINAL_DECISION_TERMS.test(args.question)) {
+  if (!isSystemIntent && COST_DECISION_TERMS.test(args.question) && COST_FINAL_DECISION_TERMS.test(args.question)) {
     findings.push({
       ruleId: "SCT-COST-001",
       reasonCode: "SCT_COST_EVIDENCE_REQUIRED",
@@ -205,7 +219,7 @@ export function validateGrounding(args: {
     });
   }
 
-  if (HUMAN_GATE_TERMS.test(args.question)) {
+  if (!isSystemIntent && HUMAN_GATE_TERMS.test(args.question)) {
     findings.push({
       ruleId: "A-ACTION-001",
       reasonCode: "HUMAN_GATE_REQUIRED",
@@ -337,7 +351,7 @@ function buildEvidenceTrace(args: {
   });
 }
 
-function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions"> {
+function composeSummary(question: string, verdict: Verdict, route: IntentRoute): Pick<GroundedAnswer, "summary" | "businessImpact" | "details" | "actions"> {
   if (verdict === "NO_EVIDENCE") {
     return {
       summary: "관련 온톨로지 근거를 찾지 못해 업무 답변을 중단했습니다.",
@@ -424,7 +438,38 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
     };
   }
 
-  if (isEmailDraftRequest(question)) {
+  if (route.intent === "SYSTEM_DIAGNOSTIC" || route.intent === "ONTOLOGY_PATCH_REVIEW" || route.intent === "CARD_RENDERING_AUDIT") {
+    const actionType =
+      route.intent === "CARD_RENDERING_AUDIT"
+        ? "RUN_CARD_RENDERING_AUDIT"
+        : route.intent === "ONTOLOGY_PATCH_REVIEW"
+          ? "REVIEW_ONTOLOGY_CARD_PATCH_SPEC"
+          : "RUN_SYSTEM_QA_RULEPACK";
+    return {
+      summary: "SCT_ONTOLOGY CARD 시스템 점검 요청으로 분류했습니다. 이메일 초안이나 비용 승인으로 처리하지 않습니다.",
+      businessImpact: "router, validation, evidence, schema 점검은 운영 판단 카드 품질을 확인하는 읽기/진단 작업입니다.",
+      details: [
+        "SYSTEM_QA_RULEPACK을 우선 적용하고 COMM/COST write rulepack은 차단합니다.",
+        "email, cost 같은 단어가 포함되어도 초안 작성이나 승인 실행 intent로 승격하지 않습니다.",
+        "필요한 출력은 진단 결과, patch backlog, acceptance criteria, 회귀 테스트 시나리오입니다."
+      ],
+      actions: [
+        {
+          actionType,
+          ownerRole: "Ontology Platform Owner",
+          parameters: {
+            intent: route.intent,
+            rulePacks: route.rulePackIds.join(", "),
+            blockedActions: route.blockedActions.join(", ")
+          },
+          humanGateRequired: false,
+          dueAt: null
+        }
+      ]
+    };
+  }
+
+  if (route.intent === "EMAIL_DRAFT") {
     return {
       summary: "이 질문은 HVDC 물류 이메일 답장 작성 요청입니다. sct_ontology 검토 후 현재 제공된 이메일 문맥에 맞춰 초안을 분리해야 합니다.",
       businessImpact: "이메일 초안 내용을 특정 과거 케이스로 고정하지 않으면 잘못된 수신자, 요청 문서, 운송 목적이 포함되는 리스크를 줄일 수 있습니다.",
@@ -449,7 +494,7 @@ function composeSummary(question: string, verdict: Verdict): Pick<GroundedAnswer
     };
   }
 
-  if (COST_DECISION_TERMS.test(question)) {
+  if (route.intent === "COST_GUARD") {
     return {
       summary: "Invoice/Cost 질문은 CostGuard evidence pack 기준으로 검토해야 하며, 금액·요율·TariffRef 근거가 없으면 최종 판단을 보류합니다.",
       businessImpact: "RateRef/TariffRef/InvoiceLine 정합성 없이 과청구 판단을 확정하면 정산 dispute 또는 recovery 누락이 발생할 수 있습니다.",
@@ -526,7 +571,7 @@ export function answerQuestion(args: {
   const shipmentValidation = mergeShipmentValidation(shipmentRule);
   const mergedValidation = [...validation, ...shipmentValidation.findings];
   const verdict = deriveVerdict(evidence, mergedValidation);
-  const core = composeSummary(maskedQuestion.text, verdict);
+  const core = composeSummary(maskedQuestion.text, verdict, route);
   // WARN-6: Build actions immutably to avoid shared reference between evidenceTrace and answer
   const baseActions = [...core.actions, ...shipmentValidation.actions];
   const needsHumanGate = mergedValidation.some((finding) => finding.ruleId === "A-ACTION-001") && !baseActions.some((action) => action.humanGateRequired);

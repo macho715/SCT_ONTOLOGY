@@ -12,6 +12,7 @@
     "validationStatus",
     "validation",
     "actions",
+    "decisionCard",
     "humanGateRequired",
     "audit"
   ],
@@ -31,12 +32,40 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "docId", "sectionPath", "snippet", "sourceType"],
+        "required": ["id", "docId", "sectionPath", "snippet", "sourceType", "evidenceScore"],
         "properties": {
           "id": { "type": "string" },
           "docId": { "type": "string" },
           "sectionPath": { "type": "string" },
           "snippet": { "type": "string" },
+          "evidenceScore": {
+            "type": "object",
+            "required": [
+              "evidenceId",
+              "intentRelevance",
+              "domainSpecificity",
+              "directSupport",
+              "authorityLevel",
+              "operationalActionability",
+              "recency",
+              "finalScore",
+              "supportState"
+            ],
+            "properties": {
+              "evidenceId": { "type": "string" },
+              "intentRelevance": { "type": "number" },
+              "domainSpecificity": { "type": "number" },
+              "directSupport": { "type": "number" },
+              "authorityLevel": { "type": "number" },
+              "operationalActionability": { "type": "number" },
+              "recency": { "type": "number" },
+              "finalScore": { "type": "number" },
+              "supportState": {
+                "type": "string",
+                "enum": ["SUPPORTED", "PARTIAL", "NO_DIRECT_EVIDENCE", "CONTRADICTED"]
+              }
+            }
+          },
           "sourceType": { "type": "string" }
         }
       }
@@ -76,6 +105,161 @@
           "ownerRole": { "type": "string" },
           "humanGateRequired": { "type": "boolean" },
           "parameters": { "type": "object" }
+        }
+      }
+    },
+    "decisionCard": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "intent",
+        "verdict",
+        "severity",
+        "primaryReason",
+        "blockedBy",
+        "allowedNow",
+        "blockedUntilApproved",
+        "humanGateState",
+        "evidenceCoverage",
+        "actions",
+        "trace"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "sct.card.v2"
+        },
+        "intent": {
+          "type": "string",
+          "enum": [
+            "SYSTEM_DIAGNOSTIC",
+            "ONTOLOGY_PATCH_REVIEW",
+            "CARD_RENDERING_AUDIT",
+            "LOGISTICS_DECISION",
+            "EMAIL_DRAFT",
+            "COST_GUARD",
+            "DOCUMENT_GUARDIAN",
+            "GENERAL_ANSWER"
+          ]
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["PASS", "WARN", "BLOCK"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["P0", "P1", "P2"]
+        },
+        "primaryReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "blockedBy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ruleId", "ruleName", "reason", "requiredInputs", "missingInputs", "blockedActions", "severity"],
+            "properties": {
+              "ruleId": { "type": "string" },
+              "ruleName": { "type": "string" },
+              "reason": { "type": "string" },
+              "requiredInputs": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "missingInputs": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "blockedActions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "severity": { "type": "string", "enum": ["P0", "P1", "P2"] }
+            }
+          }
+        },
+        "allowedNow": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blockedUntilApproved": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "humanGateState": {
+          "type": "string",
+          "enum": [
+            "READ_ONLY",
+            "DRY_RUN",
+            "APPROVAL_REQUESTED",
+            "APPROVED_ACTION",
+            "EXECUTED",
+            "AUDITED",
+            "DENIED",
+            "CANCELLED",
+            "EXPIRED",
+            "NEEDS_REVIEW"
+          ]
+        },
+        "evidenceCoverage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["domain", "status", "required", "available", "directSupportRatio"],
+            "properties": {
+              "domain": { "type": "string" },
+              "status": { "type": "string", "enum": ["PASS", "WARN", "BLOCK"] },
+              "required": { "type": "number" },
+              "available": { "type": "number" },
+              "directSupportRatio": { "type": "number" }
+            }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["actionId", "ownerRole", "actionType", "requiredInput", "approvalRequired", "approvalStatus", "status", "dueBasis"],
+            "properties": {
+              "actionId": { "type": "string" },
+              "ownerRole": { "type": "string" },
+              "actionType": { "type": "string" },
+              "requiredInput": { "type": ["string", "null"] },
+              "approvalRequired": { "type": "boolean" },
+              "approvalStatus": {
+                "type": "string",
+                "enum": ["NotRequired", "Pending", "Approved", "Rejected", "Expired"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["Open", "Pending Input", "Pending Approval", "Done", "Rejected", "Expired", "Unassigned"]
+              },
+              "dueBasis": { "type": "string" }
+            }
+          }
+        },
+        "trace": {
+          "type": "object",
+          "required": ["sourceHash", "rulePackVersion", "rulePackIds", "promptVersion", "approvalStatus", "generatedAt", "routeId"],
+          "properties": {
+            "sourceHash": { "type": "string" },
+            "rulePackVersion": { "type": "string" },
+            "rulePackIds": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "promptVersion": { "type": "string" },
+            "approvalActor": { "type": ["string", "null"] },
+            "approvalStatus": {
+              "type": "string",
+              "enum": ["NotRequired", "Pending", "Approved", "Rejected", "Expired"]
+            },
+            "sensitiveAccessed": { "type": "boolean" },
+            "generatedAt": { "type": "string" },
+            "routeId": { "type": "string" }
+          }
         }
       }
     },

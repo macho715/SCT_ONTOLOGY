@@ -292,6 +292,7 @@ export type HvdcProtectedStorage = {
 };
 
 const domainEnum = z.enum([
+  "system",
   "master",
   "warehouse",
   "document",
@@ -303,6 +304,17 @@ const domainEnum = z.enum([
   "operations",
   "team",
   "compliance"
+]);
+
+const intentEnum = z.enum([
+  "SYSTEM_DIAGNOSTIC",
+  "ONTOLOGY_PATCH_REVIEW",
+  "CARD_RENDERING_AUDIT",
+  "LOGISTICS_DECISION",
+  "EMAIL_DRAFT",
+  "COST_GUARD",
+  "DOCUMENT_GUARDIAN",
+  "GENERAL_ANSWER"
 ]);
 
 const approvalSchema = z.object({
@@ -391,6 +403,18 @@ const writeCommitOutputSchema = {
   contentHash: z.string().optional()
 };
 
+const evidenceScoreSchema = z.object({
+  evidenceId: z.string(),
+  intentRelevance: z.number(),
+  domainSpecificity: z.number(),
+  directSupport: z.number(),
+  authorityLevel: z.number(),
+  operationalActionability: z.number(),
+  recency: z.number(),
+  finalScore: z.number(),
+  supportState: z.enum(["SUPPORTED", "PARTIAL", "NO_DIRECT_EVIDENCE", "CONTRADICTED"])
+});
+
 const evidenceSchema = z.object({
   id: z.string(),
   docId: z.string(),
@@ -400,13 +424,18 @@ const evidenceSchema = z.object({
   snippet: z.string(),
   docHash: z.string(),
   confidence: z.number(),
+  evidenceScore: evidenceScoreSchema.optional(),
   sourceType: z.string()
 });
 
 const routeSchema = z.object({
   routeId: z.string(),
+  intent: intentEnum,
   domains: z.array(domainEnum),
   requiredDocs: z.array(z.string()),
+  rulePackIds: z.array(z.string()),
+  allowedActions: z.array(z.string()),
+  blockedActions: z.array(z.string()),
   confidence: z.number(),
   routingReason: z.string()
 });
@@ -534,7 +563,7 @@ const evidenceTraceSchema = z.object({
   targetType: z.enum(["summary", "businessImpact", "detail", "action"]),
   targetIndex: z.number().nullable(),
   answerText: z.string(),
-  supportState: z.enum(["SUPPORTED", "NO_DIRECT_EVIDENCE"]),
+  supportState: z.enum(["SUPPORTED", "PARTIAL", "NO_DIRECT_EVIDENCE", "CONTRADICTED"]),
   evidenceIds: z.array(z.string())
 });
 
@@ -561,6 +590,84 @@ const shipmentRuleSchema = z
   })
   .optional();
 
+const decisionCardSchema = z.object({
+  schemaVersion: z.literal("sct.card.v2"),
+  cardId: z.string(),
+  routeId: z.string(),
+  intent: intentEnum,
+  generatedAt: z.string(),
+  verdict: z.enum(["PASS", "WARN", "BLOCK"]),
+  severity: z.enum(["P0", "P1", "P2"]),
+  primaryReason: z.string(),
+  unblockSummary: z.string(),
+  piiStatus: z.enum(["None", "Masked", "Risk"]),
+  dataClass: z.enum(["P0", "P1", "P2"]),
+  blockedBy: z.array(
+    z.object({
+      ruleId: z.string(),
+      ruleName: z.string(),
+      reason: z.string(),
+      requiredInputs: z.array(z.string()),
+      missingInputs: z.array(z.string()),
+      blockedActions: z.array(z.string()),
+      severity: z.enum(["P0", "P1", "P2"])
+    })
+  ),
+  allowedActions: z.array(z.string()),
+  blockedActions: z.array(z.string()),
+  allowedNow: z.array(z.string()),
+  blockedUntilApproved: z.array(z.string()),
+  humanGateState: z.enum([
+    "READ_ONLY",
+    "DRY_RUN",
+    "APPROVAL_REQUESTED",
+    "APPROVED_ACTION",
+    "EXECUTED",
+    "AUDITED",
+    "DENIED",
+    "CANCELLED",
+    "EXPIRED",
+    "NEEDS_REVIEW"
+  ]),
+  evidenceCoverage: z.array(
+    z.object({
+      domain: z.string(),
+      status: z.enum(["PASS", "WARN", "BLOCK"]),
+      required: z.number(),
+      available: z.number(),
+      directSupportRatio: z.number()
+    })
+  ),
+  actions: z.array(
+    z.object({
+      actionId: z.string(),
+      ownerRole: z.string(),
+      ownerNameMasked: z.string().nullable(),
+      actionType: z.string(),
+      actionLabel: z.string(),
+      requiredInput: z.string().nullable(),
+      approvalRequired: z.boolean(),
+      approvalStatus: z.enum(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]),
+      status: z.enum(["Open", "Pending Input", "Pending Approval", "Done", "Rejected", "Expired", "Unassigned"]),
+      evidenceIds: z.array(z.string()),
+      blockedUntil: z.array(z.string()),
+      dueBasis: z.string(),
+      dueAt: z.string().nullable()
+    })
+  ),
+  trace: z.object({
+    sourceHash: z.string(),
+    rulePackVersion: z.string(),
+    rulePackIds: z.array(z.string()),
+    promptVersion: z.string(),
+    approvalActor: z.string().nullable(),
+    approvalStatus: z.enum(["NotRequired", "Pending", "Approved", "Rejected", "Expired"]),
+    sensitiveAccessed: z.boolean(),
+    generatedAt: z.string(),
+    routeId: z.string()
+  })
+});
+
 const answerOutputSchema = {
   answerId: z.string(),
   verdict: z.enum(["PASS", "WARN", "BLOCK", "INFO", "NO_EVIDENCE"]),
@@ -577,6 +684,7 @@ const answerOutputSchema = {
   evidence: z.array(evidenceSchema),
   evidenceTrace: z.array(evidenceTraceSchema).default([]),
   shipmentRule: shipmentRuleSchema,
+  decisionCard: decisionCardSchema.optional(),
   validation: z.array(
     z.object({
       ruleId: z.string(),

@@ -1,6 +1,7 @@
 import type { DecisionCardPayload } from "./decision-card.js";
 
 export type DomainHint =
+  | "system"
   | "master"
   | "warehouse"
   | "document"
@@ -12,6 +13,16 @@ export type DomainHint =
   | "operations"
   | "team"
   | "compliance";
+
+export type IntentCode =
+  | "SYSTEM_DIAGNOSTIC"
+  | "ONTOLOGY_PATCH_REVIEW"
+  | "CARD_RENDERING_AUDIT"
+  | "LOGISTICS_DECISION"
+  | "EMAIL_DRAFT"
+  | "COST_GUARD"
+  | "DOCUMENT_GUARDIAN"
+  | "GENERAL_ANSWER";
 
 export type Verdict = "PASS" | "WARN" | "BLOCK" | "INFO" | "NO_EVIDENCE";
 
@@ -32,7 +43,8 @@ export type ReasonCode =
   | "SCT_CLAIM_EVIDENCE_REQUIRED"
   | "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED"
   | "SHIPMENT_INVOICE_HUMAN_GATE_REQUIRED"
-  | "SHIPMENT_MISSING_DOCUMENTS";
+  | "SHIPMENT_MISSING_DOCUMENTS"
+  | "SYSTEM_DIAGNOSTIC_ROUTED";
 
 export type EvidenceSnippet = {
   id: string;
@@ -43,13 +55,30 @@ export type EvidenceSnippet = {
   snippet: string;
   docHash: string;
   confidence: number;
+  evidenceScore?: EvidenceScore;
   sourceType: "ontology_corpus" | "sample" | "kg";
+};
+
+export type EvidenceScore = {
+  evidenceId: string;
+  intentRelevance: number;
+  domainSpecificity: number;
+  directSupport: number;
+  authorityLevel: number;
+  operationalActionability: number;
+  recency: number;
+  finalScore: number;
+  supportState: "SUPPORTED" | "PARTIAL" | "NO_DIRECT_EVIDENCE" | "CONTRADICTED";
 };
 
 export type IntentRoute = {
   routeId: string;
+  intent: IntentCode;
   domains: DomainHint[];
   requiredDocs: string[];
+  rulePackIds: string[];
+  allowedActions: string[];
+  blockedActions: string[];
   confidence: number;
   routingReason: string;
 };
@@ -85,6 +114,7 @@ export type ActionRecommendation = {
   ownerRole: string;
   parameters: Record<string, string | number | boolean | null>;
   humanGateRequired: boolean;
+  dueBasis?: string | null;
   dueAt: string | null;
 };
 
@@ -92,7 +122,7 @@ export type EvidenceTraceItem = {
   targetType: "summary" | "businessImpact" | "detail" | "action";
   targetIndex: number | null;
   answerText: string;
-  supportState: "SUPPORTED" | "NO_DIRECT_EVIDENCE";
+  supportState: "SUPPORTED" | "PARTIAL" | "NO_DIRECT_EVIDENCE" | "CONTRADICTED";
   evidenceIds: string[];
 };
 
@@ -200,6 +230,7 @@ export type {
   ActionStatus,
   DataClass,
   ExportType,
+  HumanGateState,
   DecisionRule,
   BlockedByEntry,
   EvidenceCoverageItem,

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildBlockedActions,
   buildEvidenceCoverage,
+  deriveHumanGateState,
   derivePiiStatus,
   deriveVerdict,
   REASON_CODE_TO_RULE,
@@ -34,8 +35,12 @@ function makeAnswer(overrides: Partial<GroundedAnswer> = {}): GroundedAnswer {
     validationStatus: "PASS",
     route: {
       routeId: "ROUTE-001",
+      intent: "GENERAL_ANSWER",
       domains: ["master"],
       requiredDocs: ["CONSOLIDATED-00"],
+      rulePackIds: ["SYSTEM_QA_RULEPACK"],
+      allowedActions: ["read"],
+      blockedActions: ["write_back"],
       confidence: 0.9,
       routingReason: "default"
     },
@@ -139,14 +144,43 @@ describe("buildEvidenceCoverage", () => {
   it("returns PASS for each requiredDoc that is present in evidence", () => {
     const result = buildEvidenceCoverage({
       evidence: [
-        { id: "e1", docId: "CONSOLIDATED-00" },
-        { id: "e2", docId: "RATE-REF" }
+        {
+          id: "e1",
+          docId: "CONSOLIDATED-00",
+          evidenceScore: {
+            evidenceId: "e1",
+            intentRelevance: 1,
+            domainSpecificity: 1,
+            directSupport: 1,
+            authorityLevel: 1,
+            operationalActionability: 1,
+            recency: 1,
+            finalScore: 1,
+            supportState: "SUPPORTED"
+          }
+        },
+        {
+          id: "e2",
+          docId: "RATE-REF",
+          evidenceScore: {
+            evidenceId: "e2",
+            intentRelevance: 0.5,
+            domainSpecificity: 0.5,
+            directSupport: 0.5,
+            authorityLevel: 0.5,
+            operationalActionability: 0.5,
+            recency: 0.5,
+            finalScore: 0.5,
+            supportState: "PARTIAL"
+          }
+        }
       ],
       requiredDocs: ["CONSOLIDATED-00", "RATE-REF"]
     });
     expect(result).toHaveLength(2);
     expect(result.every((row) => row.status === "PASS")).toBe(true);
     expect(result.every((row) => row.available === 1)).toBe(true);
+    expect(result.find((row) => row.domain === "CONSOLIDATED-00")?.directSupportRatio).toBe(1);
   });
 
   it("marks a missing requiredDoc as BLOCK", () => {
@@ -224,6 +258,29 @@ describe("buildBlockedActions", () => {
   });
 });
 
+describe("deriveHumanGateState", () => {
+  it("maps not-required approval to READ_ONLY", () => {
+    expect(
+      deriveHumanGateState({ approvalRequired: false, approvalStatus: "NotRequired" })
+    ).toBe("READ_ONLY");
+  });
+
+  it("maps pending approval to APPROVAL_REQUESTED", () => {
+    expect(
+      deriveHumanGateState({ approvalRequired: true, approvalStatus: "Pending" })
+    ).toBe("APPROVAL_REQUESTED");
+  });
+
+  it("maps rejected and expired approval to terminal guard states", () => {
+    expect(
+      deriveHumanGateState({ approvalRequired: true, approvalStatus: "Rejected" })
+    ).toBe("DENIED");
+    expect(
+      deriveHumanGateState({ approvalRequired: true, approvalStatus: "Expired" })
+    ).toBe("EXPIRED");
+  });
+});
+
 describe("RULE_MATRIX and REASON_CODE_TO_RULE", () => {
   it("RULE_MATRIX contains all minimum rules from Spec", () => {
     expect(RULE_MATRIX["SCT-COST-001"]).toBeDefined();
@@ -265,8 +322,11 @@ describe("toDecisionCardPayload — adapter", () => {
       ]
     });
     const payload = toDecisionCardPayload({ answer });
+    expect(payload.schemaVersion).toBe("sct.card.v2");
+    expect(payload.intent).toBe("GENERAL_ANSWER");
     expect(payload.verdict).toBe("BLOCK");
     expect(payload.primaryReason.length).toBeLessThanOrEqual(80);
+    expect(payload.primaryReason).not.toBe("No blocking finding");
     expect(payload.unblockSummary).not.toBe("");
   });
 
@@ -292,6 +352,7 @@ describe("toDecisionCardPayload — adapter", () => {
     expect(entry.ruleName).toBeTruthy();
     expect(entry.reason).toBeTruthy();
     expect(entry.requiredInputs.length).toBeGreaterThan(0);
+    expect(entry.blockedActions.length).toBeGreaterThan(0);
     expect(RULE_MATRIX[entry.ruleId].blockedActions.length).toBeGreaterThan(0);
     expect(entry.severity).toBe("P0");
   });
@@ -334,7 +395,10 @@ describe("toDecisionCardPayload — adapter", () => {
     expect(payload.actions.length).toBe(1);
     expect(payload.actions[0].ownerRole).toBe("Cost Owner");
     expect(payload.actions[0].actionType).toBe("REQUEST_INPUT");
-    expect(payload.actions[0].status).toBe("Open");
+    expect(payload.actions[0].requiredInput).toBe("RateRef");
+    expect(payload.actions[0].dueBasis).toBe("Before approval-gated execution");
+    expect(payload.actions[0].status).toBe("Pending Approval");
+    expect(payload.humanGateState).toBe("NEEDS_REVIEW");
   });
 
   it("AC-008: trace contains generatedAt, sourceHash, rulePackVersion, approvalStatus, routeId", () => {
@@ -347,6 +411,7 @@ describe("toDecisionCardPayload — adapter", () => {
     expect(payload.trace.generatedAt).toBe("2026-05-17T12:00:00Z");
     expect(payload.trace.routeId).toBe("ROUTE-001");
     expect(payload.trace.rulePackVersion).toBe("2026.05");
+    expect(payload.trace.rulePackIds).toEqual(["SYSTEM_QA_RULEPACK"]);
     expect(payload.trace.promptVersion).toBe("prompt-v3");
     expect(payload.trace.approvalStatus).toBe("NotRequired");
     expect(payload.trace.sourceHash).toBeTypeOf("string");

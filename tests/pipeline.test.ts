@@ -245,8 +245,12 @@ describe("HVDC ontology grounded answer pipeline", () => {
   it("blocks missing CONSOLIDATED-00 route coverage with a standard reason code", () => {
     const route: IntentRoute = {
       routeId: "route_test_missing_master",
+      intent: "GENERAL_ANSWER",
       domains: ["operations"],
       requiredDocs: ["CONSOLIDATED-09-operations"],
+      rulePackIds: ["SYSTEM_QA_RULEPACK"],
+      allowedActions: ["read"],
+      blockedActions: ["write_back"],
       confidence: 0.9,
       routingReason: "test fixture without master spine"
     };

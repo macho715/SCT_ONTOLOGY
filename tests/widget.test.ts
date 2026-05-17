@@ -405,6 +405,7 @@ describe("HVDC answer widget", () => {
   it("contains Decision Card v2 widget helpers and styles", () => {
     expect(widgetHtml).toContain("decision-card-v2");
     expect(widgetHtml).toContain("renderDecisionCard");
+    expect(widgetHtml).toContain("renderDecisionTabs");
     expect(widgetHtml).toContain("renderBlockReasonBox");
     expect(widgetHtml).toContain("renderUnblockChecklist");
     expect(widgetHtml).toContain("renderHumanGateBanner");
@@ -412,6 +413,11 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("renderActionTable");
     expect(widgetHtml).toContain("safeCardVerdict");
     expect(widgetHtml).toContain("truncateText");
+    expect(widgetHtml).toContain("Human gate state");
+    expect(widgetHtml).toContain("Allowed now");
+    expect(widgetHtml).toContain("Blocked until approved");
+    expect(widgetHtml).toContain("RulePacks");
+    expect(widgetHtml).toContain("Decision Card sections");
   });
 
   it("does not render Decision Card v2 markup when decisionCard is absent", () => {
@@ -452,6 +458,8 @@ describe("HVDC answer widget", () => {
 
     expect(html).toContain("Decision Card v2");
     expect(html).toContain("aria-label=\"Decision verdict BLOCK\"");
+    expect(html).toContain("Intent");
+    expect(html).toContain("LOGISTICS_DECISION");
     expect(html).toContain("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     expect(html).toContain("…");
     expect(html).not.toContain("<script>alert(1)</script>");
@@ -465,6 +473,8 @@ describe("HVDC answer widget", () => {
     expect(html).toContain("Operational document evidence required");
     expect(html).toContain("BOE / DO / Port evidence required");
     expect(html).toContain("Required inputs");
+    expect(html).toContain("Blocked actions");
+    expect(html).toContain("Report publication");
     expect(html).toContain("BOE");
     expect(html).toContain("DO");
     expect(html).toContain("UnblockChecklist");
@@ -488,6 +498,7 @@ describe("HVDC answer widget", () => {
           status: "Open",
           evidenceIds: ["ev1"],
           blockedUntil: [],
+          dueBasis: "Before approval-gated execution",
           dueAt: null
         }
       ]
@@ -501,15 +512,23 @@ describe("HVDC answer widget", () => {
   it("renders evidence coverage and action table with text statuses", () => {
     const html = renderWidgetFixture(decisionCardFixture());
 
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain("Decision Card sections");
+    for (const tab of ["Decision", "Evidence", "Validation", "Entities", "Actions", "Trace"]) {
+      expect(html).toContain(`>${tab}</button>`);
+    }
     expect(html).toContain("EvidenceCoverageBar");
     expect(html).toContain("Customs");
     expect(html).toContain("BLOCK");
     expect(html).toContain("0 / 1");
+    expect(html).toContain("Direct support: 0.92");
     expect(html).toContain("ActionTable v2");
     expect(html).toContain("Publish Report");
     expect(html).toContain("Logistics Lead");
     expect(html).toContain("Pending Approval");
     expect(html).toContain("Approval actor");
+    expect(html).toContain("Before approval-gated execution");
+    expect(html).toContain("APPROVAL_REQUESTED");
   });
 
   it("escapes Decision Card v2 table and trace fields", () => {
@@ -542,8 +561,10 @@ describe("HVDC answer widget", () => {
 
 function decisionCardFixture(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const decisionCard = {
+    schemaVersion: "sct.card.v2",
     cardId: "DC-fixture",
     routeId: "r1",
+    intent: "LOGISTICS_DECISION",
     generatedAt: "2026-05-17T00:00:00Z",
     verdict: "BLOCK",
     severity: "P0",
@@ -558,14 +579,18 @@ function decisionCardFixture(overrides: Record<string, unknown> = {}): Record<st
         reason: "BOE / DO / Port evidence required",
         requiredInputs: ["BOE", "DO", "Port evidence"],
         missingInputs: ["BOE", "DO"],
+        blockedActions: ["Report publication"],
         severity: "P0"
       }
     ],
     allowedActions: ["Copy JSON"],
     blockedActions: ["Publish Report"],
+    allowedNow: ["read", "dry_run", "Copy JSON"],
+    blockedUntilApproved: ["Publish Report", "External send"],
+    humanGateState: "APPROVAL_REQUESTED",
     evidenceCoverage: [
-      { domain: "Customs", status: "BLOCK", required: 1, available: 0 },
-      { domain: "Warehouse", status: "PASS", required: 1, available: 1 }
+      { domain: "Customs", status: "BLOCK", required: 1, available: 0, directSupportRatio: 0 },
+      { domain: "Warehouse", status: "PASS", required: 1, available: 1, directSupportRatio: 0.92 }
     ],
     actions: [
       {
@@ -580,12 +605,14 @@ function decisionCardFixture(overrides: Record<string, unknown> = {}): Record<st
         status: "Pending Approval",
         evidenceIds: ["ev1"],
         blockedUntil: ["Approval actor"],
+        dueBasis: "Before approval-gated execution",
         dueAt: "2026-05-18"
       }
     ],
     trace: {
       sourceHash: "sha256:fixture",
       rulePackVersion: "2026.05",
+      rulePackIds: ["SYSTEM_QA_RULEPACK", "DOCUMENT_RULEPACK"],
       promptVersion: "test",
       approvalActor: null,
       approvalStatus: "Pending",

@@ -125,6 +125,11 @@
       .decision-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 18px 0; }
       .decision-card-panel { border: 1px solid #9fb3cc; border-radius: 20px; padding: 18px; background: rgba(255, 255, 255, 0.95); color: #0f172a; overflow-wrap: anywhere; word-break: break-word; box-shadow: 0 10px 24px rgba(30, 41, 59, 0.06); }
       .decision-card-panel strong { display: block; color: #0f172a; margin-bottom: 8px; font-size: 0.98rem; }
+      .decision-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 14px; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; }
+      .decision-tab-button { border: 1px solid #94a3b8; border-radius: 8px; background: #f8fafc; color: #0f172a; padding: 9px 12px; font-weight: 800; cursor: pointer; }
+      .decision-tab-button[aria-selected="true"] { background: #0f172a; border-color: #0f172a; color: #fff; }
+      .decision-tab-panel[hidden] { display: none; }
+      .decision-tab-panel { margin-top: 16px; }
       .block-reason-box { border: 1px solid #fca5a5; background: linear-gradient(180deg, #fff7f7, #fff1f2); border-radius: 22px; padding: 18px; margin: 20px 0; }
       .human-gate-banner { border: 1px solid #fb923c; background: linear-gradient(180deg, #fff7ed, #ffedd5); border-radius: 22px; padding: 18px; margin: 20px 0; }
       .block-reason-box h3, .unblock-checklist h3, .human-gate-banner h3, .evidence-coverage h3, .action-table-wrap h3, .decision-trace h3 { margin: 0 0 14px; font-size: 1.03rem; letter-spacing: -0.02em; color: #0f172a; }
@@ -256,6 +261,13 @@
         if (value === undefined || value === null || value === "") return fallback;
         if (typeof value === "number") return Number.isFinite(value) ? value.toFixed(2) : fallback;
         return value;
+      }
+
+      function safeDomId(value) {
+        return String(displayValue(value, "decision-card"))
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "decision-card";
       }
 
       function renderList(items, fallback) {
@@ -525,11 +537,14 @@
       function renderHumanGateBanner(card) {
         const trace = card.trace && typeof card.trace === "object" ? card.trace : {};
         const status = safeApprovalStatus(trace.approvalStatus);
-        if (status !== "Pending") return "";
+        const gateState = displayValue(card.humanGateState);
+        if (status === "Approved" || gateState === "APPROVED_ACTION") return "";
+        if (status !== "Pending" && gateState !== "APPROVAL_REQUESTED" && gateState !== "NEEDS_REVIEW") return "";
         return `
           <section class="human-gate-banner" aria-label="HumanGateBanner">
             <h3>HumanGateBanner</h3>
             <p><strong>Approval is pending.</strong> Human approval is required before export or publish actions.</p>
+            <p>Human gate state: ${escapeHtml(gateState)}</p>
             <p>Approver: ${escapeHtml(displayValue(trace.approvalActor))}</p>
           </section>
         `;
@@ -547,6 +562,7 @@
                   <strong>${escapeHtml(displayValue(item.domain))}</strong>
                   <span class="coverage-status">${escapeHtml(displayValue(item.status))}</span>
                   <div>${escapeHtml(item.available ?? item.coveredCount ?? "Not provided")} / ${escapeHtml(item.required ?? item.requiredCount ?? "Not provided")} evidence</div>
+                  <div>Direct support: ${escapeHtml(item.directSupportRatio ?? "Not provided")}</div>
                 </div>
               `).join("")}
             </div>
@@ -562,8 +578,9 @@
             <td>${escapeHtml(displayValue(action.owner ?? action.ownerRole ?? action.ownerNameMasked))}</td>
             <td>${escapeHtml(displayValue(action.action ?? action.actionLabel ?? action.actionType))}</td>
             <td>${escapeHtml(displayValue(action.requiredInput))}</td>
-            <td>${escapeHtml(displayValue(action.gate))}</td>
+            <td>${escapeHtml(displayValue(action.gate ?? action.approvalStatus))}</td>
             <td>${escapeHtml(displayValue(action.status))}</td>
+            <td>${escapeHtml(displayValue(action.dueBasis))}</td>
             <td>${escapeHtml(displayValue(action.dueAt))}</td>
           </tr>
         `).join("");
@@ -571,7 +588,7 @@
           <section class="action-table-wrap" aria-label="ActionTable v2">
             <h3>ActionTable v2</h3>
             <table class="decision-card-table">
-              <thead><tr><th>Owner</th><th>Action</th><th>Required input</th><th>Gate</th><th>Status</th><th>Due</th></tr></thead>
+              <thead><tr><th>Owner</th><th>Action</th><th>Required input</th><th>Gate</th><th>Status</th><th>Due basis</th><th>Due</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </section>
@@ -585,12 +602,88 @@
           <section class="decision-trace" aria-label="Decision trace">
             <h3>Trace</h3>
             <div class="decision-card-grid">
-              <div class="decision-card-panel"><strong>PII status</strong>${escapeHtml(safePiiStatus(trace.piiStatus))}</div>
+              <div class="decision-card-panel"><strong>PII status</strong>${escapeHtml(safePiiStatus(card.piiStatus))}</div>
               <div class="decision-card-panel"><strong>Approval status</strong>${escapeHtml(safeApprovalStatus(trace.approvalStatus))}</div>
               <div class="decision-card-panel"><strong>Approval actor</strong>${escapeHtml(displayValue(trace.approvalActor))}</div>
+              <div class="decision-card-panel"><strong>Generated at</strong>${escapeHtml(displayValue(trace.generatedAt))}</div>
+              <div class="decision-card-panel"><strong>Route ID</strong>${escapeHtml(displayValue(trace.routeId))}</div>
+              <div class="decision-card-panel"><strong>RulePack version</strong>${escapeHtml(displayValue(trace.rulePackVersion))}</div>
+              <div class="decision-card-panel"><strong>Prompt version</strong>${escapeHtml(displayValue(trace.promptVersion))}</div>
+              <div class="decision-card-panel"><strong>RulePacks</strong>${escapeHtml(asArray(trace.rulePackIds).join(", ") || "Not provided")}</div>
               <div class="decision-card-panel"><strong>Source hash</strong>${escapeHtml(displayValue(trace.sourceHash))}</div>
             </div>
           </section>
+        `;
+      }
+
+      function renderDecisionEntities(answer) {
+        const entities = asArray(answer?.resolvedEntities);
+        const rows = entities.map((entity) => `
+          <tr>
+            <td>${escapeHtml(displayValue(entity.entityType))}</td>
+            <td>${escapeHtml(displayValue(entity.identifierScheme))}</td>
+            <td>${escapeHtml(displayValue(entity.normalizedValue ?? entity.identifierValue))}</td>
+            <td>${escapeHtml(displayValue(entity.confidence))}</td>
+          </tr>
+        `).join("");
+        return `
+          <section class="action-table-wrap" aria-label="Entities">
+            <h3>Entities</h3>
+            <table class="decision-card-table">
+              <thead><tr><th>Type</th><th>Scheme</th><th>Value</th><th>Confidence</th></tr></thead>
+              <tbody>${rows || `<tr><td colspan="4" class="empty">No entities resolved.</td></tr>`}</tbody>
+            </table>
+          </section>
+        `;
+      }
+
+      function renderDecisionTabs(card, answer) {
+        const baseId = safeDomId(card.cardId ?? card.routeId ?? "decision-card");
+        const tabs = [
+          ["decision", "Decision", `
+            <div class="decision-card-grid">
+              <div class="decision-card-panel"><strong>Intent</strong>${escapeHtml(displayValue(card.intent))}</div>
+              <div class="decision-card-panel"><strong>Human gate</strong>${escapeHtml(displayValue(card.humanGateState))}</div>
+              <div class="decision-card-panel"><strong>Unblock summary</strong>${escapeHtml(displayValue(card.unblockSummary))}</div>
+              <div class="decision-card-panel"><strong>Allowed now</strong>${escapeHtml(asArray(card.allowedNow ?? card.allowedActions).join(", ") || "Not provided")}</div>
+              <div class="decision-card-panel"><strong>Blocked until approved</strong>${escapeHtml(asArray(card.blockedUntilApproved ?? card.blockedActions).join(", ") || "Not provided")}</div>
+            </div>
+            ${renderHumanGateBanner(card)}
+            ${renderUnblockChecklist(card)}
+          `],
+          ["evidence", "Evidence", renderEvidenceCoverage(card)],
+          ["validation", "Validation", renderBlockReasonBox(card)],
+          ["entities", "Entities", renderDecisionEntities(answer)],
+          ["actions", "Actions", renderActionTable(card)],
+          ["trace", "Trace", renderDecisionTrace(card)]
+        ];
+        const buttons = tabs.map(([id, label], index) => `
+          <button
+            type="button"
+            class="decision-tab-button"
+            role="tab"
+            id="${baseId}-${id}-tab"
+            aria-controls="${baseId}-${id}-panel"
+            aria-selected="${index === 0 ? "true" : "false"}"
+            data-decision-tab-target="${baseId}-${id}-panel"
+          >${escapeHtml(label)}</button>
+        `).join("");
+        const panels = tabs.map(([id, label, content], index) => `
+          <div
+            class="decision-tab-panel"
+            role="tabpanel"
+            id="${baseId}-${id}-panel"
+            aria-labelledby="${baseId}-${id}-tab"
+            ${index === 0 ? "" : "hidden"}
+          >
+            ${content || `<p class="empty">No ${escapeHtml(label.toLowerCase())} data returned.</p>`}
+          </div>
+        `).join("");
+        return `
+          <div class="decision-tabs" role="tablist" aria-label="Decision Card sections">
+            ${buttons}
+          </div>
+          ${panels}
         `;
       }
 
@@ -608,17 +701,7 @@
               </div>
               <span class="decision-card-badge ${escapeHtml(verdict)}" aria-label="Decision verdict ${escapeHtml(verdict)}">${escapeHtml(verdict)}</span>
             </div>
-            <div class="decision-card-grid">
-              <div class="decision-card-panel"><strong>Reason code</strong>${escapeHtml(displayValue(card.reasonCode))}</div>
-              <div class="decision-card-panel"><strong>Unblock summary</strong>${escapeHtml(displayValue(card.unblockSummary))}</div>
-              <div class="decision-card-panel"><strong>Evidence freshness</strong>${escapeHtml(displayValue(card.evidenceFreshness))}</div>
-            </div>
-            ${renderBlockReasonBox(card)}
-            ${renderHumanGateBanner(card)}
-            ${renderUnblockChecklist(card)}
-            ${renderEvidenceCoverage(card)}
-            ${renderActionTable(card)}
-            ${renderDecisionTrace(card)}
+            ${renderDecisionTabs(card, answer)}
           </section>
         `;
       }
@@ -885,6 +968,22 @@
       root.addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
+        const tabButton = target.closest("[data-decision-tab-target]");
+        if (tabButton instanceof HTMLElement) {
+          const cardRoot = tabButton.closest(".decision-card-v2");
+          const targetPanelId = tabButton.dataset.decisionTabTarget;
+          if (cardRoot && targetPanelId) {
+            cardRoot.querySelectorAll("[data-decision-tab-target]").forEach((button) => {
+              button.setAttribute("aria-selected", button === tabButton ? "true" : "false");
+            });
+            cardRoot.querySelectorAll(".decision-tab-panel").forEach((panel) => {
+              if (panel instanceof HTMLElement) {
+                panel.hidden = panel.id !== targetPanelId;
+              }
+            });
+          }
+          return;
+        }
         const rawEvidenceId = target.dataset.evidenceId;
         if (rawEvidenceId) focusEvidence(rawEvidenceId);
       });
