@@ -354,6 +354,61 @@
         target.focus({ preventScroll: false });
       }
 
+      function notifyIntrinsicHeight() {
+        try {
+          window.openai?.notifyIntrinsicHeight?.();
+        } catch {
+          // Host height notification is best-effort only.
+        }
+      }
+
+      function persistWidgetUiState(patch) {
+        const previous = window.openai?.widgetState && typeof window.openai.widgetState === "object"
+          ? window.openai.widgetState
+          : {};
+        const next = {
+          ...previous,
+          hvdcDecisionCard: {
+            ...(previous.hvdcDecisionCard ?? {}),
+            ...patch
+          }
+        };
+        try {
+          window.openai?.setWidgetState?.(next);
+        } catch {
+          // Widget state persistence is optional across MCP Apps hosts.
+        }
+      }
+
+      function activateDecisionTab(tabButton) {
+        const cardRoot = tabButton.closest(".decision-card-v2");
+        const targetPanelId = tabButton.dataset.decisionTabTarget;
+        if (!cardRoot || !targetPanelId) return;
+        cardRoot.querySelectorAll("[data-decision-tab-target]").forEach((button) => {
+          button.setAttribute("aria-selected", button === tabButton ? "true" : "false");
+          button.tabIndex = button === tabButton ? 0 : -1;
+        });
+        cardRoot.querySelectorAll(".decision-tab-panel").forEach((panel) => {
+          if (panel instanceof HTMLElement) {
+            panel.hidden = panel.id !== targetPanelId;
+          }
+        });
+        persistWidgetUiState({ activeTab: tabButton.dataset.decisionTabId ?? targetPanelId });
+        notifyIntrinsicHeight();
+      }
+
+      function toggleDetailsSummary(summary) {
+        const drawer = summary.closest("details");
+        if (!(drawer instanceof HTMLDetailsElement)) return;
+        drawer.open = !drawer.open;
+        persistWidgetUiState({ [drawer.dataset.drawerKey ?? summary.textContent?.trim() ?? "details"]: drawer.open });
+        notifyIntrinsicHeight();
+      }
+
+      function getInteractionEventTarget() {
+        return typeof document?.addEventListener === "function" ? document : root;
+      }
+
       function normalizeUiState(answer) {
         const fallbackUsed = answer.fallbackUsed ?? answer.ui?.fallbackUsed ?? false;
         return {
@@ -725,6 +780,8 @@
             aria-controls="${baseId}-${id}-panel"
             aria-selected="${index === 0 ? "true" : "false"}"
             data-decision-tab-target="${baseId}-${id}-panel"
+            data-decision-tab-id="${id}"
+            tabindex="${index === 0 ? "0" : "-1"}"
           >${escapeHtml(label)}</button>
         `).join("");
         const panels = tabs.map(([id, label, content], index) => `
@@ -1028,28 +1085,36 @@
         if (message.method === "ui/notifications/tool-result") render(extractToolOutput(message));
       }, { passive: true });
 
-      root.addEventListener("click", (event) => {
+      getInteractionEventTarget().addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
         const tabButton = target.closest("[data-decision-tab-target]");
         if (tabButton instanceof HTMLElement) {
-          const cardRoot = tabButton.closest(".decision-card-v2");
-          const targetPanelId = tabButton.dataset.decisionTabTarget;
-          if (cardRoot && targetPanelId) {
-            cardRoot.querySelectorAll("[data-decision-tab-target]").forEach((button) => {
-              button.setAttribute("aria-selected", button === tabButton ? "true" : "false");
-            });
-            cardRoot.querySelectorAll(".decision-tab-panel").forEach((panel) => {
-              if (panel instanceof HTMLElement) {
-                panel.hidden = panel.id !== targetPanelId;
-              }
-            });
-          }
+          event.preventDefault();
+          event.stopPropagation();
+          activateDecisionTab(tabButton);
+          return;
+        }
+        const summary = target.closest("summary");
+        if (summary instanceof HTMLElement && summary.closest("details")) {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleDetailsSummary(summary);
           return;
         }
         const rawEvidenceId = target.dataset.evidenceId;
         if (rawEvidenceId) focusEvidence(rawEvidenceId);
-      });
+      }, true);
+
+      getInteractionEventTarget().addEventListener("keydown", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const tabButton = target.closest("[data-decision-tab-target]");
+        if (!(tabButton instanceof HTMLElement)) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        activateDecisionTab(tabButton);
+      }, true);
 
       window.addEventListener("openai:set_globals", (event) => {
         handleOpenAiGlobals(event.detail?.globals ?? event.detail ?? {});
