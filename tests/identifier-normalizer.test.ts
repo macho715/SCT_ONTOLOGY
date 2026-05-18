@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { expandIdentifierVariants, extractIdentifierLookupVariants, isRuleIdLikeToken } from "../server/src/identifier-normalizer.js";
+import {
+  expandIdentifierVariants,
+  extractIdentifierLookupVariants,
+  isReservedIdentifierFieldToken,
+  isRuleIdLikeToken
+} from "../server/src/identifier-normalizer.js";
 import { resolveAnyKey } from "../server/src/router.js";
 
 describe("HVDC identifier normalization", () => {
@@ -82,6 +87,18 @@ describe("HVDC identifier normalization", () => {
     expect(variants.map((variant) => variant.normalized)).toContain("HVDC-ADOPT-SCT-0001");
     expect(variants.some((variant) => ruleIds.includes(variant.normalized))).toBe(false);
     expect(resolveAnyKey(ruleIds.join(" ")).some((candidate) => candidate.entityType === "ShipmentUnit")).toBe(false);
+  });
+
+  it("excludes reserved Decision Card field names from identifier lookup", () => {
+    const fieldNames = ["blockedBy", "ruleId", "ruleName", "verdictMappingRule"];
+
+    for (const fieldName of fieldNames) {
+      expect(isReservedIdentifierFieldToken(fieldName)).toBe(true);
+      expect(expandIdentifierVariants(fieldName)).toEqual([]);
+    }
+
+    const candidates = resolveAnyKey("blockedBy ruleId ruleName verdictMappingRule");
+    expect(candidates).toEqual([]);
   });
 
   it("resolves suffixed split shipment codes as HVDC_CODE candidates", () => {

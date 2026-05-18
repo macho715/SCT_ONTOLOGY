@@ -1,5 +1,5 @@
 import type { DomainHint, IntentCode, IntentRoute, ResolvedEntity } from "./types.js";
-import { expandIdentifierVariants } from "./identifier-normalizer.js";
+import { expandIdentifierVariants, isReservedIdentifierFieldToken } from "./identifier-normalizer.js";
 import { sha256 } from "./redact.js";
 
 export const FMC_ROLE_DOC = "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined";
@@ -429,6 +429,7 @@ export function resolveAnyKey(identifierOrQuestion: string): ResolvedEntity[] {
   for (const { scheme, entityType, regex } of patterns) {
     for (const match of text.matchAll(regex)) {
       const raw = match[0];
+      if (isReservedIdentifierFieldToken(raw)) continue;
       const normalized = raw.toUpperCase().replace(/\s+/g, "-");
       const hvdcAdoptMatch = scheme === "HVDC_CODE"
         ? /^HVDC-ADOPT-[A-Z]{2,8}-(\d{4,})(?:-[A-Z0-9]{1,8})?$/.exec(normalized)
