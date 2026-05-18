@@ -1,6 +1,6 @@
 # SCT Card Metrics Report
 
-- generatedAt: 2026-05-17T22:32:35.054Z
+- generatedAt: 2026-05-18T05:25:19.713Z
 - command: npm run report:sct-card
 - coverage note: This is a deterministic smoke metric report. It does not replace the approved full-size regression set required for final KPI claims.
 

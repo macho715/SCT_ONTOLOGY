@@ -1,6 +1,6 @@
 # SCT Card Validation Report
 
-- generatedAt: 2026-05-17T22:32:35.054Z
+- generatedAt: 2026-05-18T05:25:19.713Z
 - command: npm run report:sct-card
 - coverage note: This is a deterministic smoke bundle, not the full 90.00% validation KPI report.
 

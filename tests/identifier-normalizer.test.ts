@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { expandIdentifierVariants, extractIdentifierLookupVariants } from "../server/src/identifier-normalizer.js";
+import { expandIdentifierVariants, extractIdentifierLookupVariants, isRuleIdLikeToken } from "../server/src/identifier-normalizer.js";
 import { resolveAnyKey } from "../server/src/router.js";
 
 describe("HVDC identifier normalization", () => {
@@ -68,6 +68,20 @@ describe("HVDC identifier normalization", () => {
   it("does not emit a fake ShipmentUnit for zero sequence codes", () => {
     expect(resolveAnyKey("SCT0")).toEqual([]);
     expect(resolveAnyKey("HVDC-ADOPT-SCT-0000")).toEqual([]);
+  });
+
+  it("excludes ontology ruleId namespace tokens from shipment identifier lookup", () => {
+    const ruleIds = ["A-FLOW-001", "SYS-ROUTER-001", "SCT-SCHEMA-007", "CARD-GOV-VERDICT-001"];
+
+    for (const ruleId of ruleIds) {
+      expect(isRuleIdLikeToken(ruleId)).toBe(true);
+      expect(expandIdentifierVariants(ruleId)).toEqual([]);
+    }
+
+    const variants = extractIdentifierLookupVariants(`Check ${ruleIds.join(" ")} against SCT001`);
+    expect(variants.map((variant) => variant.normalized)).toContain("HVDC-ADOPT-SCT-0001");
+    expect(variants.some((variant) => ruleIds.includes(variant.normalized))).toBe(false);
+    expect(resolveAnyKey(ruleIds.join(" ")).some((candidate) => candidate.entityType === "ShipmentUnit")).toBe(false);
   });
 
   it("resolves suffixed split shipment codes as HVDC_CODE candidates", () => {

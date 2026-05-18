@@ -6,6 +6,7 @@ export type IdentifierVariant = {
 const TOKEN_PATTERN = /[A-Za-z0-9][A-Za-z0-9._/-]{2,}/g;
 const HVDC_ADOPT_PATTERN = /^HVDC[-_ ]ADOPT[-_ ]([A-Z]{2,8})[-_ ]0*(\d{1,8})(?:[-_ ]([A-Z0-9]{1,8}))?$/i;
 const SHORT_ADOPT_PATTERN = /^([A-Z]{2,8})[-_ ]?0*(\d{1,8})(?:[-_ ]([A-Z0-9]{1,8}))?$/i;
+const RULE_ID_PATTERN = /^(?:A|V|SCT|SYS|CARD|SEC|SRC)-[A-Z0-9]+(?:-[A-Z0-9]+)*-\d{3,}$/;
 
 function unique(values: string[]): string[] {
   return Array.from(new Set(values.filter(Boolean)));
@@ -24,6 +25,10 @@ function hasPositiveSequenceNumber(digits: string): boolean {
   return Number.isFinite(parsed) && parsed > 0;
 }
 
+export function isRuleIdLikeToken(value: string): boolean {
+  return RULE_ID_PATTERN.test(normalizeLookupToken(value));
+}
+
 function canonicalHvdcAdoptCode(prefix: string, digits: string, suffix?: string): string {
   const parsed = Number.parseInt(digits, 10);
   const padded = Number.isFinite(parsed) ? String(parsed).padStart(4, "0") : digits;
@@ -40,6 +45,8 @@ function compactHvdcAdoptCode(prefix: string, digits: string, suffix?: string): 
 
 export function expandIdentifierVariants(raw: string): IdentifierVariant[] {
   const normalized = normalizeLookupToken(raw);
+  if (isRuleIdLikeToken(normalized)) return [];
+
   const compact = compactToken(raw);
   const variants = [normalized, compact];
 

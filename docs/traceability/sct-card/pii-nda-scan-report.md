@@ -1,6 +1,6 @@
 # SCT Card PII/NDA Output Surface Scan
 
-- generatedAt: 2026-05-17T22:32:35.570Z
+- generatedAt: 2026-05-18T05:25:20.196Z
 - command: npm run scan:sct-pii
 - status: PASS
 - scannedFiles: 14
