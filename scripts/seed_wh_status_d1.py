@@ -40,7 +40,11 @@ def sql(value) -> str:
 
 
 def normalize_case(value: str) -> str:
-    token = re.sub(r"[^A-Za-z0-9]+", "-", value.strip().upper()).strip("-")
+    text = value.strip()
+    numeric = re.fullmatch(r"(\d+)\.0+", text)
+    if numeric:
+        text = numeric.group(1)
+    token = re.sub(r"[^A-Za-z0-9]+", "-", text.upper()).strip("-")
     return token or "UNKNOWN"
 
 
