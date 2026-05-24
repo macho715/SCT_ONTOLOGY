@@ -139,6 +139,18 @@
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
       }
     },
+    "get_hvdc_case_status": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reads a projected HVDC WH Status Case No. from Cloudflare D1 and returns the case status report without changing data.",
+        "open_world_justification": "Does not contact public or third-party systems; uses the app-owned D1 projection.",
+        "destructive_justification": "Does not delete, overwrite, approve, send, or perform irreversible actions."
+      }
+    },
     "validate_answer": {
       "annotations": {
         "readOnlyHint": true,

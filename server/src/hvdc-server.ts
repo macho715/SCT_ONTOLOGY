@@ -135,6 +135,7 @@ export type ControlTowerShipmentReport = {
 
 export type HvdcControlTowerLookup = {
   resolveAnyKey?: (identifierOrQuestion: string) => Promise<ResolvedEntity[]>;
+  getCaseStatus?: (caseNo: string) => Promise<ControlTowerShipmentReport | null>;
   getShipmentUnit?: (shipmentUnitId: string) => Promise<ControlTowerShipmentUnit | null>;
   getShipmentReport?: (shipmentUnitId: string) => Promise<ControlTowerShipmentReport | null>;
   listMilestones?: (shipmentUnitId: string) => Promise<MilestoneRecord[]>;
@@ -879,6 +880,14 @@ export const HVDC_TOOL_DESCRIPTORS = {
     _meta: {},
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
   },
+  get_hvdc_case_status: {
+    title: "Get HVDC WH Status case",
+    description: "Use this to return the D1 Control Tower status projection for one HVDC WH Status Case No. from hvdc_wh_status.xlsx.",
+    inputSchema: { caseNo: z.string().min(1) },
+    outputSchema: { report: controlTowerShipmentReportSchema.nullable() },
+    _meta: {},
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
+  },
   validate_answer: {
     title: "Validate HVDC answer grounding",
     description: "Use this to validate evidence coverage, master spine use, currentness, and human-gate requirements before final answer.",
@@ -1434,6 +1443,23 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
         return {
           structuredContent: { candidates, controlTowerReports },
           content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length, reportCount: controlTowerReports.length }) }]
+        };
+      });
+    }
+  );
+
+  registerAppTool(
+    server,
+    "get_hvdc_case_status",
+    HVDC_TOOL_DESCRIPTORS.get_hvdc_case_status,
+    async ({ caseNo }) => {
+      return withSpan("get_hvdc_case_status", async (span) => {
+        span.setAttribute("hvdc.case_no", String(caseNo ?? "").slice(0, 64));
+        const report = await options.controlTower?.getCaseStatus?.(caseNo) ?? null;
+        span.setAttribute("hvdc.report_found", report ? "true" : "false");
+        return {
+          structuredContent: { report },
+          content: [{ type: "text", text: JSON.stringify({ found: Boolean(report), shipmentUnitId: report?.shipmentUnitId ?? null }) }]
         };
       });
     }

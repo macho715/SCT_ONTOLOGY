@@ -474,9 +474,57 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
           seen.add(key);
           candidates.push(shipmentRowToResolvedEntity(row, raw, token));
         }
+
+        const indexRows = await db.prepare(
+          `SELECT su.${SHIPMENT_UNIT_COLUMNS.split(", ").map((column) => column.trim()).join(", su.")}
+             FROM identifier_index ii
+             JOIN shipment_unit su ON su.shipment_unit_id = ii.target_rid
+            WHERE ii.target_type = 'ShipmentUnit'
+              AND upper(ii.normalized_value) = ?
+            LIMIT 5`
+        )
+          .bind(token)
+          .all<ControlTowerShipmentRow>();
+
+        for (const row of indexRows.results ?? []) {
+          const key = `${row.shipment_unit_id}:${token}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          candidates.push(shipmentRowToResolvedEntity(row, raw, token));
+        }
       }
 
       return candidates;
+    },
+
+    async getCaseStatus(caseNo: string): Promise<ControlTowerShipmentReport | null> {
+      const token = normalizeLookupToken(caseNo);
+      if (!token) return null;
+
+      const directRow = await db.prepare(
+        `SELECT ${SHIPMENT_UNIT_COLUMNS}
+           FROM shipment_unit
+          WHERE upper(shipment_unit_id) = ?
+             OR upper(source_line_id) = ?
+          LIMIT 1`
+      )
+        .bind(token, token)
+        .first<ControlTowerShipmentRow>();
+
+      const indexedRow = directRow ?? await db.prepare(
+        `SELECT su.${SHIPMENT_UNIT_COLUMNS.split(", ").map((column) => column.trim()).join(", su.")}
+           FROM identifier_index ii
+           JOIN shipment_unit su ON su.shipment_unit_id = ii.target_rid
+          WHERE ii.target_type = 'ShipmentUnit'
+            AND upper(ii.normalized_value) = ?
+            AND upper(ii.identifier_scheme) IN ('CASE_NO', 'SHIPMENTUNIT', 'SOURCE_LINE_ID')
+          LIMIT 1`
+      )
+        .bind(token)
+        .first<ControlTowerShipmentRow>();
+
+      if (!indexedRow) return null;
+      return this.getShipmentReport?.(indexedRow.shipment_unit_id) ?? null;
     },
 
     async getShipmentUnit(shipmentUnitId: string): Promise<ControlTowerShipmentUnit | null> {

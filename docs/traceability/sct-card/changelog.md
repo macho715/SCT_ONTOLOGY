@@ -1,6 +1,6 @@
 # SCT Card Traceability Changelog
 
-- generatedAt: 2026-05-24T12:23:25.315Z
+- generatedAt: 2026-05-24T12:40:58.862Z
 - command: npm run report:sct-card
 
 ## Current bundle contents

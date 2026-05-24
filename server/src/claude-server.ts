@@ -290,6 +290,7 @@ export const HVDC_CLAUDE_TOOL_NAMES = [
   "route_question",
   "search_ontology_corpus",
   "resolve_any_key",
+  "get_hvdc_case_status",
   "validate_answer",
   "write_file_dry_run",
   "write_file_commit"
@@ -409,6 +410,21 @@ export function createClaudeServer(): McpServer {
       return {
         structuredContent: { findings },
         content: [{ type: "text", text: JSON.stringify({ findingCount: findings.length }, null, 2) }]
+      };
+    }
+  );
+
+  server.tool(
+    "get_hvdc_case_status",
+    "Return the Cloudflare D1 Control Tower status projection for one HVDC WH Status Case No.",
+    { caseNo: z.string().min(1) },
+    async ({ caseNo }) => {
+      return {
+        structuredContent: { report: null },
+        content: [{
+          type: "text",
+          text: `get_hvdc_case_status(${caseNo}) requires the Cloudflare remote MCP endpoint with D1 binding MCP_AUDIT_DB.`
+        }]
       };
     }
   );

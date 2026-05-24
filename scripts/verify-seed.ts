@@ -66,6 +66,18 @@ const CHECKS: SeedCheck[] = [
     expect: (cnt) => cnt >= 100,
     hint: "receipt_event appears unpopulated — check ops provisioning",
   },
+  {
+    label: "WH Status Excel cases projected (≥7560)",
+    sql: "SELECT COUNT(*) AS cnt FROM shipment_unit WHERE shipment_unit_id LIKE 'WHCASE-%'",
+    expect: (cnt) => cnt >= 7560,
+    hint: "run: npm run d1:seed-wh-status",
+  },
+  {
+    label: "WH Status Case No identifiers projected (≥7560)",
+    sql: "SELECT COUNT(*) AS cnt FROM identifier_index WHERE source_system = 'hvdc_wh_status.xlsx' AND identifier_scheme = 'CASE_NO'",
+    expect: (cnt) => cnt >= 7560,
+    hint: "run: npm run d1:seed-wh-status",
+  },
 ];
 
 let failures = 0;

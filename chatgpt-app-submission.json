@@ -128,6 +128,18 @@
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform irreversible actions."
       }
     },
+    "get_hvdc_case_status": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reads a projected HVDC WH Status Case No. from Cloudflare D1 and returns the case status report without changing data.",
+        "open_world_justification": "Does not contact public or third-party systems; uses the app-owned D1 projection.",
+        "destructive_justification": "Does not delete, overwrite, approve, send, or perform irreversible actions."
+      }
+    },
     "validate_answer": {
       "annotations": {
         "readOnlyHint": true,
@@ -245,6 +257,11 @@
       "tools_triggered": "render_hvdc_answer_card",
       "expected_output": "Renders the prepared HVDC answer card with verdict, route documents, evidence drawer, validation findings, next action, and no card UI error.",
       "expected_output_url": null
+    },
+    {
+      "user_prompt": "Case No. CASE-0003의 HVDC WH Status 상태를 조회하라.",
+      "tools_triggered": "get_hvdc_case_status",
+      "expected_output": "Returns the D1 Control Tower case-status projection for the requested Case No."
     }
   ],
   "negative_test_cases": [

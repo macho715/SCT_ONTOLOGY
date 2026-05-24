@@ -16,6 +16,97 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           confidence: 0.98
         }
       ],
+      getCaseStatus: async (caseNo) => ({
+        shipmentUnitId: caseNo,
+        cargoSummary: {
+          sourceLineId: "CASE-0003",
+          vendor: "Dong Yang",
+          category: "Elec",
+          poNo: "5000761114",
+          invoiceNo: "HVDC-ADOPT-PPL-0003",
+          incoterms: "FOB"
+        },
+        shipment: {
+          shipmentUnitId: caseNo,
+          sourceLineId: "CASE-0003",
+          vendor: "Dong Yang",
+          category: "Elec",
+          poNo: "5000761114",
+          invoiceNo: "HVDC-ADOPT-PPL-0003",
+          incoterms: "FOB",
+          declaredDestinationSet: "AGI|MIR",
+          declaredDestinationCount: 2,
+          currentStage: "M130_SITE_ARRIVED",
+          currentLocation: "AGI",
+          routingPattern: "WH_MOSB_SITE",
+          latestReceiptDt: "2024-02-26",
+          finalDeliveryDt: "2024-02-26",
+          siteCompletionRate: 1,
+          missingRequiredDestination: null,
+          receivedWithoutFlag: null
+        },
+        shipmentDates: {
+          etd: "2024-01-10",
+          atd: "2024-01-11",
+          eta: "2024-02-20",
+          ata: "2024-02-21",
+          attestation: null,
+          doCollected: null,
+          customsStarted: null,
+          customsClosed: null,
+          finalDelivered: "2024-02-26"
+        },
+        milestones: [
+          { milestoneCode: "M130_SITE_RECEIVED", occurredAt: "2024-02-26", sourceColumn: "AGI", sourceLineId: "CASE-0003" }
+        ],
+        destinationRequirements: [
+          {
+            requirementId: "REQ-CASE-0003-AGI",
+            destinationCode: "AGI",
+            requiredFlag: true,
+            sourceColumn: "AGI",
+            sourceLineId: "CASE-0003",
+            validationStatus: "WARN",
+            reasonCode: "MOSB_EVIDENCE_MISSING"
+          }
+        ],
+        siteReceipts: [
+          {
+            receiptEventId: "RE-CASE-0003-AGI",
+            locationCode: "AGI",
+            locationType: "PROJECT_SITE",
+            actualReceiptDt: "2024-02-26",
+            sourceColumn: "AGI",
+            sourceLineId: "CASE-0003",
+            matchedRequiredDestination: true,
+            validationStatus: "PASS",
+            reasonCode: null
+          }
+        ],
+        siteReceiptSummary: {
+          requiredDestinationCount: 1,
+          receivedDestinationCount: 1,
+          latestReceiptDt: "2024-02-26",
+          finalDeliveryDt: "2024-02-26",
+          siteCompletionRate: 1,
+          missingRequiredDestination: null,
+          receivedWithoutFlag: null
+        },
+        validationFindings: [
+          {
+            validationId: "VAL-CASE-0003-MOSB",
+            ruleId: "V-AGIDAS-001",
+            severity: "WARN",
+            field: "M115/M116/M117",
+            value: "MISSING",
+            reasonCode: "MOSB_EVIDENCE_MISSING"
+          }
+        ],
+        openActions: [],
+        reportStatus: "WARN",
+        message: `Control Tower shipment report loaded for ${caseNo}.`,
+        generatedAt: "2026-05-15T00:00:00.000Z"
+      }),
       getShipmentUnit: async (shipmentUnitId) => ({
         shipmentUnitId,
         sourceLineId: "LS-000123",
@@ -195,6 +286,35 @@ describe("Control Tower D1 MCP lookup integration", () => {
       expect(content.controlTowerReports[0].siteReceipts[0]).toMatchObject({
         locationCode: "AGI",
         actualReceiptDt: "2024-02-26"
+      });
+    });
+  });
+
+  it("returns a WH Status D1 case projection by Case No", async () => {
+    await withClient(async (client) => {
+      const result = await client.callTool({
+        name: "get_hvdc_case_status",
+        arguments: { caseNo: "CASE-0003" }
+      });
+
+      const content = result.structuredContent as {
+        report: {
+          shipmentUnitId: string;
+          reportStatus: string;
+          shipment: { deliveryStatus?: string; currentStage: string; currentLocation: string };
+          validationFindings: Array<{ reasonCode: string }>;
+        };
+      };
+      expect(content.report).toMatchObject({
+        shipmentUnitId: "CASE-0003",
+        reportStatus: "WARN",
+        shipment: {
+          currentStage: "M130_SITE_ARRIVED",
+          currentLocation: "AGI"
+        }
+      });
+      expect(content.report.validationFindings[0]).toMatchObject({
+        reasonCode: "MOSB_EVIDENCE_MISSING"
       });
     });
   });

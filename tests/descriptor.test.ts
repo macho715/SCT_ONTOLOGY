@@ -30,6 +30,7 @@ const APPROVED_V1_TOOL_NAMES = [
   "check_mosb_gate",
   "complete_upload",
   "create_upload_url",
+  "get_hvdc_case_status",
   "get_team_actions",
   "render_hvdc_answer_card",
   "route_question",
