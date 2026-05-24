@@ -115,7 +115,7 @@ Current Cloudflare production verification: `/healthz`, OAuth protected resource
 
 | No | Prompt | Expected |
 |---:|---|---|
-| 1.00 | AGI M130 닫아도 돼? BL-535 관련 | BLOCK |
+| 1.00 | AGI M130 닫아도 돼? BL-535 관련 | WARN/AMBER backfill; site date accepted as M130 delivered |
 | 2.00 | Flow Code 어디에 써? | INFO, WHP-only |
 | 3.00 | 이 invoice 과청구야? | WARN/BLOCK until invoice line, rate, and tariff evidence exists |
 | 4.00 | BOE 123 지연 원인? | Document/Port chronology evidence |

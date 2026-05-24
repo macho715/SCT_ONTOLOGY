@@ -27,22 +27,23 @@ export function mergeShipmentValidation(shipmentRule?: ShipmentRuleResult): Ship
   if (agiRisk) {
     findings.push({
       ruleId: "V-SHIPMENT-AGIDAS-001",
-      reasonCode: "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED",
-      severity: "BLOCK",
-      status: "BLOCK",
+      reasonCode: "MOSB_EVIDENCE_MISSING",
+      severity: "WARN",
+      status: "WARN",
       targetObject: "ShipmentRule/AGI_DAS_MOSB",
       evidenceIds: [],
-      message: riskText(agiRisk.detail) || "AGI/DAS M130 requires M115/M116/M117 chain evidence or approved exception."
+      message: riskText(agiRisk.detail) || "AGI/DAS M130 is accepted from site date; M115/M116/M117 MOSB-chain evidence must be backfilled."
     });
     actions.push({
-      actionType: "REQUEST_SHIPMENT_RULE_HUMAN_GATE",
+      actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
       ownerRole: "Marine / Material Chain Owner",
       parameters: {
         shipmentId: shipmentRule.shipmentId,
-        requiredEvidence: "M115/M116/M117 or approved exception",
+        requiredEvidence: "M115/M116/M117 backfill evidence",
+        dataQualityFinding: "MOSB_EVIDENCE_MISSING",
         source: shipmentRule.source
       },
-      humanGateRequired: true,
+      humanGateRequired: false,
       dueAt: null
     });
   }

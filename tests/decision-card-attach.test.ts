@@ -36,14 +36,16 @@ describe("Decision Card v2 attachment", () => {
     expect(answer.decisionCard?.trace.routeId).toBe(answer.route.routeId);
   });
 
-  it("surfaces blocked actions and unblock guidance in the attached payload", () => {
+  it("surfaces AGI/DAS MOSB backfill guidance in the attached payload", () => {
     const answer = answerQuestion({
       question: "AGI M130 site closure를 M115 없이 닫아도 되나?",
       userRole: "test",
       language: "ko"
     });
 
-    expect(answer.decisionCard?.blockedActions).toContain("Report publication");
-    expect(answer.decisionCard?.unblockSummary).toContain("BOE");
+    expect(answer.decisionCard?.verdict).toBe("WARN");
+    expect(answer.decisionCard?.blockedActions).not.toContain("Report publication");
+    expect(answer.decisionCard?.nextAction).toContain("BACKFILL_MOSB_CHAIN_EVIDENCE");
+    expect(answer.decisionCard?.actions[0]?.requiredInput).toContain("M115/M116/M117");
   });
 });

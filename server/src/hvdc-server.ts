@@ -15,7 +15,7 @@ import { checkMosbGate, type MilestoneRecord } from "./mosb-gate.js";
 import { resolveAnyKey, routeQuestion } from "./router.js";
 import { routeTeamAction, type ActionProposal } from "./team-action-router.js";
 import type { DomainHint, GroundedAnswer, ResolvedEntity } from "./types.js";
-import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, V5_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
+import { LEGACY_WIDGET_URI, logUiRenderFailure, PREVIOUS_WIDGET_URI, V5_WIDGET_URI, V6_WIDGET_URI, WIDGET_URI, withUiState } from "./ui.js";
 
 export type HvdcServerOptions = {
   widgetHtml?: string;
@@ -1031,7 +1031,7 @@ export const HVDC_TOOL_DESCRIPTORS = {
   check_mosb_gate: {
     title: "Check MOSB route gate (V-AGIDAS-001)",
     description:
-      "Validate AGI/DAS offshore MOSB milestone chain. If milestone input is omitted, reads Cloudflare D1 milestone_event rows for the shipment. BLOCK if M130 is closed but M115 MOSB Staged evidence is missing. WARN if M116/M117 are absent without approved exception.",
+      "Validate AGI/DAS offshore MOSB milestone chain. If milestone input is omitted, reads Cloudflare D1 milestone_event rows for the shipment. AGI/DAS site date/M130 is accepted as delivered; missing M115/M116/M117 MOSB evidence returns AMBER/WARN backfill required.",
     inputSchema: {
       shipmentUnitId: z.string().min(1),
       declaredDestination: z.string().min(1).optional(),
@@ -1052,6 +1052,14 @@ export const HVDC_TOOL_DESCRIPTORS = {
       appliedRule: z.string().nullable(),
       missingMilestones: z.array(z.string()),
       requiredEvidence: z.array(z.string()),
+      siteReceiptStatus: z.literal("ARRIVED").optional(),
+      deliveryStatus: z.literal("DELIVERED").optional(),
+      dataQualityFinding: z.object({
+        code: z.literal("MOSB_EVIDENCE_MISSING"),
+        severity: z.literal("AMBER"),
+        action: z.string(),
+        backfillRequired: z.literal(true)
+      }).optional(),
       ownerRole: z.string(),
       nextAction: z.string(),
       humanGateRequired: z.boolean(),
@@ -1294,17 +1302,24 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
   registerAppResource(server, "hvdc-answer-widget", WIDGET_URI, {}, async () => createWidgetResource(WIDGET_URI));
   registerAppResource(
     server,
-    "hvdc-answer-widget-v7-compat",
+    "hvdc-answer-widget-v8-compat",
     PREVIOUS_WIDGET_URI,
     {},
     async () => createWidgetResource(PREVIOUS_WIDGET_URI)
   );
   registerAppResource(
     server,
-    "hvdc-answer-widget-legacy",
+    "hvdc-answer-widget-v7-compat",
     LEGACY_WIDGET_URI,
     {},
     async () => createWidgetResource(LEGACY_WIDGET_URI)
+  );
+  registerAppResource(
+    server,
+    "hvdc-answer-widget-v6-compat",
+    V6_WIDGET_URI,
+    {},
+    async () => createWidgetResource(V6_WIDGET_URI)
   );
   registerAppResource(
     server,

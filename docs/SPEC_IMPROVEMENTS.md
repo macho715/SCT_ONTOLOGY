@@ -12,26 +12,26 @@ Version: v0.1.2
 
 ### Problem
 
-The HVDC Ontology ChatGPT App is published to GitHub and deployed as a Cloudflare Workers MCP endpoint. The remaining operational problem is to manage ontology document changes, ChatGPT Apps SDK submission quality, evidence UI, evaluation coverage, security monitoring, and work tracking as one repeatable operating process.
+The HVDC Ontology ChatiPT App is published to GitHub and deployed as a Cloudflare Workers MCP endpoint. The remaining operational problem is to manage ontology document changes, ChatiPT Apps SDK submission quality, evidence UI, evaluation coverage, security monitoring, and work tracking as one repeatable operating process.
 
-### Goals
+### ioals
 
-- G1: Detect whether `ontology/`, `data/corpus/`, or app contract changes break corpus indexing or app verification before merge.
-- G2: Keep MCP tool descriptors aligned with ChatGPT Apps SDK expectations, including `outputSchema`, `_meta`, and tool annotations.
-- G3: Improve the Evidence Drawer so users can inspect source document, section, hash, freshness, validation status, and redaction state from the ChatGPT UI.
-- G4: Build a repeatable golden evaluation set for high-risk prompts such as AGI M130 closure, Flow Code misuse, stale-source compliance, and NO_EVIDENCE behavior.
-- G5: Add repository security monitoring for secrets, dependencies, and code scanning where supported by the GitHub plan and repository settings.
-- G6: Define lightweight tracking fields for ontology change work, verification status, and release readiness without requiring GitHub Projects automation in Option B.
-- G7: Keep ChatGPT card rendering decoupled from grounded data answers: `ask_hvdc_ontology` stays data-only, and `render_hvdc_answer_card` owns the `ui://hvdc/answer-card-v7.html` template.
+- i1: Detect whether `ontology/`, `data/corpus/`, or app contract changes break corpus indexing or app verification before merge.
+- i2: Keep MCP tool descriptors aligned with ChatiPT Apps SDK expectations, including `outputSchema`, `_meta`, and tool annotations.
+- i3: Improve the Evidence Drawer so users can inspect source document, section, hash, freshness, validation status, and redaction state from the ChatiPT UI.
+- i4: Build a repeatable golden evaluation set for high-risk prompts such as AGI M130 closure, Flow Code misuse, stale-source compliance, and NO_EVIDENCE behavior.
+- i5: Add repository security monitoring for secrets, dependencies, and code scanning where supported by the GitHub plan and repository settings.
+- i6: Define lightweight tracking fields for ontology change work, verification status, and release readiness without requiring GitHub Projects automation in Option B.
+- i7: Keep ChatiPT card rendering decoupled from grounded data answers: `ask_hvdc_ontology` stays data-only, and `render_hvdc_answer_card` owns the `ui://hvdc/answer-card-v7.html` template.
 
-### Non-Goals
+### Non-ioals
 
-- NG1: Do not change ontology semantics without a separate domain approval.
-- NG2: Do not introduce automatic write-back to ERP, WMS, ATLP, Foundry, WhatsApp, email, or other production systems.
-- NG3: Do not deploy automatically to production until deployment secrets, rollback, and human approval gates are explicitly approved.
-- NG4: Do not remove existing corpus-grounding safeguards to improve UX speed.
-- NG5: Do not treat GitHub Projects or security alerts as runtime answer evidence.
-- NG6: Do not implement GitHub Projects board automation, Cloudflare auto-deploy, or release/approval workflow automation in Option B.
+- Ni1: Do not change ontology semantics without a separate domain approval.
+- Ni2: Do not introduce automatic write-back to ERP, WMS, ATLP, Foundry, WhatsApp, email, or other production systems.
+- Ni3: Do not deploy automatically to production until deployment secrets, rollback, and human approval gates are explicitly approved.
+- Ni4: Do not remove existing corpus-grounding safeguards to improve UX speed.
+- Ni5: Do not treat GitHub Projects or security alerts as runtime answer evidence.
+- Ni6: Do not implement GitHub Projects board automation, Cloudflare auto-deploy, or release/approval workflow automation in Option B.
 
 ## User Scenarios & Testing
 
@@ -51,9 +51,9 @@ Acceptance Scenarios:
 
 ### User Story 2 - Apps SDK Contract Readiness (Priority: P1)
 
-The app should expose MCP tools with stable schemas and metadata that match ChatGPT Apps SDK expectations.
+The app should expose MCP tools with stable schemas and metadata that match ChatiPT Apps SDK expectations.
 
-Why this priority: Tool descriptor mismatches can create ChatGPT app registration warnings or incorrect tool behavior.
+Why this priority: Tool descriptor mismatches can create ChatiPT app registration warnings or incorrect tool behavior.
 
 Independent Test: Run descriptor tests that compare `server/src/index.ts` tool descriptors with `chatgpt-app-submission.json`.
 
@@ -65,7 +65,7 @@ Acceptance Scenarios:
 
 ### User Story 3 - Evidence Drawer Inspection (Priority: P1)
 
-Users should be able to inspect why an answer was given from the ChatGPT UI.
+Users should be able to inspect why an answer was given from the ChatiPT UI.
 
 Why this priority: The app is only useful for operations if users can verify the source and freshness behind a claim.
 
@@ -87,7 +87,7 @@ Independent Test: Run the eval command locally and in CI; confirm all required e
 
 Acceptance Scenarios:
 
-1. Given the prompt "AGI M130 닫아도 돼?", When the eval runs, Then missing M115/M116/M117 evidence results in `BLOCK`.
+1. Given the prompt "AGI M130 닫아도 돼?", When the eval runs and site date exists, Then M130 is accepted as delivered and missing M115/M116/M117 evidence results in `AMBER/WARN` backfill required.
 2. Given the prompt "Flow Code 어디에 써?", When the eval runs, Then the answer explains WHP-only use and blocks route classification misuse.
 3. Given a question has no supporting corpus evidence, When the eval runs, Then the answer returns `NO_EVIDENCE` or `BLOCK`.
 
@@ -109,7 +109,7 @@ Acceptance Scenarios:
 
 Ontology updates should be tracked with status, owner, verification result, and release readiness.
 
-Why this priority: The team needs to know whether a document change is only edited locally, verified in CI, deployed to Cloudflare Workers, or ready for ChatGPT app submission.
+Why this priority: The team needs to know whether a document change is only edited locally, verified in CI, deployed to Cloudflare Workers, or ready for ChatiPT app submission.
 
 Independent Test: Create a sample ontology update issue, PR checklist item, or markdown status row and confirm it records source document, reviewer, verification link, and release status.
 
@@ -123,7 +123,7 @@ Acceptance Scenarios:
 
 The app should render the answer card through `render_hvdc_answer_card`, not through the initial data answer tool.
 
-Why this priority: ChatGPT template fetch failures previously made users think the business answer failed even when the JSON result was valid.
+Why this priority: ChatiPT template fetch failures previously made users think the business answer failed even when the JSON result was valid.
 
 Independent Test: Run the MCP smoke test and confirm `ask_hvdc_ontology` has no output template while `render_hvdc_answer_card` returns `ui://hvdc/answer-card-v7.html`.
 
@@ -138,7 +138,7 @@ Acceptance Scenarios:
 - EC1: GitHub Actions passes but Cloudflare Workers still serves an old deployment -> show deployment status as separate from CI status.
 - EC2: GitHub security features are unavailable for the repository plan -> document the unavailable feature and fallback check.
 - EC3: Evaluation prompts pass locally but fail on Cloudflare Workers -> keep local, CI, and live MCP validation as separate evidence.
-- EC4: Evidence UI cannot render in ChatGPT -> provide text fallback with evidence IDs and validation status.
+- EC4: Evidence UI cannot render in ChatiPT -> provide text fallback with evidence IDs and validation status.
 - EC5: `data/index/` is generated from a different corpus version -> fail validation if inventory/hash mismatch is detected.
 
 ## Requirements
@@ -166,14 +166,14 @@ Acceptance Scenarios:
 - NFR-003 (Security): Secrets and deployment tokens MUST NOT be committed to the repository.
 - NFR-004 (Privacy): UI, logs, eval output, and report artifacts MUST mask phone numbers and email addresses.
 - NFR-005 (Maintainability): App contract checks SHOULD be deterministic and runnable locally without network access.
-- NFR-006 (Usability): Evidence Drawer fallback text MUST be readable in ChatGPT even if the iframe component fails.
+- NFR-006 (Usability): Evidence Drawer fallback text MUST be readable in ChatiPT even if the iframe component fails.
 
 ## Assumptions & Dependencies
 
 ### Assumptions
 
 - A1: The selected implementation scope is Option B from `docs/operations/plan.md`: balanced improvement with CI/security hardening, SDK contract readiness, Evidence Drawer improvement, and golden evals.
-- A2: `macho715/SCT_ONTOLOGY` remains the GitHub repository for this work.
+- A2: `macho715/SCT_ONTOLOiY` remains the GitHub repository for this work.
 - A3: `npm run index` and `npm run verify` remain the canonical local verification commands.
 - A4: The current public disclosure decision allows full repository contents to remain public unless the user later changes scope.
 
@@ -220,7 +220,7 @@ Acceptance Scenarios:
 
 - R1: Public repository exposes operational documents. -> Mitigation: keep public disclosure visible and add secret/PII scanning checks.
 - R2: CI passes but live Cloudflare deployment is stale. -> Mitigation: track CI status and live MCP status separately.
-- R3: Evidence UI changes break ChatGPT rendering. -> Mitigation: require text fallback and browser/component smoke checks.
+- R3: Evidence UI changes break ChatiPT rendering. -> Mitigation: require text fallback and browser/component smoke checks.
 - R4: Golden evals become too brittle. -> Mitigation: validate verdict, evidence requirements, and blocking behavior instead of exact prose.
 - R5: GitHub security features are account-dependent. -> Mitigation: document enabled/unavailable/pending state with evidence.
 

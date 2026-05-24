@@ -8,7 +8,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Document Root",
     "text": "---\ntitle: \"HVDC Logistics Knowledge Graph — Master Ontology\"\ntype: \"master-ontology-spine\"\ndomain: \"hvdc-logistics\"\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nowner: \"HVDC Logistics Ontology Working Set\"\ncanonical_authority: true\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - GS1-EPCIS\n  - DCSA-T&T\n  - UN/CEFACT-BSP-RDM\n  - WCO-DM\n  - ICC-Incoterms-2020\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\nextended_by:\n  - CONSOLIDATED-01-core-framework-infra.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-04-barge-bulk-cargo.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-06-material-handling.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-09-operations.md\nevidence_layer:\n  - CONSOLIDATED-08-communication.md\nreplaces:\n  - CONSOLIDATED-00-master-ontology.md@2026-04-11\n  - CONSOLIDATED-00-master-ontology_rev.md@2026-04-27\nvalidation_passes: 5\nfinal_validation_rounds: 5\nfinal_validation_status: \"PASS\"\nfinal_validated_date: \"2026-04-27\"\nfinal_patch_bundle: \"HVDC_Logistics_Ontology_FINAL_5x_2026-04-27\"\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -20,7 +20,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "ExecSummary",
     "text": "HVDC 물류 온톨로지의 master spine은 `ShipmentUnit`을 중심으로 Project, Package, PO, Material, CargoUnit, Container, PortCall, CustomsEntry, ReleaseOrder, WarehouseTask, SiteReceipt, Document, MilestoneEvent, Exception, Cost 객체를 연결한다.\n\n본 문서는 전체 문서 세트(`CONSOLIDATED-01`~`09`, `AGENTS.md`, `HVDC Logistics Ontology Review.txt`, Palantir Semantic Digital Twin PDF)를 기준으로 재작성한 canonical reference다. Extension 문서가 본 spine과 충돌하면 본 문서가 우선한다.\n\n핵심 설계는 **Any-key in → Identifier resolution → ShipmentUnit → route/document/customs/warehouse/site/cost/exception full trace**이다. KPI 목표는 Key Resolution ≥ **95.00%**, Milestone Coverage ≥ **90.00%**, NumericIntegrity = **100.00%**, Validation p95 < **5.00s**이다.\n\n**ENG-KR one-liner:** Any key resolves to one operational twin; routing uses `RoutingPattern`, execution uses `MilestoneEvent`, evidence uses documents, and warehouse handling uses `WarehouseHandlingProfile` only.\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -32,7 +32,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Table of Contents",
     "text": "1. [Governance & Corpus Boundary](#part-1)\n2. [Canonical Dictionaries](#part-2)\n3. [Identity & Key Policy](#part-3)\n4. [Core Master Data Model](#part-4)\n5. [Execution Transaction Model](#part-5)\n6. [Document & Evidence Model](#part-6)\n7. [End-to-End Process & Milestone Model](#part-7)\n8. [Knowledge Graph Node/Edge Design](#part-8)\n9. [Integration Architecture](#part-9)\n10. [Validation Rules: SHACL, SPARQL, RAG, Human-gate](#part-10)\n11. [Compliance Controls](#part-11)\n12. [Warehouse Flow Code Policy](#part-12)\n13. [Options, Roadmap, Automation, QA](#part-13)\n14. [CmdRec](#cmdrec)\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -44,7 +44,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1.1 Master Governance Rule",
     "text": "1. `CONSOLIDATED-00-master-ontology.md` is the **canonical semantic spine** for the repository.\n2. Program-wide shipment visibility shall use **`RoutingPattern` + `JourneyStage` + `MilestoneEvent` + `JourneyLeg`**.\n3. Port, customs, document/OCR, cost, marine, operations, and communication domains may provide **evidence**; they shall not own warehouse handling classification.\n4. `MOSB` is an **Offshore Staging / Marine Interface Node**. It is not a top-level `Warehouse` class.\n5. `CONSOLIDATED-08-communication.md` is an **Evidence Layer** extension. It connects through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord` only.\n6. Legacy route-coded language is migration debt. It may be listed only in the late migration appendix in [Part 12](#part-12).\n7. Email reply drafting defaults to `EmailDraftMode` with mandatory `sct_ontology` grounding. A draft request must automatically invoke or display `sct_ontology`, then output a hard-marked `EmailActionCard` and the draft while keeping ontology verdict labels out of the outbound email body.",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -55,8 +55,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "1.2 Corpus Role Matrix",
-    "text": "| File | Role in this master spine | Master integration rule |\n|---|---|---|\n| `CONSOLIDATED-01-core-framework-infra.md` | Standards, node infrastructure, compliance anchors | Reuse Party, Asset, Location, Contract, Regulation, KPI concepts as reference-layer classes |\n| `CONSOLIDATED-02-warehouse-flow.md` | Warehouse operations and `WarehouseHandlingProfile` algorithm | Warehouse handling classification belongs here only |\n| `CONSOLIDATED-03-document-ocr.md` | LDG/OCR trust layer and cross-document validation | Documents extract `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` only |\n| `CONSOLIDATED-04-barge-bulk-cargo.md` | Marine, bulk, OOG, lashing, stability, LCT/barge extension | Uses `MarineRoutingPattern`, `MarineEvent`, `OperationTask`, M115/M116/M117 |\n| `CONSOLIDATED-05-invoice-cost.md` | Invoice, rate reference, CostGuard, PRISM.KERNEL | Cost reads route + WH evidence; it does not own warehouse classification |\n| `CONSOLIDATED-06-material-handling.md` | Customs → WH → MOSB → Site material chain | Canonicalizes JourneyStage, milestones, AGI/DAS M115→M130 rule |\n| `CONSOLIDATED-07-port-operations.md` | OFCO/PortCall/ServiceEvent/Tariff hub | Port records `plannedRoutingPattern` and `declaredDestination` as evidence |\n| `CONSOLIDATED-08-communication.md` | Email/chat evidence and action layer | Evidence only; no core logistics class redefinition |\n| `CONSOLIDATED-09-operations.md` | Ops analytics, routing KPI, reporting | Consumes `hasRoutingPattern`, milestone, stock, cost semantics |\n| `AGENTS.md` | Repository-wide modeling governance | Precedence, non-negotiable rules, validation gate policy |\n| `HVDC Logistics Ontology Review.txt` | Structural review and redesign source | Used to normalize layers, identity, milestones, and query entry points |\n| `Palantir 온톨로지 기반 물류 자동화.pdf` | Semantic Digital Twin architecture blueprint | Used for ontology/KG/validation/automation architecture framing |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "| File | Role in this master spine | Master integration rule |\n|---|---|---|\n| `CONSOLIDATED-01-core-framework-infra.md` | Standards, node infrastructure, compliance anchors | Reuse Party, Asset, Location, Contract, Regulation, KPI concepts as reference-layer classes |\n| `CONSOLIDATED-02-warehouse-flow.md` | Warehouse operations and `WarehouseHandlingProfile` algorithm | Warehouse handling classification belongs here only |\n| `CONSOLIDATED-03-document-ocr.md` | LDG/OCR trust layer and cross-document validation | Documents extract `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` only |\n| `CONSOLIDATED-04-barge-bulk-cargo.md` | Marine, bulk, OOG, lashing, stability, LCT/barge extension | Uses `MarineRoutingPattern`, `MarineEvent`, `OperationTask`, M115/M116/M117 |\n| `CONSOLIDATED-05-invoice-cost.md` | Invoice, rate reference, CostGuard, PRISM.KERNEL | Cost reads route + WH evidence; it does not own warehouse classification |\n| `CONSOLIDATED-06-material-handling.md` | Customs → WH → MOSB → Site material chain | Canonicalizes JourneyStage, milestones, AGI/DAS SiteReceipt/M130 acceptance plus MOSB evidence backfill rule |\n| `CONSOLIDATED-07-port-operations.md` | OFCO/PortCall/ServiceEvent/Tariff hub | Port records `plannedRoutingPattern` and `declaredDestination` as evidence |\n| `CONSOLIDATED-08-communication.md` | Email/chat evidence and action layer | Evidence only; no core logistics class redefinition |\n| `CONSOLIDATED-09-operations.md` | Ops analytics, routing KPI, reporting | Consumes `hasRoutingPattern`, milestone, stock, cost semantics |\n| `AGENTS.md` | Repository-wide modeling governance | Precedence, non-negotiable rules, validation gate policy |\n| `HVDC Logistics Ontology Review.txt` | Structural review and redesign source | Used to normalize layers, identity, milestones, and query entry points |\n| `Palantir 온톨로지 기반 물류 자동화.pdf` | Semantic Digital Twin architecture blueprint | Used for ontology/KG/validation/automation architecture framing |",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -68,7 +68,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1.3 Data Layer Separation",
     "text": "| Layer | Purpose | Canonical classes |\n|---|---|---|\n| Master Data | Stable reference and planning data | `Project`, `Package`, `PurchaseOrder`, `Vendor`, `MaterialMaster`, `HVDCCodeTag`, `LocationNode`, `EquipmentResource` |\n| Execution Transactions | What moved or was processed | `Shipment`, `ShipmentUnit`, `CargoUnit`, `Container`, `JourneyLeg`, `PortCall`, `CustomsEntry`, `ReleaseOrder`, `WarehouseTask`, `SiteReceipt` |\n| Documents | Documentary evidence | `CommercialInvoiceDocument`, `PackingListDocument`, `BillOfLadingDocument`, `BOEDocument`, `DeliveryOrderDocument`, `PermitDocument`, `MRR`, `MRI`, `ITP`, `MAR`, `MRS`, `MIS`, `POD`, `GRN`, `OSDR` |\n| Events | Time-stamped state transitions | `MilestoneEvent`, `InspectionEvent`, `WarehouseEvent`, `MarineEvent`, `ServiceEvent`, `CommunicationEvent` |\n| Exceptions | Disruption and resolution | `Exception`, `Delay`, `Damage`, `Shortage`, `Overage`, `NCR`, `Claim` |\n| Cost | Financial traceability | `Invoice`, `InvoiceLine`, `RateRef`, `CostTransaction`, `TariffRef`, `DEMDETClock`, `CostGuardResult` |\n| Evidence | Provenance, proof, approvals | `AuditRecord`, `ApprovalAction`, `VerificationResult`, `TrustLayer`, `ProofArtifact` |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -80,7 +80,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1.4 Non-collapse Rule",
     "text": "| Do not collapse | Correct model |\n|---|---|\n| `CustomsEntry` into `BOEDocument` | `CustomsEntry` is a transaction; `BOEDocument` is evidence |\n| `ReleaseOrder` into `DeliveryOrderDocument` | `ReleaseOrder` is a release transaction; DO is evidence |\n| `SiteReceipt` into `MRR` / `OSDR` / `POD` / `GRN` | `SiteReceipt` is a site transaction; documents evidence it |\n| `MOSB` into `Warehouse` | `MOSB` is `OffshoreStaging`; optional storage capability is a property, not a class collapse |\n| Route status into warehouse handling classification | Route status uses `RoutingPattern`, `JourneyStage`, `MilestoneEvent`, `JourneyLeg` |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -92,7 +92,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.1 RoutingPattern Dictionary",
     "text": "`ShipmentRoutingPattern` is an end-to-end route classifier. It is a SKOS-controlled vocabulary and must be encoded as named concepts, not integers.\n\n| Pattern | Canonical path | Business meaning | Valid owner |\n|---|---|---|---|\n| `PRE_ARRIVAL` | Not yet arrived / insufficient evidence | Pre-arrival or unresolved route | `ShipmentUnit`, `PortCall` evidence |\n| `DIRECT` | Port → Site | No warehouse and no MOSB staging | `ShipmentUnit` |\n| `WH_ONLY` | Port → WH → Site | Warehouse leg, no offshore staging | `ShipmentUnit` |\n| `MOSB_DIRECT` | Port → MOSB → Site | Offshore staging without warehouse leg | `ShipmentUnit` / marine extension |\n| `WH_MOSB` | Port → WH → MOSB → Site | Warehouse plus offshore staging | `ShipmentUnit` / marine extension |\n| `MIXED` | Mixed / incomplete / exceptional | Multi-path, split cargo, or insufficient closure | `ShipmentUnit` |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -104,7 +104,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.2 MarineRoutingPattern Dictionary",
     "text": "| Pattern | Path | Owner domain |\n|---|---|---|\n| `DIRECT_MOSB` | Port → MOSB | `CONSOLIDATED-04`, `CONSOLIDATED-06` |\n| `WH_THEN_MOSB` | WH → MOSB | `CONSOLIDATED-04`, `CONSOLIDATED-06` |\n| `LCT_DIRECT` | LCT / barge direct operation | `CONSOLIDATED-04` |\n| `OFFSHORE_PENDING` | Offshore route not yet confirmed | Exception / marine planning |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -116,7 +116,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.3 JourneyStage Vocabulary",
     "text": "| Stage Code | Korean Name | Entry Milestone | Exit Milestone | Operational use |\n|---|---|---|---|---|\n| `PLANNING` | 계획 | M10 | M20 | Demand/readiness planning |\n| `ORIGIN_DISPATCH` | 원산지 출발 | M20 | M40 | Packing, pickup, export clearance |\n| `PORT_ENTRY` | 입항 | M50 / M80 | M92 | Terminal arrival and import readiness |\n| `TERMINAL_HANDLING` | 터미널 작업 | M50 | M61 | Gate-in, loading, ATD |\n| `CUSTOMS_CLEARANCE` | 통관 | M80 | M92 | BOE and import release |\n| `INLAND_HAULAGE` | 내륙 운송 | M92 | M100 | DO, gate-out, domestic move |\n| `WH_RECEIPT` | 창고 입고 | M100 | M110 | WH appointment and receipt |\n| `WH_STORAGE` | 창고 보관 | M110 | M120 | Put-away, storage, preservation |\n| `WH_DISPATCH` | 창고 출고 | M120 | M121 | Picking, staging, dispatch |\n| `MOSB_STAGING` | MOSB 스테이징 | M121 / direct inland arrival | M115 | Offshore staging |\n| `OFFSHORE_TRANSIT` | 해상 운송 | M116 | M117 | LCT/barge loading and sail-away |\n| `SITE_RECEIVING` | 현장 수령 | M117 / M100 direct | M130 | Arrival and receiving |\n| `MATERIAL_ISSUE` | 자재 불출 | M131/M132 | M140 | Inspection, POD, GRN |\n| `CLOSEOUT` | 완료 | M140 | M160 | Claim/cost closure |\n| `EXCEPTION` | 예외 처리 | Any blocking event | Resolved milestone | Delay/damage/shortage/NCR |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -128,7 +128,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.4 Domain Vocabulary Crosswalk",
     "text": "| Domain | Use | Do not use as canonical |\n|---|---|---|\n| Core shipment | `ShipmentRoutingPattern`, `JourneyStage`, `MilestoneEvent`, `JourneyLeg` | Numeric route codes |\n| Port | `plannedRoutingPattern`, `declaredDestination`, `offshoreTransitRequired`, `importRoutingDecision` | `assignedFlowCode` |\n| Document/OCR | `routeEvidence`, `destinationEvidence`, `mosbLegIndicator`, `routeEvidenceConfidence` | `extractedFlowCode` |\n| Cost | `routeBasedCostDriver`, `costByRoutingPattern`, `wh_handling_cnt` evidence | `costByFlowCode` |\n| Marine/Bulk | `MarineRoutingPattern`, `offshoreDeliveryPattern`, `MarineEvent` | Warehouse route codes |\n| Warehouse | `WarehouseHandlingProfile`, `storageClass`, `flowConfirmationStatus`, `confirmedFlowCode` | E2E route ownership |\n| Operations/KPI | `hasRoutingPattern`, milestone analytics, stock analytics | End-to-end Flow Code analytics |\n| Communication | `CommunicationEvent`, `ApprovalAction`, `AuditRecord` | Core class ownership |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -140,7 +140,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.5 Status Vocabularies",
     "text": "| Vocabulary | Values |\n|---|---|\n| `ShipmentStatus` | `PLANNED`, `READY`, `IN_TRANSIT`, `ARRIVED`, `UNDER_CLEARANCE`, `RELEASED`, `WAREHOUSED`, `DISPATCHED`, `DELIVERED`, `CLOSED`, `EXCEPTION` |\n| `DocumentStatus` | `DRAFT`, `RECEIVED`, `OCR_EXTRACTED`, `VALIDATED`, `REJECTED`, `SUPERSEDED` |\n| `CustomsStatus` | `NOT_STARTED`, `BOE_SUBMITTED`, `UNDER_REVIEW`, `CLEARED`, `HELD`, `REJECTED` |\n| `ReleaseStatus` | `PENDING`, `DO_RELEASED`, `GATE_PASS_ISSUED`, `GATE_OUT`, `BLOCKED` |\n| `StockStatus` | `EXPECTED`, `RECEIVED`, `PUT_AWAY`, `AVAILABLE`, `QUARANTINE`, `PICKED`, `STAGED`, `DISPATCHED`, `ISSUED` |\n| `SiteReceiptStatus` | `EXPECTED`, `ARRIVED`, `INSPECTED_GOOD`, `INSPECTED_OSD`, `ACCEPTED`, `REJECTED`, `CLAIM_OPENED` |\n| `ExceptionStatus` | `OPEN`, `MITIGATING`, `WAITING_APPROVAL`, `RESOLVED`, `CLOSED` |\n| `CostGuardBand` | `PASS`, `WARN`, `HIGH`, `CRITICAL` |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -152,7 +152,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.1 Identity Principle",
     "text": "**One internal object, many external identifiers.**\n\nEvery operational object must be reachable from at least one external key, and every high-value object must carry normalized key lineage through `Identifier`.\n\n```turtle\n@prefix hvdc: <http://samsung.com/project-logistics#> .\n@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .\n\nhvdc:Identifier a owl:Class ;\n  rdfs:label \"Logistics Identifier\" ;\n  rdfs:comment \"External key normalized to a resolvable internal object.\" .\n\nhvdc:identifierScheme a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:string .\nhvdc:identifierValue  a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:string .\nhvdc:normalizedValue  a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:string .\nhvdc:sourceSystem     a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:string .\nhvdc:isPrimary        a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:boolean .\nhvdc:validFrom        a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:dateTime .\nhvdc:validTo          a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:dateTime .\nhvdc:confidenceScore  a owl:DatatypeProperty ; rdfs:domain hvdc:Identifier ; rdfs:range xsd:decimal .\n\nhvdc:resolvesTo a owl:ObjectProperty ;\n  rdfs:domain hvdc:Identifier ;\n  rdfs:range owl:Thing .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -164,7 +164,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.2 Identifier Families",
     "text": "| Family | Identifier schemes | Target objects |\n|---|---|---|\n| Project | `projectCode`, `contractNo`, `siteWorkPackage` | `Project`, `Package` |\n| Procurement | `packageNo`, `poNo`, `vendorCode`, `releaseNo` | `Package`, `PurchaseOrder`, `Vendor` |\n| Material | `materialCode`, `mfgPartNo`, `serialNo`, `HVDC_CODE`, `tagNo` | `MaterialMaster`, `HVDCCodeTag`, `CargoUnit` |\n| Shipment | `shipmentId`, `bookingNo`, `blNo`, `voyageNo`, `rotationNo`, `carrierRef` | `Shipment`, `ShipmentUnit`, `BillOfLadingDocument`, `PortCall` |\n| Container | `containerNo`, `sealNo`, `isoCode` | `Container`, `CargoUnit` |\n| Customs | `boeNo`, `declarationLineRef`, `hsCode`, `cooRef` | `CustomsEntry`, `BOEDocument` |\n| Release | `doNo`, `gatePassRef`, `freeTimeRef` | `ReleaseOrder`, `DeliveryOrderDocument` |\n| Warehouse | `whReceiptNo`, `warehouseId`, `locationCode`, `binNo`, `stockRef` | `WarehouseTask`, `WarehouseLocation`, `WarehouseHandlingProfile` |\n| Site | `siteCode`, `mrrNo`, `mriNo`, `mrsNo`, `misNo`, `podNo`, `grnNo` | `SiteReceipt`, `InspectionEvent`, `MRR`, `POD`, `GRN` |\n| Exception | `exceptionId`, `claimRef`, `ncrRef`, `osdrNo` | `Exception`, `Claim`, `NCR`, `OSDR` |\n| Cost | `invoiceNo`, `invoiceLineNo`, `costCode`, `tariffRef`, `rateRefId` | `Invoice`, `InvoiceLine`, `RateRef`, `CostGuardResult` |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -176,7 +176,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.3 Parent-Child Hierarchy",
     "text": "```text\nProject\n  └─ hasPackage → Package\n       └─ coveredBy → PurchaseOrder\n            └─ issuedTo → Vendor\n                 └─ supplies → MaterialMaster\n                      ├─ taggedBy → HVDCCodeTag\n                      └─ unitizedAs → CargoUnit\n                           ├─ packedIn → Container\n                           └─ belongsTo → ShipmentUnit\n                                ├─ groupedIn → Shipment\n                                ├─ hasJourneyLeg[]\n                                ├─ hasMilestone[]\n                                ├─ hasDocument[]\n                                ├─ hasWarehouseHandlingProfile?  # only if WH event exists\n                                ├─ hasSiteReceipt?\n                                ├─ hasCostItem[]\n                                └─ hasException[]\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -188,7 +188,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.4 Any-key Resolution Flow",
     "text": "```text\nInput key: ETA / HVDC_CODE / Vendor / PO / Package / Material / Shipment / Container / BL / BOE / DO / WH / Site / Claim / Invoice\n  → normalize(identifierScheme, identifierValue)\n  → Identifier.normalizedValue\n  → Identifier.resolvesTo(object)\n  → if object is not ShipmentUnit, traverse to nearest ShipmentUnit\n  → return Operational Twin context:\n      currentStage, routingPattern, currentLocation,\n      journeyLegs, milestones, documents, customs, release,\n      warehouse profile, site receipt, cost, exception, evidence\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -200,7 +200,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.5 Identity Quality Gates",
     "text": "| Gate | Rule | Threshold |\n|---|---|---:|\n| `IdentifierCompleteness` | `identifierScheme`, `identifierValue`, `normalizedValue`, `sourceSystem` required | 100.00% |\n| `AnyKeyResolution` | Key resolves to an object or candidate match | ≥ 95.00% |\n| `HighValueMatchReview` | Invoice or shipment value > 100,000.00 AED requires human review if confidence < 0.98 | 100.00% |\n| `DuplicateClusterCheck` | Same normalized key cannot map to conflicting live objects without `sameAsCandidate` | 0.00 conflicts |\n| `HVDCCodePolicy` | `HVDC_CODE` is a cross-cutting tag, not sole identity anchor | mandatory |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -212,7 +212,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.1 Master Object Types",
     "text": "| Object Type | Primary internal key | Required properties | Notes |\n|---|---|---|---|\n| `Project` | `projectRid` | `projectCode`, `projectName`, `country`, `status` | Parent scope |\n| `Package` | `packageRid` | `packageNo`, `packageType`, `siteCode`, `requiredDate` | Procurement and site demand bridge |\n| `PurchaseOrder` | `poRid` | `poNo`, `vendorCode`, `incoterm`, `currency`, `issueDate` | Incoterms and payment anchors |\n| `Vendor` | `vendorRid` | `vendorCode`, `vendorName`, `country`, `role` | Supplier/shipper/manufacturer roles |\n| `MaterialMaster` | `materialRid` | `materialCode`, `description`, `uom`, `hsCode`, `originCountry` | HS, origin, compliance |\n| `HVDCCodeTag` | `hvdcCodeRid` | `hvdcCode`, `engineeringArea`, `siteRelevance` | Cross-cutting engineering-logistics tag |\n| `Party` | `partyRid` | `partyCode`, `partyName`, `partyRole` | Shipper, consignee, carrier, broker, authority |\n| `ContractTerm` | `contractTermRid` | `termType`, `termCode`, `effectiveDate` | Incoterm, charter, service contract |\n| `RegulatoryRequirement` | `regReqRid` | `authority`, `requirementType`, `triggerCondition` | MOIAT/FANR/DCD/ADNOC gates |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -224,7 +224,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.2 Location and Node Types",
     "text": "| Object Type | Required properties | Classification rule |\n|---|---|---|\n| `LocationNode` | `nodeCode`, `nodeType`, `name`, `country`, `geoRef` | Superclass for all logistics nodes |\n| `Port` | `portCode`, `UNLOCODE`, `portName` | Port of loading/discharge/entry |\n| `Terminal` | `terminalId`, `terminalName`, `portCode`, `berth` | Terminal under port |\n| `Warehouse` | `warehouseId`, `name`, `warehouseType`, `operator` | Indoor/outdoor/DG/OOG storage node |\n| `WarehouseLocation` | `locationCode`, `zone`, `rackBinYard`, `capacityClass` | Sub-location of `Warehouse` only |\n| `OffshoreStaging` | `nodeCode`, `operator`, `marineAccessMode` | `MOSB` belongs here, not to `Warehouse` |\n| `Site` | `siteCode`, `siteName`, `onshoreOffshore`, `receivingRule` | AGI/DAS/MIR/SHU |\n| `Berth`, `Jetty`, `LaydownYard`, `SiteGate` | local operational fields | Specialized location nodes |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -236,7 +236,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.3 Resource Types",
     "text": "| Object Type | Required properties | Usage |\n|---|---|---|\n| `Carrier` | `carrierCode`, `carrierName`, `mode` | Main carriage / ocean / road / air |\n| `Forwarder` | `forwarderCode`, `name`, `serviceRole` | Freight forwarder / 3PL |\n| `Broker` | `brokerCode`, `name`, `authorityScope` | Customs and permit processes |\n| `EquipmentResource` | `equipId`, `equipType`, `SWL`, `certificateRef` | Crane, forklift, SPMT, spreader, rigging gear |\n| `VesselResource` | `vesselName`, `imo`, `vesselType`, `capacity` | Vessel, LCT, barge, tug |\n| `ManpowerResource` | `personOrRoleId`, `role`, `certificateRef` | Use role-based identifiers where PII masking is required |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -248,7 +248,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.1 Core Transaction Objects",
     "text": "| Object Type | Required properties | Key links |\n|---|---|---|\n| `Shipment` | `shipmentId`, `mode`, `status`, `plannedRoutingPattern`, `origin`, `destination`, `ETD`, `ETA`, `ATD`, `ATA` | `hasUnit`, `hasPortCall`, `hasDocument` |\n| `ShipmentUnit` | `shipmentUnitId`, `routingPattern`, `currentStage`, `currentLocation`, `declaredDestination` | Central operational twin |\n| `CargoUnit` | `cargoUnitId`, `packageNo`, `grossWeight`, `volume`, `dimensions`, `condition` | `belongsToShipmentUnit`, `packedIn` |\n| `Container` | `containerNo`, `sealNo`, `isoType`, `freeTime` | `containsCargoUnit` |\n| `JourneyLeg` | `legId`, `legSequence`, `fromNode`, `toNode`, `mode`, `plannedETD`, `plannedETA`, `actualATD`, `actualATA` | `departsFrom`, `arrivesAt` |\n| `PortCall` | `portCallId`, `rotationNo`, `portCode`, `plannedRoutingPattern`, `declaredDestination` | `evidencesShipment`, `hasServiceEvent` |\n| `ServiceEvent` | `serviceEventId`, `serviceType`, `eventDt`, `provider`, `costCenter` | Port/OFCO service proof |\n| `CustomsEntry` | `customsEntryId`, `boeRef`, `customsStatus`, `duty`, `broker`, `clearanceDate`, `hsCode` | `referencesBOEDocument` |\n| `ReleaseOrder` | `releaseOrderId`, `doRef`, `releaseDate`, `terminal`, `freeTime`, `gatePassRef` | `referencesDODocument` |\n| `Delivery` | `deliveryId`, `dispatchDate`, `arrivalDate`, `originNode`, `destinationNode`, `vehicleRef` | `usesJourneyLeg` |\n| `WarehouseTask` | `taskId`, `warehouseId`, `locationCode`, `stockStatus`, `storageRequirementClass`, `preservationStatus` | `createsWarehouseEvent` |\n| `SiteReceipt` | `receiptId`, `siteCode`, `receiptType`, `inspectionResult`, `mrrRef`, `osdrRef`, `podRef`, `grnRef` | `generatesSiteDocuments` |\n| `MarineTask` | `marineTaskId`, `marineRoutingPattern`, `vesselRef`, `operationWindow`, `approvalStatus` | `hasMarineEvent`, `usesEquipment` |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -260,7 +260,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.2 Transaction / Document Split",
     "text": "```text\nCustomsEntry --references--> BOEDocument\nReleaseOrder --references--> DeliveryOrderDocument\nSiteReceipt --references--> MRR / MRI / MRS / MIS / POD / GRN / OSDR\nPortCall --evidencedBy--> ArrivalNotice / PortInvoice / ServiceRecord\nWarehouseTask --evidencedBy--> WHReceipt / PutAwayNote / PickList / DispatchNote\nMarineTask --evidencedBy--> PTW / FRA / MethodStatement / LashingPlan / StabilityReport / TideTable\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -272,7 +272,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.3 Foundry Ontology Object Mapping",
     "text": "| Foundry Object Type | Backing dataset family | Cardinality / notes |\n|---|---|---|\n| `ShipmentUnit` | TMS + ERP package + WMS + LDG linked facts | One central operational twin per traceable unit |\n| `Identifier` | normalized keys from all sources | N:1 to target object |\n| `JourneyLeg` | carrier/TMS/road/marine feeds | N:1 to `ShipmentUnit` |\n| `MilestoneEvent` | EPCIS/DCSA/TMS/WMS/port/site events | N:1 to `ShipmentUnit` |\n| `Document` | LDG/OCR/document repository | N:N with ShipmentUnit/CargoUnit/Transaction |\n| `CostGuardResult` | invoice audit pipeline | N:1 to InvoiceLine / Invoice |\n| `WarehouseHandlingProfile` | WMS WH In/put-away events | 0..1 per ShipmentUnit unless split handling exists |\n| `CommunicationEvent` | email/chat/task system | Evidence-only link to object/action |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -284,7 +284,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.4 Action Types",
     "text": "| Action Type | Target | Required parameters | Guard |\n|---|---|---|---|\n| `ResolveAnyKey` | `Identifier` | `identifierScheme`, `identifierValue` | confidence ≥ 0.95 or human review |\n| `RecordPortRoutingEvidence` | `PortCall` | `plannedRoutingPattern`, `declaredDestination`, `offshoreTransitRequired` | No warehouse classification write |\n| `SubmitBOE` | `CustomsEntry` | `boeRef`, `hsCode`, `broker`, `duty` | CI/PL/BL and permit readiness |\n| `ReleaseDO` | `ReleaseOrder` | `doRef`, `releaseDate`, `gatePassRef` | BOE cleared |\n| `RecordGateOut` | `ShipmentUnit` | `terminal`, `actualDt`, `carrier` | DO exists |\n| `ConfirmWHIn` | `WarehouseTask` | `warehouseId`, `actualDt`, `locationCode`, `storageClass` | M110 creates/updates WHP |\n| `StageMOSB` | `MarineTask` | `mosbNode`, `actualDt`, `vesselRef` | Required for AGI/DAS offshore route |\n| `RecordSiteArrival` | `SiteReceipt` | `siteCode`, `actualDt`, `receiptType` | M115 check for AGI/DAS MOSB routes |\n| `CloseCostGuard` | `Invoice` | `reviewDecision`, `approvalRef` | Delta band and human-gate applied |\n| `OpenClaim` | `Exception` | `claimType`, `evidenceDoc`, `amount` | OSDR/NCR evidence required |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -296,7 +296,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.1 Document Base Class",
     "text": "```turtle\nhvdc:Document a owl:Class ;\n  rdfs:label \"Logistics Document\" .\n\nhvdc:documentNo    a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:string .\nhvdc:docType       a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:string .\nhvdc:docHash       a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:string .\nhvdc:issueDate     a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:date .\nhvdc:sourceSystem  a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:string .\nhvdc:ocrConfidence a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:decimal .\nhvdc:validatedBy   a owl:ObjectProperty ; rdfs:domain hvdc:Document ; rdfs:range hvdc:VerificationResult .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -308,7 +308,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.2 Document Types",
     "text": "| Document Type | Required properties | Primary validation |\n|---|---|---|\n| `CommercialInvoiceDocument` | `invoiceNo`, `vendor`, `currency`, `totalAmount`, `lineCount` | Invoice total = Σ line ± 2.00% |\n| `PackingListDocument` | `plNo`, `packageCount`, `grossWeight`, `volume` | PL package/weight/volume vs CargoUnit |\n| `BillOfLadingDocument` | `blNo`, `carrier`, `portOfLoading`, `portOfDischarge` | BL vs Shipment/Container/PortCall |\n| `CertificateOfOriginDocument` | `cooNo`, `originCountry`, `issuer` | Origin consistency with material |\n| `BOEDocument` | `boeNo`, `declarationDate`, `customsAuthority` | Evidence for `CustomsEntry` |\n| `DeliveryOrderDocument` | `doNo`, `releaseDate`, `terminal` | Evidence for `ReleaseOrder` |\n| `PermitDocument` | `permitNo`, `authority`, `permitType`, `expiryDate` | MOIAT/FANR/DCD/ADNOC controls |\n| `MRR` / `MRI` | `receiptNo`, `inspectionNo`, `siteCode` | Site receipt and inspection evidence |\n| `MRS` / `MIS` | `requestNo`, `issueNo`, `siteCode` | Material request / issue evidence |\n| `POD` / `GRN` | `podNo`, `grnNo`, `acceptanceDate` | Handover closure |\n| `OSDR` | `osdrNo`, `defectType`, `severity`, `claimRef` | Exception/claim trigger |\n| `PTW` / `FRA` / `MethodStatement` | `approvalNo`, `workScope`, `expiryDate` | Heavy-lift/marine execution gate |\n| `LashingPlan` / `StabilityReport` | `planNo`, `engineerApproval`, `revision` | Marine/OOG technical gate |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -320,7 +320,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.3 OCR / LDG Evidence Properties",
     "text": "| Property | Domain | Range | Ownership rule |\n|---|---|---|---|\n| `routeEvidence` | `Document` | string / SKOS concept | Evidence only; feeds routing decision |\n| `destinationEvidence` | `Document` | site code string | Evidence only |\n| `mosbLegIndicator` | `Document` | boolean | Evidence only |\n| `routeEvidenceConfidence` | `Document` | decimal | 0.00–1.00 |\n| `extractedEntity` | `Document` | `DocumentEntity` | OCR extraction |\n| `crossDocLink` | `DocumentEntity` | `CrossDocLink` | Semantic verification |\n| `verificationResult` | `Document` | `VerificationResult` | LDG result |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -332,7 +332,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.4 Evidence Layer Rules",
     "text": "1. Evidence may support a routing, compliance, cost, or exception decision.\n2. Evidence may not directly mutate the operational truth unless an approved Action writes the transaction object.\n3. Communication records are linked through `CommunicationEvent`, `ApprovalAction`, and `AuditRecord`.\n4. PII shall be masked except approved business names and role-level contacts.\n5. Proof artifacts shall store source document, extraction confidence, rule ID, verdict, timestamp, and reviewer when applicable.\n6. Email drafts are not operational truth, not evidence registration, and not transaction mutation.\n7. Email draft outputs must include mandatory `sct_ontology` review plus `EmailActionCard` with `ontology_use = AUTO_SCT_ONTOLOGY_REQUIRED`.",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -344,7 +344,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.5 OCR KPI Gates",
     "text": "| KPI | Threshold | Action |\n|---|---:|---|\n| `MeanConf` | ≥ 0.92 | Below threshold → human review |\n| `TableAcc` | ≥ 0.98 | Below threshold → table re-extraction |\n| `NumericIntegrity` | 1.00 | Any break → block finance/customs release |\n| `CrossDocumentConsistency` | 1.00 | Strict for CI/PL/BL/BOE/DO critical fields |\n| `RouteEvidenceAccuracy` | ≥ 0.95 | Below threshold → route evidence review |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -356,7 +356,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.1 MilestoneEvent Class",
     "text": "```turtle\nhvdc:MilestoneEvent a owl:Class ;\n  rdfs:label \"Logistics Milestone Event\" ;\n  rdfs:comment \"First-class event containing planned, estimated, and actual timestamps.\" .\n\nhvdc:milestoneCode    a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:string .\nhvdc:milestoneName    a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:string .\nhvdc:plannedDt        a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:dateTime .\nhvdc:estimatedDt      a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:dateTime .\nhvdc:actualDt         a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:dateTime .\nhvdc:statusAfterEvent a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:string .\nhvdc:eventLocation    a owl:ObjectProperty ;  rdfs:domain hvdc:MilestoneEvent ; rdfs:range hvdc:LocationNode .\nhvdc:responsibleParty a owl:ObjectProperty ;  rdfs:domain hvdc:MilestoneEvent ; rdfs:range hvdc:Party .\nhvdc:sourceDocument   a owl:ObjectProperty ;  rdfs:domain hvdc:MilestoneEvent ; rdfs:range hvdc:Document .\nhvdc:sourceSystem     a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:string .\nhvdc:exceptionFlag    a owl:DatatypeProperty ; rdfs:domain hvdc:MilestoneEvent ; rdfs:range xsd:boolean .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -368,7 +368,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.2 Canonical Milestone Dictionary",
     "text": "| Milestone | Name | Journey Stage | Owner domain | Required evidence |\n|---|---|---|---|---|\n| M10 | Cargo Ready | `PLANNING` | Vendor/Expeditor | readiness notice / inspection release |\n| M20 | Packed / Marked | `ORIGIN_DISPATCH` | Vendor | PL / marking sheet |\n| M30 | Pickup Completed | `ORIGIN_DISPATCH` | Forwarder | pickup note / transport order |\n| M40 | Export Cleared | `ORIGIN_DISPATCH` | Export broker | export declaration |\n| M50 | Terminal Received | `PORT_ENTRY` / `TERMINAL_HANDLING` | Terminal | terminal receipt |\n| M60 | Loaded On Board | `TERMINAL_HANDLING` | Carrier | load list / BL |\n| M61 | ATD | `TERMINAL_HANDLING` | Carrier | carrier milestone |\n| M70 | Transshipment Occurred | `TERMINAL_HANDLING` | Carrier | transshipment notice |\n| M80 | ATA | `PORT_ENTRY` | Carrier/Agent | arrival notice |\n| M90 | BOE Submitted | `CUSTOMS_CLEARANCE` | Import broker | BOE draft/submission |\n| M91 | BOE Cleared | `CUSTOMS_CLEARANCE` | Import broker | clearance confirmation |\n| M92 | DO Released | `CUSTOMS_CLEARANCE` | Carrier/Agent | DO / release note |\n| M100 | Gate-out Completed | `INLAND_HAULAGE` | Terminal/Forwarder | gate pass / EIR |\n| M110 | Warehouse Received | `WH_RECEIPT` | Warehouse operator | WH receipt |\n| M111 | Put-away Completed | `WH_STORAGE` | Warehouse operator | put-away note |\n| M115 | MOSB Staged | `MOSB_STAGING` | Marine contractor | MOSB staging record |\n| M116 | LCT/Barge Loaded | `OFFSHORE_TRANSIT` | Marine contractor | load manifest / marine event |\n| M117 | Sail-away Approved | `OFFSHORE_TRANSIT` | Marine / ALS | sail-away approval |\n| M120 | Picked / Staged | `WH_DISPATCH` | Warehouse operator | pick/stage list |\n| M121 | Dispatched | `WH_DISPATCH` | WH/Site logistics | dispatch note |\n| M130 | Site Arrived | `SITE_RECEIVING` | Site logistics | delivery note / arrival record |\n| M131 | Site Inspected — Good | `SITE_RECEIVING` | QA/QC | MRI/MRR good result |\n| M132 | Site Inspected — OSD | `SITE_RECEIVING` | QA/QC | OSDR / defect evidence |\n| M140 | POD / GRN / Handover | `MATERIAL_ISSUE` | Site stores | POD / GRN |\n| M150 | Claim Opened | `CLOSEOUT` | Claims | claim file / OSDR/NCR |\n| M160 | Cost Closed | `CLOSEOUT` | Cost control | final invoice / cost closure |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -380,7 +380,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.3 E2E 19-step Process Map",
     "text": "| Step | Process | Primary milestone(s) | Key objects | Risk / exception |\n|---:|---|---|---|---|\n| 1 | Project / Package / PO Release | demand event | Project, Package, PO | Missing package/PO chain |\n| 2 | Vendor Readiness | M10 | Vendor, MaterialMaster | readiness delay |\n| 3 | Packing / Marking / Labelling | M20 | CargoUnit, PL, CI | packing discrepancy |\n| 4 | Pickup / Origin Haulage | M30 | ShipmentUnit, JourneyLeg | truck no-show / damage |\n| 5 | Export Customs Clearance | M40 | Customs export record | export hold |\n| 6 | Terminal Receiving | M50 | PortCall, Terminal | terminal delay |\n| 7 | Vessel Loading / Departure | M60/M61 | Shipment, BL, Container | rollover / lashing issue |\n| 8 | Ocean / Transshipment | M70 | JourneyLeg | missed connection |\n| 9 | Arrival / Pre-arrival Review | M80 | PortCall, Document pack | missing docs |\n| 10 | Import BOE | M90/M91 | CustomsEntry, BOEDocument | customs hold / permit expiry |\n| 11 | DO / Gate-out | M92/M100 | ReleaseOrder, Delivery | DEM/DET exposure |\n| 12 | Inland Transport | JourneyLeg event | Delivery, Truck/SPMT | access restriction |\n| 13 | Warehouse Receiving | M110 | WarehouseTask, WHP | receipt mismatch |\n| 14 | Put-away / Storage / Preservation | M111 | WarehouseTask, StockSnapshot | wrong bin / preservation failure |\n| 15 | Picking / Staging / Dispatch | M120/M121 | WarehouseTask, Delivery | short pick / wrong material |\n| 16 | Offshore / Heavy-lift / OOG | M115/M116/M117 | MarineTask, MarineEvent | HSE stop / weather / lift failure |\n| 17 | Site Delivery / Inspection | M130/M131/M132 | SiteReceipt, InspectionEvent | OSD / damage / shortage |\n| 18 | POD / GRN / Handover | M140 | POD, GRN, SiteReceipt | missing acknowledgement |\n| 19 | Exception / Claim / Cost Closure | M150/M160 | Exception, Claim, Invoice | lingering claim/cost exposure |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -392,7 +392,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.4 AGI/DAS Offshore Rule",
     "text": "```text\nIF ShipmentUnit.declaredDestination IN (\"AGI\", \"DAS\")\nAND ShipmentUnit.routingPattern IN (\"MOSB_DIRECT\", \"WH_MOSB\", \"MIXED\")\nAND M130.actualDt IS NOT NULL\nAND M115.actualDt IS NULL\nTHEN VIOLATION-2: Block site arrival closure and request MOSB evidence.\n```\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -404,7 +404,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.1 Node Families",
     "text": "| Node family | Classes | Primary resolution keys |\n|---|---|---|\n| Master | Project, Package, PO, Vendor, MaterialMaster, HVDCCodeTag | projectCode, packageNo, poNo, vendorCode, materialCode, HVDC_CODE |\n| Transport | Shipment, ShipmentUnit, JourneyLeg, PortCall, Delivery | shipmentId, bookingNo, BL No., rotationNo, ETA/ATA |\n| Physical | CargoUnit, Container, EquipmentResource, VesselResource | cargoUnitId, containerNo, sealNo, equipId, vesselName |\n| Document | CI, PL, BL, BOE, DO, Permit, MRR, OSDR, POD, GRN | documentNo, docHash |\n| Event | MilestoneEvent, WarehouseEvent, MarineEvent, InspectionEvent, ServiceEvent | eventId, milestoneCode |\n| Exception | Delay, Damage, Shortage, Overage, NCR, Claim | exceptionId, claimRef, ncrRef, osdrNo |\n| Cost | Invoice, InvoiceLine, RateRef, CostTransaction, DEMDETClock | invoiceNo, invoiceLineNo, costCode, tariffRef |\n| Evidence | AuditRecord, CommunicationEvent, ApprovalAction, VerificationResult | threadId, emailId, approvalRef, proofId |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -416,7 +416,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.2 Edge Grammar",
     "text": "```turtle",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -428,7 +428,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Containment / hierarchy",
     "text": "hvdc:hasPackage, hvdc:coveredBy, hvdc:issuedTo, hvdc:supplies, hvdc:unitizedAs, hvdc:containsCargoUnit, hvdc:packedIn, hvdc:hasUnit",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -440,7 +440,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Identity",
     "text": "hvdc:hasIdentifier, hvdc:resolvesTo, hvdc:sameAsCandidate, hvdc:hasNormalizedKey",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -452,7 +452,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Movement",
     "text": "hvdc:hasJourneyLeg, hvdc:departsFrom, hvdc:arrivesAt, hvdc:deliveredTo, hvdc:storedAt, hvdc:stagedAt",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -464,7 +464,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Evidence / provenance",
     "text": "hvdc:evidencedBy, hvdc:referencesDocument, hvdc:attachedTo, hvdc:provenanceOf, hvdc:validatedBy",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -476,7 +476,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Status / event",
     "text": "hvdc:hasMilestone, hvdc:hasInspection, hvdc:hasWarehouseEvent, hvdc:hasMarineEvent, hvdc:triggeredBy",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -488,7 +488,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Responsibility",
     "text": "hvdc:operatedBy, hvdc:approvedBy, hvdc:handledBy, hvdc:assignedTo, hvdc:issuedBy",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -500,7 +500,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Compliance",
     "text": "hvdc:requiresPermit, hvdc:classifiedByHS, hvdc:conformsTo, hvdc:governedBy, hvdc:checkedBy",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -512,7 +512,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Finance",
     "text": "hvdc:chargesFor, hvdc:mappedToCostCode, hvdc:linkedToInvoice, hvdc:usesRateRef, hvdc:accruesTo\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -524,7 +524,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "ETA / ATA → Full Context",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nPREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?unit ?eta ?stage ?routing ?location ?boe ?do ?whp ?site ?risk ?invoice\nWHERE {\n  ?leg hvdc:estimatedATA ?eta .\n  FILTER(?eta > NOW() && ?eta < NOW() + \"P7D\"^^xsd:duration)\n  ?unit hvdc:hasJourneyLeg ?leg ;\n        hvdc:hasCurrentStage ?stage ;\n        hvdc:hasRoutingPattern ?routing ;\n        hvdc:hasCurrentLocation ?location .\n  OPTIONAL { ?unit hvdc:hasCustomsEntry ?ce . ?ce hvdc:boeRef ?boe . }\n  OPTIONAL { ?unit hvdc:hasReleaseOrder ?ro . ?ro hvdc:doRef ?do . }\n  OPTIONAL { ?unit hvdc:hasWarehouseHandlingProfile ?whp . }\n  OPTIONAL { ?unit hvdc:hasSiteReceipt ?site . }\n  OPTIONAL { ?unit hvdc:hasException ?risk . }\n  OPTIONAL { ?unit hvdc:hasCostItem ?invoice . }\n}\nORDER BY ?eta\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -536,7 +536,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Any-key → ShipmentUnit Twin",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?unit ?scheme ?value ?stage ?routing ?doc ?milestone ?cost ?exception\nWHERE {\n  ?id hvdc:identifierScheme ?scheme ;\n      hvdc:normalizedValue ?value ;\n      hvdc:resolvesTo ?resolved .\n  BIND(COALESCE(?resolved, ?id) AS ?seed)\n  ?seed (hvdc:belongsToShipmentUnit|^hvdc:hasDocument|^hvdc:packedIn|^hvdc:hasCustomsEntry|^hvdc:hasReleaseOrder)* ?unit .\n  ?unit a hvdc:ShipmentUnit ;\n        hvdc:hasCurrentStage ?stage ;\n        hvdc:hasRoutingPattern ?routing .\n  OPTIONAL { ?unit hvdc:hasDocument ?doc . }\n  OPTIONAL { ?unit hvdc:hasMilestone ?milestone . }\n  OPTIONAL { ?unit hvdc:hasCostItem ?cost . }\n  OPTIONAL { ?unit hvdc:hasException ?exception . }\n}\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -548,7 +548,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "BOE No. → Release and Cost Trace",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?entry ?unit ?shipment ?boe ?do ?gateOut ?invoice ?deltaPct ?band\nWHERE {\n  ?entry a hvdc:CustomsEntry ; hvdc:boeRef ?boe .\n  ?unit hvdc:hasCustomsEntry ?entry .\n  OPTIONAL { ?unit hvdc:groupedIn ?shipment . }\n  OPTIONAL { ?unit hvdc:hasReleaseOrder ?ro . ?ro hvdc:doRef ?do . }\n  OPTIONAL { ?unit hvdc:hasMilestone ?m . ?m hvdc:milestoneCode \"M100\" ; hvdc:actualDt ?gateOut . }\n  OPTIONAL { ?unit hvdc:hasCostItem ?line . ?line hvdc:belongsToInvoice ?invoice ; hvdc:deltaPct ?deltaPct ; hvdc:costGuardBand ?band . }\n}\n```\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -560,7 +560,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.1 Pipeline Pattern",
     "text": "```text\nRaw source\n  → Bronze: source schema, ingest timestamp, source owner, file hash\n  → Silver: normalized identifiers, dates, units, currencies, locations\n  → Gold: canonical object tables + link tables + evidence tables\n  → Ontology: Object Types, Link Types, Actions, Functions\n  → Validation: SHACL/SPARQL rules + RAG evidence + human-gate\n  → Apps: Logistics COP, KPI, COST-GUARD, Document Guardian, routing dashboard\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -572,7 +572,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.2 Source-to-Ontology Mapping",
     "text": "| Source system / feed | Canonical objects | Link points |\n|---|---|---|\n| ERP / Procurement | Project, Package, PO, Vendor, MaterialMaster | Project→Package→PO→Vendor→Material |\n| Engineering tag register | HVDCCodeTag, MaterialMaster | Material↔HVDCCodeTag |\n| TMS / Forwarder | Shipment, ShipmentUnit, JourneyLeg, Delivery | Shipment→Unit→Leg |\n| Carrier / DCSA-style feed | Container, BL, MilestoneEvent | Container→CargoUnit, BL→Shipment |\n| OFCO / Port Ops | PortCall, ServiceEvent, TariffRef, InvoiceLine | PortCall↔Shipment, ServiceEvent→InvoiceLine |\n| ATLP / Customs / Broker | CustomsEntry, ReleaseOrder, PermitDocument | CustomsEntry→BOE, ReleaseOrder→DO |\n| WMS | WarehouseTask, WarehouseEvent, StockSnapshot, WarehouseHandlingProfile | ShipmentUnit→WarehouseTask→WHP |\n| Marine / MOSB | MarineTask, MarineEvent, VesselResource, EquipmentResource | ShipmentUnit→M115/M116/M117 |\n| Site systems | SiteReceipt, InspectionEvent, MRR, OSDR, POD, GRN | SiteReceipt→Documents |\n| LDG / OCR | Document, DocumentEntity, VerificationResult, AuditRecord | Document→ShipmentUnit / Transaction |\n| Invoice / Finance | Invoice, InvoiceLine, RateRef, CostGuardResult | InvoiceLine→ShipmentUnit / PortCall / Task |\n| Communication | CommunicationEvent, ApprovalAction, AuditRecord | Evidence link only |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -584,7 +584,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.3 Foundry Implementation Notes",
     "text": "| Foundry layer | Implementation rule |\n|---|---|\n| Object Types | Create object types from Gold datasets only; raw records remain evidence/source lineage |\n| Link Types | Materialize edge tables for high-cardinality links; derive secondary links through Functions |\n| Actions | Use transaction-gated Actions for BOE, DO, WH In, MOSB, Site Arrival, Cost Closure |\n| Functions | Implement `resolveAnyKey`, `computeCurrentStage`, `computeRoutingPattern`, `costGuardDelta`, `validateAGIDASGate` |\n| Workshop / Quiver | Publish COP, search panel, shipment timeline, route risk, CostGuard views |\n| Automation | Trigger validation on ingest, action submit, milestone close, invoice audit, daily digest |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -596,7 +596,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.4 Integration KPIs",
     "text": "| KPI | Target |\n|---|---:|\n| Object mapping coverage | ≥ 95.00% |\n| Link completeness | ≥ 95.00% |\n| Any-key search precision | ≥ 95.00% |\n| Milestone coverage | ≥ 90.00% |\n| Validation p95 latency | < 5.00s |\n| Audit trail completeness | 100.00% for blocked actions |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -607,8 +607,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "10.1 Validation Control Matrix",
-    "text": "| Rule ID | Target | Logic | Severity |\n|---|---|---|---|\n| `V-IDENT-001` | `Identifier` | scheme/value/normalized/source required | BLOCK |\n| `V-SU-001` | `ShipmentUnit` | must have ≥1 Identifier, RoutingPattern, CurrentStage | BLOCK |\n| `V-FLOW-001` | `confirmedFlowCode` | subject must be `WarehouseHandlingProfile` | BLOCK |\n| `V-FLOW-002` | `WarehouseHandlingProfile` | confirmation requires M110 actual timestamp | BLOCK |\n| `V-ROUTE-001` | `ShipmentUnit` | RoutingPattern enum only | BLOCK |\n| `V-AGIDAS-001` | AGI/DAS unit | M130 requires M115 for MOSB-inclusive routes | BLOCK |\n| `V-DOC-001` | CI/PL/BL/BOE/DO | cross-document key, qty, weight consistency | WARN/BLOCK |\n| `V-CUSTOMS-001` | `CustomsEntry` | BOE document must be linked but not collapsed | BLOCK |\n| `V-RELEASE-001` | `ReleaseOrder` | DO document must exist before M100 | BLOCK |\n| `V-SITE-001` | `SiteReceipt` | M130 must link to SiteCode and delivery evidence | BLOCK |\n| `V-COST-001` | `InvoiceLine` | EA × Rate = Amount ± 0.01 | BLOCK |\n| `V-COST-002` | `Invoice` | Σ lineAmount = invoiceTotal ± 2.00% | BLOCK |\n| `V-COST-003` | `CostGuardResult` | Δ% band assigned | BLOCK |\n| `V-EVID-001` | `Document` / communication | evidence cannot own transaction truth | BLOCK |\n| `V-COMM-DRAFT-001` | email draft output | draft-mode reply must auto-invoke or surface `sct_ontology`; `EmailActionCard` required | BLOCK |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "| Rule ID | Target | Logic | Severity |\n|---|---|---|---|\n| `V-IDENT-001` | `Identifier` | scheme/value/normalized/source required | BLOCK |\n| `V-SU-001` | `ShipmentUnit` | must have ≥1 Identifier, RoutingPattern, CurrentStage | BLOCK |\n| `V-FLOW-001` | `confirmedFlowCode` | subject must be `WarehouseHandlingProfile` | BLOCK |\n| `V-FLOW-002` | `WarehouseHandlingProfile` | confirmation requires M110 actual timestamp | BLOCK |\n| `V-ROUTE-001` | `ShipmentUnit` | RoutingPattern enum only | BLOCK |\n| `V-AGIDAS-001` | AGI/DAS unit | site date/M130 is accepted as delivered; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` backfill | WARN/AMBER |\n| `V-DOC-001` | CI/PL/BL/BOE/DO | cross-document key, qty, weight consistency | WARN/BLOCK |\n| `V-CUSTOMS-001` | `CustomsEntry` | BOE document must be linked but not collapsed | BLOCK |\n| `V-RELEASE-001` | `ReleaseOrder` | DO document must exist before M100 | BLOCK |\n| `V-SITE-001` | `SiteReceipt` | M130 must link to SiteCode and delivery evidence | BLOCK |\n| `V-COST-001` | `InvoiceLine` | EA × Rate = Amount ± 0.01 | BLOCK |\n| `V-COST-002` | `Invoice` | Σ lineAmount = invoiceTotal ± 2.00% | BLOCK |\n| `V-COST-003` | `CostGuardResult` | Δ% band assigned | BLOCK |\n| `V-EVID-001` | `Document` / communication | evidence cannot own transaction truth | BLOCK |\n| `V-COMM-DRAFT-001` | email draft output | draft-mode reply must auto-invoke or surface `sct_ontology`; `EmailActionCard` required | BLOCK |",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -620,7 +620,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.2 SHACL: ShipmentUnit Required Shape",
     "text": "```turtle\n@prefix sh:   <http://www.w3.org/ns/shacl#> .\n@prefix hvdc: <http://samsung.com/project-logistics#> .\n\nhvdc:ShipmentUnitRequiredShape a sh:NodeShape ;\n  sh:targetClass hvdc:ShipmentUnit ;\n  sh:property [\n    sh:path hvdc:hasIdentifier ; sh:minCount 1 ;\n    sh:message \"ShipmentUnit must have at least one Identifier.\" ;\n  ] ;\n  sh:property [\n    sh:path hvdc:hasRoutingPattern ; sh:minCount 1 ;\n    sh:in (hvdc:PRE_ARRIVAL hvdc:DIRECT hvdc:WH_ONLY hvdc:MOSB_DIRECT hvdc:WH_MOSB hvdc:MIXED) ;\n    sh:message \"ShipmentUnit must have a valid ShipmentRoutingPattern.\" ;\n  ] ;\n  sh:property [\n    sh:path hvdc:hasCurrentStage ; sh:minCount 1 ;\n    sh:message \"ShipmentUnit must have a current JourneyStage.\" ;\n  ] .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -632,7 +632,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.3 SHACL: Warehouse Boundary Shape",
     "text": "```turtle\nhvdc:FlowCodeBoundaryShape a sh:NodeShape ;\n  sh:targetSubjectsOf hvdc:confirmedFlowCode ;\n  sh:sparql [\n    sh:message \"VIOLATION-1: confirmedFlowCode found outside WarehouseHandlingProfile — immediate block.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:confirmedFlowCode ?fc .\n        FILTER NOT EXISTS { $this a hvdc:WarehouseHandlingProfile }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -644,7 +644,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.4 SHACL: WHP Confirmation Requires M110",
     "text": "```turtle\nhvdc:WarehouseHandlingConfirmationShape a sh:NodeShape ;\n  sh:targetClass hvdc:WarehouseHandlingProfile ;\n  sh:sparql [\n    sh:message \"VIOLATION-1B: WarehouseHandlingProfile cannot be confirmed before M110 Warehouse Received.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:flowConfirmationStatus \"confirmed\" ;\n              hvdc:belongsToShipmentUnit ?unit .\n        FILTER NOT EXISTS {\n          ?unit hvdc:hasMilestone ?m110 .\n          ?m110 hvdc:milestoneCode \"M110\" ; hvdc:actualDt ?dt .\n        }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -655,8 +655,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "10.5 SHACL: AGI/DAS MOSB Milestone Shape",
-    "text": "```turtle\nhvdc:AGIDASStagingShape a sh:NodeShape ;\n  sh:targetClass hvdc:ShipmentUnit ;\n  sh:sparql [\n    sh:message \"VIOLATION-2: AGI/DAS shipment missing MOSB staging milestone M115 before Site Arrived M130.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:declaredDestination ?dest ;\n              hvdc:hasRoutingPattern ?rp ;\n              hvdc:hasMilestone ?m130 .\n        FILTER(?dest IN (\"AGI\", \"DAS\"))\n        FILTER(?rp IN (hvdc:MOSB_DIRECT, hvdc:WH_MOSB, hvdc:MIXED))\n        ?m130 hvdc:milestoneCode \"M130\" ; hvdc:actualDt ?arrived .\n        FILTER NOT EXISTS {\n          $this hvdc:hasMilestone ?m115 .\n          ?m115 hvdc:milestoneCode \"M115\" ; hvdc:actualDt ?staged .\n        }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "```turtle\nhvdc:AGIDASStagingShape a sh:NodeShape ;\n  sh:targetClass hvdc:ShipmentUnit ;\n  sh:sparql [\n    sh:message \"VIOLATION-2: AGI/DAS shipment has Site Arrived M130 while MOSB chain evidence is missing; accept M130 and create MOSB_EVIDENCE_MISSING backfill.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:declaredDestination ?dest ;\n              hvdc:hasRoutingPattern ?rp ;\n              hvdc:hasMilestone ?m130 .\n        FILTER(?dest IN (\"AGI\", \"DAS\"))\n        FILTER(?rp IN (hvdc:MOSB_DIRECT, hvdc:WH_MOSB, hvdc:MIXED))\n        ?m130 hvdc:milestoneCode \"M130\" ; hvdc:actualDt ?arrived .\n        FILTER NOT EXISTS {\n          $this hvdc:hasMilestone ?m115 .\n          ?m115 hvdc:milestoneCode \"M115\" ; hvdc:actualDt ?staged .\n        }\n      }\n    \"\"\" ;\n  ] .\n```",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -668,7 +668,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.6 SHACL: Invoice Numeric Integrity",
     "text": "```turtle\nhvdc:InvoiceLineNumericShape a sh:NodeShape ;\n  sh:targetClass hvdc:InvoiceLine ;\n  sh:sparql [\n    sh:message \"COST-GUARD: InvoiceLine amount must equal qty * rate within 0.01.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:qty ?qty ; hvdc:rate ?rate ; hvdc:amount ?amount .\n        BIND(ABS((?qty * ?rate) - ?amount) AS ?delta)\n        FILTER(?delta > 0.01)\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -680,7 +680,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.7 COST-GUARD Rule",
     "text": "```text\nDeltaPct = (DraftAmount - StandardAmount) / StandardAmount * 100.00\n\nBand:\n  <= 2.00%       PASS\n  2.01% - 5.00%  WARN\n  5.01% - 10.00% HIGH\n  > 10.00%       CRITICAL\n\nHuman-gate:\n  invoiceTotal > 100,000.00 AED OR band IN (HIGH, CRITICAL) → Finance approval required.\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -692,7 +692,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.8 SPARQL: Legacy Term Detection",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?s ?p ?o\nWHERE {\n  ?s ?p ?o .\n  FILTER(CONTAINS(LCASE(STR(?p)), \"assignedflowcode\") ||\n         CONTAINS(LCASE(STR(?p)), \"extractedflowcode\") ||\n         CONTAINS(LCASE(STR(?p)), \"costbyflowcode\") ||\n         CONTAINS(LCASE(STR(?p)), \"haslogisticsflowcode\"))\n}\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -704,7 +704,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.9 RAG / Latest Evidence Gate",
     "text": "| Trigger | Required evidence refresh |\n|---|---|\n| Regulation / authority notice changed | RAG check against latest approved SOP / authority source |\n| MOIAT/FANR/DCD/ADNOC permit mismatch | Compliance owner review |\n| Cost/rate table change | Contract/rate master re-ingest and audit proof |\n| Route exception for AGI/DAS | Marine + Site Logistics review |\n| Low OCR confidence | LDG re-extraction or human document validation |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -715,8 +715,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "10.10 Human-gate Matrix",
-    "text": "| Trigger | Approver |\n|---|---|\n| Invoice total > 100,000.00 AED | Finance Approver |\n| CostGuard `HIGH` / `CRITICAL` | Cost Control Lead |\n| AGI/DAS M130 without M115 | Marine Lead + Site Logistics |\n| WHP override | Warehouse Manager |\n| Permit expired or missing | Compliance Lead |\n| OSD / NCR / damage / shortage | QA/QC + Claims |\n| Identifier confidence < 0.95 for operational action | Data Steward |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "| Trigger | Approver |\n|---|---|\n| Invoice total > 100,000.00 AED | Finance Approver |\n| CostGuard `HIGH` / `CRITICAL` | Cost Control Lead |\n| AGI/DAS M130 without M115/M116/M117 | Marine Lead + Site Logistics backfill queue |\n| WHP override | Warehouse Manager |\n| Permit expired or missing | Compliance Lead |\n| OSD / NCR / damage / shortage | QA/QC + Claims |\n| Identifier confidence < 0.95 for operational action | Data Steward |\n\n---",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -728,7 +728,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11.1 Compliance Object Model",
     "text": "| Object | Required properties | Links |\n|---|---|---|\n| `ComplianceRequirement` | `authority`, `requirementType`, `triggerCondition`, `effectiveDate`, `status` | appliesTo Material/Shipment/Site/Node |\n| `PermitDocument` | `permitNo`, `authority`, `permitType`, `issueDate`, `expiryDate` | evidences requirement |\n| `ComplianceCheck` | `checkId`, `ruleId`, `result`, `checkedAt`, `checkedBy` | validates ShipmentUnit / Document / Material |\n| `ApprovalAction` | `approvalRef`, `approverRole`, `approvedAt`, `decision` | authorizes Action |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -740,7 +740,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11.2 Incoterms 2020 Control",
     "text": "| Control | Logic |\n|---|---|\n| `IncotermPresence` | PO / Shipment must carry `incoterm` and delivery place |\n| `RiskTransferPoint` | JourneyLeg responsibility changes at incoterm-defined point |\n| `CostResponsibility` | InvoiceLine must map to buyer/seller responsibility according to term |\n| `DisputeEvidence` | Any cost dispute must attach contract term and route/service evidence |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -752,7 +752,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11.3 UAE Regulatory Controls",
     "text": "| Authority / topic | Ontology handling |\n|---|---|\n| MOIAT | `MaterialMaster.isRegulatedProduct`, `requiresMOIATCoC`, `certificateRef`, `certificateExpiryDate` |\n| FANR | `requiresFANRPermit`, `radiationSourceFlag`, `permitRef`, `permitExpiryDate` |\n| DCD / Dangerous Goods | `dgClass`, `UNNumber`, `storageSegregationClass`, `dangerousCargoWarehouseRequired` |\n| ADNOC / CICPA / Site Access | `AccessPermit`, `GatePass`, `SecurityApproval`, `LocationNode.governedBy` |\n| WCO / HS | `hsCode`, `classificationConfidence`, `customsRiskScore`, `CustomsEntry` linkage |\n| DCSA / carrier events | `BillOfLadingDocument`, `Container`, `MilestoneEvent`, `JourneyLeg` alignment |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -763,8 +763,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "11.4 Compliance Blockers",
-    "text": "```text\nIF regulated product AND missing valid MOIAT/FANR/DCD permit → block DO / GatePass / Site Issue.\nIF hsCode missing on InvoiceLine / MaterialMaster → block BOE draft.\nIF gatePass expired before gate-out → block M100.\nIF AGI/DAS offshore cargo lacks marine approval evidence → block M117/M130.\n```\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "```text\nIF regulated product AND missing valid MOIAT/FANR/DCD permit → block DO / GatePass / Site Issue.\nIF hsCode missing on InvoiceLine / MaterialMaster → block BOE draft.\nIF gatePass expired before gate-out → block M100.\nIF AGI/DAS site date exists and marine approval evidence is missing → accept M130, mark DELIVERED, and create AMBER/WARN MOSB_EVIDENCE_MISSING backfill; block only M117 marine approval if execution approval itself is requested.\n```\n\n---",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -776,7 +776,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.1 Policy Scope",
     "text": "This part intentionally appears near the end of the master document. Warehouse Flow Code is a **warehouse-handling classification**, not the master route language.\n\nAllowed owner:\n\n```text\nWarehouseHandlingProfile.confirmedFlowCode\n```\n\nDisallowed owners:\n\n```text\nShipment, ShipmentUnit, PortCall, CustomsEntry, Document, Invoice, InvoiceLine, MarineTask, OperationsKPI, CommunicationEvent\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -788,7 +788,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.2 WarehouseHandlingProfile Class",
     "text": "```turtle\nhvdc:WarehouseHandlingProfile a owl:Class ;\n  rdfs:label \"Warehouse Handling Profile\" ;\n  rdfs:comment \"Warehouse-only profile created by M110 Warehouse Received / put-away evidence.\" .\n\nhvdc:confirmedFlowCode a owl:DatatypeProperty ;\n  rdfs:domain hvdc:WarehouseHandlingProfile ;\n  rdfs:range xsd:integer ;\n  rdfs:comment \"Warehouse-only handling classification. Not a route classifier.\" .\n\nhvdc:flowConfirmationStatus a owl:DatatypeProperty ;\n  rdfs:domain hvdc:WarehouseHandlingProfile ;\n  rdfs:range xsd:string .\n\nhvdc:wh_handling_cnt a owl:DatatypeProperty ;\n  rdfs:domain hvdc:WarehouseHandlingProfile ;\n  rdfs:range xsd:integer .\n\nhvdc:storageClass a owl:DatatypeProperty ;\n  rdfs:domain hvdc:WarehouseHandlingProfile ;\n  rdfs:range xsd:string .\n\nhvdc:flowEvidenceSource a owl:ObjectProperty ;\n  rdfs:domain hvdc:WarehouseHandlingProfile ;\n  rdfs:range hvdc:WarehouseEvent .\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -800,7 +800,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.3 Confirmed Flow Code Values",
     "text": "| Code | Warehouse handling meaning | Minimum evidence | Notes |\n|---:|---|---|---|\n| 0 | `PRE_WH_OR_TENTATIVE` | No M110 WH In evidence and pre-arrival/expected status | Tentative until evidence arrives |\n| 1 | `WH_BYPASS_CONFIRMED` | No M110 WH In evidence and direct delivery/bypass evidence | Confirms no warehouse handling |\n| 2 | `SINGLE_WH_HANDLING` | Exactly 1 M110 WH In / put-away evidence | Standard warehouse handling |\n| 3 | `WH_LINKED_OFFSHORE_HANDLING` | Warehouse evidence plus MOSB staging evidence or AGI/DAS minimum offshore handling class | WH evidence with offshore interface |\n| 4 | `MULTI_WH_OFFSHORE_HANDLING` | At least 2 WH handling events plus MOSB staging evidence | Multi-WH + offshore interface |\n| 5 | `MIXED_OR_UNRESOLVED_WH_PATTERN` | Incomplete, conflicting, split, or pending warehouse evidence | Requires reason flag and review |\n\n> Numeric values are retained for warehouse operational compatibility only. They must never be interpreted as the master Port → WH → MOSB → Site route classifier. The master route classifier remains `ShipmentRoutingPattern`.",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -812,7 +812,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.4 Legacy Migration Map",
     "text": "| Legacy phrase | Canonical replacement | Owner |\n|---|---|---|\n| `Flow Code 0 = Pre Arrival` | `ShipmentRoutingPattern.PRE_ARRIVAL` or pre-arrival milestone state | `ShipmentUnit` / `PortCall` |\n| `Flow Code 1 = Port → Site` | `ShipmentRoutingPattern.DIRECT` | `ShipmentUnit` |\n| `Flow Code 2 = Port → WH → Site` | `ShipmentRoutingPattern.WH_ONLY` | `ShipmentUnit` |\n| `Flow Code 3 = Port → MOSB → Site` | `ShipmentRoutingPattern.MOSB_DIRECT` | `ShipmentUnit` / Marine |\n| `Flow Code 4 = Port → WH → MOSB → Site` | `ShipmentRoutingPattern.WH_MOSB` | `ShipmentUnit` / Marine |\n| `Flow Code 5 = Mixed` | `ShipmentRoutingPattern.MIXED` | `ShipmentUnit` |\n| `assignedFlowCode` | `plannedRoutingPattern` | `PortCall` evidence |\n| `extractedFlowCode` | `routeEvidence` | `Document` evidence |\n| `costByFlowCode` | `costByRoutingPattern` / `routeBasedCostDriver` | Cost domain |\n| `Flow Code 3/4/5` in marine text | `MarineRoutingPattern` / `offshoreDeliveryPattern` | Marine extension |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -824,7 +824,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.5 Warehouse Flow Validation Rules",
     "text": "1. `confirmedFlowCode` can appear only on `WarehouseHandlingProfile`.\n2. `flowConfirmationStatus = confirmed` requires M110 actual milestone.\n3. `confirmedFlowCode` shall not be used as a KPI bucket for end-to-end route analytics.\n4. Cost may read `WarehouseHandlingProfile.wh_handling_cnt` and `storageClass` as evidence, but cost cannot assign `confirmedFlowCode`.\n5. Port and OCR may supply route/WH evidence but cannot write `confirmedFlowCode`.\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -836,7 +836,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.1 Implementation Options",
     "text": "| Option | Scope | Pros | Cons | CostIndex | Risk | Time |\n|---|---|---|---|---:|---:|---:|\n| A. Master Spine MVP | `ShipmentUnit`, Identifier, Document, Milestone, Cost baseline | Fast search/COP enablement | Limited marine/claims depth | 1.00/5.00 | 20.00% | 4.00 weeks |\n| B. Operational Twin | MVP + WHP + PortCall + CustomsEntry + SiteReceipt | Strong route and action validation | More integration work | 2.50/5.00 | 18.00% | 8.00 weeks |\n| C. Full Semantic Control Tower | Operational Twin + marine/OOG + CostGuard + compliance RAG | Full chain visibility and audit | Data quality dependency | 4.00/5.00 | 22.00% | 12.00 weeks |\n| D. Enterprise RDF Bridge | Foundry Ontology + RDF/SHACL/GraphDB bridge | Strong OWL/SHACL reasoning | Higher architecture complexity | 5.00/5.00 | 30.00% | 16.00 weeks |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -848,7 +848,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.2 Roadmap",
     "text": "| Phase | Scope | KPI |\n|---|---|---|\n| Prepare | Source inventory, object/link dictionary, namespace lock | Semantic blocker count = 0.00 |\n| Pilot | One onshore + one AGI/DAS + one invoice end-to-end | Key Resolution ≥ 95.00%; Milestone Coverage ≥ 90.00% |\n| Build | Gold datasets + Ontology mapping + Actions | Object mapping ≥ 95.00%; Link completeness ≥ 95.00% |\n| Operate | SHACL/SPARQL validation + COP dashboard + CostGuard | Validation p95 < 5.00s; NumericIntegrity = 100.00% |\n| Scale | Marine/OOG, compliance RAG, predictive ETA/risk | Full-chain visibility ≥ 95.00%; ETA MAPE ≤ 12.00% |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -859,8 +859,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-master-ontology · CONSOLIDATED-00",
     "version": "2.0-final",
     "sectionPath": "13.3 Automation Notes",
-    "text": "| Automation | Trigger | Action |\n|---|---|---|\n| `AnyKeySearchBot` | User enters BL/BOE/Container/HVDC_CODE/Invoice | Resolve object and open ShipmentUnit twin |\n| `PreArrivalGuard` | M80 ATA / arrival notice | Validate CI/PL/BL/BOE/permit readiness |\n| `GateOutGuard` | M100 action attempt | Check DO, BOE cleared, gate pass validity |\n| `WHPInjector` | M110 WH Received | Create or update WarehouseHandlingProfile |\n| `AGIDASGuard` | M130 Site Arrived attempt | Require M115 for AGI/DAS MOSB routes |\n| `CostGuardBot` | Invoice loaded | Compute Δ%, band, proof artifact |\n| `OSDRClaimBot` | M132 OSD event | Create OSDR/Claim draft and evidence pack |\n| `ComplianceRAG` | Missing/expired permit | Retrieve latest approved SOP/authority evidence |\n| `DailyCOPDigest` | Daily 08:00 Asia/Dubai | At-risk shipments, customs holds, DEM/DET, high-cost invoices |\n| `EmailDraftGuard` | User requests reply/draft | Invoke/surface `sct_ontology`, then emit `EmailActionCard` + draft; no KG action unless explicitly requested |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "text": "| Automation | Trigger | Action |\n|---|---|---|\n| `AnyKeySearchBot` | User enters BL/BOE/Container/HVDC_CODE/Invoice | Resolve object and open ShipmentUnit twin |\n| `PreArrivalGuard` | M80 ATA / arrival notice | Validate CI/PL/BL/BOE/permit readiness |\n| `GateOutGuard` | M100 action attempt | Check DO, BOE cleared, gate pass validity |\n| `WHPInjector` | M110 WH Received | Create or update WarehouseHandlingProfile |\n| `AGIDASGuard` | M130 Site Arrived attempt | Accept AGI/DAS site date as M130 and backfill missing M115/M116/M117 evidence |\n| `CostGuardBot` | Invoice loaded | Compute Δ%, band, proof artifact |\n| `OSDRClaimBot` | M132 OSD event | Create OSDR/Claim draft and evidence pack |\n| `ComplianceRAG` | Missing/expired permit | Retrieve latest approved SOP/authority evidence |\n| `DailyCOPDigest` | Daily 08:00 Asia/Dubai | At-risk shipments, customs holds, DEM/DET, high-cost invoices |\n| `EmailDraftGuard` | User requests reply/draft | Invoke/surface `sct_ontology`, then emit `EmailActionCard` + draft; no KG action unless explicitly requested |",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -872,7 +872,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.4 QA Checklist",
     "text": "| Check | PASS criteria |\n|---|---|\n| Canonical authority | This file governs all extensions |\n| Data separation | Master/transaction/document/event/exception/cost/evidence separated |\n| Flow boundary | `confirmedFlowCode` only on `WarehouseHandlingProfile` |\n| Flow placement | Warehouse Flow Code policy located after validation/compliance, not in early dictionaries |\n| MOSB | `MOSB` typed as `OffshoreStaging`, not `Warehouse` |\n| Port compatibility | `plannedRoutingPattern`, `declaredDestination`, `offshoreTransitRequired` retained |\n| OCR compatibility | `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` retained |\n| Cost compatibility | `routeBasedCostDriver`, `wh_handling_cnt`, CostGuard bands retained |\n| Marine compatibility | `MarineRoutingPattern`, M115/M116/M117 retained |\n| Ops compatibility | `hasRoutingPattern` and milestone analytics retained |\n| Communication compatibility | evidence-only connection retained |\n| Numeric integrity | line math ±0.01; invoice total ±2.00% |\n| Compliance | Incoterms/MOIAT/FANR/DCD/ADNOC controls modeled |\n| Validation | SHACL/SPARQL rules included for core blockers |",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -884,7 +884,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.5 Assumptions",
     "text": "| Assumption | Reason | Risk |\n|---|---|---|\n| Gold datasets exist or will be built before Ontology mapping | Foundry object types should not map directly to raw data | Raw schema drift |\n| Project-specific MOIAT/FANR/DCD/ADNOC SOPs are externally governed | Current regulatory process may change | RAG/human review required |\n| Existing extension docs may still contain legacy prose | Master spine governs; extensions should be patched later | Mixed vocabulary if extensions are not migrated |\n| `HVDC_CODE` is a tag, not a sole identity key | Required for multi-key traceability | Duplicate/ambiguous tags |\n\n---",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -896,7 +896,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "CmdRec {#cmdrec}",
     "text": "```text\n/switch_mode PRIME + /logi-master report --deep --KRsummary\n```\n\n```text\n/logi-master cert-chk --deep\n```\n\n```text\n/logi-master invoice-audit --AEDonly\n```",
-    "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+    "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
     "domains": [
       "master"
     ]
@@ -908,7 +908,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Document Root",
     "text": "---\ntitle: \"HVDC Core Framework & Infrastructure Ontology — Consolidated\"\ntype: \"ontology-design\"\ndomain: \"framework-infrastructure\"\nsub-domains:\n  - logistics-framework\n  - node-infrastructure\n  - construction-logistics\n  - transport-network\n  - standards-alignment\n  - compliance-control\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\nextension_of: \"hvdc-master-ontology-v2.0-final\"\ncanonical_role: \"high-level standards, regulations, infrastructure nodes, and project framework extension\"\nowner: \"HVDC Logistics Ontology Working Set\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - GS1-EPCIS-CBV\n  - DCSA-Track-and-Trace\n  - UN-CEFACT-BSP-RDM\n  - WCO-DM-4.2.0\n  - ICC-Incoterms-2020\n  - UN-LOCODE-2025-1\n  - ISO-6346\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\n  - BIMCO-SUPPLYTIME-2017\nsource_files:\n  - 1_CORE-01-hvdc-core-framework.md\n  - 1_CORE-02-hvdc-infra-nodes.md\nchecked_against:\n  - CONSOLIDATED-00-master-ontology.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-04-barge-bulk-cargo.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-06-material-handling.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-08-communication.md\n  - CONSOLIDATED-09-operations.md\n  - AGENTS.md\n  - HVDC Logistics Ontology Review.txt\nvalidation_passes: 5\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -920,7 +920,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1. ExecSummary",
     "text": "`CONSOLIDATED-01`은 HVDC Logistics KG의 **reference framework + infrastructure-node extension**이다. 본 문서는 `CONSOLIDATED-00` master spine을 재정의하지 않고, 표준·규정·노드·운영 제약을 `ShipmentUnit`, `JourneyLeg`, `MilestoneEvent`, `LocationNode`, `RegulatoryRequirement`에 연결하는 상위 참조 레이어로만 동작한다.\n\n비즈니스 임팩트는 **Port/Customs/WH/MOSB/Site 노드별 release blocker 조기 검출**, **DEM/DET·GatePass·Permit 지연 감소**, **Any-key 기반 프로젝트 물류 traceability**이다. 기술 해법은 RDF/OWL class boundary, SHACL gate, SPARQL node-risk query, Foundry Object/Link mapping을 결합한다.\n\nKPI 목표는 `NodeMasterCoverage ≥ 95.00%`, `PermitEvidenceCompleteness ≥ 98.00%`, `RoutingPatternValidation = 100.00%`, `Validation p95 < 5.00s`, `HumanGate leakage = 0.00건`이다.\n\n**ENG-KR one-liner:** Standards and infrastructure nodes are reference anchors; execution truth still flows through `RoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent`.\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -932,7 +932,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.1 Master Governance Rule",
     "text": "1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine.\n2. `CONSOLIDATED-01` provides high-level standards, regulations, infrastructure nodes, and framework constraints only.\n3. Program-wide shipment visibility uses `RoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent`.\n4. Warehouse handling classification is owned only by `WarehouseHandlingProfile` in `CONSOLIDATED-02` and triggered by M110 WH Received.\n5. `MOSB` is an `OffshoreStagingNode` / `MarineInterfaceNode`; it is not a top-level `Warehouse`.\n6. `CONSOLIDATED-08` is an evidence layer. It may attach `CommunicationEvent`, `ApprovalAction`, and `AuditRecord`; it does not redefine logistics execution classes.\n7. Extension-local legacy route-code language is migration debt and must not be promoted into this framework document.",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -944,7 +944,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.2 Scope Matrix",
     "text": "| Scope item | Included in CONSOLIDATED-01 | Excluded / delegated |\n|---|---|---|\n| Standards alignment | UN/CEFACT, WCO, DCSA, ICC, UN/LOCODE, ISO, BIMCO, PROV-O, OWL-Time, SKOS, DQV | Detailed API payloads and carrier-specific integration |\n| Infrastructure nodes | Port, terminal, berth, gate, yard, warehouse, offshore staging, site, corridor | Site construction work-pack execution |\n| Compliance anchors | MOIAT, FANR, DCD/DG, ADNOC/CICPA/GatePass, Customs, Incoterms | Authority-specific operational truth unless evidenced by current SOP |\n| Route semantics | Node capability and allowed route constraints | End-to-end route state machine, which remains in `CONSOLIDATED-00` |\n| Warehouse handling | Boundary reference only | WH algorithm and storage classification, which remain in `CONSOLIDATED-02` |\n| Marine / OOG | Node capability and gate constraints | LCT, stability, rigging, lashing, which remain in `CONSOLIDATED-04` |\n| Cost | Standards and KPI anchors | Invoice line audit and CostGuard, which remain in `CONSOLIDATED-05` |\n| Operations analytics | KPI definitions and node risk views | DataFrame/Excel operation mapping, which remains in `CONSOLIDATED-09` |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -956,7 +956,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.3 Corpus Compatibility Anchors",
     "text": "| Source | Required compatibility rule |\n|---|---|\n| `CONSOLIDATED-00` | Reuse `LocationNode`, `JourneyLeg`, `MilestoneEvent`, `RoutingPattern`, `RegulatoryRequirement`, `PermitDocument` |\n| `CONSOLIDATED-02` | Do not assign or calculate WH handling class in this file |\n| `CONSOLIDATED-03` | Treat document fields as evidence: `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` |\n| `CONSOLIDATED-04` | Use `MarineRoutingPattern` and M115/M116/M117 for offshore execution |\n| `CONSOLIDATED-05` | Cost reads route and WH evidence; cost does not own WH handling classification |\n| `CONSOLIDATED-06` | Material handling uses `RoutingPattern + MilestoneStatus`; AGI/DAS requires MOSB evidence |\n| `CONSOLIDATED-07` | Port records `plannedRoutingPattern` and `declaredDestination` as evidence only |\n| `CONSOLIDATED-08` | Evidence only; no core node or route class redefinition |\n| `CONSOLIDATED-09` | Consume `hasRoutingPattern`, stock, milestone, and cost semantics; do not redefine them |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -968,7 +968,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.1 Reference Standards",
     "text": "| Standard / authority | Current framework role | Ontology binding | RAG status on 2026-04-27 |\n|---|---|---|---|\n| UN/CEFACT BSP-RDM | Buy-Ship-Pay semantic reference for party, shipment, consignment, transport means, invoice | `Party`, `Shipment`, `Consignment`, `Document`, `InvoiceLine` | Official UNECE RDM page retained as reference anchor |\n| WCO Data Model 4.2.0 | Customs declaration, bond, origin/certificate data alignment | `CustomsEntry`, `BOEDocument`, `HSCode`, `CertificateOfOrigin` | WCO announced v4.2.0 on 2025-07-15 |\n| DCSA Track & Trace | Container / shipment event visibility and operational event normalization | `Container`, `CarrierEvent`, `JourneyLeg`, `MilestoneEvent` | Use latest release per DCSA standard documentation; conformance references newer T&T release line |\n| ICC Incoterms 2020 | Cost/risk responsibility and delivery obligation | `IncotermTerm`, `RiskTransferPoint`, `CostResponsibility` | Incoterms 2020 remains the official ICC ruleset anchor |\n| UN/LOCODE 2025-1 | Port, terminal, city, and trade location code normalization | `LocationNode.unlocode`, `Port.unlocode` | UNECE lists 2025-1 as current published release in 2026 |\n| ISO 6346 | Container identification and equipment code | `Container.containerNo`, `Container.isoType` | Stable reference; local validation via check digit required |\n| GS1 EPCIS / CBV | Event-centric visibility pattern | `VisibilityEvent`, `MilestoneEvent`, `Disposition` | Use as event model anchor, not as full replacement |\n| PROV-O | Provenance and evidence lineage | `AuditRecord`, `Evidence`, `SourceSystem`, `wasDerivedFrom` | Required for document, communication, and RAG evidence |\n| OWL-Time | Time interval, instant, duration | `plannedDt`, `estimatedDt`, `actualDt`, `dwellDuration` | Required for milestone and dwell clocks |\n| SKOS | Controlled vocabularies and code lists | `RoutingPattern`, `JourneyStage`, `NodeType`, `PermitType` | Required for enum governance |\n| DQV | Data quality metadata | `ValidationResult`, `QualityMetric`, `ConfidenceScore` | Required for OCR/KPI trust |\n| BIMCO SUPPLYTIME 2017 | Offshore support vessel contract and knock-for-knock responsibility reference | `MarineContract`, `CharterTerm`, `LiabilityRegime` | Official BIMCO page identifies SUPPLYTIME 2017 as the latest edition |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -980,7 +980,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.2 Standards-to-Domain Mapping",
     "text": "| Domain | Primary standard anchor | HVDC object layer | Mandatory validation |\n|---|---|---|---|\n| Procurement / PO | UN/CEFACT BSP-RDM | `PurchaseOrder`, `Package`, `Vendor`, `MaterialMaster` | PO/package/material link completeness |\n| Customs | WCO DM, HS nomenclature | `CustomsEntry`, `BOEDocument`, `HSCode`, `DutyLine` | HS, origin, value, quantity, permit evidence |\n| Shipping / carrier | DCSA T&T, ISO 6346 | `Shipment`, `Container`, `BillOfLadingDocument`, `MilestoneEvent` | BL/container/event key resolution |\n| Commercial terms | ICC Incoterms 2020 | `IncotermTerm`, `RiskTransferPoint`, `CostResponsibility` | Risk/cost owner matches PO and invoice |\n| Port / terminal | UN/LOCODE, DCSA event pattern | `Port`, `Terminal`, `PortCall`, `ServiceEvent` | PortCall→Shipment linkage and node code validity |\n| Warehouse | ISO 9001/14001 internal QMS + WH SOP | `Warehouse`, `WarehouseTask`, `WarehouseHandlingProfile` | WH task and storage class gate |\n| Offshore / marine | BIMCO SUPPLYTIME 2017 + project marine SOP | `OffshoreStagingNode`, `MarineEvent`, `Vessel`, `LCT` | PTW/FRA/weather/lashing/stability human gate |\n| Evidence / audit | PROV-O, DQV | `AuditRecord`, `CommunicationEvent`, `VerificationResult` | Provenance, confidence, hash, reviewer |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -992,7 +992,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.1 Core Classes",
     "text": "| Class | Type | Required properties | Purpose |\n|---|---|---|---|\n| `hvdc:FrameworkStandard` | Reference | `standardCode`, `version`, `authority`, `ragCheckedAt` | Standard registry |\n| `hvdc:RegulatoryRequirement` | Reference / compliance | `requirementCode`, `authority`, `scope`, `effectiveStatus` | Compliance condition |\n| `hvdc:PermitRequirement` | Compliance | `permitType`, `authority`, `trigger`, `evidenceRequired` | Permit gate |\n| `hvdc:IncotermTerm` | Contract reference | `termCode`, `riskTransferPoint`, `costResponsibility` | Contract risk/cost owner |\n| `hvdc:LocationNode` | Master / infrastructure | `nodeCode`, `nodeType`, `nodeName`, `countryCode`, `status` | Parent infrastructure node |\n| `hvdc:Port` | Infrastructure | `unlocode`, `portAuthority`, `cargoProfile` | Port-of-entry node |\n| `hvdc:Terminal` | Infrastructure | `terminalCode`, `terminalType`, `parentPort` | Berth/CY/CFS terminal node |\n| `hvdc:Warehouse` | Infrastructure | `warehouseCode`, `storageType`, `capacityProfile` | Warehouse node only |\n| `hvdc:OffshoreStagingNode` | Infrastructure | `nodeCode`, `marineInterfaceType`, `supportsLCT` | MOSB / marine interface |\n| `hvdc:Site` | Infrastructure | `siteCode`, `siteType`, `receivingCapability` | MIR/SHU/AGI/DAS receiving node |\n| `hvdc:TransportCorridor` | Infrastructure | `mode`, `fromNode`, `toNode`, `permitRequired` | Allowed movement corridor |\n| `hvdc:AccessPolicy` | Compliance | `policyCode`, `authority`, `locationScope` | GatePass/CICPA/ADNOC access |\n| `hvdc:CapacityProfile` | Ops reference | `capacityUnit`, `ratedCapacity`, `currentUtilization` | Node capacity monitoring |\n| `hvdc:ServiceCapability` | Ops reference | `capabilityType`, `cargoCategory`, `equipmentRequired` | Node capability match |\n| `hvdc:InfrastructureKPI` | KPI | `metricCode`, `targetValue`, `actualValue`, `unit` | Dashboard/KPI control |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1004,7 +1004,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.2 Object Properties",
     "text": "| Property | Domain → Range | Cardinality | Meaning |\n|---|---|---:|---|\n| `hvdc:nodePartOf` | `LocationNode → LocationNode` | N:1 | Terminal/yard/site subdivision hierarchy |\n| `hvdc:connectsTo` | `LocationNode → LocationNode` | N:N | Node adjacency for route graph |\n| `hvdc:servedByCorridor` | `LocationNode → TransportCorridor` | 1:N | Allowed movement path |\n| `hvdc:hasCapability` | `LocationNode → ServiceCapability` | 1:N | Cargo/service support |\n| `hvdc:hasCapacityProfile` | `LocationNode → CapacityProfile` | 1:N | Capacity and utilization |\n| `hvdc:governedBy` | `LocationNode → RegulatoryRequirement` | N:N | Jurisdictional / authority control |\n| `hvdc:requiresPermit` | `TransportCorridor → PermitRequirement` | 0:N | Permit gate |\n| `hvdc:hasAccessPolicy` | `LocationNode → AccessPolicy` | 0:N | GatePass/security control |\n| `hvdc:supportsRoutingPattern` | `LocationNode → skos:Concept` | 0:N | Allowed route pattern evidence |\n| `hvdc:servesJourneyStage` | `LocationNode → skos:Concept` | 0:N | Stage capability |\n| `hvdc:operatedBy` | `LocationNode → Party` | 0:N | Operational owner |\n| `hvdc:evidencedBy` | `RegulatoryRequirement → Document` | 0:N | Compliance proof |\n| `hvdc:triggersHumanGate` | `RegulatoryRequirement → ApprovalAction` | 0:N | Manual approval condition |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1016,7 +1016,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.3 Data Properties",
     "text": "| Property | Domain | Range | Constraint |\n|---|---|---|---|\n| `hvdc:nodeCode` | `LocationNode` | `xsd:string` | Required, unique within project |\n| `hvdc:nodeType` | `LocationNode` | enum | `PORT`, `TERMINAL`, `WAREHOUSE`, `OFFSHORE_STAGING`, `SITE`, `GATE`, `CORRIDOR` |\n| `hvdc:unlocode` | `Port` | `xsd:string` | Optional but required where official UN/LOCODE exists |\n| `hvdc:countryCode` | `LocationNode` | ISO 3166 string | UAE nodes use `AE` |\n| `hvdc:capacitySqm` | `CapacityProfile` | decimal | ≥ 0.00 |\n| `hvdc:capacityTeu` | `CapacityProfile` | decimal | ≥ 0.00 |\n| `hvdc:maxPayloadT` | `ServiceCapability` | decimal | ≥ 0.00 |\n| `hvdc:maxOogLengthM` | `ServiceCapability` | decimal | ≥ 0.00 |\n| `hvdc:gatePassRequired` | `AccessPolicy` | boolean | Required for controlled nodes |\n| `hvdc:permitLeadTimeDays` | `PermitRequirement` | decimal | RAG-checked; do not hardcode if unknown |\n| `hvdc:ragCheckedAt` | `FrameworkStandard` | `xsd:date` | ISO date required |\n| `hvdc:validationStatus` | any governed object | enum | `PASS`, `WARN`, `FAIL`, `PENDING_HUMAN` |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1028,7 +1028,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.4 Turtle Skeleton",
     "text": "```turtle\n@prefix hvdc: <http://samsung.com/project-logistics#> .\n@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .\n@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\nhvdc:LocationNode a owl:Class .\nhvdc:Port a owl:Class ; rdfs:subClassOf hvdc:LocationNode .\nhvdc:Terminal a owl:Class ; rdfs:subClassOf hvdc:LocationNode .\nhvdc:Warehouse a owl:Class ; rdfs:subClassOf hvdc:LocationNode .\nhvdc:OffshoreStagingNode a owl:Class ; rdfs:subClassOf hvdc:LocationNode .\nhvdc:Site a owl:Class ; rdfs:subClassOf hvdc:LocationNode .\nhvdc:TransportCorridor a owl:Class .\nhvdc:RegulatoryRequirement a owl:Class .\nhvdc:PermitRequirement a owl:Class ; rdfs:subClassOf hvdc:RegulatoryRequirement .\nhvdc:FrameworkStandard a owl:Class .\nhvdc:CapacityProfile a owl:Class .\nhvdc:ServiceCapability a owl:Class .\nhvdc:AccessPolicy a owl:Class .\n\nhvdc:nodeCode a owl:DatatypeProperty ;\n  rdfs:domain hvdc:LocationNode ;\n  rdfs:range xsd:string .\n\nhvdc:nodeType a owl:DatatypeProperty ;\n  rdfs:domain hvdc:LocationNode ;\n  rdfs:range xsd:string .\n\nhvdc:connectsTo a owl:ObjectProperty ;\n  rdfs:domain hvdc:LocationNode ;\n  rdfs:range hvdc:LocationNode .\n\nhvdc:governedBy a owl:ObjectProperty ;\n  rdfs:domain hvdc:LocationNode ;\n  rdfs:range hvdc:RegulatoryRequirement .\n\nhvdc:requiresPermit a owl:ObjectProperty ;\n  rdfs:domain hvdc:TransportCorridor ;\n  rdfs:range hvdc:PermitRequirement .\n```\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1040,7 +1040,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.1 Node Type Dictionary",
     "text": "| NodeType | Class | Description | Allowed journey stages |\n|---|---|---|---|\n| `PORT` | `Port` | Seaport or entry port | `PORT_ENTRY`, `TERMINAL_HANDLING`, `CUSTOMS_CLEARANCE` |\n| `TERMINAL` | `Terminal` | CY/CFS/berth/gate within a port | `TERMINAL_HANDLING`, `INLAND_HAULAGE` |\n| `WAREHOUSE` | `Warehouse` | Indoor/outdoor/dangerous/OOG storage facility | `WH_RECEIPT`, `WH_STORAGE`, `WH_DISPATCH` |\n| `OFFSHORE_STAGING` | `OffshoreStagingNode` | Marine interface / staging base for offshore movements | `MOSB_STAGING`, `OFFSHORE_TRANSIT` |\n| `SITE_ONSHORE` | `Site` | Onshore construction / receiving site | `SITE_RECEIVING`, `MATERIAL_ISSUE` |\n| `SITE_OFFSHORE` | `Site` | Offshore island/site receiving node | `SITE_RECEIVING`, `MATERIAL_ISSUE` |\n| `GATE` | `Gate` | Controlled access point | `INLAND_HAULAGE`, `SITE_RECEIVING` |\n| `CORRIDOR` | `TransportCorridor` | Route segment between nodes | All movement stages |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1051,8 +1051,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
     "sectionPath": "5.2 Core Node Registry",
-    "text": "| Node | Canonical class | Function | RoutingPattern support | Compliance gates |\n|---|---|---|---|---|\n| Khalifa Port | `Port` | Container import, terminal handling, carrier event source | `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | Port access, customs, BL/DO, container release |\n| Zayed Port | `Port` | Breakbulk, OOG, heavy cargo, bulk handling | `DIRECT`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | Port access, OOG method statement, customs, lifting plan |\n| Jebel Ali Port / Free Zone | `Port` | Free-zone and special supplier import cases | `DIRECT`, `WH_ONLY`, `WH_MOSB`, `MIXED` | Free-zone customs, re-clearance, BOE/DO |\n| Port Terminal / CY / CFS | `Terminal` | Gate-in/out, CY storage, terminal services | Evidence only | Terminal release and service event validation |\n| DSV Indoor / controlled WH | `Warehouse` | Controlled indoor storage | `WH_ONLY`, `WH_MOSB` | WMS receipt, preservation, stock accuracy |\n| DSV Yard / outdoor WH | `Warehouse` | Outdoor/yard storage | `WH_ONLY`, `WH_MOSB` | Capacity, preservation, HSE |\n| AAA / Al Markaz storage | `Warehouse` | Overflow or project storage | `WH_ONLY`, `WH_MOSB`, `MIXED` | Lease/contract, WH capacity, insurance |\n| MOSB | `OffshoreStagingNode` | Marine interface, consolidation, LCT/barge staging | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | ADNOC/ALS access, PTW/FRA, marine weather gate, M115 evidence |\n| MIR Site | `Site` / `SITE_ONSHORE` | Onshore receiving and laydown | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, MRR/MRI/GRN, lifting/HSE if OOG |\n| SHU Site | `Site` / `SITE_ONSHORE` | Onshore receiving and installation support | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, capacity, MRR/MRI/GRN |\n| DAS Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115 prerequisite, LCT/barge, ADNOC HSE, site permit |\n| AGI Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115 prerequisite, LCT/barge, ADNOC HSE, site permit |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "text": "| Node | Canonical class | Function | RoutingPattern support | Compliance gates |\n|---|---|---|---|---|\n| Khalifa Port | `Port` | Container import, terminal handling, carrier event source | `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | Port access, customs, BL/DO, container release |\n| Zayed Port | `Port` | Breakbulk, OOG, heavy cargo, bulk handling | `DIRECT`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | Port access, OOG method statement, customs, lifting plan |\n| Jebel Ali Port / Free Zone | `Port` | Free-zone and special supplier import cases | `DIRECT`, `WH_ONLY`, `WH_MOSB`, `MIXED` | Free-zone customs, re-clearance, BOE/DO |\n| Port Terminal / CY / CFS | `Terminal` | Gate-in/out, CY storage, terminal services | Evidence only | Terminal release and service event validation |\n| DSV Indoor / controlled WH | `Warehouse` | Controlled indoor storage | `WH_ONLY`, `WH_MOSB` | WMS receipt, preservation, stock accuracy |\n| DSV Yard / outdoor WH | `Warehouse` | Outdoor/yard storage | `WH_ONLY`, `WH_MOSB` | Capacity, preservation, HSE |\n| AAA / Al Markaz storage | `Warehouse` | Overflow or project storage | `WH_ONLY`, `WH_MOSB`, `MIXED` | Lease/contract, WH capacity, insurance |\n| MOSB | `OffshoreStagingNode` | Marine interface, consolidation, LCT/barge staging | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | ADNOC/ALS access, PTW/FRA, marine weather gate, M115 evidence |\n| MIR Site | `Site` / `SITE_ONSHORE` | Onshore receiving and laydown | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, MRR/MRI/GRN, lifting/HSE if OOG |\n| SHU Site | `Site` / `SITE_ONSHORE` | Onshore receiving and installation support | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, capacity, MRR/MRI/GRN |\n| DAS Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | site date accepted; M115/M116/M117 backfill, LCT/barge, ADNOC HSE, site permit |\n| AGI Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | site date accepted; M115/M116/M117 backfill, LCT/barge, ADNOC HSE, site permit |",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1064,7 +1064,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.3 MOSB Boundary Rule",
     "text": "`MOSB` may have laydown, temporary holding, and staging functions, but the top-level class is `OffshoreStagingNode`, not `Warehouse`. If a physical sub-area inside MOSB is used for temporary storage, model it as `StorageCapability` or `LaydownArea` attached to `MOSB`; do not type MOSB as a `Warehouse`.\n\n```turtle\nhvdc:MOSB a hvdc:OffshoreStagingNode ;\n  hvdc:nodeCode \"MOSB\" ;\n  hvdc:nodeType \"OFFSHORE_STAGING\" ;\n  hvdc:servesJourneyStage hvdc:MOSB_STAGING ;\n  hvdc:servesJourneyStage hvdc:OFFSHORE_TRANSIT ;\n  hvdc:supportsRoutingPattern hvdc:MOSB_DIRECT ;\n  hvdc:supportsRoutingPattern hvdc:WH_MOSB .\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1076,7 +1076,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.4 Transport Corridor Model",
     "text": "| Corridor | Mode | From → To | Permit / gate | Primary milestones |\n|---|---|---|---|---|\n| Port-to-WH | Truck / trailer / SPMT | Port/terminal → Warehouse | DO, gate pass, OOG permit if required | M92 → M100 → M110 |\n| Port-to-Site | Truck / trailer / SPMT | Port/terminal → MIR/SHU | DO, gate pass, site receiving plan | M92 → M100 → M130 |\n| Port-to-MOSB | Truck / trailer / SPMT | Port/terminal → MOSB | DO, access pass, marine staging plan | M92 → M100 → M115 |\n| WH-to-Site | Truck / trailer | Warehouse → MIR/SHU | WH dispatch, gate pass | M121 → M130 |\n| WH-to-MOSB | Truck / trailer / SPMT | Warehouse → MOSB | WH dispatch, access pass | M121 → M115 |\n| MOSB-to-AGI/DAS | LCT / barge / marine support | MOSB → AGI/DAS | PTW/FRA/weather/lashing/handover | M115 → M116 → M117 → M130 |\n| Inter-WH transfer | Truck | Warehouse → Warehouse | transfer order | M111/M121 as applicable |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1087,8 +1087,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
     "sectionPath": "6.1 RoutingPattern Compatibility",
-    "text": "| RoutingPattern | Required node sequence | Node constraints | Notes |\n|---|---|---|---|\n| `PRE_ARRIVAL` | Origin / vessel / pre-entry | No UAE infrastructure milestone yet | No WH handling classification |\n| `DIRECT` | Port → Site | Site must be MIR/SHU unless explicitly approved | No MOSB requirement |\n| `WH_ONLY` | Port → Warehouse → Site | Warehouse milestone M110 required | No offshore leg |\n| `MOSB_DIRECT` | Port → MOSB → Site | MOSB M115 required before offshore site arrival | Mandatory for AGI/DAS direct offshore route |\n| `WH_MOSB` | Port → Warehouse → MOSB → Site | M110 and M115 required | Used for storage + offshore staging |\n| `MIXED` | Incomplete, exception, multi-hop, unresolved | Requires exception review | Must not become a permanent normal state |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "text": "| RoutingPattern | Required node sequence | Node constraints | Notes |\n|---|---|---|---|\n| `PRE_ARRIVAL` | Origin / vessel / pre-entry | No UAE infrastructure milestone yet | No WH handling classification |\n| `DIRECT` | Port → Site | Site must be MIR/SHU unless explicitly approved | No MOSB requirement |\n| `WH_ONLY` | Port → Warehouse → Site | Warehouse milestone M110 required | No offshore leg |\n| `MOSB_DIRECT` | Port → MOSB → Site | MOSB M115/M116/M117 evidence expected; backfill if site date already exists | Mandatory for AGI/DAS direct offshore route |\n| `WH_MOSB` | Port → Warehouse → MOSB → Site | M110 and M115 required | Used for storage + offshore staging |\n| `MIXED` | Incomplete, exception, multi-hop, unresolved | Requires exception review | Must not become a permanent normal state |",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1099,8 +1099,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
     "sectionPath": "6.2 AGI/DAS Offshore Gate",
-    "text": "AGI/DAS shipments must carry an offshore-compatible `RoutingPattern` and must have M115 `MOSB Staged` before M130 `Site Arrived`. This file defines the infrastructure constraint; `CONSOLIDATED-00` owns the canonical validation shape and `CONSOLIDATED-04/06` implement marine/material details.\n\n```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?unit ?dest ?pattern\nWHERE {\n  ?unit hvdc:declaredDestination ?dest ;\n        hvdc:hasRoutingPattern ?pattern .\n  FILTER(?dest IN (\"AGI\", \"DAS\"))\n  FILTER(?pattern NOT IN (\"MOSB_DIRECT\", \"WH_MOSB\", \"MIXED\"))\n}\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "text": "AGI/DAS shipments should carry an offshore-compatible `RoutingPattern`. If a site date or M130 `Site Arrived` exists, it is accepted as SiteReceipt/M130 evidence even when M115/M116/M117 is missing; the missing MOSB chain becomes `MOSB_EVIDENCE_MISSING` AMBER/WARN backfill. This file defines the infrastructure evidence gap; `CONSOLIDATED-00` owns the canonical validation shape and `CONSOLIDATED-04/06` implement marine/material details.\n\n```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?unit ?dest ?pattern\nWHERE {\n  ?unit hvdc:declaredDestination ?dest ;\n        hvdc:hasRoutingPattern ?pattern .\n  FILTER(?dest IN (\"AGI\", \"DAS\"))\n  FILTER(?pattern NOT IN (\"MOSB_DIRECT\", \"WH_MOSB\", \"MIXED\"))\n}\n```",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1112,7 +1112,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.3 No Universal MOSB Assumption",
     "text": "Do not assert that all cargo must pass through MOSB. Correct logic:\n\n- MIR/SHU onshore cargo may be `DIRECT` or `WH_ONLY`.\n- AGI/DAS offshore cargo requires MOSB-inclusive routing or an explicit exception gate.\n- Bulk/OOG cargo often uses MOSB, but the requirement is route- and destination-dependent.\n- Port and OCR sources provide evidence, not final route ownership.\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1124,7 +1124,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.1 Foundry Object Type Mapping",
     "text": "| Foundry Object Type | Source dataset | Key properties | Link Types |\n|---|---|---|---|\n| `FrameworkStandard` | standards registry / RAG table | `standardCode`, `version`, `authority`, `ragCheckedAt` | appliesTo → ObjectType |\n| `RegulatoryRequirement` | compliance master | `authority`, `requirementCode`, `scope`, `trigger` | governs → LocationNode / CargoCategory |\n| `PermitRequirement` | permit matrix | `permitType`, `authority`, `leadTimeDays`, `evidenceRequired` | requiredFor → JourneyLeg / LocationNode |\n| `LocationNode` | node master | `nodeCode`, `nodeType`, `nodeName`, `countryCode` | connectsTo → LocationNode |\n| `Port` | port/terminal master | `unlocode`, `portAuthority`, `cargoProfile` | hasTerminal → Terminal |\n| `Warehouse` | WMS/location master | `warehouseCode`, `storageType`, `capacity` | supports → WarehouseTask |\n| `OffshoreStagingNode` | marine/MOSB master | `supportsLCT`, `marineInterfaceType` | stagesFor → Site |\n| `Site` | site master | `siteCode`, `siteType`, `receivingCapability` | receives → ShipmentUnit |\n| `TransportCorridor` | route matrix | `mode`, `fromNode`, `toNode`, `permitRequired` | usedBy → JourneyLeg |\n| `AccessPolicy` | gate/security SOP | `policyCode`, `issuer`, `locationScope` | controls → LocationNode |\n| `CapacityProfile` | WMS/yard/site capacity | `capacityUnit`, `ratedCapacity`, `currentUtilization` | belongsTo → LocationNode |\n| `InfrastructureKPI` | dashboard / KPI dataset | `metricCode`, `targetValue`, `actualValue` | measures → LocationNode |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1136,7 +1136,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.2 Dataset Integration Points",
     "text": "| Source system | Dataset | Ontology output | Validation |\n|---|---|---|---|\n| ERP / PMO | `project_po_package_material` | Project, Package, PO, Material, Vendor | PO-package-material completeness |\n| Port / OFCO | `portcall_service_tariff` | Port, Terminal, PortCall, ServiceEvent | PortCall↔Shipment link |\n| Carrier / forwarder | `carrier_container_events` | Container, CarrierEvent, JourneyLeg | DCSA-style event sequence |\n| Customs / ATLP / broker | `customs_boe_permit_release` | CustomsEntry, PermitDocument, ReleaseOrder | WCO field and permit evidence |\n| WMS | `warehouse_location_capacity_task` | Warehouse, CapacityProfile, WarehouseTask | WH capacity and stock integrity |\n| Marine / MOSB | `mosb_lct_barge_events` | OffshoreStagingNode, MarineEvent, Corridor | M115/M116/M117 sequence |\n| Site receiving | `site_mrr_grn_osdr` | Site, SiteReceipt, InspectionEvent | M130/M140 evidence |\n| LDG / OCR | `doc_entity_evidence` | Document, Evidence, VerificationResult | OCR confidence and cross-doc checks |\n| Invoice / Cost | `invoice_line_rate_ref` | Invoice, InvoiceLine, RateRef, CostGuardResult | Δ% and numeric integrity |\n| Communication | `email_chat_approval_evidence` | CommunicationEvent, ApprovalAction, AuditRecord | Evidence-only linking |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1148,7 +1148,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.3 Foundry Action Types",
     "text": "| Action | Target | Inputs | Guard |\n|---|---|---|---|\n| `RegisterLocationNode` | LocationNode | node code, type, owner, capabilities | node code uniqueness |\n| `UpdateCapacityProfile` | CapacityProfile | node, capacity, current utilization | utilization ≤ threshold or WARN |\n| `AttachPermitRequirement` | PermitRequirement | authority, trigger, required evidence | current SOP/RAG source required |\n| `ApproveAccessPolicy` | AccessPolicy | location, role, validity, approver | expiry date and approver required |\n| `ValidateNodeForRouting` | ShipmentUnit / JourneyLeg | origin, destination, routing pattern | AGI/DAS + MOSB gate |\n| `OpenInfrastructureException` | Exception | node, blocker, evidence, owner | human-gate for high-risk blockers |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1160,7 +1160,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.1 SHACL Constraints",
     "text": "```turtle\n@prefix sh:   <http://www.w3.org/ns/shacl#> .\n@prefix hvdc: <http://samsung.com/project-logistics#> .\n@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .\n\nhvdc:LocationNodeShape a sh:NodeShape ;\n  sh:targetClass hvdc:LocationNode ;\n  sh:property [\n    sh:path hvdc:nodeCode ;\n    sh:minCount 1 ;\n    sh:datatype xsd:string ;\n    sh:message \"LocationNode requires nodeCode.\" ;\n  ] ;\n  sh:property [\n    sh:path hvdc:nodeType ;\n    sh:minCount 1 ;\n    sh:in (\"PORT\" \"TERMINAL\" \"WAREHOUSE\" \"OFFSHORE_STAGING\" \"SITE_ONSHORE\" \"SITE_OFFSHORE\" \"GATE\" \"CORRIDOR\") ;\n    sh:message \"LocationNode nodeType must use controlled vocabulary.\" ;\n  ] .\n\nhvdc:MOSBNotWarehouseShape a sh:NodeShape ;\n  sh:targetNode hvdc:MOSB ;\n  sh:sparql [\n    sh:message \"MOSB must be OffshoreStagingNode, not Warehouse.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE { $this a hvdc:Warehouse . }\n    \"\"\" ;\n  ] .\n\nhvdc:PermitRequirementShape a sh:NodeShape ;\n  sh:targetClass hvdc:PermitRequirement ;\n  sh:property [ sh:path hvdc:authority ; sh:minCount 1 ; sh:datatype xsd:string ] ;\n  sh:property [ sh:path hvdc:evidenceRequired ; sh:minCount 1 ; sh:datatype xsd:boolean ] .\n\nhvdc:CapacityProfileShape a sh:NodeShape ;\n  sh:targetClass hvdc:CapacityProfile ;\n  sh:property [\n    sh:path hvdc:currentUtilizationPct ;\n    sh:datatype xsd:decimal ;\n    sh:minInclusive 0.00 ;\n    sh:maxInclusive 100.00 ;\n  ] .\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1172,7 +1172,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Node without governance",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?node ?type\nWHERE {\n  ?node a hvdc:LocationNode ; hvdc:nodeType ?type .\n  FILTER NOT EXISTS { ?node hvdc:governedBy ?req . }\n}\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1182,9 +1182,9 @@ export const CORPUS_CHUNKS = [
     "docId": "CONSOLIDATED-01-core-framework-infra",
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
-    "sectionPath": "AGI/DAS route without MOSB stage",
+    "sectionPath": "AGI/DAS M130 with missing MOSB stage evidence",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?unit ?dest ?m130\nWHERE {\n  ?unit hvdc:declaredDestination ?dest ;\n        hvdc:hasMilestone ?m130 .\n  ?m130 hvdc:milestoneCode \"M130\" ; hvdc:actualDt ?actual .\n  FILTER(?dest IN (\"AGI\", \"DAS\"))\n  FILTER NOT EXISTS {\n    ?unit hvdc:hasMilestone ?m115 .\n    ?m115 hvdc:milestoneCode \"M115\" ; hvdc:actualDt ?m115Actual .\n  }\n}\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1196,7 +1196,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Capacity warning",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?node ?util\nWHERE {\n  ?node hvdc:hasCapacityProfile ?cap .\n  ?cap hvdc:currentUtilizationPct ?util .\n  FILTER(?util > 85.00)\n}\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1208,7 +1208,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.3 RAG Checks",
     "text": "| RAG check | Trigger | Required evidence | Human-gate |\n|---|---|---|---|\n| Standards version | Quarterly or schema release | Official authority source and `ragCheckedAt` | Ontology owner |\n| MOIAT product conformity | Regulated product / certificate missing | MOIAT certificate or exemption evidence | Compliance |\n| FANR / radiation-source control | Nuclear/radiation-related material | FANR licence/permit evidence or project legal note | Compliance + HSE |\n| DCD / DG | Dangerous goods | DG declaration, segregation evidence, HSE approval | HSE |\n| ADNOC / CICPA access | Controlled port/site/MOSB access | GatePass/access approval | Site logistics |\n| OOG / heavy corridor | OOG / abnormal load | route survey, method statement, permit | Heavy-lift engineer |\n| Weather / marine | MOSB-to-AGI/DAS movement | weather window, FRA, PTW, marine approval | Marine coordinator |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1219,8 +1219,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
     "sectionPath": "8.4 Human-gate Thresholds",
-    "text": "| Gate | Trigger | Required role |\n|---|---|---|\n| High-value cost | Invoice or claim > 100,000.00 AED | Finance approver |\n| Capacity overload | WH/MOSB/Site utilization > 85.00% | Logistics manager |\n| Permit uncertainty | missing or expired authority evidence | Compliance owner |\n| AGI/DAS M115 violation | M130 exists without M115 | Marine + Site logistics |\n| OOG method statement missing | OOG cargo enters corridor without approved MS | Heavy-lift engineer |\n| Dangerous goods mismatch | DG class, UN number, or segregation missing | HSE |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "text": "| Gate | Trigger | Required role |\n|---|---|---|\n| High-value cost | Invoice or claim > 100,000.00 AED | Finance approver |\n| Capacity overload | WH/MOSB/Site utilization > 85.00% | Logistics manager |\n| Permit uncertainty | missing or expired authority evidence | Compliance owner |\n| AGI/DAS MOSB evidence gap | M130/site date exists without M115/M116/M117 | Marine + Site logistics backfill |\n| OOG method statement missing | OOG cargo enters corridor without approved MS | Heavy-lift engineer |\n| Dangerous goods mismatch | DG class, UN number, or segregation missing | HSE |\n\n---",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1232,7 +1232,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.1 Compliance Object Model",
     "text": "| Compliance area | Object | Evidence | Blocking rule |\n|---|---|---|---|\n| Incoterms 2020 | `IncotermTerm` | PO/contract term | cost/risk owner must match PO and invoice |\n| Customs / WCO | `CustomsEntry`, `BOEDocument` | BOE, HS, origin, value | BOE draft blocked if mandatory fields missing |\n| MOIAT | `ConformityCertificateRequirement` | UAE CoC / ECAS/EQM-style evidence or exemption | DO/GatePass blocked for regulated products without certificate evidence |\n| FANR | `RadiationPermitRequirement` | licence/permit evidence | BOE or movement blocked until compliance owner approves |\n| DCD / DG | `DangerousGoodsRequirement` | DG declaration, SDS, segregation plan | WH/storage/transport blocked if DG data incomplete |\n| ADNOC / CICPA / site access | `AccessPolicy`, `GatePass` | gate pass/access approval | gate entry blocked if expired or missing |\n| BIMCO / Marine contract | `MarineContract`, `CharterTerm` | SUPPLYTIME or project marine contract clause | marine work order requires liability/insurance check |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1244,7 +1244,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.2 Incoterms Control",
     "text": "Incoterms are not route classifiers. They determine delivery obligation, cost responsibility, and risk transfer. Store them on PO/Shipment contract context and use them to validate invoice and release ownership.\n\n```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?shipment ?term ?invoiceOwner ?expectedOwner\nWHERE {\n  ?shipment hvdc:hasIncoterm ?term ; hvdc:hasInvoice ?invoice .\n  ?term hvdc:localCostOwner ?expectedOwner .\n  ?invoice hvdc:chargedTo ?invoiceOwner .\n  FILTER(?invoiceOwner != ?expectedOwner)\n}\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1256,7 +1256,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.3 Permit Control",
     "text": "Permit validation is event-gated:\n\n| Event | Permit / evidence precondition |\n|---|---|\n| M50 Terminal Received | BL/manifest and port record exist |\n| M90 BOE Submitted | CI/PL/BL, HS, origin, value, permits if applicable |\n| M92 DO Released | BOE cleared, DO evidence, regulated-product certificates if applicable |\n| M100 Gate-out | DO + gate pass + transporter details |\n| M110 WH Received | WMS receiving task and preservation requirement |\n| M115 MOSB Staged | access approval, marine plan, staging evidence |\n| M116 LCT Loaded | PTW/FRA, lashing/stability approval, weather window |\n| M130 Site Arrived | receiving plan, site access, offshore prerequisite if applicable |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1268,7 +1268,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10. Options ≥3",
     "text": "| Option | Description | Pros | Cons | CostIndex | Risk | Time |\n|---|---|---|---|---:|---:|---:|\n| A. Reference-first | Standards + node registry only | fast, low disruption, strong external alignment | weaker operational automation | 1.00/5.00 | 20.00% | 4.00 weeks |\n| B. Hybrid framework | Standards + nodes + SHACL + Foundry actions | best balance, deployable gates, direct COP integration | requires curated node master | 2.50/5.00 | 18.00% | 8.00 weeks |\n| C. Ops Twin | Hybrid + live capacity + gate-pass + permit clocks | strongest operational value, supports exception management | needs source-system integration | 4.00/5.00 | 24.00% | 12.00 weeks |\n| D. Enterprise RDF Bridge | Full RDF/OWL + external graph + Foundry bridge | strongest reasoning and SHACL governance | architecture and maintenance complexity | 5.00/5.00 | 30.00% | 16.00 weeks |\n\nRecommended path: **Option B** for controlled rollout, then Option C for live operations.\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1280,7 +1280,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale",
     "text": "| Phase | Scope | KPI |\n|---|---|---|\n| Prepare | Confirm standards registry, node dictionary, authority matrix | NodeMasterCoverage ≥ 90.00% |\n| Pilot | 1.00 onshore route + 1.00 offshore route + 1.00 OOG case | RoutingPatternValidation = 100.00% |\n| Build | Foundry Object/Link mapping, SHACL gates, SPARQL audit panels | Link completeness ≥ 95.00% |\n| Operate | Daily infra blocker review, permit expiry monitor, capacity warning | Validation p95 < 5.00s |\n| Scale | Extend to all nodes, marine/OOG, cost, RAG compliance | PermitEvidenceCompleteness ≥ 98.00% |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1291,8 +1291,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
     "version": "2.0-final",
     "sectionPath": "12. Automation Notes — RPA / LLM / Sheets / TG Hooks",
-    "text": "| Automation | Trigger | Output |\n|---|---|---|\n| `NodeMasterGuard` | new or modified LocationNode | node code, type, governance, capability validation |\n| `PermitExpiryBot` | permit expiry within threshold | compliance review list |\n| `RouteNodeFitGuard` | route planning / JourneyLeg creation | allowed route and node capability check |\n| `AGIDASGateBot` | AGI/DAS route or M130 event | M115 prerequisite check |\n| `CapacityGuard` | WH/MOSB/Site utilization update | WARN at > 85.00%, HIGH at > 95.00% |\n| `CertChkRAG` | regulated product or uncertain authority rule | latest authority evidence retrieval request |\n| `GatePassGuard` | gate-out / site entry / MOSB staging | access policy and validity check |\n| `WeatherTieMarineGuard` | M116/M117 marine movement | weather/FRA/PTW checklist |\n| `DailyInfraDigest` | 08:00 Asia/Dubai daily | node blocker, permit, capacity, route exception summary |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "text": "| Automation | Trigger | Output |\n|---|---|---|\n| `NodeMasterGuard` | new or modified LocationNode | node code, type, governance, capability validation |\n| `PermitExpiryBot` | permit expiry within threshold | compliance review list |\n| `RouteNodeFitGuard` | route planning / JourneyLeg creation | allowed route and node capability check |\n| `AGIDASGateBot` | AGI/DAS route or M130 event | SiteReceipt acceptance plus MOSB evidence backfill check |\n| `CapacityGuard` | WH/MOSB/Site utilization update | WARN at > 85.00%, HIGH at > 95.00% |\n| `CertChkRAG` | regulated product or uncertain authority rule | latest authority evidence retrieval request |\n| `GatePassGuard` | gate-out / site entry / MOSB staging | access policy and validity check |\n| `WeatherTieMarineGuard` | M116/M117 marine movement | weather/FRA/PTW checklist |\n| `DailyInfraDigest` | 08:00 Asia/Dubai daily | node blocker, permit, capacity, route exception summary |\n\n---",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1304,7 +1304,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.1 QA Checklist",
     "text": "| Check | PASS 기준 |\n|---|---|\n| Master spine alignment | `CONSOLIDATED-00` vocabulary reused, not redefined |\n| Flow boundary | Warehouse handling class not used as route/cost/document/marine classifier |\n| MOSB classification | MOSB typed as `OffshoreStagingNode`, not `Warehouse` |\n| Universal MOSB claim | Removed; MOSB is conditional by destination/routing/cargo |\n| Evidence ownership | Port/OCR/Cost/Communication provide evidence only |\n| Node registry | Port/WH/MOSB/Site/Terminal/Gate/Corridor separated |\n| Compliance | Incoterms, Customs, MOIAT, FANR, DCD/DG, ADNOC/CICPA, BIMCO anchors present |\n| SHACL | LocationNode, MOSB, Permit, Capacity shapes present |\n| SPARQL | governance, AGI/DAS, capacity queries present |\n| PII | No phone/e-mail contact registry embedded |\n| KPI format | Operational numbers use two-decimal format where applicable |",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1316,7 +1316,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.2 Assumptions",
     "text": "- `CONSOLIDATED-00` remains the semantic authority for core classes and milestones.\n- Current operational facts such as site gate rules, permit lead time, authority forms, and ADNOC/CICPA details must be RAG-checked against current project SOP before automated release.\n- FANR-related permit validity and processing timelines are not hardcoded here because authority-specific service evidence must be confirmed for the actual cargo and licence context.\n- `FMC_OrgChart_Data.json` is not embedded in this document. Names, phone numbers, and e-mail addresses remain PII and require masking before register write.\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1328,7 +1328,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "14. RAG Source Anchors",
     "text": "| Anchor | Official source URL | Use in this document |\n|---|---|---|\n| UN/CEFACT RDM | https://unece.org/trade/uncefact/rdm | BSP-RDM semantic alignment |\n| WCO Data Model v4.2.0 | https://www.wcoomd.org/en/media/newsroom/2025/july/world-customs-organization-releases-data-mode.aspx | Customs data model version anchor |\n| WCO Data Model app | https://datamodel.wcoomd.org/ | WCO DM access and package verification |\n| DCSA Track & Trace | https://dcsa.org/standards/track-and-trace | Container visibility/event alignment |\n| DCSA Track & Trace documentation | https://dcsa.org/standards/track-and-trace/standard-documentation-track-and-trace | Latest-release adoption gate |\n| ICC Incoterms 2020 | https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/ | Incoterm rule anchor |\n| MOIAT regulated product CoC | https://moiat.gov.ae/en/services/issue-conformity-certificates-for-regulated-products | UAE conformity evidence anchor |\n| UN/LOCODE | https://unece.org/trade/uncefact/unlocode | Location code release anchor |\n| BIMCO SUPPLYTIME 2017 | https://www.bimco.org/contractual-affairs/bimco-contracts/contracts/supplytime-2017/ | Offshore support vessel contract anchor |\n| UAE nuclear legal baseline | https://uaelegislation.gov.ae/en/legislations/1123/download | FANR-controlled activity legal baseline |\n\n---",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -1340,7 +1340,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "15. CmdRec",
     "text": "```text\n/switch_mode PRIME + /logi-master cert-chk --deep --KRsummary\n```\n\n```text\n/logi-master report --deep --KRsummary\n```\n\n```text\n/logi-master hs-risk --deep --AEDonly\n```",
-    "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+    "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
     "domains": [
       "compliance"
     ]
@@ -2324,7 +2324,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Document Root",
     "text": "---\ntitle: \"HVDC Marine, Barge & Bulk Cargo Ontology — Consolidated\"\ntype: \"ontology-design\"\ndomain: \"marine-barge-bulk-operations\"\nsub-domains:\n  - marine-operations\n  - barge-lct-operations\n  - bulk-cargo-operations\n  - oog-heavy-lift\n  - stowage-and-seafastening\n  - stability-control\n  - lifting-and-rigging\n  - mosb-offshore-staging\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\nextension_of: \"hvdc-master-ontology-v2.0-final\"\ncanonical_role: \"marine, bulk, OOG, lashing, stability, LCT/barge execution extension\"\nowner: \"HVDC Logistics Ontology Working Set\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\n  - IMSBC-Code\n  - SOLAS\n  - IMDG-Code\n  - BIMCO-SUPPLYTIME-2017\nsource_files:\n  - 1_CORE-05-hvdc-bulk-cargo-ops.md\nchecked_against:\n  - CONSOLIDATED-00-master-ontology.md\n  - CONSOLIDATED-01-core-framework-infra.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-06-material-handling.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-09-operations.md\n  - AGENTS.md\n  - HVDC Logistics Ontology Review.txt\nvalidation_passes: 5\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2336,7 +2336,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1. ExecSummary",
     "text": "`CONSOLIDATED-04`는 HVDC Logistics KG의 **marine / barge / bulk / OOG execution extension**이다. 본 문서는 MOSB staging, LCT/barge loading, seafastening, stability, lifting, discharge, marine handover를 `ShipmentUnit`, `CargoUnit`, `MarineOperation`, `MarineEvent`, `OperationTask`, `StowagePlan`, `LashingPlan`, `StabilityCase`, `LiftingPlan`으로 정규화한다.\n\n비즈니스 임팩트는 **AGI/DAS offshore delivery의 M115→M116→M117→M130 traceability**, **deck pressure / stability / lashing / rigging gate의 사전 차단**, **LCT utilization 및 MOSB dwell risk의 가시화**, **marine document evidence 기반 승인 추적**이다.\n\n기술 해법은 `MarineRoutingPattern`과 `offshoreDeliveryPattern`을 marine leg 전용 분류로 사용하고, end-to-end route는 `ShipmentRoutingPattern`, 실행 상태는 `MilestoneEvent`, warehouse 내부 처리는 `WarehouseHandlingProfile`로 분리하는 것이다.\n\nKPI 목표는 `MarinePlanCoverage ≥ 95.00%`, `DeckPressurePassRate = 100.00%`, `StabilityGatePassRate = 100.00%`, `LashingEvidenceCompleteness ≥ 98.00%`, `LCTUtilization = 80.00–85.00%`, `Validation p95 < 5.00s`이다.\n\n**ENG-KR one-liner:** Marine execution owns MOSB staging, LCT/barge events, stowage, lashing, stability, and lifting controls; route truth remains in `RoutingPattern`, and warehouse handling remains in `WarehouseHandlingProfile` only.\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2348,7 +2348,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.1 Master Governance Rule",
     "text": "1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine.\n2. `CONSOLIDATED-04` owns **marine / barge / bulk / OOG execution semantics** only.\n3. Program-wide shipment visibility uses `RoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent`.\n4. Marine leg classification uses `MarineRoutingPattern` and `offshoreDeliveryPattern`.\n5. `MOSB` is an `OffshoreStagingNode` / `MarineInterfaceNode`; it is not a top-level `Warehouse`.\n6. Warehouse handling classification is owned only by `WarehouseHandlingProfile.confirmedFlowCode` in `CONSOLIDATED-02`.\n7. Documents, port records, costs, and communications provide evidence; they do not own marine execution truth.\n8. Engineering approval remains human-gated. This ontology validates data readiness and consistency; it does not replace MWS, marine warranty, naval architecture, lifting engineer, HSE, port authority, or client approval.",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2360,7 +2360,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.2 Included vs Delegated Scope",
     "text": "| Scope item | Included in CONSOLIDATED-04 | Delegated / excluded |\n|---|---|---|\n| MOSB staging | M115, laydown, consolidation, marine readiness, staging inspection | Warehouse put-away and stock ownership in `CONSOLIDATED-02` |\n| LCT / barge execution | M116 loaded, barge trip, ATD/ETA/ATA, sail-away approval M117 | Port entry / customs release in `CONSOLIDATED-07` / `CONSOLIDATED-06` |\n| Bulk cargo | Aggregate, sand, soil, rock, steel bundle, pipe bundle, precast, jumbo bags | Commercial invoice audit in `CONSOLIDATED-05` |\n| OOG / heavy lift | Transformer, cable drum, pre-assembled module, A-frame, PC beam/column | Supplier manufacturing readiness in ERP / procurement |\n| Stowage | deck slot, COG, footprint, deck pressure, sequence | CAD/BIM geometry as external engineering evidence |\n| Seafastening / lashing | lashing assembly, WLL, angle, count, safety factor, inspection | Final engineering calculation approval |\n| Stability | displacement, GM, VCG, trim, list, loading condition, weather gate | Naval architecture final approval |\n| Lifting / rigging | lifting plan, rigging gear, sling angle, crane/Hiab/SPMT interface | Final lifting engineer approval |\n| Marine permits | PTW, JSA/TRA, hot work, working-over-water, port/marine clearance | Authority approval system of record |\n| Evidence | load plan, lashing plan, stability report, rigging plan, inspection photo, survey report | OCR extraction internals in `CONSOLIDATED-03` |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2372,7 +2372,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.3 Domain Boundary Crosswalk",
     "text": "| Domain | Allowed interface with marine/bulk | Not allowed in CONSOLIDATED-04 |\n|---|---|---|\n| Core master | Read/write `MarineEvent`, `OperationTask`, `JourneyLeg`, `MilestoneEvent` links | Redefine `ShipmentRoutingPattern` dictionary |\n| Infrastructure | Read `Port`, `Berth`, `Jetty`, `OffshoreStagingNode`, `Site`, `TransportCorridor` | Type MOSB as top-level `Warehouse` |\n| Warehouse | Read WH dispatch evidence M121 and storage constraints | Assign or interpret warehouse handling class |\n| Document/OCR | Consume `routeEvidence`, `destinationEvidence`, `mosbLegIndicator`, plan documents | Treat OCR output as engineering approval |\n| Port | Consume `plannedRoutingPattern`, berth, gate, port service evidence | Assign marine execution status from port invoice alone |\n| Material handling | Provide M115/M116/M117/M130 milestone continuity | Collapse site receipt into marine discharge |\n| Cost | Export marine charge evidence and LCT utilization | Own cost bands or CostGuard verdict |\n| Operations/KPI | Export marine event, LCT, MOSB dwell, safety gate KPIs | Replace routing analytics with marine-only vocabulary |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2384,7 +2384,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.4 Legacy Migration Rules",
     "text": "| Legacy wording / pattern | Canonical replacement | Patch action |\n|---|---|---|\n| Marine domain using warehouse handling class language | `MarineRoutingPattern` and `offshoreDeliveryPattern` | Replace in all marine tables and SHACL |\n| Port→WH→MOSB→Site described as marine class | `ShipmentRoutingPattern` for E2E, `MarineRoutingPattern` for MOSB/LCT leg | Separate routing layers |\n| MOSB treated as warehouse | `OffshoreStagingNode` with optional `LaydownArea` / `StorageCapability` | Preserve staging function only |\n| Direct cost implication from marine class | `MarineChargeEvidence`, `LCTTrip`, `MarineServiceEvent` | Cost domain calculates audit result |\n| Document-derived marine approval | `DocumentEvidence` + `ApprovalAction` | Human-gate for MWS / stability / lifting |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2396,7 +2396,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.1 Marine Ontology Layer",
     "text": "| Layer | Class / vocabulary | Purpose |\n|---|---|---|\n| Core cargo | `CargoUnit`, `BulkCargoUnit`, `OOGCargoUnit`, `HeavyLiftCargoUnit` | Marine-handled cargo object |\n| Marine operation | `MarineOperation`, `BargeOperation`, `LCTOperation`, `BulkCargoOperation` | Marine execution transaction |\n| Event | `MarineEvent`, `MOSBStagedEvent`, `LCTLoadedEvent`, `SailAwayEvent`, `OffshoreDischargeEvent` | Time-stamped execution evidence |\n| Stowage | `StowagePlan`, `DeckArea`, `DeckSlot`, `StowagePosition` | Deck layout and pressure control |\n| Seafastening | `LashingPlan`, `LashingAssembly`, `LashingElement`, `SeafasteningInspection` | Sea transport securing control |\n| Stability | `StabilityCase`, `LoadingCondition`, `BallastCondition`, `HydrostaticLimit` | Barge/LCT stability gate |\n| Lifting | `LiftingPlan`, `LiftOperation`, `RiggingGear`, `CraneResource`, `SPMTResource` | Load handling gate |\n| Environment | `MarineWeatherWindow`, `SeaStateObservation`, `TideWindow` | Weather / tide feasibility gate |\n| Resource | `MarineAsset`, `Barge`, `LCT`, `Crew`, `EquipmentResource` | Vessel, crew, equipment allocation |\n| Compliance | `MarinePermit`, `PTW`, `JSA`, `TRA`, `MWSApproval`, `HSEApproval` | Approval and permit evidence |\n| Evidence | `MarineDocument`, `SurveyReport`, `InspectionPhoto`, `AuditRecord` | Provenance and validation proof |\n| KPI | `MarineKPI`, `LCTUtilizationMetric`, `MOSBDwellMetric`, `DeckPressureMetric` | Operational monitoring |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2408,7 +2408,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.2 Core Classes",
     "text": "| Class | Required properties | Key relations | Notes |\n|---|---|---|---|\n| `MarineOperation` | `operationId`, `operationType`, `operationStatus`, `plannedStart`, `actualStart`, `actualEnd` | `forShipmentUnit`, `hasMarineEvent`, `usesMarineAsset`, `requiresApproval` | Parent marine transaction |\n| `BargeOperation` | `bargeOperationId`, `bargeName`, `voyageNo`, `marineRoutingPattern` | `subClassOf MarineOperation`, `hasStowagePlan`, `hasStabilityCase` | Generic barge movement |\n| `LCTOperation` | `lctOperationId`, `lctName`, `wellsId`, `musNo`, `departureNode`, `arrivalNode` | `subClassOf BargeOperation`, `hasLCTTrip` | AGI/DAS LCT leg |\n| `BulkCargoUnit` | `cargoId`, `bulkCategory`, `qty`, `uom`, `weightMt`, `volumeCbm` | `belongsTo ShipmentUnit`, `allocatedTo DeckSlot` | Aggregate/sand/soil/bulk cargo |\n| `OOGCargoUnit` | `cargoId`, `lengthM`, `widthM`, `heightM`, `grossWeightMt`, `cogX`, `cogY`, `cogZ` | `requiresLiftingPlan`, `requiresLashingPlan` | OOG/heavy project cargo |\n| `DeckArea` | `deckAreaId`, `usableLengthM`, `usableWidthM`, `maxUniformLoadTpm2`, `maxPointLoadT` | `partOf MarineAsset`, `containsDeckSlot` | LCT/barge deck capacity |\n| `DeckSlot` | `slotId`, `xM`, `yM`, `lengthM`, `widthM`, `allowablePressureTpm2` | `partOf DeckArea`, `occupiedBy CargoUnit` | Stowage position |\n| `StowagePlan` | `planId`, `planVersion`, `approvalStatus`, `totalWeightMt`, `maxDeckPressureTpm2` | `forMarineOperation`, `hasStowagePosition`, `approvedBy` | Load plan control object |\n| `LashingPlan` | `planId`, `calcMethod`, `approvalStatus`, `safetyFactorMin` | `secures CargoUnit`, `hasLashingAssembly`, `verifiedBy` | Seafastening control |\n| `LashingAssembly` | `assemblyId`, `requiredCapacityT`, `calculatedTensionT`, `safetyFactor` | `uses LashingElement`, `appliedTo CargoUnit` | Per-cargo lashing proof |\n| `LashingElement` | `elementId`, `elementType`, `wllT`, `angleDeg`, `count` | `partOf LashingAssembly` | Chain, belt, wire, shackle, turnbuckle |\n| `StabilityCase` | `caseId`, `loadingCondition`, `displacementMt`, `gmM`, `vcgM`, `trimM`, `listDeg` | `evaluates MarineAsset`, `considers StowagePlan`, `approvedBy` | Stability gate |\n| `LiftingPlan` | `liftId`, `liftMethod`, `grossLiftWeightMt`, `slingAngleDeg`, `approvalStatus` | `for CargoUnit`, `uses RiggingGear`, `uses EquipmentResource` | Lift / LOLO / RORO interface |\n| `MarineWeatherWindow` | `windowId`, `startTime`, `endTime`, `maxWindKn`, `maxSeaState`, `visibilityNm` | `appliesTo MarineOperation`, `verifiedBy` | Weather feasibility |\n| `MarinePermit` | `permitId`, `permitType`, `issuer`, `validFrom`, `validTo`, `status` | `requiredFor MarineOperation`, `evidencedByDocument` | PTW, JSA, TRA, marine clearance |\n| `MarineDocument` | `docId`, `docType`, `docVersion`, `docHash`, `approvalStatus` | `evidences MarineOperation`, `wasDerivedFrom` | Plan/report/proof artifact |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2420,7 +2420,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.3 Controlled Vocabularies",
     "text": "| Vocabulary | Values | Owner |\n|---|---|---|\n| `MarineRoutingPattern` | `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT`, `OFFSHORE_PENDING`, `SPLIT_MARINE_LEG`, `EXCEPTIONAL_HEAVY_LIFT` | `CONSOLIDATED-04` |\n| `OffshoreDeliveryPattern` | `MOSB_TO_AGI`, `MOSB_TO_DAS`, `PORT_TO_MOSB`, `WH_TO_MOSB`, `BARGE_SHUTTLE`, `PENDING_ASSIGNMENT` | `CONSOLIDATED-04` |\n| `MarineOperationStatus` | `PLANNED`, `READY`, `PERMIT_PENDING`, `APPROVED`, `LOADING`, `SAIL_AWAY_APPROVED`, `IN_TRANSIT`, `DISCHARGING`, `COMPLETED`, `BLOCKED`, `CANCELLED` | `CONSOLIDATED-04` |\n| `CargoMarineCategory` | `BULK_AGGREGATE`, `BULK_SAND`, `BULK_SOIL`, `STEEL_STRUCTURE`, `PIPE_BUNDLE`, `PRECAST_UNIT`, `JUMBO_BAG`, `TRANSFORMER`, `CABLE_DRUM`, `A_FRAME`, `MIXED_PROJECT_CARGO` | `CONSOLIDATED-04` |\n| `StowageApprovalStatus` | `DRAFT`, `CHECKED`, `APPROVED`, `REJECTED`, `SUPERSEDED` | `CONSOLIDATED-04` |\n| `LashingApprovalStatus` | `DRAFT`, `CALCULATED`, `ENGINEER_REVIEWED`, `APPROVED`, `FIELD_VERIFIED`, `REJECTED` | `CONSOLIDATED-04` |\n| `StabilityGateStatus` | `NOT_STARTED`, `DATA_MISSING`, `CALCULATED`, `PASS`, `FAIL`, `APPROVED_WITH_CONDITION` | `CONSOLIDATED-04` |\n| `WeatherGateStatus` | `OPEN`, `WATCH`, `HOLD`, `CLOSED`, `OVERRIDE_APPROVED` | `CONSOLIDATED-04` |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2432,7 +2432,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.4 Object Property Map",
     "text": "| Object property | Domain → Range | Meaning |\n|---|---|---|\n| `marine:forShipmentUnit` | `MarineOperation → ShipmentUnit` | Marine operation belongs to shipment unit |\n| `marine:hasMarineRoutingPattern` | `MarineOperation → MarineRoutingPattern` | Marine leg classification |\n| `marine:hasOffshoreDeliveryPattern` | `MarineOperation → OffshoreDeliveryPattern` | Offshore delivery path |\n| `marine:usesMarineAsset` | `MarineOperation → MarineAsset` | LCT/barge/vessel allocation |\n| `marine:usesDeckArea` | `StowagePlan → DeckArea` | Deck capacity context |\n| `marine:positionsCargo` | `StowagePlan → CargoUnit` | Cargo included in stowage plan |\n| `marine:securedBy` | `CargoUnit → LashingAssembly` | Cargo seafastening relation |\n| `marine:evaluatedBy` | `MarineOperation → StabilityCase` | Stability proof |\n| `marine:liftedBy` | `CargoUnit → LiftOperation` | Lift execution link |\n| `marine:requiresPermit` | `MarineOperation → MarinePermit` | Permit gate |\n| `marine:evidencedBy` | `MarineOperation → MarineDocument` | Evidence trace |\n| `marine:generatesMilestone` | `MarineEvent → MilestoneEvent` | M115/M116/M117/M130 linkage |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2444,7 +2444,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.5 Datatype Property Map",
     "text": "| Datatype property | Domain | Range / rule |\n|---|---|---|\n| `marine:grossWeightMt` | `CargoUnit` | `xsd:decimal`, `> 0.00` |\n| `marine:lengthM`, `marine:widthM`, `marine:heightM` | `CargoUnit` | `xsd:decimal`, `> 0.00` |\n| `marine:cogXM`, `marine:cogYM`, `marine:cogZM` | `CargoUnit` | `xsd:decimal`, required for OOG/heavy lift |\n| `marine:footprintSqm` | `CargoUnit` | `lengthM × widthM` |\n| `marine:deckPressureTpm2` | `DeckSlot` / `StowagePosition` | `grossWeightMt / footprintSqm` |\n| `marine:maxUniformLoadTpm2` | `DeckArea` | deck limit |\n| `marine:gmM` | `StabilityCase` | `xsd:decimal`, project-defined minimum gate |\n| `marine:listDeg`, `marine:trimM` | `StabilityCase` | project-defined limit |\n| `marine:wllT` | `LashingElement` | working load limit |\n| `marine:safetyFactor` | `LashingAssembly` | must be `>= requiredSafetyFactor` |\n| `marine:maxWindKn`, `marine:maxSeaState` | `MarineWeatherWindow` | weather gate |\n| `marine:approvalStatus` | plan/document classes | controlled vocabulary |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2456,7 +2456,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.1 Separation of E2E Routing and Marine Leg",
     "text": "| Layer | Vocabulary | Example | Owner |\n|---|---|---|---|\n| End-to-end shipment route | `ShipmentRoutingPattern` | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | `CONSOLIDATED-00` |\n| Journey stage | `JourneyStage` | `MOSB_STAGING`, `OFFSHORE_TRANSIT`, `SITE_RECEIVING` | `CONSOLIDATED-00` |\n| Marine leg | `MarineRoutingPattern` | `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT` | `CONSOLIDATED-04` |\n| Offshore delivery | `offshoreDeliveryPattern` | `MOSB_TO_AGI`, `MOSB_TO_DAS` | `CONSOLIDATED-04` |\n| Warehouse handling | `WarehouseHandlingProfile.confirmedFlowCode` | warehouse-only handling class | `CONSOLIDATED-02` |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2467,8 +2467,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
     "version": "2.0-final",
     "sectionPath": "4.2 Marine Milestone Chain",
-    "text": "| Milestone | Name | Required evidence | Blocking rule |\n|---|---|---|---|\n| `M115` | MOSB Staged | MOSB staging request, laydown allocation, cargo inspection, ALS/Marine confirmation | Cannot proceed to M116 without cargo, deck, permit readiness |\n| `M116` | LCT / Barge Loaded | stowage plan, loading checklist, lashing inspection, deck pressure check | Cannot proceed to M117 if lashing/stability not approved |\n| `M117` | Sail-away Approved | weather/tide gate, stability approval, marine clearance, vessel readiness | Cannot depart if weather gate is HOLD/CLOSED without override |\n| `M118` | Offshore Arrival / Alongside | ATA AGI/DAS, berth/landing confirmation, site readiness | Cannot discharge if site access or lifting permit missing |\n| `M119` | Offshore Discharged | discharge checklist, receiving handover, damage/shortage note | Must create exception if OSD found |\n| `M130` | Site Arrived | site receipt / MRR / POD / GRN evidence | AGI/DAS requires prior M115/M116/M117 evidence unless exception approved |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "text": "| Milestone | Name | Required evidence | Blocking rule |\n|---|---|---|---|\n| `M115` | MOSB Staged | MOSB staging request, laydown allocation, cargo inspection, ALS/Marine confirmation | Cannot proceed to M116 without cargo, deck, permit readiness |\n| `M116` | LCT / Barge Loaded | stowage plan, loading checklist, lashing inspection, deck pressure check | Cannot proceed to M117 if lashing/stability not approved |\n| `M117` | Sail-away Approved | weather/tide gate, stability approval, marine clearance, vessel readiness | Cannot depart if weather gate is HOLD/CLOSED without override |\n| `M118` | Offshore Arrival / Alongside | ATA AGI/DAS, berth/landing confirmation, site readiness | Cannot discharge if site access or lifting permit missing |\n| `M119` | Offshore Discharged | discharge checklist, receiving handover, damage/shortage note | Must create exception if OSD found |\n| `M130` | Site Arrived | site receipt / MRR / POD / GRN evidence | AGI/DAS site date is accepted as delivered; missing M115/M116/M117 becomes AMBER/WARN backfill |",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2480,7 +2480,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.3 MarineRoutingPattern Rules",
     "text": "| Pattern | Canonical path | Use case | Required milestones |\n|---|---|---|---|\n| `DIRECT_MOSB` | Port → MOSB → LCT/Barge → AGI/DAS | Bulk/OOG cargo bypasses warehouse and stages at MOSB | M100 → M115 → M116 → M117 → M130 |\n| `WH_THEN_MOSB` | WH → MOSB → LCT/Barge → AGI/DAS | Cargo consolidated or preserved in WH before offshore move | M121 → M115 → M116 → M117 → M130 |\n| `LCT_DIRECT` | MOSB → LCT/Barge → Site | Marine leg only; used when upstream route is already resolved | M115 → M116 → M117 → M130 |\n| `OFFSHORE_PENDING` | MOSB staged, site/voyage not yet fixed | Waiting for site readiness, permit, vessel, weather, or priority | M115 open; M116 not allowed |\n| `SPLIT_MARINE_LEG` | One shipment split across multiple LCT trips | Heavy/volume split, mixed cargo or partial dispatch | Each trip needs separate M116/M117 |\n| `EXCEPTIONAL_HEAVY_LIFT` | Special engineering route | Transformer, oversized module, abnormal lift | MWS / engineering / HSE human-gate mandatory |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2491,8 +2491,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
     "version": "2.0-final",
     "sectionPath": "4.4 AGI/DAS Offshore Rule",
-    "text": "1. If `declaredDestination IN (AGI, DAS)`, the shipment must carry `ShipmentRoutingPattern IN (MOSB_DIRECT, WH_MOSB, MIXED)` or an explicit exception.\n2. If a marine leg is present, `MarineRoutingPattern` must be one of `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT`, `SPLIT_MARINE_LEG`, `EXCEPTIONAL_HEAVY_LIFT`.\n3. `M130 Site Arrived` for AGI/DAS is invalid without prior M115, M116, and M117 unless `ExceptionStatus = APPROVED_OVERRIDE`.\n4. MOSB laydown/storage is modeled as `LaydownArea` or `StorageCapability` attached to `OffshoreStagingNode`, not as a top-level `Warehouse`.\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "text": "1. If `declaredDestination IN (AGI, DAS)`, the shipment must carry `ShipmentRoutingPattern IN (MOSB_DIRECT, WH_MOSB, MIXED)` or an explicit exception.\n2. If a marine leg is present, `MarineRoutingPattern` must be one of `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT`, `SPLIT_MARINE_LEG`, `EXCEPTIONAL_HEAVY_LIFT`.\n3. `M130 Site Arrived` for AGI/DAS is valid when site date evidence exists. Missing prior M115, M116, or M117 creates `MOSB_EVIDENCE_MISSING` with AMBER/WARN severity and backfill required unless an approved exception explains the gap.\n4. MOSB laydown/storage is modeled as `LaydownArea` or `StorageCapability` attached to `OffshoreStagingNode`, not as a top-level `Warehouse`.\n\n---",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2504,7 +2504,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.1 Prepare — Marine Readiness",
     "text": "| Step | Input | Output | Gate |\n|---|---|---|---|\n| Cargo data capture | CI/PL, packing list, survey sheet, WMS, site request | normalized `CargoUnit` and `BulkCargoUnit` | Dimensions, weight, COG completeness |\n| Route confirmation | port/WH dispatch, destination, site priority | `ShipmentRoutingPattern` + `MarineRoutingPattern` candidate | AGI/DAS MOSB rule |\n| Marine asset nomination | LCT/barge availability, deck strength, cargo footprint | `MarineAsset` allocation | deck capacity and availability |\n| Permit readiness | PTW, JSA/TRA, gate pass, ADNOC/ALS clearance | `MarinePermit` records | valid dates and issuer |\n| Engineering document readiness | load plan, lashing plan, stability report, lifting plan | `MarineDocument` evidence | approved version only |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2516,7 +2516,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.2 MOSB Staging — M115",
     "text": "| Control | Required data | Fail condition |\n|---|---|---|\n| Cargo identity | `shipmentId`, `packageNo`, `HVDC_CODE`, cargo label | unresolved identity |\n| Physical condition | photo, inspection report, damage note | unclosed OSD |\n| Laydown allocation | `LaydownArea`, footprint, access path | area capacity exceeded |\n| Sequence readiness | load order, priority, site receiving window | no linked LCT/voyage plan |\n| Permit readiness | access, PTW, HSE, security | expired or missing permit |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2528,7 +2528,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.3 LCT / Barge Loading — M116",
     "text": "| Control | Required data | Fail condition |\n|---|---|---|\n| Stowage | deck slot, cargo position, sequence | unapproved stowage plan |\n| Deck pressure | weight, footprint, deck allowable | pressure above limit |\n| Lashing | lashing assembly, WLL, angle, count | safety factor below gate |\n| Stability | GM, VCG, trim, list, loading condition | stability gate not PASS/approved |\n| Lift / ramp | crane/Hiab/SPMT/ramp data | SWL, axle, ramp, or lift data missing |\n| Checklist | loading checklist, inspection sign-off | no field verification |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2540,7 +2540,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.4 Sail-away — M117",
     "text": "| Control | Required data | Fail condition |\n|---|---|---|\n| Weather | wind, sea state, visibility, forecast window | weather gate HOLD/CLOSED |\n| Tide / berth | tide window, berth availability, pilot/port control | window mismatch |\n| Marine readiness | crew, vessel certificate, fuel, communication | incomplete readiness |\n| Client / authority gate | ALS/ADNOC/MWS/HSE approval as applicable | missing approval |\n| Document pack | manifest, PL, inspection, load plan, lashing/stability report | incomplete evidence pack |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2552,7 +2552,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.5 Offshore Discharge and Site Handover — M118/M119/M130",
     "text": "| Control | Required data | Fail condition |\n|---|---|---|\n| Arrival | ATA, berth/landing confirmation, site access | arrival not confirmed |\n| Discharge method | crane/ramp/Hiab/SPMT/lifting plan | method not approved |\n| Receiving | MRR/POD/GRN, site inspection | missing site evidence |\n| OSD | damage, shortage, overage, NCR | exception not created |\n| Close-out | final report, signed checklist, document archive | missing close-out pack |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2564,7 +2564,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.1 Stowage Data Model",
     "text": "| Data item | Required for | Rule |\n|---|---|---|\n| `cargo.lengthM`, `cargo.widthM`, `cargo.heightM` | all OOG / project cargo | must be > 0.00 |\n| `cargo.grossWeightMt` | all cargo | must be > 0.00 |\n| `cargo.cogX/Y/Z` | OOG, heavy lift, transformer, unstable cargo | required before M116 |\n| `deck.maxUniformLoadTpm2` | all deck areas | required before deck pressure validation |\n| `deck.maxPointLoadT` | point-loaded cargo / jacking / skid | required before M116 |\n| `position.xM`, `position.yM` | all deck stowage | must be inside deck boundary |\n| `stowage.sequenceNo` | multi-cargo loading | must not conflict with discharge sequence |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2576,7 +2576,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.2 Deck Pressure Rule",
     "text": "Formula:\n\n```text\nfootprintSqm = lengthM × widthM\ndeckPressureTpm2 = grossWeightMt / footprintSqm\nPASS if deckPressureTpm2 <= DeckArea.maxUniformLoadTpm2\nZERO if grossWeightMt, lengthM, widthM, or deck capacity is missing for OOG/heavy cargo\n```\n\nMinimum SHACL gate:\n\n```turtle\n@prefix marine: <https://hvdc-project.com/ontology/marine/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nmarine:DeckPressureShape a sh:NodeShape ;\n  sh:targetClass marine:StowagePosition ;\n  sh:property [\n    sh:path marine:deckPressureTpm2 ;\n    sh:datatype xsd:decimal ;\n    sh:minInclusive 0.00 ;\n    sh:message \"deckPressureTpm2 must be calculated before M116.\" ;\n  ] ;\n  sh:sparql [\n    sh:message \"Deck pressure exceeds the allowable deck load for the assigned DeckArea.\" ;\n    sh:select \"\"\"\n      PREFIX marine: <https://hvdc-project.com/ontology/marine/>\n      SELECT $this\n      WHERE {\n        $this marine:deckPressureTpm2 ?p ;\n              marine:assignedDeckArea ?area .\n        ?area marine:maxUniformLoadTpm2 ?limit .\n        FILTER(?p > ?limit)\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2588,7 +2588,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.3 Lashing / Seafastening Rule",
     "text": "```text\nRequired input:\n- Cargo gross weight and COG\n- Expected acceleration / voyage condition\n- Lashing element WLL, angle, count\n- Effective capacity per direction\n- Minimum safety factor\n\nPASS if calculated safety factor >= required safety factor and field inspection is signed.\nZERO if lashing plan is missing for OOG, transformer, heavy lift, or deck cargo exposed to sea passage.\n```\n\nSHACL gate:\n\n```turtle\nmarine:LashingApprovalShape a sh:NodeShape ;\n  sh:targetClass marine:LashingPlan ;\n  sh:property [\n    sh:path marine:approvalStatus ;\n    sh:in (\"APPROVED\" \"FIELD_VERIFIED\") ;\n    sh:message \"LashingPlan must be APPROVED or FIELD_VERIFIED before M117.\" ;\n  ] ;\n  sh:property [\n    sh:path marine:safetyFactorMin ;\n    sh:minInclusive 1.00 ;\n    sh:message \"Lashing safety factor must be present and positive.\" ;\n  ] .\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2600,7 +2600,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.4 Stability Rule",
     "text": "```text\nRequired input:\n- MarineAsset loading condition\n- Cargo list and deck positions\n- Ballast condition\n- GM, VCG, trim, list\n- Applicable operating limit / approval note\n\nPASS if StabilityCase.status IN (PASS, APPROVED_WITH_CONDITION) and condition notes are closed.\nZERO if stability report is missing before sail-away for LCT/barge heavy or mixed deck load.\n```\n\nSHACL gate:\n\n```turtle\nmarine:StabilityGateShape a sh:NodeShape ;\n  sh:targetClass marine:StabilityCase ;\n  sh:property [\n    sh:path marine:stabilityGateStatus ;\n    sh:in (\"PASS\" \"APPROVED_WITH_CONDITION\") ;\n    sh:message \"StabilityCase must pass or be approved with condition before M117.\" ;\n  ] ;\n  sh:property [\n    sh:path marine:gmM ;\n    sh:datatype xsd:decimal ;\n    sh:message \"GM must be available for stability gate.\" ;\n  ] .\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2612,7 +2612,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.5 Lifting / Rigging Rule",
     "text": "```text\nRequired input:\n- Lift weight and COG\n- Lift points\n- Crane/Hiab/SPMT capacity\n- Rigging gear WLL\n- Sling angle and load share\n- Lift supervisor approval\n\nPASS if every rigging gear WLL >= calculated load share and lifting plan status is APPROVED.\nZERO if lift weight, COG, lift points, or rigging capacity is missing for OOG/heavy lift.\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2624,7 +2624,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.6 Weather / Tide Gate",
     "text": "| Gate | PASS | AMBER | ZERO |\n|---|---|---|---|\n| Wind | within operation limit | forecast uncertain / near limit | above limit and no override |\n| Sea state | within marine plan | worsening trend | above limit and no override |\n| Visibility | within navigation / lifting limit | restricted visibility warning | below minimum |\n| Tide | compatible with draft / berth / ramp | narrow window | incompatible with operation |\n| Port control / pilot | confirmed | pending confirmation | rejected / unavailable |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2636,7 +2636,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.1 Foundry Object Type Mapping",
     "text": "| Foundry Object Type | Source dataset | Key properties | Link Types |\n|---|---|---|---|\n| `MarineOperation` | marine operation register | `operationId`, `operationType`, `status`, `plannedStart`, `actualEnd` | forShipmentUnit → ShipmentUnit; usesMarineAsset → MarineAsset |\n| `LCTOperation` | LCT/voyage tracker | `lctName`, `wellsId`, `musNo`, `ATD`, `ETA`, `ATA` | generatesMilestone → M116/M117/M118 |\n| `BulkCargoUnit` | manifest / PL / WMS / site request | `cargoId`, `bulkCategory`, `qty`, `uom`, `weightMt` | belongsTo → ShipmentUnit; allocatedTo → DeckSlot |\n| `OOGCargoUnit` | PL / engineering cargo sheet | `dimensions`, `grossWeightMt`, `COG`, `liftPoints` | requires → StowagePlan/LashingPlan/LiftingPlan |\n| `MarineAsset` | vessel/barge master | `assetName`, `assetType`, `deckLimit`, `certificateStatus` | usedBy → MarineOperation |\n| `StowagePlan` | load plan / deck plan | `planVersion`, `approvalStatus`, `maxDeckPressureTpm2` | positionsCargo → CargoUnit |\n| `LashingPlan` | lashing calculation / inspection | `approvalStatus`, `safetyFactorMin` | secures → CargoUnit |\n| `StabilityCase` | stability report | `gmM`, `vcgM`, `trimM`, `status` | evaluates → MarineOperation |\n| `LiftingPlan` | rigging/lift plan | `liftMethod`, `grossLiftWeightMt`, `approvalStatus` | forCargo → CargoUnit |\n| `MarinePermit` | PTW/JSA/TRA/GatePass | `permitType`, `issuer`, `validFrom`, `validTo` | requiredFor → MarineOperation |\n| `MarineDocument` | document store / LDG | `docType`, `docHash`, `approvalStatus` | evidences → MarineOperation |\n| `MarineKPI` | dashboard dataset | `metricCode`, `targetValue`, `actualValue` | measures → MarineOperation / MarineAsset |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2648,7 +2648,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.2 Dataset Integration Points",
     "text": "| Source system | Dataset | Ontology output | Validation |\n|---|---|---|---|\n| ERP / PMO | `project_po_package_material` | `ShipmentUnit`, `CargoUnit`, `MaterialMaster` | package-material completeness |\n| WMS | `wh_dispatch_m121` | M121 evidence, cargo availability | dispatch before M115 |\n| Port / OFCO | `portcall_service_event` | port departure / service evidence | port evidence only |\n| Marine / ALS / OFCO | `lct_voyage_register` | `LCTOperation`, ATD/ETA/ATA, voyage ID | M116/M117/M118 completeness |\n| LDG / Document OCR | `marine_document_evidence` | `MarineDocument`, docHash, approval status | approved version check |\n| Engineering | `stowage_lashing_stability_lift` | plans and calculation cases | human-gate and required fields |\n| HSE / Permit | `ptw_jsa_tra_register` | `MarinePermit`, approval actions | valid permit window |\n| Site / FMC | `site_receipt_m130` | `SiteReceipt`, MRR/POD/GRN | M130 after M117 |\n| Cost | `marine_invoice_lines` | `MarineChargeEvidence` | handed off to `CONSOLIDATED-05` |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2660,7 +2660,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7.3 Link Model",
     "text": "```text\nShipmentUnit\n  ├─ hasRoutingPattern → ShipmentRoutingPattern\n  ├─ hasMilestone → M115 / M116 / M117 / M118 / M119 / M130\n  ├─ hasCargoUnit → CargoUnit / BulkCargoUnit / OOGCargoUnit\n  ├─ hasMarineOperation → MarineOperation / LCTOperation\n  │    ├─ usesMarineAsset → LCT / Barge\n  │    ├─ hasStowagePlan → StowagePlan\n  │    ├─ hasLashingPlan → LashingPlan\n  │    ├─ hasStabilityCase → StabilityCase\n  │    ├─ hasLiftingPlan → LiftingPlan\n  │    ├─ requiresPermit → MarinePermit\n  │    └─ evidencedBy → MarineDocument\n  ├─ hasSiteReceipt → SiteReceipt\n  ├─ hasCostItem → MarineChargeEvidence / InvoiceLine\n  └─ hasException → Delay / Damage / Shortage / NCR / Claim\n```\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2671,8 +2671,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
     "version": "2.0-final",
     "sectionPath": "8.1 SHACL Gate Summary",
-    "text": "| Shape | Target | Rule | Severity |\n|---|---|---|---|\n| `MarineOperationBaseShape` | `MarineOperation` | operationId, status, ShipmentUnit link required | VIOLATION |\n| `MarineRoutingPatternShape` | `MarineOperation` | valid `MarineRoutingPattern` enum | VIOLATION |\n| `AGIDASMarineChainShape` | `ShipmentUnit` | AGI/DAS M130 requires M115/M116/M117 unless approved exception | VIOLATION |\n| `MOSBNodeBoundaryShape` | `LocationNode` | MOSB cannot be top-level Warehouse | VIOLATION |\n| `DeckPressureShape` | `StowagePosition` | deck pressure <= deck limit | VIOLATION |\n| `OOGDataCompletenessShape` | `OOGCargoUnit` | dimensions, weight, COG required | VIOLATION |\n| `LashingApprovalShape` | `LashingPlan` | approved/field verified before M117 | VIOLATION |\n| `StabilityGateShape` | `StabilityCase` | PASS or approved condition before M117 | VIOLATION |\n| `LiftingPlanShape` | `LiftingPlan` | gross lift weight, rigging gear, approval required | VIOLATION |\n| `WeatherGateShape` | `MarineWeatherWindow` | weather gate not closed before M117 | WARNING / VIOLATION |\n| `PermitValidityShape` | `MarinePermit` | operation time within valid permit window | VIOLATION |\n| `HumanGateShape` | high-risk marine operation | MWS/engineering/HSE approval required | ZERO |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "text": "| Shape | Target | Rule | Severity |\n|---|---|---|---|\n| `MarineOperationBaseShape` | `MarineOperation` | operationId, status, ShipmentUnit link required | VIOLATION |\n| `MarineRoutingPatternShape` | `MarineOperation` | valid `MarineRoutingPattern` enum | VIOLATION |\n| `AGIDASMarineChainShape` | `ShipmentUnit` | AGI/DAS M130 accepts site date and flags missing M115/M116/M117 as backfill | WARN/AMBER |\n| `MOSBNodeBoundaryShape` | `LocationNode` | MOSB cannot be top-level Warehouse | VIOLATION |\n| `DeckPressureShape` | `StowagePosition` | deck pressure <= deck limit | VIOLATION |\n| `OOGDataCompletenessShape` | `OOGCargoUnit` | dimensions, weight, COG required | VIOLATION |\n| `LashingApprovalShape` | `LashingPlan` | approved/field verified before M117 | VIOLATION |\n| `StabilityGateShape` | `StabilityCase` | PASS or approved condition before M117 | VIOLATION |\n| `LiftingPlanShape` | `LiftingPlan` | gross lift weight, rigging gear, approval required | VIOLATION |\n| `WeatherGateShape` | `MarineWeatherWindow` | weather gate not closed before M117 | WARNING / VIOLATION |\n| `PermitValidityShape` | `MarinePermit` | operation time within valid permit window | VIOLATION |\n| `HumanGateShape` | high-risk marine operation | MWS/engineering/HSE approval required | ZERO |",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2684,7 +2684,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.2 SPARQL — AGI/DAS Marine Chain Compliance",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nPREFIX marine: <https://hvdc-project.com/ontology/marine/>\n\nSELECT ?unit ?dest ?pattern ?m115 ?m116 ?m117 ?m130 ?verdict\nWHERE {\n  ?unit hvdc:declaredDestination ?dest ;\n        hvdc:hasRoutingPattern ?pattern .\n  FILTER(?dest IN (\"AGI\", \"DAS\"))\n  OPTIONAL { ?unit hvdc:hasMilestone ?m115 . ?m115 hvdc:milestoneCode \"M115\" . }\n  OPTIONAL { ?unit hvdc:hasMilestone ?m116 . ?m116 hvdc:milestoneCode \"M116\" . }\n  OPTIONAL { ?unit hvdc:hasMilestone ?m117 . ?m117 hvdc:milestoneCode \"M117\" . }\n  OPTIONAL { ?unit hvdc:hasMilestone ?m130 . ?m130 hvdc:milestoneCode \"M130\" . }\n  BIND(IF(BOUND(?m115) && BOUND(?m116) && BOUND(?m117) && BOUND(?m130), \"PASS\", \"FAIL\") AS ?verdict)\n}\nORDER BY ?verdict ?dest\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2696,7 +2696,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.3 SPARQL — Deck Pressure Exception",
     "text": "```sparql\nPREFIX marine: <https://hvdc-project.com/ontology/marine/>\n\nSELECT ?operation ?cargo ?slot ?pressure ?limit\nWHERE {\n  ?operation marine:hasStowagePlan ?plan .\n  ?plan marine:hasStowagePosition ?slot .\n  ?slot marine:forCargo ?cargo ;\n        marine:deckPressureTpm2 ?pressure ;\n        marine:assignedDeckArea ?area .\n  ?area marine:maxUniformLoadTpm2 ?limit .\n  FILTER(?pressure > ?limit)\n}\nORDER BY DESC(?pressure)\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2708,7 +2708,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.4 SPARQL — Missing Human Gate",
     "text": "```sparql\nPREFIX marine: <https://hvdc-project.com/ontology/marine/>\n\nSELECT ?operation ?cargo ?riskClass\nWHERE {\n  ?operation a marine:MarineOperation ;\n             marine:hasCargoUnit ?cargo ;\n             marine:riskClass ?riskClass .\n  FILTER(?riskClass IN (\"OOG\", \"HEAVY_LIFT\", \"TRANSFORMER\", \"CRITICAL_BULK\"))\n  FILTER NOT EXISTS { ?operation marine:hasApproval ?approval . ?approval marine:approvalStatus \"APPROVED\" . }\n}\n```",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2720,7 +2720,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.5 RAG Check",
     "text": "| Check | Evidence source | Rule |\n|---|---|---|\n| SOLAS / IMSBC applicability | approved project HSE / marine standard registry | use latest project-approved standard reference |\n| IMDG / DG cargo | DG declaration, SDS, permit | DG cannot be loaded without segregation evidence |\n| BIMCO / SUPPLYTIME charter interface | contract / charter party evidence | cost/liability interpreted outside ontology; only evidence links here |\n| Port / Marine clearance | port control / agency / ALS confirmation | M117 blocked without clearance |\n| Weather / tide | approved weather source / port control | AI forecast is advisory; final decision requires human gate |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2732,7 +2732,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8.6 Human-gate Matrix",
     "text": "| Condition | Required reviewer | Output |\n|---|---|---|\n| Cargo > 50.00 MT or OOG critical cargo | lifting engineer + marine superintendent | approved lifting/stowage plan |\n| Transformer / critical HVDC equipment | MWS / client / HSE as applicable | approved transport method statement |\n| Deck pressure near limit | marine engineer / naval architect | approved deck calculation |\n| Stability case with condition | naval architect / vessel master | approved condition note |\n| Weather/tide near threshold | vessel master / port control | go/no-go decision |\n| OSD during load/discharge | QA/QC + logistics + site | exception + claim record |\n| Permit ambiguity | HSE / authority focal | permit closure evidence |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2744,7 +2744,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.1 Standards / Authority Alignment",
     "text": "| Area | Control | Ontology binding |\n|---|---|---|\n| Marine safety | SOLAS / project marine procedure | `MarinePermit`, `MarineWeatherWindow`, `MarineEvent` |\n| Bulk cargo | IMSBC / project cargo SOP | `BulkCargoUnit`, `BulkCargoOperation` |\n| Dangerous goods | IMDG / SDS / DG segregation | `DangerousCargoControl`, `MarinePermit` |\n| Offshore support vessel | BIMCO SUPPLYTIME 2017 contract evidence | `MarineContract`, `MarineAsset`, `MarineOperation` |\n| ADNOC / ALS access | gate pass, PTW, JSA/TRA, site/marine clearance | `MarinePermit`, `ApprovalAction` |\n| MWS / engineering approval | method statement, stowage/lashing/stability/lift plans | `MWSApproval`, `StowagePlan`, `LashingPlan`, `StabilityCase`, `LiftingPlan` |\n| Customs / release | BOE, DO, port release | read-only evidence from `CONSOLIDATED-06/07` |\n| Site receipt | MRR/POD/GRN/OSDR | handoff to `CONSOLIDATED-06` |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2755,8 +2755,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
     "version": "2.0-final",
     "sectionPath": "9.2 ZERO / Fail-safe Triggers",
-    "text": "| Trigger | Reason | Required data |\n|---|---|---|\n| OOG/heavy cargo without dimensions, gross weight, or COG | Cannot validate deck pressure, stability, or lift | dimensions, weight, COG, lift points |\n| Lashing plan missing before M117 | Sea passage securing not evidenced | approved lashing plan and inspection |\n| Stability report missing before M117 | Sail-away safety not evidenced | approved stability case |\n| Deck capacity missing for assigned deck | Deck pressure cannot be validated | deck area load limits |\n| AGI/DAS M130 without M115/M116/M117 | MOSB/LCT chain broken | milestone evidence or approved exception |\n| Expired/missing PTW/JSA/TRA/gate pass | Authority/HSE gate not closed | valid permit evidence |\n| Weather/port control closed and no override | Go/no-go decision unsafe | official go/no-go approval |\n| OSD found and no exception record | Claim/audit chain broken | exception/OSDR/NCR record |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "text": "| Trigger | Reason | Required data |\n|---|---|---|\n| OOG/heavy cargo without dimensions, gross weight, or COG | Cannot validate deck pressure, stability, or lift | dimensions, weight, COG, lift points |\n| Lashing plan missing before M117 | Sea passage securing not evidenced | approved lashing plan and inspection |\n| Stability report missing before M117 | Sail-away safety not evidenced | approved stability case |\n| Deck capacity missing for assigned deck | Deck pressure cannot be validated | deck area load limits |\n| AGI/DAS M130 without M115/M116/M117 | MOSB/LCT evidence gap; delivery still accepted if site date exists | milestone backfill evidence or approved exception |\n| Expired/missing PTW/JSA/TRA/gate pass | Authority/HSE gate not closed | valid permit evidence |\n| Weather/port control closed and no override | Go/no-go decision unsafe | official go/no-go approval |\n| OSD found and no exception record | Claim/audit chain broken | exception/OSDR/NCR record |\n\n---",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2768,7 +2768,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10. Options ≥3",
     "text": "| Option | Description | Pros | Cons | Cost | Risk | Time |\n|---|---|---|---|---:|---|---:|\n| A. Baseline Marine Evidence Layer | Marine operation register + document evidence + M115/M116/M117 gates | 빠른 적용, 기존 Excel/MD 호환 | engineering calculation 자동화 제한 | 45,000.00 AED | Medium | 2.00 weeks |\n| B. Hybrid Foundry Object + KG | Foundry Object Types + RDF/SHACL validation + dashboard KPI | traceability, validation, automation 균형 | 초기 mapping discipline 필요 | 110,000.00 AED | Medium | 5.00 weeks |\n| C. Engineering-linked Marine Twin | deck/stowage/lashing/stability/lift objects with CAD/BIM hooks | deck pressure / stability / lift gate 고도화 | CAD/BIM/engineering data 품질 의존 | 220,000.00 AED | High | 10.00 weeks |\n| D. Compliance-first Marine Control | PTW/JSA/TRA/MWS/HSE approval-first 운영 | 안전/감사에 강함 | 운영 KPI/최적화는 제한 | 85,000.00 AED | Low | 4.00 weeks |\n\n**Recommended option:** Option B. Hybrid Foundry Object + KG. It gives the best balance between immediate marine control, ontology consistency, and future engineering automation.\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2780,7 +2780,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale",
     "text": "| Phase | Duration | Key work | KPI target | Owner |\n|---|---:|---|---|---|\n| Prepare | 1.00 week | marine object schema, identifier map, milestone map, document list | object coverage ≥ 90.00% | Ontology / Logistics |\n| Pilot | 2.00 weeks | 1 LCT voyage + 1 OOG cargo + 1 bulk cargo validation | M115/M116/M117 completeness = 100.00% | Marine / FMC |\n| Build | 3.00 weeks | Foundry object mapping, SHACL gates, SPARQL checks, dashboard panels | validation pass ≥ 98.00% | Data / Ops |\n| Operate | ongoing | daily marine readiness board, exception workflow, human-gate approval | ZERO leakage = 0.00건 | Logistics / Marine |\n| Scale | 4.00 weeks | CAD/BIM link, deck pressure heatmap, weather/tide gate, cost handoff | LCT utilization 80.00–85.00% | PMO / Digital |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2792,7 +2792,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.1 RPA / LLM / Sheets / Telegram Hooks",
     "text": "| Hook | Trigger | Action | Human gate |\n|---|---|---|---|\n| `MarineReadinessBot` | new cargo list / PL / WMS dispatch | create marine readiness checklist | approve before M115 |\n| `MOSBStagingBot` | M121 or direct gate-out | open M115 staging candidate | ALS/Marine confirmation |\n| `StowageGuard` | stowage plan upload | calculate deck pressure and slot conflict | marine engineer approval |\n| `LashingGuard` | lashing plan upload | check WLL/angle/count/safety factor fields | engineer sign-off |\n| `StabilityGuard` | stability report upload | verify case status and mandatory values | naval architect / master approval |\n| `PermitGuard` | PTW/JSA/TRA/gate pass update | check validity window | HSE / authority approval |\n| `WeatherTie` | planned M117 within 48.00 hrs | attach weather/tide gate status | vessel master / port control |\n| `OSDGuard` | damage/shortage photo or note | create exception/NCR/claim candidate | QA/QC confirmation |\n| `TelegramDigest` | daily 07:30 Asia/Dubai | send marine readiness / blocked list | read-only alert |\n| `SheetsExport` | daily close | export LCT/MOSB/milestone KPI | manager review |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2804,7 +2804,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "12.2 Command-ready Workflow",
     "text": "```text\n/logi-master stowage --deep --noheatmap\n/logi-master weather-tie --route MOSB-AGI --horizon 72h\n/logi-master report --marine --KRsummary\n```\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2816,7 +2816,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.1 QA Checklist",
     "text": "| No | Check | PASS condition |\n|---:|---|---|\n| 1.00 | Master spine alignment | `CONSOLIDATED-00` remains canonical |\n| 2.00 | Flow Code boundary | no marine/offshore classification by warehouse handling code |\n| 3.00 | MOSB boundary | MOSB typed as `OffshoreStagingNode` / `MarineInterfaceNode` |\n| 4.00 | Route separation | `ShipmentRoutingPattern` ≠ `MarineRoutingPattern` |\n| 5.00 | Milestone continuity | M115/M116/M117/M130 chain complete for AGI/DAS |\n| 6.00 | Deck pressure | pressure calculated and within deck limit |\n| 7.00 | Lashing | approved / field verified before sail-away |\n| 8.00 | Stability | PASS or approved condition before sail-away |\n| 9.00 | Lift plan | OOG/heavy cargo has approved lift/rigging data |\n| 10.00 | Permit | PTW/JSA/TRA/gate pass valid during operation |\n| 11.00 | Weather/tide | final go/no-go has human evidence |\n| 12.00 | Site handover | MRR/POD/GRN or exception linked |\n| 13.00 | Cost handoff | marine charge evidence exported, CostGuard not redefined |\n| 14.00 | Document evidence | docHash/version/approval status captured |\n| 15.00 | PII/NDA | names allowed if operational; phone/email masked in public artifacts |",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2828,7 +2828,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "13.2 Assumptions",
     "text": "- 가정: 본 문서는 ontology/data-control layer이며, engineering calculation 결과 자체를 대체하지 않는다.\n- 가정: Deck allowable load, GM limit, wind/sea-state limits, tide/ramp constraints are project/vessel-specific and must be provided as approved source data before live validation.\n- 가정: MOSB laydown can be represented as `LaydownArea` or `StorageCapability`; this does not convert MOSB into a top-level warehouse.\n- 가정: Cost rates, charter terms, and liability interpretation remain in contract/cost documents; this document only exports marine evidence.\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2840,7 +2840,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "14. Validation Patch Log — 5 Parallel Passes",
     "text": "| Pass | Review lane | Defect found | Patch applied | Result |\n|---:|---|---|---|---|\n| 1.00 | Master spine alignment | old document mixed marine class with end-to-end route wording | separated `ShipmentRoutingPattern` and `MarineRoutingPattern` | PASS |\n| 2.00 | Flow Code boundary | legacy route-coded language appeared in marine context | confined warehouse handling to `CONSOLIDATED-02` reference only | PASS |\n| 3.00 | MOSB boundary | MOSB staging could be read as warehouse-like | modeled MOSB as `OffshoreStagingNode` with `LaydownArea` capability | PASS |\n| 4.00 | Engineering gate | original text described engineering objects but lacked hard gates | added deck pressure, lashing, stability, lifting, weather, permit ZERO gates | PASS |\n| 5.00 | Integration / artifact hygiene | adjacent-domain handoffs needed clearer ownership | added Foundry mapping, dataset integration, handoff model, QA checklist | PASS |\n\n---",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -2852,7 +2852,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "15. CmdRec",
     "text": "- `/switch_mode LATTICE + /logi-master stowage --deep --noheatmap`\n- `/switch_mode PRIME + /logi-master report --marine --KRsummary`\n- `/switch_mode ORACLE + /logi-master weather-tie --route MOSB-AGI --horizon 72h`",
-    "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+    "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
     "domains": [
       "marine"
     ]
@@ -3367,8 +3367,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "Document Root",
-    "text": "---\ntitle: \"HVDC Material Handling Ontology — Consolidated\"\ntype: \"ontology-design\"\ndomain: \"material-handling\"\nsub-domains:\n  - customs-release\n  - inland-haulage\n  - warehouse-interface\n  - mosb-offshore-staging\n  - marine-heavy-lift-interface\n  - site-receiving\n  - inspection-claims\n  - material-issue\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\nextension_of: \"hvdc-master-ontology-v2.0-final\"\ncanonical_role: \"customs → release → WH → MOSB → site material-chain extension\"\nowner: \"HVDC Logistics Ontology Working Set\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - GS1-EPCIS\n  - DCSA-T&T\n  - UN/CEFACT-BSP-RDM\n  - WCO-DM\n  - ICC-Incoterms-2020\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\nsource_files:\n  - 2_EXT-08A-hvdc-material-handling-overview.md\n  - 2_EXT-08B-hvdc-material-handling-customs.md\n  - 2_EXT-08C-hvdc-material-handling-storage.md\n  - 2_EXT-08D-hvdc-material-handling-offshore.md\n  - 2_EXT-08E-hvdc-material-handling-site-receiving.md\n  - 2_EXT-08F-hvdc-material-handling-transformer.md\n  - 2_EXT-08G-hvdc-material-handling-bulk-integrated.md\nchecked_against:\n  - CONSOLIDATED-00-master-ontology.md\n  - CONSOLIDATED-01-core-framework-infra.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-04-barge-bulk-cargo.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-09-operations.md\n  - AGENTS.md\n  - HVDC Logistics Ontology Review.txt\n  - Palantir 온톨로지 기반 물류 자동화.pdf\nvalidation_passes: 5\nsemantic_patch:\n  - \"Material Handling owns milestone continuity and material-chain transactions; it does not own RoutingPattern dictionary or warehouse Flow Code.\"\n  - \"Program route truth uses ShipmentRoutingPattern + JourneyStage + JourneyLeg + MilestoneEvent.\"\n  - \"WarehouseHandlingProfile.confirmedFlowCode remains warehouse-only and is created/confirmed under CONSOLIDATED-02.\"\n  - \"MOSB is OffshoreStagingNode / MarineInterfaceNode, not Warehouse.\"\n  - \"AGI/DAS site arrival is blocked unless MOSB/LCT chain evidence exists or a human-gated exception is approved.\"\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "---\ntitle: \"HVDC Material Handling Ontology — Consolidated\"\ntype: \"ontology-design\"\ndomain: \"material-handling\"\nsub-domains:\n  - customs-release\n  - inland-haulage\n  - warehouse-interface\n  - mosb-offshore-staging\n  - marine-heavy-lift-interface\n  - site-receiving\n  - inspection-claims\n  - material-issue\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\nextension_of: \"hvdc-master-ontology-v2.0-final\"\ncanonical_role: \"customs → release → WH → MOSB → site material-chain extension\"\nowner: \"HVDC Logistics Ontology Working Set\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - GS1-EPCIS\n  - DCSA-T&T\n  - UN/CEFACT-BSP-RDM\n  - WCO-DM\n  - ICC-Incoterms-2020\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\nsource_files:\n  - 2_EXT-08A-hvdc-material-handling-overview.md\n  - 2_EXT-08B-hvdc-material-handling-customs.md\n  - 2_EXT-08C-hvdc-material-handling-storage.md\n  - 2_EXT-08D-hvdc-material-handling-offshore.md\n  - 2_EXT-08E-hvdc-material-handling-site-receiving.md\n  - 2_EXT-08F-hvdc-material-handling-transformer.md\n  - 2_EXT-08G-hvdc-material-handling-bulk-integrated.md\nchecked_against:\n  - CONSOLIDATED-00-master-ontology.md\n  - CONSOLIDATED-01-core-framework-infra.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-04-barge-bulk-cargo.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-09-operations.md\n  - AGENTS.md\n  - HVDC Logistics Ontology Review.txt\n  - Palantir 온톨로지 기반 물류 자동화.pdf\nvalidation_passes: 5\nsemantic_patch:\n  - \"Material Handling owns milestone continuity and material-chain transactions; it does not own RoutingPattern dictionary or warehouse Flow Code.\"\n  - \"Program route truth uses ShipmentRoutingPattern + JourneyStage + JourneyLeg + MilestoneEvent.\"\n  - \"WarehouseHandlingProfile.confirmedFlowCode remains warehouse-only and is created/confirmed under CONSOLIDATED-02.\"\n  - \"MOSB is OffshoreStagingNode / MarineInterfaceNode, not Warehouse.\"\n  - \"AGI/DAS site arrival is accepted when site date exists; missing MOSB/LCT chain evidence creates AMBER/WARN backfill required.\"\n---",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3380,7 +3380,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1. ExecSummary",
     "text": "`CONSOLIDATED-06`는 HVDC Logistics KG의 **customs release → inland haulage → warehouse interface → MOSB/offshore staging → site receiving → inspection/issue/claim** material-chain extension이다. 본 문서는 `ShipmentUnit`의 물류 여정에서 자재 취급 상태를 `JourneyStage`, `JourneyLeg`, `MilestoneEvent`, `MaterialHandlingCase`, `SiteReceipt`, `InspectionEvent`, `Exception`, `Claim`으로 연결한다.\n\n비즈니스 임팩트는 **통관 후 반출 지연 차단**, **AGI/DAS MOSB 누락 방지**, **M130 현장 입고·검수·GRN 정합성 확보**, **OSD/NCR/Claim 자동 증빙 패키지 생성**, **자재 traceability와 비용/재고 결산 정확도 향상**이다.\n\n기술 해법은 `RoutingPattern`을 end-to-end route classifier로 유지하고, warehouse 내부 처리 등급은 `WarehouseHandlingProfile.confirmedFlowCode`로만 제한하며, 문서/OCR/Port/Cost/Marine 도메인은 material handling에 **evidence**만 제공하도록 분리하는 것이다.\n\nKPI 목표는 `MaterialTraceCoverage ≥ 95.00%`, `AGIDASGateCompliance = 100.00%`, `SiteReceiptDocCompleteness ≥ 98.00%`, `QuantityReconciliationAccuracy = 100.00%`, `Validation p95 < 5.00s`, `HumanGate leakage = 0.00건`이다.\n\n**ENG-KR one-liner:** Material Handling owns custody and milestone continuity; route truth remains `RoutingPattern`, warehouse handling remains `WarehouseHandlingProfile`, and documents remain evidence.\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3392,7 +3392,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.1 Master Governance Rule",
     "text": "1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine.\n2. `CONSOLIDATED-06` owns **material-chain execution continuity** between customs release, warehouse handoff, MOSB staging, site receipt, inspection, issue, and claim.\n3. Program-wide shipment visibility uses `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, and `MilestoneEvent`.\n4. `confirmedFlowCode` may exist only on `WarehouseHandlingProfile`; material handling may read `wh_handling_cnt`, `storageClass`, and WH event evidence but shall not assign warehouse Flow Code.\n5. `MOSB` is an `OffshoreStagingNode` / `MarineInterfaceNode`; it is not a top-level `Warehouse` and shall not be used as warehouse class evidence.\n6. Port, document/OCR, cost, marine, and operations domains provide evidence or downstream analytics; they do not override material-handling transaction truth without an approved Foundry Action.\n7. Extension-local legacy route-code language is migration debt. This document uses only canonical route, stage, milestone, and evidence terms.",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3404,7 +3404,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.2 Included vs Delegated Scope",
     "text": "| Scope item | Included in CONSOLIDATED-06 | Delegated / excluded |\n|---|---|---|\n| Customs release handoff | M90/M91/M92, BOE/DO evidence, permit blocker, release gate | Detailed customs declaration schema in `CONSOLIDATED-00` / document extraction in `CONSOLIDATED-03` |\n| Inland haulage | M92→M100, gate-out, truck dispatch, custody handover, DEM/DET risk event | Carrier freight commercial audit in `CONSOLIDATED-05` |\n| Warehouse interface | M110/M111/M120/M121 continuity and evidence handoff | WHP algorithm, zone/bin, storage classification in `CONSOLIDATED-02` |\n| MOSB staging | M115 staging readiness, laydown handoff, AGI/DAS route gate | Marine stowage/stability/lashing execution in `CONSOLIDATED-04` |\n| LCT/offshore interface | M116/M117 continuity requirement and exception handling | Vessel stability, deck pressure, weather/tide final approval in `CONSOLIDATED-04` |\n| Site receiving | M130 arrival, M131 good inspection, M132 OSD inspection, M140 POD/GRN/MIS/MRS | Site construction work-pack execution outside logistics KG |\n| Exception / claim | M150 claim opened, NCR/OSDR proof pack, M160 closeout | Legal claim settlement and commercial negotiation |\n| Cost handoff | material event evidence for warehouse/marine/trucking/DEM-DET charges | RateRef, CostGuard verdict, invoice approval in `CONSOLIDATED-05` |\n| Communication evidence | approval, escalation, exception note as evidence | Communication ontology ownership in `CONSOLIDATED-08` |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3416,7 +3416,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.3 Domain Boundary Crosswalk",
     "text": "| Domain | Allowed interface with material handling | Not allowed in CONSOLIDATED-06 |\n|---|---|---|\n| Master spine | Read/write links to `ShipmentUnit`, `JourneyLeg`, `MilestoneEvent`, `SiteReceipt`, `Exception` | Redefine route dictionary, milestone dictionary, or identity policy |\n| Infrastructure | Read `LocationNode`, `Port`, `Warehouse`, `OffshoreStagingNode`, `Site`, `TransportCorridor` | Reclassify MOSB into warehouse semantics |\n| Warehouse | Read M110/M111/M120/M121 and `WarehouseHandlingProfile` evidence | Assign `confirmedFlowCode` or alter WHP algorithm |\n| Document/OCR | Consume `routeEvidence`, `destinationEvidence`, `mosbLegIndicator`, permit/doc extraction | Treat OCR extraction as transaction mutation |\n| Port | Consume `plannedRoutingPattern`, `declaredDestination`, DO/gate/release evidence | Treat `plannedRoutingPattern` as final route truth without action review |\n| Marine/Bulk | Consume M115/M116/M117, `MarineRoutingPattern`, lashing/stability readiness | Approve engineering/marine execution inside material handling |\n| Cost | Provide material event evidence to invoice audit | Own `RateRef`, `CostGuardResult`, or FX override |\n| Operations | Export timeline, inventory issue, exception, and route analytics | Replace material event state with Excel-only row status |\n| Communication | Attach `CommunicationEvent`, `ApprovalAction`, `AuditRecord` | Redefine material transaction classes |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3428,7 +3428,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.4 Migration Rules",
     "text": "| Legacy wording / pattern | Canonical replacement | Patch action |\n|---|---|---|\n| Flow Code 0~5 as customs→WH→MOSB→site route | `ShipmentRoutingPattern` + `JourneyStage` + `MilestoneEvent` | Replace in all route, KPI, and status sections |\n| Pre-arrival Flow Code | `ShipmentStatus = PLANNED/READY` or `RoutingPattern = PRE_ARRIVAL` | Remove from material-chain logic |\n| Port-provided warehouse route code | `PortCall.plannedRoutingPattern` and `declaredDestination` as evidence | Do not promote to WHP |\n| Document-derived warehouse route code | `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` | Attach confidence and provenance only |\n| Cost grouped by warehouse route code | `costByRoutingPattern` + `wh_handling_cnt` evidence | Cost layer computes audit result |\n| MOSB collapsed into warehouse semantics | `OffshoreStagingNode` / `MarineInterfaceNode` | Optional storage capability only |\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3440,7 +3440,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.1 Ontology Layer Map",
     "text": "| Layer | Class / vocabulary | Purpose |\n|---|---|---|\n| Core custody | `MaterialHandlingCase`, `CustodyTransfer`, `MaterialMove`, `HandlingInstruction` | Customs-to-site custody chain |\n| Shipment link | `ShipmentUnit`, `CargoUnit`, `Container`, `Package`, `MaterialMaster` | Identity and physical material anchor |\n| Route/stage | `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, `MilestoneEvent` | End-to-end visibility and timeline |\n| Customs/release | `CustomsReleaseGate`, `CustomsEntry`, `ReleaseOrder`, `BOEDocument`, `DeliveryOrderDocument` | Import release and gate-out readiness |\n| Inland transport | `InlandHaulageTask`, `GateOutEvent`, `TruckDispatch`, `TransportManifest` | M92→M100 transport execution |\n| Warehouse interface | `WarehouseTask`, `WarehouseEvent`, `WarehouseHandlingProfile`, `StockSnapshot` | M110~M121 handoff without WHP ownership |\n| MOSB/marine interface | `MOSBStagingTask`, `MarineReadinessGate`, `MarineEvent`, `MarineRoutingPattern` | M115/M116/M117 continuity for offshore delivery |\n| Site receiving | `SiteReceipt`, `InspectionEvent`, `MaterialAcceptanceRecord`, `MaterialIssueTransaction` | M130~M140 site material control |\n| Documents | `MRR`, `MRI`, `ITP`, `MAR`, `MRS`, `MIS`, `POD`, `GRN`, `OSDR`, `PermitDocument` | Documentary evidence |\n| Exception/claim | `Exception`, `Shortage`, `Damage`, `Overage`, `WrongItem`, `NCR`, `Claim` | OSD, claim, and closeout lifecycle |\n| Evidence/provenance | `VerificationResult`, `AuditRecord`, `ApprovalAction`, `ProofArtifact` | Human-gated proof trail |\n| KPI | `MaterialHandlingKPI`, `GateDelayMetric`, `AGIDASComplianceMetric`, `GRNClosureMetric` | Operations and SLA monitoring |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3452,7 +3452,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.2 Core Classes",
     "text": "| Class | Required properties | Key relations | Notes |\n|---|---|---|---|\n| `MaterialHandlingCase` | `caseId`, `caseStatus`, `currentStage`, `declaredDestination`, `routingPattern`, `openedAt` | `forShipmentUnit`, `hasCustodyTransfer`, `hasHandlingInstruction`, `hasMilestone` | One operational case per material/shipment control unit |\n| `CustodyTransfer` | `transferId`, `fromParty`, `toParty`, `transferTime`, `transferCondition`, `qtyPkg` | `forShipmentUnit`, `evidencedByDocument`, `generatesMilestone` | Handover record between broker/port/WMS/marine/site |\n| `CustomsReleaseGate` | `gateId`, `releaseStatus`, `boeRef`, `doRef`, `permitStatus`, `releasedAt` | `validatesCustomsEntry`, `requiresPermit`, `blocksMilestone` | M92 precondition for M100 |\n| `InlandHaulageTask` | `haulageTaskId`, `truckId`, `driverRefMasked`, `originNode`, `destinationNode`, `plannedPickup`, `actualGateOut` | `forJourneyLeg`, `evidencedByTransportManifest` | PII must be masked or role-tokenized |\n| `WarehouseInterfaceHandoff` | `handoffId`, `warehouseNode`, `handoffStatus`, `m110Ref`, `m121Ref` | `linksWarehouseEvent`, `readsWarehouseHandlingProfile` | Does not assign `confirmedFlowCode` |\n| `MOSBStagingTask` | `stagingTaskId`, `mosbNode`, `laydownArea`, `stagingStatus`, `readyForMarineLoad` | `generatesMilestone M115`, `requiresMarineReadinessGate` | MOSB is offshore staging, not warehouse |\n| `MarineReadinessGate` | `gateId`, `stowageReady`, `lashingReady`, `stabilityReady`, `weatherReady`, `approvalStatus` | `validatedByMarineOperation`, `blocksMilestone M117` | Final engineering approval remains human-gated |\n| `SiteReceipt` | `receiptId`, `siteCode`, `receiptType`, `arrivalTime`, `inspectionResult`, `mrrRef`, `osdrRef`, `podRef`, `grnRef` | `forShipmentUnit`, `generatesSiteDocuments`, `opensException` | Transaction object; documents are evidence |\n| `InspectionEvent` | `inspectionId`, `inspectionTime`, `inspectionResult`, `inspectorRole`, `qtyAccepted`, `qtyRejected` | `forSiteReceipt`, `evidencedByMRI`, `createsMARorOSDR` | M131/M132 driver |\n| `MaterialIssueTransaction` | `issueId`, `requestNo`, `issueNo`, `issuedQty`, `issuedTo`, `issueTime` | `evidencedByMRS`, `evidencedByMIS`, `reducesSiteStock` | M140 material issue handoff |\n| `MaterialException` | `exceptionId`, `exceptionType`, `severity`, `detectedAt`, `rootCauseStatus` | `evidencedByOSDR`, `mayOpenClaim`, `blocksCloseout` | Shortage/damage/overage/wrong item |\n| `Claim` | `claimId`, `claimType`, `claimAmount`, `claimCurrency`, `claimStatus`, `openedAt`, `closedAt` | `supportedByNCR`, `supportedByOSDR`, `linkedToInvoice` | M150/M160 chain |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3464,7 +3464,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.3 Core Properties",
     "text": "| Property | Domain → Range | Cardinality | Rule |\n|---|---|---:|---|\n| `forShipmentUnit` | `MaterialHandlingCase → ShipmentUnit` | 1..1 | Case must resolve to one shipment unit |\n| `hasCurrentStage` | `MaterialHandlingCase → JourneyStage` | 1..1 | Must follow canonical stage vocabulary |\n| `hasRoutingPattern` | `MaterialHandlingCase → ShipmentRoutingPattern` | 1..1 | Mirrors approved `ShipmentUnit.hasRoutingPattern`; no integer route code |\n| `hasMilestone` | `ShipmentUnit/MaterialHandlingCase → MilestoneEvent` | 1..N | Key events must have actual/planned timestamp |\n| `requiresReleaseGate` | `MaterialHandlingCase → CustomsReleaseGate` | 0..1 | Required before M100 for import flows |\n| `hasWarehouseHandoff` | `MaterialHandlingCase → WarehouseInterfaceHandoff` | 0..N | Required for `WH_ONLY` / `WH_MOSB` |\n| `hasMOSBStagingTask` | `MaterialHandlingCase → MOSBStagingTask` | 0..N | Required for `MOSB_DIRECT` / `WH_MOSB` / AGI/DAS |\n| `hasSiteReceipt` | `MaterialHandlingCase → SiteReceipt` | 0..N | Required at M130 |\n| `evidencedByDocument` | `CustodyTransfer/SiteReceipt/Exception → Document` | 1..N | Documents provide proof, not ownership |\n| `createdByAction` | Transaction → `ApprovalAction` | 1..N for manual override | Action must carry reviewer and reason |\n| `readsWarehouseHandlingProfile` | `WarehouseInterfaceHandoff → WarehouseHandlingProfile` | 0..1 | Read-only evidence |\n| `hasCostEvidence` | `MaterialHandlingCase → InvoiceLine/CostTransaction` | 0..N | Cost layer owns verdict |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3475,8 +3475,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "3.4 Canonical Route and Stage Matrix",
-    "text": "| Material category | Allowed `ShipmentRoutingPattern` | Mandatory stages | Blocking rule |\n|---|---|---|---|\n| Container cargo | `DIRECT`, `WH_ONLY`, `WH_MOSB`, `MIXED` | M92→M100→M110/M130 | DO evidence required before gate-out |\n| Bulk cargo | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M92/M100→M115→M116→M117→M130 | Marine readiness gate before M117 |\n| Transformer / OOG | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M100/M121→M115→M116→M117→M130 | Lift/stability/lashing evidence required |\n| MIR / SHU onshore | `DIRECT`, `WH_ONLY`, `MIXED` | M92→M100→M130 or M110→M121→M130 | MOSB not required unless routing evidence says otherwise |\n| AGI / DAS offshore | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115→M116→M117→M130 | M130 blocked without MOSB/LCT chain or approved exception |\n| Dangerous Goods | Any allowed route with DG control | Permit/DCD/FANR/DG storage checks | Permit or segregation failure blocks M100/M110/M115 |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Material category | Allowed `ShipmentRoutingPattern` | Mandatory stages | Blocking rule |\n|---|---|---|---|\n| Container cargo | `DIRECT`, `WH_ONLY`, `WH_MOSB`, `MIXED` | M92→M100→M110/M130 | DO evidence required before gate-out |\n| Bulk cargo | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M92/M100→M115→M116→M117→M130 | Marine readiness gate before M117 |\n| Transformer / OOG | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M100/M121→M115→M116→M117→M130 | Lift/stability/lashing evidence required |\n| MIR / SHU onshore | `DIRECT`, `WH_ONLY`, `MIXED` | M92→M100→M130 or M110→M121→M130 | MOSB not required unless routing evidence says otherwise |\n| AGI / DAS offshore | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115→M116→M117→M130 plus site-date M130 acceptance | Site date creates delivered M130; missing MOSB/LCT chain is AMBER/WARN backfill |\n| Dangerous Goods | Any allowed route with DG control | Permit/DCD/FANR/DG storage checks | Permit or segregation failure blocks M100/M110/M115 |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3488,7 +3488,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.5 Milestone Chain",
     "text": "| Milestone | Name | Stage | Material-handling meaning | Required evidence |\n|---|---|---|---|---|\n| M40 | Export Cleared | `ORIGIN_DISPATCH` | Origin export release | Export permit / export clearance |\n| M50 | Terminal Received | `TERMINAL_HANDLING` | Port/terminal received cargo | terminal receipt / gate-in |\n| M61 | Vessel ATD / Loaded | `TERMINAL_HANDLING` | Carrier departure / load confirmation | carrier event / BL update |\n| M80 | Vessel ATA | `PORT_ENTRY` | Arrival at UAE port | carrier/port event |\n| M90 | BOE Submitted | `CUSTOMS_CLEARANCE` | Import declaration submitted | BOE document |\n| M91 | BOE Cleared | `CUSTOMS_CLEARANCE` | Customs clearance approved | customs clearance proof |\n| M92 | DO Released | `CUSTOMS_CLEARANCE` | Delivery order ready | DO / release order |\n| M100 | Gate-out | `INLAND_HAULAGE` | Port/terminal exit | gate pass / transport manifest |\n| M110 | WH Received | `WH_RECEIPT` | Physical receipt by warehouse | WMS receipt / warehouse event |\n| M111 | Put-away | `WH_STORAGE` | Zone/bin confirmed | put-away task / WHP confirmation |\n| M120 | Picked/Staged | `WH_DISPATCH` | Ready for dispatch | pick list / staging record |\n| M121 | WH Dispatched | `WH_DISPATCH` | Leaves warehouse | dispatch note / WMS event |\n| M115 | MOSB Staged | `MOSB_STAGING` | Offshore staging ready | MOSB staging record |\n| M116 | LCT/Barge Loaded | `OFFSHORE_TRANSIT` | Loaded for offshore transit | load confirmation / stowage evidence |\n| M117 | Sail-away Approved | `OFFSHORE_TRANSIT` | Marine release approved | sail-away approval / weather gate |\n| M130 | Site Arrived | `SITE_RECEIVING` | Material arrived at site | delivery note / MRR |\n| M131 | Site Inspected — Good | `SITE_RECEIVING` | Accepted as good | MRI / MAR |\n| M132 | Site Inspected — OSD | `SITE_RECEIVING` | Shortage, damage, overage, or wrong item | OSDR / photos / NCR evidence |\n| M140 | POD / GRN / Material Issue | `MATERIAL_ISSUE` | Receipt closed or issued | POD / GRN / MRS / MIS |\n| M150 | Claim Opened | `CLOSEOUT` | Claim/NCR case opened | claim file / NCR / OSDR |\n| M160 | Closed | `CLOSEOUT` | Claim/cost/material case closed | closure approval |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3500,7 +3500,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.6 RDF/OWL Skeleton",
     "text": "```turtle\n@prefix hvdc: <http://samsung.com/project-logistics#> .\n@prefix sh:   <http://www.w3.org/ns/shacl#> .\n@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .\n\nhvdc:MaterialHandlingCase a owl:Class ;\n  rdfs:label \"Material Handling Case\" ;\n  rdfs:comment \"Customs-to-site material custody case linked to one ShipmentUnit.\" .\n\nhvdc:CustomsReleaseGate a owl:Class ;\n  rdfs:label \"Customs Release Gate\" ;\n  rdfs:comment \"BOE/DO/permit-controlled gate before port gate-out.\" .\n\nhvdc:MOSBStagingTask a owl:Class ;\n  rdfs:label \"MOSB Staging Task\" ;\n  rdfs:comment \"Offshore staging task at MOSB; not a Warehouse task.\" .\n\nhvdc:SiteReceipt a owl:Class ;\n  rdfs:label \"Site Receipt\" ;\n  rdfs:comment \"Site arrival/inspection transaction evidenced by MRR/MRI/POD/GRN/OSDR.\" .\n\nhvdc:hasRoutingPattern a owl:ObjectProperty ;\n  rdfs:domain hvdc:MaterialHandlingCase ;\n  rdfs:range hvdc:ShipmentRoutingPattern .\n\nhvdc:evidencedByDocument a owl:ObjectProperty ;\n  rdfs:domain owl:Thing ;\n  rdfs:range hvdc:Document .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3511,8 +3511,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "3.7 Key Rules",
-    "text": "1. `MaterialHandlingCase` must resolve to exactly one `ShipmentUnit` through Any-key identity.\n2. `MaterialHandlingCase.hasRoutingPattern` must use `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, or `MIXED` only.\n3. `confirmedFlowCode` must not appear on `MaterialHandlingCase`, `SiteReceipt`, `CustomsReleaseGate`, `MOSBStagingTask`, `PortCall`, `Document`, `Invoice`, or `MarineOperation`.\n4. AGI/DAS material cannot reach M130 unless M115 exists, and M116/M117 are required unless direct exception approval is attached.\n5. `SiteReceipt` is the transaction owner; `MRR`, `MRI`, `POD`, `GRN`, and `OSDR` are evidence documents.\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "1. `MaterialHandlingCase` must resolve to exactly one `ShipmentUnit` through Any-key identity.\n2. `MaterialHandlingCase.hasRoutingPattern` must use `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, or `MIXED` only.\n3. `confirmedFlowCode` must not appear on `MaterialHandlingCase`, `SiteReceipt`, `CustomsReleaseGate`, `MOSBStagingTask`, `PortCall`, `Document`, `Invoice`, or `MarineOperation`.\n4. AGI/DAS material with a site date can reach M130 and `DeliveryStatus=DELIVERED`; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` with AMBER/WARN severity and backfill required.\n5. `SiteReceipt` is the transaction owner; `MRR`, `MRI`, `POD`, `GRN`, and `OSDR` are evidence documents.\n\n---",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3524,7 +3524,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.1 Object Type Mapping",
     "text": "| Foundry Object Type | Source system / dataset | Key fields | Links |\n|---|---|---|---|\n| `ShipmentUnit` | ERP, freight forwarder, carrier feed, LDG | `shipmentId`, `blNo`, `containerNo`, `caseNo`, `hvdcCode` | `hasMaterialHandlingCase`, `hasDocument`, `hasMilestone` |\n| `MaterialHandlingCase` | Gold material flow dataset | `caseId`, `currentStage`, `routingPattern`, `declaredDestination` | `forShipmentUnit`, `hasSiteReceipt`, `hasException` |\n| `CustomsReleaseGate` | ATLP/eDAS/customs broker/LDG | `boeNo`, `doNo`, `releaseStatus`, `permitStatus` | `validatesCustomsEntry`, `blocksMilestone M100` |\n| `InlandHaulageTask` | TMS / forwarder / port gate feed | `truckRef`, `origin`, `destination`, `gateOutAt` | `forJourneyLeg`, `generates M100` |\n| `WarehouseInterfaceHandoff` | WMS / WH Gold dataset | `warehouseNode`, `m110At`, `m121At`, `whpRef` | `readsWarehouseHandlingProfile` |\n| `MOSBStagingTask` | ALS / marine planner / MOSB register | `mosbNode`, `stagingAt`, `laydownArea`, `readinessStatus` | `generates M115`, `requiresMarineReadinessGate` |\n| `MarineReadinessGate` | Marine extension / planning register | `stowageReady`, `lashingReady`, `stabilityReady`, `weatherReady` | `blocks M117`, `evidencedByMarineDocument` |\n| `SiteReceipt` | Site logistics / FMC / ERP | `receiptId`, `siteCode`, `arrivalAt`, `inspectionResult` | `forShipmentUnit`, `generatesSiteDocuments` |\n| `MaterialException` | Site QA/QC / OSDR / claims register | `exceptionType`, `severity`, `detectedAt`, `claimRef` | `linkedToOSDR`, `linkedToClaim`, `blocksCloseout` |\n| `CostEvidenceLink` | Invoice/CostGuard | `invoiceNo`, `invoiceLineNo`, `chargeType`, `evidenceEvent` | `supportsInvoiceLine`, `doesNotOwnVerdict` |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3536,7 +3536,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.2 Link Type Mapping",
     "text": "| Link Type | From → To | Purpose |\n|---|---|---|\n| `resolvesToShipmentUnit` | `Identifier → ShipmentUnit` | Any-key search entry |\n| `opensMaterialCase` | `ShipmentUnit → MaterialHandlingCase` | Creates operational custody case |\n| `evidencedByDocument` | `MaterialHandlingCase/CustodyTransfer/SiteReceipt → Document` | Evidence lineage |\n| `generatesMilestone` | `Task/Event → MilestoneEvent` | Timeline closure |\n| `requiresGate` | `MaterialHandlingCase → CustomsReleaseGate/MarineReadinessGate` | Blocker visibility |\n| `readsWarehouseEvidence` | `WarehouseInterfaceHandoff → WarehouseHandlingProfile` | Read-only WHP evidence |\n| `createsSiteReceipt` | `MilestoneEvent M130 → SiteReceipt` | Site transaction creation |\n| `opensException` | `InspectionEvent M132 → MaterialException` | OSD/NCR trigger |\n| `supportsCostAudit` | `MilestoneEvent/Task → InvoiceLine` | Cost evidence handoff |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3547,8 +3547,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "4.3 Action Workflow",
-    "text": "| Action | Trigger | Writes | Hard gate |\n|---|---|---|---|\n| `CreateMaterialHandlingCase` | `ShipmentUnit` ready or M80 arrival | `MaterialHandlingCase` | ≥1 identifier and route evidence |\n| `SubmitCustomsReleaseGate` | BOE/DO/permit evidence received | `CustomsReleaseGate`, M90/M91/M92 | BOE/DO/permit document completeness |\n| `RecordGateOut` | Port gate-out event | M100, `InlandHaulageTask` | M92 exists and permit blockers cleared |\n| `RecordWHReceipt` | WMS receipt | M110, `WarehouseInterfaceHandoff` | WH route or warehouse appointment evidence |\n| `RecordMOSBStaging` | MOSB laydown confirmation | M115, `MOSBStagingTask` | AGI/DAS or MOSB-inclusive route |\n| `ApproveSailAway` | marine readiness approval | M117, `MarineReadinessGate` | M115/M116 + stowage/lashing/stability/weather readiness |\n| `RecordSiteArrival` | site receipt event | M130, `SiteReceipt` | AGI/DAS requires M115 and usually M116/M117 |\n| `RecordInspectionGood` | QA/QC good inspection | M131, MAR | MRR/MRI evidence |\n| `RecordInspectionOSD` | shortage/damage/overage/wrong item | M132, OSDR, `MaterialException` | photo/MRI/OSDR proof pack |\n| `CloseMaterialIssue` | POD/GRN/MRS/MIS posted | M140 | quantity reconciliation |\n| `OpenClaim` | OSD/NCR requires commercial action | M150, `Claim` | OSDR/NCR evidence |\n| `CloseClaimAndCase` | claim or discrepancy closed | M160 | approval + proof artifact |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Action | Trigger | Writes | Hard gate |\n|---|---|---|---|\n| `CreateMaterialHandlingCase` | `ShipmentUnit` ready or M80 arrival | `MaterialHandlingCase` | ≥1 identifier and route evidence |\n| `SubmitCustomsReleaseGate` | BOE/DO/permit evidence received | `CustomsReleaseGate`, M90/M91/M92 | BOE/DO/permit document completeness |\n| `RecordGateOut` | Port gate-out event | M100, `InlandHaulageTask` | M92 exists and permit blockers cleared |\n| `RecordWHReceipt` | WMS receipt | M110, `WarehouseInterfaceHandoff` | WH route or warehouse appointment evidence |\n| `RecordMOSBStaging` | MOSB laydown confirmation | M115, `MOSBStagingTask` | AGI/DAS or MOSB-inclusive route |\n| `ApproveSailAway` | marine readiness approval | M117, `MarineReadinessGate` | M115/M116 + stowage/lashing/stability/weather readiness |\n| `RecordSiteArrival` | site receipt event | M130, `SiteReceipt` | AGI/DAS site date is accepted; missing M115/M116/M117 becomes backfill |\n| `RecordInspectionGood` | QA/QC good inspection | M131, MAR | MRR/MRI evidence |\n| `RecordInspectionOSD` | shortage/damage/overage/wrong item | M132, OSDR, `MaterialException` | photo/MRI/OSDR proof pack |\n| `CloseMaterialIssue` | POD/GRN/MRS/MIS posted | M140 | quantity reconciliation |\n| `OpenClaim` | OSD/NCR requires commercial action | M150, `Claim` | OSDR/NCR evidence |\n| `CloseClaimAndCase` | claim or discrepancy closed | M160 | approval + proof artifact |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3560,7 +3560,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.4 Source System Crosswalk",
     "text": "| Source | Consumed fields | Output in KG | Validation |\n|---|---|---|---|\n| ERP / PO / Package | PO, package, material code, incoterm, site code | `MaterialMaster`, `Package`, `ShipmentUnit` | PO/package/material link completeness |\n| LDG/OCR | CI/PL/BL/BOE/DO/MRR/POD/GRN/OSDR fields | `DocumentEntity`, evidence assertions | `MeanConf ≥ 0.92`, `TableAcc ≥ 0.98`, `NumericIntegrity = 1.00` |\n| Port / OFCO | `plannedRoutingPattern`, `declaredDestination`, gate pass, port service evidence | route evidence, service evidence, M50/M80/M92/M100 candidates | evidence-only route update |\n| ATLP/eDAS/customs broker | BOE status, HS, permit, DO release | `CustomsReleaseGate`, `CustomsEntry`, `ReleaseOrder` | BOE document not collapsed into CustomsEntry |\n| WMS | M110/M111/M120/M121, stock snapshot, WHP reference | `WarehouseInterfaceHandoff`, `StockSnapshot`, WH event links | `confirmedFlowCode` remains WHP-only |\n| ALS / Marine / MOSB | M115/M116/M117, staging, LCT, marine approval | `MOSBStagingTask`, `MarineReadinessGate`, `MarineEvent` | AGI/DAS chain gate |\n| Site / FMC / QA/QC | MRR/MRI/MAR/MRS/MIS/POD/GRN/OSDR | `SiteReceipt`, `InspectionEvent`, `MaterialIssueTransaction`, `Exception` | M130/M131/M132/M140 document gate |\n| Invoice / Cost | invoice lines, charge type, DEM/DET, trucking, WH, marine charges | `CostEvidenceLink` | CostGuard verdict remains Cost domain |\n| Communication evidence | approval emails/chat/actions | `CommunicationEvent`, `ApprovalAction`, `AuditRecord` | evidence-only, PII masked |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3572,7 +3572,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.5 Foundry Pipeline",
     "text": "```text\nBronze  : raw ERP/WMS/ATLP/LDG/Port/MOSB/Site/Invoice records + immutable source lineage\nSilver  : normalized identifiers, dates, units, site codes, route evidence, document entities\nGold    : ShipmentUnit, MaterialHandlingCase, MilestoneEvent, SiteReceipt, Exception, CostEvidenceLink\nActions : controlled writes for M100/M110/M115/M117/M130/M132/M140/M150/M160\nViews   : Any-key trace, route gate board, AGI/DAS blocker, site GRN closure, OSD/NCR dashboard\n```\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3583,8 +3583,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "5.1 SHACL Control Matrix",
-    "text": "| Rule ID | Target | Logic | Severity |\n|---|---|---|---|\n| `MH-IDENT-001` | `MaterialHandlingCase` | exactly one `forShipmentUnit` and ≥1 identifier | BLOCK |\n| `MH-ROUTE-001` | `MaterialHandlingCase` | valid `ShipmentRoutingPattern` enum only | BLOCK |\n| `MH-FLOW-001` | any subject with `confirmedFlowCode` | subject must be `WarehouseHandlingProfile` | BLOCK |\n| `MH-CUSTOMS-001` | `CustomsReleaseGate` | BOE and DO evidence required before M100 | BLOCK |\n| `MH-PERMIT-001` | regulated material | permit/certificate not expired at gate event | BLOCK |\n| `MH-DEMDET-001` | M92→M100 | alert if gate-out not completed within 72.00 hrs after DO release | WARN/HIGH |\n| `MH-WH-001` | `WH_ONLY` / `WH_MOSB` | M110 required before WH stock appears | BLOCK |\n| `MH-MOSB-001` | AGI/DAS | M130 requires M115; M116/M117 required unless approved exception | BLOCK |\n| `MH-MARINE-001` | M117 | marine readiness gate must pass or carry approved exception | BLOCK |\n| `MH-SITE-001` | `SiteReceipt` | M130 must link site code and delivery evidence | BLOCK |\n| `MH-OSD-001` | M132 | OSDR + photo/inspection evidence required | BLOCK |\n| `MH-GRN-001` | M140 | POD/GRN/MIS/MRS must reconcile quantities | BLOCK |\n| `MH-COST-001` | `CostEvidenceLink` | material event evidence may support InvoiceLine, not CostGuard verdict ownership | WARN/BLOCK |\n| `MH-EVID-001` | evidence records | document/communication evidence cannot mutate transaction without approved Action | BLOCK |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Rule ID | Target | Logic | Severity |\n|---|---|---|---|\n| `MH-IDENT-001` | `MaterialHandlingCase` | exactly one `forShipmentUnit` and ≥1 identifier | BLOCK |\n| `MH-ROUTE-001` | `MaterialHandlingCase` | valid `ShipmentRoutingPattern` enum only | BLOCK |\n| `MH-FLOW-001` | any subject with `confirmedFlowCode` | subject must be `WarehouseHandlingProfile` | BLOCK |\n| `MH-CUSTOMS-001` | `CustomsReleaseGate` | BOE and DO evidence required before M100 | BLOCK |\n| `MH-PERMIT-001` | regulated material | permit/certificate not expired at gate event | BLOCK |\n| `MH-DEMDET-001` | M92→M100 | alert if gate-out not completed within 72.00 hrs after DO release | WARN/HIGH |\n| `MH-WH-001` | `WH_ONLY` / `WH_MOSB` | M110 required before WH stock appears | BLOCK |\n| `MH-MOSB-001` | AGI/DAS | M130 site date is accepted; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` | WARN/AMBER |\n| `MH-MARINE-001` | M117 | marine readiness gate must pass or carry approved exception | BLOCK |\n| `MH-SITE-001` | `SiteReceipt` | M130 must link site code and delivery evidence | BLOCK |\n| `MH-OSD-001` | M132 | OSDR + photo/inspection evidence required | BLOCK |\n| `MH-GRN-001` | M140 | POD/GRN/MIS/MRS must reconcile quantities | BLOCK |\n| `MH-COST-001` | `CostEvidenceLink` | material event evidence may support InvoiceLine, not CostGuard verdict ownership | WARN/BLOCK |\n| `MH-EVID-001` | evidence records | document/communication evidence cannot mutate transaction without approved Action | BLOCK |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3596,7 +3596,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.2 SHACL — MaterialHandlingCase Required Shape",
     "text": "```turtle\nhvdc:MaterialHandlingCaseRequiredShape a sh:NodeShape ;\n  sh:targetClass hvdc:MaterialHandlingCase ;\n  sh:property [\n    sh:path hvdc:forShipmentUnit ;\n    sh:minCount 1 ; sh:maxCount 1 ;\n    sh:message \"MaterialHandlingCase must resolve to exactly one ShipmentUnit.\" ;\n  ] ;\n  sh:property [\n    sh:path hvdc:hasRoutingPattern ;\n    sh:minCount 1 ;\n    sh:in (hvdc:PRE_ARRIVAL hvdc:DIRECT hvdc:WH_ONLY hvdc:MOSB_DIRECT hvdc:WH_MOSB hvdc:MIXED) ;\n    sh:message \"MaterialHandlingCase must use ShipmentRoutingPattern enum only.\" ;\n  ] ;\n  sh:property [\n    sh:path hvdc:hasCurrentStage ;\n    sh:minCount 1 ;\n    sh:message \"MaterialHandlingCase must have a current JourneyStage.\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3608,7 +3608,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.3 SHACL — Flow Code Boundary",
     "text": "```turtle\nhvdc:MaterialHandlingFlowCodeBoundaryShape a sh:NodeShape ;\n  sh:targetSubjectsOf hvdc:confirmedFlowCode ;\n  sh:sparql [\n    sh:message \"VIOLATION-1: confirmedFlowCode found outside WarehouseHandlingProfile.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:confirmedFlowCode ?code .\n        FILTER NOT EXISTS { $this a hvdc:WarehouseHandlingProfile }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3620,7 +3620,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.4 SHACL — Customs Release Before Gate-out",
     "text": "```turtle\nhvdc:GateOutRequiresReleaseShape a sh:NodeShape ;\n  sh:targetClass hvdc:MaterialHandlingCase ;\n  sh:sparql [\n    sh:message \"M100 Gate-out requires M92 DO Released and cleared permit blockers.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:hasMilestone ?m100 .\n        ?m100 hvdc:milestoneCode \"M100\" ; hvdc:actualDt ?gateOut .\n        FILTER NOT EXISTS {\n          $this hvdc:hasMilestone ?m92 .\n          ?m92 hvdc:milestoneCode \"M92\" ; hvdc:actualDt ?doReleased .\n        }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3632,7 +3632,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.5 SHACL — AGI/DAS MOSB + LCT Chain",
     "text": "```turtle\nhvdc:AGIDASMaterialChainShape a sh:NodeShape ;\n  sh:targetClass hvdc:MaterialHandlingCase ;\n  sh:sparql [\n    sh:message \"VIOLATION-2: AGI/DAS Site Arrival requires MOSB/LCT chain evidence or approved exception.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:declaredDestination ?dest ;\n              hvdc:hasRoutingPattern ?rp ;\n              hvdc:hasMilestone ?m130 .\n        FILTER(?dest IN (\"AGI\", \"DAS\"))\n        FILTER(?rp IN (hvdc:MOSB_DIRECT, hvdc:WH_MOSB, hvdc:MIXED))\n        ?m130 hvdc:milestoneCode \"M130\" ; hvdc:actualDt ?siteArrived .\n        FILTER NOT EXISTS {\n          $this hvdc:hasMilestone ?m115 .\n          ?m115 hvdc:milestoneCode \"M115\" ; hvdc:actualDt ?mosbStaged .\n        }\n        FILTER NOT EXISTS {\n          $this hvdc:hasApprovedException ?ex .\n          ?ex hvdc:exceptionType \"AGIDAS_MOSB_BYPASS\" ; hvdc:approvalStatus \"APPROVED\" .\n        }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3644,7 +3644,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.6 SHACL — OSD Requires OSDR",
     "text": "```turtle\nhvdc:OSDRequiresOSDRShape a sh:NodeShape ;\n  sh:targetClass hvdc:SiteReceipt ;\n  sh:sparql [\n    sh:message \"M132 OSD inspection requires OSDR evidence and exception record.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:inspectionResult \"OSD\" .\n        FILTER NOT EXISTS { $this hvdc:osdrRef ?osdr . }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3656,7 +3656,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.7 SHACL — Quantity Reconciliation",
     "text": "```turtle\nhvdc:SiteQuantityReconciliationShape a sh:NodeShape ;\n  sh:targetClass hvdc:SiteReceipt ;\n  sh:sparql [\n    sh:message \"Received + OSD quantity must reconcile with dispatched quantity within 0.00 tolerance unless approved variance exists.\" ;\n    sh:select \"\"\"\n      PREFIX hvdc: <http://samsung.com/project-logistics#>\n      SELECT $this WHERE {\n        $this hvdc:dispatchedQty ?dq ; hvdc:acceptedQty ?aq ; hvdc:osdQty ?oq .\n        BIND(ABS(?dq - (?aq + ?oq)) AS ?delta)\n        FILTER(?delta > 0.00)\n        FILTER NOT EXISTS { $this hvdc:hasApprovedVariance ?variance . }\n      }\n    \"\"\" ;\n  ] .\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3668,7 +3668,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.8 SPARQL — Gate-out Delay After DO Release",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nPREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?case ?shipment ?doReleased ?gateOut\nWHERE {\n  ?case a hvdc:MaterialHandlingCase ; hvdc:forShipmentUnit ?shipment ; hvdc:hasMilestone ?m92 .\n  ?m92 hvdc:milestoneCode \"M92\" ; hvdc:actualDt ?doReleased .\n  OPTIONAL { ?case hvdc:hasMilestone ?m100 . ?m100 hvdc:milestoneCode \"M100\" ; hvdc:actualDt ?gateOut . }\n  FILTER(!BOUND(?gateOut) || (?gateOut > ?doReleased + \"PT72H\"^^xsd:dayTimeDuration))\n}\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3680,7 +3680,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.9 SPARQL — M140 Missing POD/GRN",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?receipt ?shipment\nWHERE {\n  ?case a hvdc:MaterialHandlingCase ; hvdc:forShipmentUnit ?shipment ; hvdc:hasSiteReceipt ?receipt .\n  ?receipt hvdc:hasMilestone ?m140 .\n  ?m140 hvdc:milestoneCode \"M140\" ; hvdc:actualDt ?closed .\n  FILTER NOT EXISTS { ?receipt hvdc:podRef ?pod . }\n  FILTER NOT EXISTS { ?receipt hvdc:grnRef ?grn . }\n}\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3692,7 +3692,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.10 SPARQL — Legacy Term Detection",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nSELECT ?s ?p ?o\nWHERE {\n  ?s ?p ?o .\n  FILTER(REGEX(LCASE(STR(?p)), \"(assigned|extracted).*flow.*code\") ||\n         REGEX(LCASE(STR(?p)), \"cost.*flow.*code\") ||\n         REGEX(LCASE(STR(?p)), \"logistics.*flow.*code\"))\n}\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3703,8 +3703,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "5.11 RAG Check",
-    "text": "| Trigger | RAG / latest-evidence action | Human gate |\n|---|---|---|\n| MOIAT/FANR/DCD/ADNOC rule or permit mismatch | Re-check approved SOP / authority source on action date | Compliance Lead |\n| HS/BOE classification confidence < 0.95 | Review BOE/CI/PL/COO and broker note | Customs Lead |\n| AGI/DAS M130 without M115/M116/M117 | Require marine exception pack | Marine Lead + Site Logistics |\n| OOG/heavy cargo missing weight, dimension, COG, lift point | Request engineering document pack | Heavy Lift Engineer |\n| M132 OSD with high-value material | Require photo/MRI/OSDR/NCR pack | QA/QC + Claims |\n| Invoice/DEM/DET charge linked to delayed gate-out | Reconcile M92/M100 timestamps and rate master | Cost Control Lead |\n| OCR confidence below threshold | Re-extract or manual document validation | Data Steward |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Trigger | RAG / latest-evidence action | Human gate |\n|---|---|---|\n| MOIAT/FANR/DCD/ADNOC rule or permit mismatch | Re-check approved SOP / authority source on action date | Compliance Lead |\n| HS/BOE classification confidence < 0.95 | Review BOE/CI/PL/COO and broker note | Customs Lead |\n| AGI/DAS M130 without M115/M116/M117 | Backfill MOSB/LCT evidence; delivery remains accepted when site date exists | Marine Lead + Site Logistics |\n| OOG/heavy cargo missing weight, dimension, COG, lift point | Request engineering document pack | Heavy Lift Engineer |\n| M132 OSD with high-value material | Require photo/MRI/OSDR/NCR pack | QA/QC + Claims |\n| Invoice/DEM/DET charge linked to delayed gate-out | Reconcile M92/M100 timestamps and rate master | Cost Control Lead |\n| OCR confidence below threshold | Re-extract or manual document validation | Data Steward |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3715,8 +3715,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "5.12 Human-gate Matrix",
-    "text": "| Gate | Trigger | Approver | Required proof |\n|---|---|---|---|\n| Customs gate | BOE/DO/permit missing or expired | Customs / Compliance Lead | BOE, DO, permit/certificate |\n| Warehouse gate | WHP override or special storage | Warehouse Manager | M110/M111 evidence, storage note |\n| Marine gate | M117 approval or OOG/heavy lift | Marine Lead / Engineer / HSE | stowage, lashing, stability, weather, PTW |\n| AGI/DAS gate | M130 attempt without complete MOSB chain | Marine Lead + Site Logistics | approved bypass exception |\n| Site OSD gate | M132 OSD | QA/QC + Claims | OSDR, photos, MRI, NCR |\n| Cost gate | high DEM/DET, WH, marine, trucking dispute | Cost Control Lead | milestone evidence + invoice line |\n| Privacy gate | personnel contact evidence | Data Steward | masked contact/token only |\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Gate | Trigger | Approver | Required proof |\n|---|---|---|---|\n| Customs gate | BOE/DO/permit missing or expired | Customs / Compliance Lead | BOE, DO, permit/certificate |\n| Warehouse gate | WHP override or special storage | Warehouse Manager | M110/M111 evidence, storage note |\n| Marine gate | M117 approval or OOG/heavy lift | Marine Lead / Engineer / HSE | stowage, lashing, stability, weather, PTW |\n| AGI/DAS gate | M130/site date with incomplete MOSB chain | Marine Lead + Site Logistics | backfill M115/M116/M117 evidence |\n| Site OSD gate | M132 OSD | QA/QC + Claims | OSDR, photos, MRI, NCR |\n| Cost gate | high DEM/DET, WH, marine, trucking dispute | Cost Control Lead | milestone evidence + invoice line |\n| Privacy gate | personnel contact evidence | Data Steward | masked contact/token only |\n\n---",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3728,7 +3728,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.1 Compliance Object Model",
     "text": "| Object | Required properties | Links |\n|---|---|---|\n| `RegulatoryRequirement` | `authority`, `requirementType`, `triggerCondition`, `effectiveDate`, `status` | applies to `MaterialMaster`, `ShipmentUnit`, `LocationNode`, `Site` |\n| `PermitDocument` | `permitNo`, `authority`, `permitType`, `issueDate`, `expiryDate` | evidences requirement |\n| `ComplianceCheck` | `checkId`, `ruleId`, `result`, `checkedAt`, `checkedByRole` | validates gate/action |\n| `AccessPermit` | `permitNo`, `siteCode`, `validFrom`, `validTo`, `holderToken` | controls ADNOC/CICPA/site access |\n| `ApprovalAction` | `approvalRef`, `approverRole`, `approvedAt`, `decision`, `reason` | authorizes exception or override |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3740,7 +3740,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.2 Incoterms 2020 Controls",
     "text": "| Control | Logic | Material-handling impact |\n|---|---|---|\n| `IncotermPresence` | PO/shipment must carry incoterm and named place | Owner of transport risk is clear at each `JourneyLeg` |\n| `RiskTransferPoint` | Risk transfer must match incoterm-defined point | Damage/shortage liability is linked to correct custody transfer |\n| `CostResponsibility` | InvoiceLine charge owner must match PO/incoterm | DEM/DET, trucking, marine, WH charge dispute evidence is traceable |\n| `DeliveryObligation` | Site delivery / named place must match `declaredDestination` | Route exception and M130 mismatch become review items |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3752,7 +3752,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.3 UAE Regulatory Controls",
     "text": "| Authority / topic | Ontology handling | Blocking point |\n|---|---|---|\n| MOIAT | `requiresMOIATCoC`, `certificateRef`, `certificateExpiryDate`, `productCategory` | M91/M92 or M100 if certificate missing/expired |\n| FANR | `requiresFANRPermit`, `radiationSourceFlag`, `permitRef`, `permitExpiryDate` | M90/M91/M100 and DG/controlled storage |\n| DCD / Dangerous Goods | `dgClass`, `UNNumber`, `segregationGroup`, `dangerousCargoWarehouseRequired` | M100/M110/M115 staging |\n| ADNOC / CICPA / Site Access | `AccessPermit`, `GatePass`, `SecurityApproval`, `LocationNode.governedBy` | M100, M115, M130 |\n| WCO / HS | `hsCode`, `classificationConfidence`, `customsRiskScore`, `CustomsEntry` | BOE submission and clearance |\n| Port / Marine / HSE | PTW, JSA/TRA, lifting permit, working-over-water permit | M115/M116/M117 |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3763,8 +3763,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "6.4 Compliance Blockers",
-    "text": "```text\nIF regulated material AND permit missing/expired           → BLOCK M90/M91/M100\nIF DG cargo AND DCD/DG segregation evidence missing        → BLOCK M110/M115\nIF AGI/DAS AND MOSB/LCT evidence missing                   → BLOCK M130\nIF OOG/heavy cargo AND lift/stability/lashing pack missing → BLOCK M116/M117\nIF Site access permit missing                              → BLOCK M130\nIF OCR/confidence evidence below threshold                 → HUMAN-GATE before action write\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "```text\nIF regulated material AND permit missing/expired           → BLOCK M90/M91/M100\nIF DG cargo AND DCD/DG segregation evidence missing        → BLOCK M110/M115\nIF AGI/DAS AND site date exists but MOSB/LCT evidence missing → ACCEPT M130, DELIVERED, AMBER/WARN backfill\nIF OOG/heavy cargo AND lift/stability/lashing pack missing → BLOCK M116/M117\nIF Site access permit missing                              → BLOCK M130\nIF OCR/confidence evidence below threshold                 → HUMAN-GATE before action write\n```",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3776,7 +3776,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.5 Privacy and NDA Guard",
     "text": "1. Personnel names may be retained when operationally required, but phone/e-mail fields must be masked before register write.\n2. Driver and site access holders should be represented by `holderToken` or role reference unless explicit operational approval exists.\n3. Communication evidence should link to `CommunicationEvent` and `AuditRecord`; it must not expose raw PII in dashboard extracts.\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3788,7 +3788,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time)",
     "text": "| Option | Description | Pros | Cons | Est. cost | Risk | Time |\n|---|---|---|---|---:|---|---:|\n| A. Baseline Material Gate | M92/M100/M110/M130/M140 milestone and document gate only | 빠른 적용, 기존 Excel/WMS/LDG 연동 용이 | Marine/OOG gate는 수동 검토 의존 | 35,000.00 AED | Medium | 2.00 weeks |\n| B. Operational Material Twin | MaterialHandlingCase + CustodyTransfer + SiteReceipt + OSD/NCR graph | Any-key traceability, AGI/DAS/MOSB 차단 자동화, site GRN 정합성 강화 | 객체/링크 설계와 Actions 필요 | 95,000.00 AED | Medium | 6.00 weeks |\n| C. Marine-linked Material Twin | B + MOSB/LCT/stowage/lashing/stability/weather gates | AGI/DAS offshore delivery 리스크 감소, M115→M117→M130 완전성 강화 | Marine engineering evidence 품질 의존 | 165,000.00 AED | High | 8.00 weeks |\n| D. CostGuard-linked Control | B + invoice/DEM-DET/WH/marine charge evidence link | Cost dispute 대응력 향상, DEM/DET 조기경보 | RateRef/CostGuard 도메인과 동기화 필요 | 120,000.00 AED | Medium | 7.00 weeks |\n\n**Recommended path:** Option B를 base로 적용하고, AGI/DAS·OOG 물량은 Option C gate를 우선 붙인다. DEM/DET와 WH/marine charge dispute가 많은 월에는 Option D를 병행한다.\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3800,7 +3800,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI)",
     "text": "| Phase | Duration | Work package | KPI / Exit criterion | Owner |\n|---|---:|---|---|---|\n| Prepare | 1.00 week | source inventory, identifier dictionary, route/stage/milestone alignment, legacy term scan | Required source coverage ≥ 95.00%; forbidden route-code leakage = 0.00 | Data Steward / Ontology Lead |\n| Pilot | 2.00 weeks | 1 port, 1 warehouse, 1 AGI/DAS route, 1 MIR/SHU route, 1 OSD case replay | M92→M100→M130 trace completeness ≥ 95.00%; AGI/DAS gate = 100.00% | Logistics Ops |\n| Build | 4.00 weeks | Foundry Object/Link Types, Actions, SHACL/SPARQL gates, site documents and claim workflow | Validation p95 < 5.00s; SiteReceiptDocCompleteness ≥ 98.00% | Digital / Foundry Team |\n| Operate | ongoing | daily blocker board, DEM/DET alert, OSD/NCR pack, GRN closure, human-gate review | DEM/DET alert lead time ≥ 72.00 hrs; HumanGate leakage = 0.00건 | Logistics Control Tower |\n| Scale | 6.00 weeks | marine-linked gates, CostGuard evidence, route risk analytics, site issue dashboard | MaterialTraceCoverage ≥ 98.00%; QuantityReconciliationAccuracy = 100.00% | PMO / Cost / Marine |\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3811,8 +3811,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "9.1 Foundry Functions",
-    "text": "| Function | Input | Output | Gate |\n|---|---|---|---|\n| `resolveAnyKey` | BL/container/DO/invoice/case/HVDC code | `ShipmentUnit` + confidence | confidence < 0.95 → review |\n| `computeCurrentStage` | milestone events | `JourneyStage` | missing predecessor → blocker |\n| `validateMaterialGate` | case + docs + permits + milestones | pass/warn/block | action submit gate |\n| `validateAGIDASGate` | destination + route + M115/M116/M117/M130 | pass/block | M130 gate |\n| `openOSDRClaimPack` | M132 + inspection evidence | OSDR/NCR/Claim draft | QA/QC approval |\n| `linkCostEvidence` | M92/M100/M110/M115/M130 events + invoice lines | cost evidence link | CostGuard remains cost domain |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Function | Input | Output | Gate |\n|---|---|---|---|\n| `resolveAnyKey` | BL/container/DO/invoice/case/HVDC code | `ShipmentUnit` + confidence | confidence < 0.95 → review |\n| `computeCurrentStage` | milestone events | `JourneyStage` | missing predecessor → blocker |\n| `validateMaterialGate` | case + docs + permits + milestones | pass/warn/block | action submit gate |\n| `validateAGIDASGate` | destination + route + M115/M116/M117/M130 | pass/warn | M130 acceptance + MOSB backfill gate |\n| `openOSDRClaimPack` | M132 + inspection evidence | OSDR/NCR/Claim draft | QA/QC approval |\n| `linkCostEvidence` | M92/M100/M110/M115/M130 events + invoice lines | cost evidence link | CostGuard remains cost domain |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3824,7 +3824,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.2 RPA Hooks",
     "text": "| Hook | Trigger | Action |\n|---|---|---|\n| `ATLPReleaseSync` | BOE/DO status change | update `CustomsReleaseGate`, create M90/M91/M92 candidate |\n| `GateOutBot` | port gate-out feed | create M100 candidate; alert if M92 missing |\n| `WMSReceiptBot` | WMS receipt | create M110 candidate; open WHP handoff reference |\n| `MOSBStagingBot` | M121 or direct M100 for AGI/DAS | open M115 staging checklist |\n| `MarineReadinessBot` | M115 completed | request stowage/lashing/stability/weather proof before M117 |\n| `SiteReceiptBot` | site delivery note / MRR | create M130/SiteReceipt candidate |\n| `OSDRClaimBot` | M132 / OSDR upload | create exception, NCR/claim draft, proof artifact |\n| `GRNClosureBot` | POD/GRN posted | close M140 if quantities reconcile |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3836,7 +3836,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.3 LLM Guardrail",
     "text": "1. LLM may summarize CI/PL/BL/BOE/DO/MRR/MRI/POD/GRN/OSDR and propose evidence links.\n2. LLM shall not write M100/M110/M115/M117/M130/M140 directly without an approved Action.\n3. LLM must preserve original unit/currency/date strings and normalized values separately.\n4. LLM output must include confidence, source document, page/field reference, and reviewer requirement when confidence < 0.92.\n5. Any regulated material, high-value material, OOG/heavy lift, or AGI/DAS exception requires human-gate.",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3848,7 +3848,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.4 Sheets / Excel Mapping",
     "text": "| Sheet / dataset | Required normalized columns |\n|---|---|\n| Shipment tracker | `shipmentUnitId`, `caseNo`, `blNo`, `containerNo`, `routingPattern`, `declaredDestination`, `currentStage` |\n| Port/customs | `boeNo`, `doNo`, `m92Actual`, `m100Actual`, `permitStatus`, `gatePassStatus` |\n| Warehouse | `m110Actual`, `m111Actual`, `m120Actual`, `m121Actual`, `whpRef`, `stockStatus` |\n| MOSB/marine | `m115Actual`, `m116Actual`, `m117Actual`, `marineGateStatus`, `lctVoyageNo` |\n| Site | `m130Actual`, `m131Actual`, `m132Actual`, `m140Actual`, `mrrNo`, `mriNo`, `podNo`, `grnNo`, `osdrNo` |\n| Cost evidence | `invoiceNo`, `invoiceLineNo`, `chargeType`, `evidenceMilestone`, `costGuardRef` |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3859,8 +3859,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "9.5 TG / Alert Hooks",
-    "text": "| Alert | Condition | Recipient role |\n|---|---|---|\n| `DO_RELEASE_NO_GATEOUT` | M92 actual + 72.00 hrs and no M100 | Port / Customs / Transport Lead |\n| `AGIDAS_MISSING_MOSB` | AGI/DAS M130 candidate without M115 | Marine Lead + Site Logistics |\n| `M117_BLOCKED` | marine readiness gate incomplete | Marine / HSE / Heavy Lift Engineer |\n| `OSD_OPEN` | M132 or OSDR uploaded | QA/QC + Claims |\n| `GRN_OVERDUE` | M130 + 48.00 hrs without M140 | Site Logistics |\n| `COST_EVIDENCE_MISMATCH` | invoice line lacks matching material event | Cost Control Lead |\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| Alert | Condition | Recipient role |\n|---|---|---|\n| `DO_RELEASE_NO_GATEOUT` | M92 actual + 72.00 hrs and no M100 | Port / Customs / Transport Lead |\n| `AGIDAS_MISSING_MOSB` | AGI/DAS M130 accepted with missing M115/M116/M117 | Marine Lead + Site Logistics backfill |\n| `M117_BLOCKED` | marine readiness gate incomplete | Marine / HSE / Heavy Lift Engineer |\n| `OSD_OPEN` | M132 or OSDR uploaded | QA/QC + Claims |\n| `GRN_OVERDUE` | M130 + 48.00 hrs without M140 | Site Logistics |\n| `COST_EVIDENCE_MISMATCH` | invoice line lacks matching material event | Cost Control Lead |\n\n---",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3871,8 +3871,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "10.1 QA Checklist",
-    "text": "| No. | Check | Pass criterion |\n|---:|---|---|\n| 1.00 | Master spine alignment | Uses `ShipmentUnit`, `JourneyStage`, `JourneyLeg`, `MilestoneEvent` |\n| 2.00 | Route dictionary | Uses `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` only |\n| 3.00 | Flow Code boundary | `confirmedFlowCode` appears only as WHP read-only reference or boundary rule |\n| 4.00 | MOSB classification | MOSB is `OffshoreStagingNode` / `MarineInterfaceNode`, not Warehouse |\n| 5.00 | Document boundary | CI/PL/BL/BOE/DO/MRR/MRI/POD/GRN/OSDR are evidence, not transaction owner |\n| 6.00 | Customs release | M100 requires M92 and blocker-free permit status |\n| 7.00 | DEM/DET alert | M92→M100 delay > 72.00 hrs creates alert |\n| 8.00 | WH interface | M110/M111/M120/M121 linked without assigning `confirmedFlowCode` |\n| 9.00 | AGI/DAS gate | M130 blocked without M115 and marine chain evidence/exception |\n| 10.00 | Marine gate | M117 requires stowage/lashing/stability/weather approval or exception |\n| 11.00 | Site receipt | M130 creates/links `SiteReceipt` and MRR evidence |\n| 12.00 | Inspection outcome | M131 creates MAR; M132 creates OSDR/Exception |\n| 13.00 | Quantity reconciliation | dispatched = accepted + OSD ± 0.00 unless approved variance |\n| 14.00 | GRN closure | M140 requires POD/GRN and, where applicable, MRS/MIS |\n| 15.00 | Claim lifecycle | M150/M160 require OSDR/NCR/approval trail |\n| 16.00 | Cost handoff | material events support InvoiceLine evidence only; CostGuard verdict stays in cost domain |\n| 17.00 | PII masking | phone/e-mail/driver contact data masked or tokenized |\n| 18.00 | Validation latency | p95 < 5.00s for gate query |\n| 19.00 | Audit trail | blocked/overridden actions carry `ApprovalAction` + `AuditRecord` |\n| 20.00 | Legacy term scan | no invalid route-code terms in schema/prose |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| No. | Check | Pass criterion |\n|---:|---|---|\n| 1.00 | Master spine alignment | Uses `ShipmentUnit`, `JourneyStage`, `JourneyLeg`, `MilestoneEvent` |\n| 2.00 | Route dictionary | Uses `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, `MIXED` only |\n| 3.00 | Flow Code boundary | `confirmedFlowCode` appears only as WHP read-only reference or boundary rule |\n| 4.00 | MOSB classification | MOSB is `OffshoreStagingNode` / `MarineInterfaceNode`, not Warehouse |\n| 5.00 | Document boundary | CI/PL/BL/BOE/DO/MRR/MRI/POD/GRN/OSDR are evidence, not transaction owner |\n| 6.00 | Customs release | M100 requires M92 and blocker-free permit status |\n| 7.00 | DEM/DET alert | M92→M100 delay > 72.00 hrs creates alert |\n| 8.00 | WH interface | M110/M111/M120/M121 linked without assigning `confirmedFlowCode` |\n| 9.00 | AGI/DAS gate | M130 accepted from site date; missing marine chain evidence becomes AMBER/WARN backfill |\n| 10.00 | Marine gate | M117 requires stowage/lashing/stability/weather approval or exception |\n| 11.00 | Site receipt | M130 creates/links `SiteReceipt` and MRR evidence |\n| 12.00 | Inspection outcome | M131 creates MAR; M132 creates OSDR/Exception |\n| 13.00 | Quantity reconciliation | dispatched = accepted + OSD ± 0.00 unless approved variance |\n| 14.00 | GRN closure | M140 requires POD/GRN and, where applicable, MRS/MIS |\n| 15.00 | Claim lifecycle | M150/M160 require OSDR/NCR/approval trail |\n| 16.00 | Cost handoff | material events support InvoiceLine evidence only; CostGuard verdict stays in cost domain |\n| 17.00 | PII masking | phone/e-mail/driver contact data masked or tokenized |\n| 18.00 | Validation latency | p95 < 5.00s for gate query |\n| 19.00 | Audit trail | blocked/overridden actions carry `ApprovalAction` + `AuditRecord` |\n| 20.00 | Legacy term scan | no invalid route-code terms in schema/prose |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3884,7 +3884,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.2 Assumptions(가정:)",
     "text": "1. `CONSOLIDATED-00` remains canonical; this extension does not override master spine definitions.\n2. Authority requirements and permit logic must be refreshed through RAG/current SOP before operational approval on the action date.\n3. WMS owns warehouse storage/handling detail; `CONSOLIDATED-06` only links warehouse events and WHP evidence.\n4. Marine engineering approvals are external human-gated approvals; ontology validation checks readiness and evidence consistency only.\n5. Cost rates, FX, invoice line verdicts, and CostGuard bands are owned by `CONSOLIDATED-05`.\n6. All PII in FMC/personnel/driver/contact sources is masked before dashboard or KG write.\n7. Numeric calculations use source unit and source currency unless a downstream approved policy explicitly normalizes them.",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3895,8 +3895,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-material-handling · CONSOLIDATED-06",
     "version": "2.0-final",
     "sectionPath": "10.3 ZERO / Fail-safe Table",
-    "text": "| 단계 | 이유 | 위험 | 요청데이터 | 다음조치 |\n|---|---|---|---|---|\n| Customs gate | BOE/DO/permit evidence missing | illegal release / port hold / DEM-DET | BOE, DO, permit, clearance timestamp | block M100 and request customs evidence |\n| WH gate | M110 event missing for WH route | phantom stock / cost mismatch | WMS receipt, WH appointment, warehouse event | block WH stock creation |\n| MOSB gate | AGI/DAS lacks M115/M116/M117 | offshore delivery trace break | MOSB staging, LCT load, sail-away approval | block M130 unless approved exception |\n| Site gate | MRR/MRI/POD/GRN missing | receipt/issue mismatch | MRR, MRI, POD, GRN, MRS/MIS | block M140 closure |\n| OSD gate | OSD without OSDR/NCR proof | claim leakage | OSDR, photos, inspection report, NCR | open exception/claim and block closeout |\n| Cost gate | invoice line lacks material event evidence | overbilling / dispute | invoice line, milestone, task, rate evidence | route to CostGuard review |",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "text": "| 단계 | 이유 | 위험 | 요청데이터 | 다음조치 |\n|---|---|---|---|---|\n| Customs gate | BOE/DO/permit evidence missing | illegal release / port hold / DEM-DET | BOE, DO, permit, clearance timestamp | block M100 and request customs evidence |\n| WH gate | M110 event missing for WH route | phantom stock / cost mismatch | WMS receipt, WH appointment, warehouse event | block WH stock creation |\n| MOSB gate | AGI/DAS lacks M115/M116/M117 | offshore evidence gap; delivery accepted from site date | MOSB staging, LCT load, sail-away approval | accept M130 and backfill evidence |\n| Site gate | MRR/MRI/POD/GRN missing | receipt/issue mismatch | MRR, MRI, POD, GRN, MRS/MIS | block M140 closure |\n| OSD gate | OSD without OSDR/NCR proof | claim leakage | OSDR, photos, inspection report, NCR | open exception/claim and block closeout |\n| Cost gate | invoice line lacks material event evidence | overbilling / dispute | invoice line, milestone, task, rate evidence | route to CostGuard review |",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3908,7 +3908,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.4 Compatibility Patch Register — 5.00 Parallel Lanes",
     "text": "| Lane | Review focus | Patch applied | Status |\n|---:|---|---|---|\n| 1.00 | Master spine / AGENTS | Route status normalized to `RoutingPattern + JourneyStage + MilestoneEvent + JourneyLeg`; Flow Code route semantics removed | PASS |\n| 2.00 | Warehouse boundary | `WarehouseHandlingProfile.confirmedFlowCode` retained only as WHP read-only evidence; material handling cannot assign it | PASS |\n| 3.00 | Document/OCR evidence | `routeEvidence`, `destinationEvidence`, `mosbLegIndicator`, and document proof artifacts treated as evidence-only | PASS |\n| 4.00 | Marine/MOSB/site chain | MOSB kept as offshore staging; AGI/DAS M115→M116→M117→M130 gate strengthened | PASS |\n| 5.00 | Port/cost/ops integration | Port planned route, CostGuard evidence handoff, and operations analytics linked without ownership collision | PASS |\n\n---",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -3920,7 +3920,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11. CmdRec",
     "text": "```text\n/switch_mode LATTICE + /logi-master cert-chk --deep --KRsummary\n/logi-master report --deep --AEDonly\n/visualize_data --type=heatmap CONSOLIDATED-06-validation-report.json\n```",
-    "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+    "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
     "domains": [
       "material"
     ]
@@ -5049,7 +5049,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "Document Root",
     "text": "---\ntitle: \"HVDC Operations Management & RoutingPattern Analytics Ontology — Consolidated\"\ntype: \"ontology-design\"\ndomain: \"operations-management\"\nsub-domains:\n  - operations-analytics\n  - routing-pattern-kpi\n  - warehouse-stock-reporting\n  - site-delivery-analytics\n  - marine-bulk-vessel-analytics\n  - cost-and-sqm-reporting\n  - exception-dashboard\nversion: \"2.0-final\"\ndate: \"2026-04-27\"\ntimezone: \"Asia/Dubai\"\nstatus: \"active\"\nspine_ref: \"CONSOLIDATED-00-master-ontology.md\"\nextension_of: \"hvdc-master-ontology-v2.0-final\"\ncanonical_role: \"operations analytics, reporting, KPI, dashboard, and data-mapping extension\"\nowner: \"HVDC Logistics Ontology Working Set\"\nstandards:\n  - RDF\n  - OWL\n  - SHACL\n  - SPARQL\n  - JSON-LD\n  - GS1-EPCIS-CBV\n  - DCSA-Track-and-Trace\n  - PROV-O\n  - OWL-Time\n  - SKOS\n  - DQV\nsource_files:\n  - 2_EXT-05-hvdc-ops-management.md\n  - legacy_operations_excel_mapping_notes\nchecked_against:\n  - CONSOLIDATED-00-master-ontology.md\n  - CONSOLIDATED-01-core-framework-infra.md\n  - CONSOLIDATED-02-warehouse-flow.md\n  - CONSOLIDATED-03-document-ocr.md\n  - CONSOLIDATED-04-barge-bulk-cargo.md\n  - CONSOLIDATED-05-invoice-cost.md\n  - CONSOLIDATED-06-material-handling.md\n  - CONSOLIDATED-07-port-operations.md\n  - CONSOLIDATED-08-communication.md\n  - AGENTS.md\n  - HVDC Logistics Ontology Review.txt\n  - Palantir 온톨로지 기반 물류 자동화.pdf\nvalidation_passes: 5\nsemantic_patch:\n  - \"Operations consumes canonical ShipmentRoutingPattern, JourneyStage, JourneyLeg, MilestoneEvent, StockSnapshot, SiteReceipt, CostGuardResult, and CommunicationEvent; it does not redefine them.\"\n  - \"WarehouseHandlingProfile.confirmedFlowCode remains warehouse-only and is used only as WH evidence or storage analytics dimension.\"\n  - \"End-to-end routing KPI uses ShipmentRoutingPattern, not legacy warehouse route-code language.\"\n  - \"MOSB is OffshoreStagingNode / MarineInterfaceNode; operations may report MOSB dwell and marine readiness but shall not classify MOSB as Warehouse.\"\n  - \"Bulk/vessel/OOG analytics consume CONSOLIDATED-04 marine events and CONSOLIDATED-06 material milestones; execution truth remains in those domains.\"\n  - \"Excel/ERP rows become OperationDataset, OperationRecord, MappingRule, AnalyticsRun, KPIObservation, and ReportArtifact.\"\nfinal_validation_rounds: 5\nfinal_validation_status: \"PASS\"\nfinal_validated_date: \"2026-04-27\"\nfinal_patch_bundle: \"HVDC_Logistics_Ontology_FINAL_5x_2026-04-27\"\npatch_version: \"2.1-query-prefix-hardening\"\npatched_date: \"2026-05-12\"\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5061,7 +5061,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "1. ExecSummary",
     "text": "`CONSOLIDATED-09`는 HVDC Logistics KG의 **operations analytics / reporting / KPI extension**이다. Excel, ERP, WMS, ATLP, LDG/OCR, Port, Cost, Marine, Communication 데이터를 `OperationDataset`, `OperationRecord`, `AnalyticsRun`, `KPIObservation`, `OperationalSnapshot`, `ReportArtifact`로 정규화하여 운영 가시성을 제공한다.\n\n비즈니스 임팩트는 **RoutingPattern 기반 물류 효율 분석**, **WH/Site/MOSB/Marine stock·dwell·dispatch 현황 통합**, **SQM/PKG/CBM 이중계산 방지**, **월별 보고 자동화**, **exception/action backlog를 통한 지연 비용 감소**이다.\n\n기술 해법은 canonical object를 재정의하지 않고 consume-only로 읽는 것이다. 전체 여정은 `ShipmentRoutingPattern`, 상태 전이는 `MilestoneEvent`, 창고 내부 처리는 `WarehouseHandlingProfile`, 커뮤니케이션 증빙은 `CommunicationEvent`, 비용 verdict는 `CostGuardResult`가 소유한다.\n\nKPI 목표는 `RoutingPatternCoverage ≥ 95.00%`, `StockSnapshotAccuracy ≥ 99.00%`, `DoubleCountLeakage = 0.00건`, `ReportRefreshSLA ≤ 4.00h`, `Validation p95 < 5.00s`이다.\n\n**ENG-KR one-liner:** Operations consumes the logistics twin for analytics and reporting; it does not own route truth, warehouse handling, marine execution, cost verdicts, or communication evidence.\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5073,7 +5073,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.1 Master Governance Rule",
     "text": "1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine.\n2. `CONSOLIDATED-09` owns **analytics, reporting, KPI observations, dashboard views, dataset mappings, and report artifacts** only.\n3. Operations consumes `ShipmentRoutingPattern`, `JourneyStage`, `JourneyLeg`, `MilestoneEvent`, `StockSnapshot`, `WarehouseTask`, `SiteReceipt`, `MarineEvent`, `PortServiceEvent`, `CostGuardResult`, and `CommunicationEvent`.\n4. Operations shall not redefine the route dictionary, milestone dictionary, identity policy, WHP algorithm, CostGuard band, or communication evidence model.\n5. `WarehouseHandlingProfile.confirmedFlowCode` is warehouse-only. Operations may use WHP as a warehouse evidence dimension but cannot calculate or assign it.\n6. `MOSB` is an `OffshoreStagingNode` / `MarineInterfaceNode`. Operations may report MOSB dwell, staging readiness, marine interface backlog, and AGI/DAS route compliance.\n7. Excel/DataFrame row status is evidence for analytics. It cannot override operational truth without source-system reconciliation and an approved domain action.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5085,7 +5085,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.2 Included vs Delegated Scope",
     "text": "| Scope item | Included in CONSOLIDATED-09 | Delegated / excluded |\n|---|---|---|\n| Dataset normalization | Header cleanup, date normalization, key extraction, mapping rules | Source-system master ownership |\n| KPI observation | Route, stock, dwell, site receipt, exception, cost, SLA metrics | Domain-specific operational decision |\n| Dashboard and reports | 5-sheet summary, 27-sheet snapshots, route KPI, stock aging, SQM billing view | Contractual invoice approval |\n| WH/Site analytics | WH in/out, stock balance, site arrival, GRN/POD status | WHP algorithm and SiteReceipt transaction creation |\n| MOSB/Marine analytics | MOSB dwell, M115/M116/M117/M130 continuity, LCT utilization | Marine execution approval and stability/lashing truth |\n| Bulk/vessel analytics | Bulk cargo summary, vessel trip KPI, heavy-lift dashboard | OOG/marine engineering calculation |\n| Cost analytics | CostGuard summary, invoice aging, DEM/DET risk view | RateRef ownership and payment approval |\n| Communication analytics | Open actions, SLA breach, approval evidence completeness | Message ontology ownership |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5097,7 +5097,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.3 Domain Boundary Crosswalk",
     "text": "| Domain | Allowed interface with operations | Not allowed in CONSOLIDATED-09 |\n|---|---|---|\n| Master spine | Consume identity policy, route, stage, milestone, data layer separation | Redefine core classes |\n| Infrastructure | Consume `LocationNode`, `Site`, `Warehouse`, `OffshoreStagingNode`, `Port` | Reclassify MOSB as warehouse |\n| Warehouse | Consume `WarehouseEvent`, `StockSnapshot`, `WarehouseHandlingProfile` evidence | Assign warehouse handling class |\n| Document/OCR | Consume `VerificationResult`, `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` | Treat OCR evidence as final transaction truth |\n| Marine/Bulk | Consume M115/M116/M117, `MarineEvent`, LCT utilization | Replace marine execution with dashboard row |\n| Cost | Consume `Invoice`, `CostGuardResult`, DEM/DET clock | Own RateRef or CostGuard verdict |\n| Material handling | Consume M90→M160 timeline and site receipt | Create site receipt from spreadsheet alone |\n| Port | Consume `PortCall`, `ServiceEvent`, `plannedRoutingPattern`, release evidence | Own port service truth |\n| Communication | Consume open action/SLA metrics and approval evidence completeness | Redefine communication classes |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5109,7 +5109,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "2.4 Legacy Migration Rules",
     "text": "| Legacy wording / pattern | Canonical replacement | Patch action |\n|---|---|---|\n| Route KPI by warehouse route code | KPI by `ShipmentRoutingPattern` | Replace in dashboard and SPARQL |\n| Pre-arrival represented as warehouse class | `RoutingPattern = PRE_ARRIVAL` or `JourneyStage = PLANNING/PORT_ENTRY` | Use master route/stage |\n| MOSB listed as warehouse | `OffshoreStagingNode` / `MarineInterfaceNode` with `OperationalSnapshot` | Report separately from WH stock |\n| Spreadsheet status overrides shipment | `OperationRecord` evidence + reconciliation result | Require source-system action |\n| Bulk/vessel execution truth in Ops | `MarineEvent` / `BargeOperation` from CONSOLIDATED-04 | Ops reports only |\n| Cost center decision in Ops | `CostGuardResult` / `CostAllocation` from CONSOLIDATED-05 | Ops aggregates only |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5121,7 +5121,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.1 Operations Ontology Layer",
     "text": "| Layer | Class / vocabulary | Purpose |\n|---|---|---|\n| Dataset | `OperationDataset`, `OperationRecord`, `SourceRow`, `DataMappingRule`, `HeaderNormalizationRule` | Ingested spreadsheet/API rows and mapping logic |\n| Analytics | `AnalyticsRun`, `KPIObservation`, `MetricDefinition`, `DashboardView`, `ReportArtifact` | Analytical outputs and dashboards |\n| Snapshot | `OperationalSnapshot`, `StockSnapshotView`, `RouteSnapshot`, `AgingSnapshot`, `CostSnapshot` | Periodic state view |\n| Route analytics | `RoutingPatternKPI`, `JourneyStageKPI`, `MilestoneCoverageMetric` | End-to-end visibility metrics |\n| Warehouse analytics | `WarehouseStockKPI`, `DwellMetric`, `CapacityMetric`, `DispatchMetric` | WH inventory and movement reporting |\n| Site analytics | `SiteReceiptKPI`, `GRNCompletenessMetric`, `OSDMetric`, `IssueMetric` | Site delivery and closeout reporting |\n| Marine analytics | `MOSBDwellMetric`, `LCTUtilizationMetric`, `MarineReadinessMetric` | Offshore staging and LCT reporting |\n| Cost analytics | `CostGuardSummary`, `InvoiceAgingMetric`, `DEMDETExposureMetric`, `SQMBillingMetric` | Cost and billing analytics |\n| Exception analytics | `ExceptionBacklogMetric`, `NCRMetric`, `ClaimAgingMetric`, `SLAActionMetric` | Risk and unresolved action reporting |\n| Evidence | `OperationEvidenceLink`, `ReconciliationResult`, `DataQualityFinding`, `AuditRecord` | Quality and lineage |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5133,7 +5133,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.2 Core Classes",
     "text": "| Class | Required properties | Key relations | Notes |\n|---|---|---|---|\n| `OperationDataset` | `datasetId`, `sourceSystem`, `datasetType`, `extractDate`, `rowCount` | `hasSourceRow`, `usesMappingRule`, `producesAnalyticsRun` | Excel/API input container |\n| `OperationRecord` | `recordId`, `sourceRowId`, `recordType`, `eventDate`, `quantityPkg`, `volumeCbm`, `areaSqm` | `resolvesToShipmentUnit`, `referencesLocation`, `evidencesMilestone` | Row-level normalized record |\n| `DataMappingRule` | `ruleId`, `sourceColumn`, `targetProperty`, `transformType`, `version` | `appliesToDataset`, `mapsToClass` | Column mapping and normalization |\n| `AnalyticsRun` | `runId`, `runAt`, `runType`, `sourceDatasetHash`, `validationStatus` | `usesDataset`, `generatesKPI`, `generatesReport` | Reproducible analytics execution |\n| `KPIObservation` | `kpiId`, `metricCode`, `metricValue`, `metricUnit`, `observedAt`, `periodStart`, `periodEnd` | `computedFrom`, `forDomain`, `forLocation` | DQV-style metric |\n| `OperationalSnapshot` | `snapshotId`, `snapshotDate`, `snapshotType`, `cutoffAt` | `summarizesShipmentUnit`, `summarizesLocation`, `derivedFromRun` | Monthly/daily state |\n| `ReportArtifact` | `reportId`, `reportType`, `generatedAt`, `artifactHash`, `sheetCount` | `derivedFromRun`, `includesKPI` | Excel/PDF/dashboard output |\n| `ReconciliationResult` | `resultId`, `checkCode`, `status`, `deltaPct`, `findingCount` | `checksRecord`, `checksTargetObject`, `opensFinding` | Data quality validation |\n| `DataQualityFinding` | `findingId`, `severity`, `findingType`, `detectedAt`, `ownerDomain` | `aboutRecord`, `aboutTargetObject`, `requiresAction` | Exception list |\n| `OperationEvidenceLink` | `linkId`, `evidenceType`, `confidence`, `sourceRef` | `linksRecordToObject`, `derivedFromDocument`, `derivedFromCommunication` | Evidence bridge |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5145,7 +5145,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.3 Object Properties",
     "text": "| Property | Domain → Range | Cardinality | Purpose |\n|---|---|---:|---|\n| `resolvesToShipmentUnit` | `OperationRecord → ShipmentUnit` | 0..1 | Any-key identity join |\n| `evidencesMilestone` | `OperationRecord → MilestoneEvent` | 0..n | Row evidence for status transition |\n| `referencesLocation` | `OperationRecord → LocationNode` | 0..n | Port/WH/MOSB/site reference |\n| `usesMappingRule` | `OperationDataset → DataMappingRule` | 1..n | Mapping reproducibility |\n| `computedFrom` | `KPIObservation → AnalyticsRun/OperationalSnapshot` | 1..n | KPI provenance |\n| `generatesReport` | `AnalyticsRun → ReportArtifact` | 0..n | Report lineage |\n| `opensFinding` | `ReconciliationResult → DataQualityFinding` | 0..n | Quality exception |\n| `requiresAction` | `DataQualityFinding → ActionRequest` | 0..1 | Communication action hook |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5157,7 +5157,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.4 Data Properties",
     "text": "| Property | Range | Rule |\n|---|---|---|\n| `hasRoutingPattern` | SKOS enum | Values match master `ShipmentRoutingPattern` only |\n| `eventDate` | `xsd:dateTime` | ISO-8601; no ambiguous local dates |\n| `quantityPkg` | decimal | `>= 0.00`; integer package count when package unit applies |\n| `volumeCbm` | decimal | `>= 0.00`; preserve original unit evidence |\n| `areaSqm` | decimal | `>= 0.00`; mandatory for SQM billing rows |\n| `deltaPct` | decimal | Store as percentage with 2.00 decimal precision |\n| `validationStatus` | SKOS enum | `PASS`, `WARN`, `HIGH`, `CRITICAL`, `BLOCKED` |\n| `snapshotDate` | `xsd:date` | Monthly snapshot uses cutoff date, not generation date |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5169,7 +5169,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "3.5 Canonical KPI Dictionary",
     "text": "| KPI code | Formula | Target |\n|---|---|---:|\n| `OPS_ROUTE_COVERAGE` | ShipmentUnits with valid `hasRoutingPattern` / total ShipmentUnits | ≥ 95.00% |\n| `OPS_MILESTONE_COVERAGE` | ShipmentUnits with required milestones / total ShipmentUnits | ≥ 90.00% |\n| `OPS_STOCK_ACCURACY` | matched stock records / total stock records | ≥ 99.00% |\n| `OPS_DOUBLECOUNT_LEAKAGE` | duplicate counted records after reconciliation | 0.00건 |\n| `OPS_AGIDAS_GATE_PASS` | AGI/DAS site arrivals with M115/M116/M117 evidence / total AGI/DAS arrivals | 100.00% |\n| `OPS_REPORT_REFRESH_SLA` | report generation age | ≤ 4.00 hrs |\n| `OPS_DEMDET_RISK` | release-to-gateout breaches / total release events | ≤ 10.00% |\n| `OPS_ACTION_CLOSURE` | closed action requests / total action requests | ≥ 90.00% |\n| `OPS_VALIDATION_LATENCY` | validation p95 | < 5.00s |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5181,7 +5181,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.1 Source-to-Object Mapping",
     "text": "| Source | Consumed data | Operations object | Target domain owner |\n|---|---|---|---|\n| ERP / Procurement | PO, package, material, vendor, delivery plan | `OperationDataset`, `OperationRecord` | Master / procurement source |\n| WMS | M110/M111/M120/M121, stock, zone/bin, WHP evidence | `WarehouseStockKPI`, `StockSnapshotView` | CONSOLIDATED-02 |\n| ATLP / Customs | BOE, DO, release, gate-out, M90/M92/M100 | `MilestoneCoverageMetric`, `DEMDETExposureMetric` | Master / Material / Port |\n| LDG/OCR | VerificationResult, document discrepancy, route/destination evidence | `DataQualityFinding`, `OperationEvidenceLink` | CONSOLIDATED-03 |\n| Marine / Barge | M115/M116/M117, LCT trip, lashing/stability readiness | `MOSBDwellMetric`, `LCTUtilizationMetric` | CONSOLIDATED-04 |\n| Invoice / CostGuard | Invoice aging, cost bands, DEM/DET, SQM charges | `CostGuardSummary`, `SQMBillingMetric` | CONSOLIDATED-05 |\n| Material Handling | M90→M160 custody chain, site receipt, OSD/NCR/Claim | `SiteReceiptKPI`, `ExceptionBacklogMetric` | CONSOLIDATED-06 |\n| Port / OFCO | PortCall, ServiceEvent, TariffRef, release evidence | `PortServiceKPI`, `ReleaseDelayMetric` | CONSOLIDATED-07 |\n| Communication | Open actions, approval evidence, SLA breach | `SLAActionMetric`, `ApprovalCompletenessMetric` | CONSOLIDATED-08 |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5193,7 +5193,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.2 Data Pipeline",
     "text": "```text\n1. Ingest\n   - Read Excel/API rows.\n   - Preserve source file hash, sheet name, row number, extraction date.\n\n2. Normalize\n   - Trim whitespace, normalize date formats, resolve column aliases.\n   - Convert quantities to canonical unit while preserving original value.\n\n3. Map\n   - Apply DataMappingRule version.\n   - Create OperationRecord and candidate target object links.\n\n4. Resolve\n   - Run Any-key identity resolution.\n   - Link records to ShipmentUnit, Document, WarehouseTask, SiteReceipt, Invoice, Exception.\n\n5. Validate\n   - Run SHACL/SPARQL rules.\n   - Create ReconciliationResult and DataQualityFinding.\n\n6. Compute\n   - Generate OperationalSnapshot and KPIObservation.\n\n7. Publish\n   - Create ReportArtifact or dashboard view.\n   - Push open findings to Communication ActionRequest when needed.\n```",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5205,7 +5205,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.3 Two-track Date Model",
     "text": "Operations supports a two-track date model but does not overwrite the canonical event timeline.\n\n| Track | Source columns | Canonical target | Reporting output |\n|---|---|---|---|\n| WH track | DSV Indoor, Outdoor, AAA, MZP, WH Received, WH Dispatch | `WarehouseEvent`, `StockSnapshot`, `WarehouseTask` | WH in/out, dwell, stock aging |\n| Site track | AGI, DAS, MIR, SHU, site receipt date, POD/GRN | `SiteReceipt`, `MilestoneEvent` | Site arrival, receipt compliance |\n| MOSB track | MOSB staging date, LCT load/sail-away, offshore handover | `OffshoreStagingNode`, `MarineEvent`, `MilestoneEvent` | MOSB dwell, AGI/DAS gate |\n| Cost track | invoice date, draft/approved amount, DEM/DET clock | `Invoice`, `CostGuardResult`, `DEMDETClock` | Cost aging and risk |\n| Communication track | request date, approval date, escalation due date | `ActionRequest`, `ApprovalAction`, `SLAClock` | Open action and SLA report |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5217,7 +5217,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.4 5-Sheet Standard Report",
     "text": "| Sheet | Grain | Metrics | Source objects |\n|---|---|---|---|\n| `01_RoutingPattern` | ShipmentUnit | route pattern, stage, current location, exception status | ShipmentUnit, JourneyStage, MilestoneEvent |\n| `02_WH_Monthly` | Warehouse x month | inbound, outbound, stock, dwell, capacity | WarehouseEvent, StockSnapshot |\n| `03_Site_Monthly` | Site x month | arrivals, POD, GRN, OSD, NCR | SiteReceipt, InspectionEvent |\n| `04_PreArrival` | ShipmentUnit | ETA, doc readiness, release blockers | PortCall, Document, CustomsEntry |\n| `05_All_Transactions` | OperationRecord | source row, target object, validation status | OperationDataset, OperationRecord |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5229,7 +5229,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "4.5 27-Sheet Snapshot Pattern",
     "text": "`OperationalSnapshot` can generate detailed monthly snapshots by location group and domain. The B5 date or equivalent cutoff cell is treated as `snapshotDate`, while actual generation timestamp is `generatedAt`.\n\n| Snapshot group | Example sheets | Control |\n|---|---|---|\n| WH stock | Indoor, Outdoor, AAA, MZP, DG, OOG | WHP evidence only |\n| Site | AGI, DAS, MIR, SHU | SiteReceipt evidence |\n| MOSB / marine | MOSB staging, LCT trips, offshore pending | OffshoreStagingNode / MarineEvent |\n| Cost | Invoice aging, DEM/DET, SQM billing | CostGuard evidence |\n| Exception | OSD, NCR, claim, open communication actions | Exception + CommunicationEvent |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5241,7 +5241,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.1 SHACL — OperationRecord identity and date",
     "text": "```turtle\nops:OperationRecordShape a sh:NodeShape ;\n  sh:targetClass ops:OperationRecord ;\n  sh:property [ sh:path ops:recordId ; sh:minCount 1 ; sh:maxCount 1 ] ;\n  sh:property [ sh:path ops:sourceRowId ; sh:minCount 1 ; sh:maxCount 1 ] ;\n  sh:property [ sh:path ops:eventDate ; sh:datatype xsd:dateTime ; sh:minCount 1 ] ;\n  sh:property [ sh:path ops:quantityPkg ; sh:datatype xsd:decimal ; sh:minInclusive 0.00 ] .\n```",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5253,7 +5253,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.2 SHACL — RoutingPattern controlled vocabulary",
     "text": "```turtle\nops:RoutingPatternObservationShape a sh:NodeShape ;\n  sh:targetClass ops:OperationRecord ;\n  sh:property [\n    sh:path ops:hasRoutingPattern ;\n    sh:in ( \"PRE_ARRIVAL\" \"DIRECT\" \"WH_ONLY\" \"MOSB_DIRECT\" \"WH_MOSB\" \"MIXED\" ) ;\n  ] .\n```",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5265,7 +5265,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.3 SPARQL — Operations must not redefine core truth",
     "text": "```sparql\nPREFIX ops:    <http://samsung.com/project-logistics/operations#>\nPREFIX wh:     <http://samsung.com/project-logistics/warehouse#>\nPREFIX cost:   <http://samsung.com/project-logistics/cost#>\nPREFIX marine: <http://samsung.com/project-logistics/marine#>\nPREFIX comm:   <http://samsung.com/project-logistics/communication#>\n\nSELECT ?opsObj ?badPredicate WHERE {\n  ?opsObj a ?opsClass .\n  FILTER(?opsClass IN (ops:OperationRecord ops:KPIObservation ops:OperationalSnapshot))\n  ?opsObj ?badPredicate ?value .\n  FILTER(?badPredicate IN (\n    wh:confirmedFlowCode,\n    cost:costGuardVerdict,\n    marine:stabilityApprovalStatus,\n    comm:decision\n  ))\n}\n```\n\nExpected result: **0.00 rows**. Operations reads those fields from owners.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5277,7 +5277,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.4 SPARQL — Missing route pattern coverage",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?su WHERE {\n  ?su a hvdc:ShipmentUnit .\n  FILTER NOT EXISTS { ?su hvdc:hasRoutingPattern ?pattern }\n}\n```\n\nMetric: `OPS_ROUTE_COVERAGE`. Target: **≥ 95.00%**.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5289,7 +5289,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.5 SPARQL — AGI/DAS offshore gate",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\n\nSELECT ?su ?site WHERE {\n  ?su hvdc:finalDestination ?site ;\n      hvdc:hasMilestone hvdc:M130 .\n  FILTER(?site IN (\"AGI\", \"DAS\"))\n  FILTER NOT EXISTS { ?su hvdc:hasMilestone hvdc:M115 }\n  FILTER NOT EXISTS { ?su hvdc:hasHumanGatedException ?ex }\n}\n```\n\nExpected result: **0.00 rows** unless approved exception exists.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5301,7 +5301,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.6 SPARQL — WH stock double-count candidate",
     "text": "```sparql\nPREFIX ops: <http://samsung.com/project-logistics/operations#>\n\nSELECT ?su ?location ?date (COUNT(?record) AS ?cnt) WHERE {\n  ?record a ops:OperationRecord ;\n          ops:resolvesToShipmentUnit ?su ;\n          ops:referencesLocation ?location ;\n          ops:eventDate ?date ;\n          ops:recordType \"STOCK_IN\" .\n}\nGROUP BY ?su ?location ?date\nHAVING (COUNT(?record) > 1)\n```\n\nExpected result: **0.00 rows** after deduplication.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5313,7 +5313,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.7 SPARQL — M92 to M100 DEM/DET risk",
     "text": "```sparql\nPREFIX hvdc: <http://samsung.com/project-logistics#>\nPREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?su ?releasedAt ?gateOutAt WHERE {\n  ?su hvdc:hasMilestoneEvent ?m92 .\n  ?m92 hvdc:milestoneCode \"M92\" ;\n       hvdc:actualDt ?releasedAt .\n  OPTIONAL {\n    ?su hvdc:hasMilestoneEvent ?m100 .\n    ?m100 hvdc:milestoneCode \"M100\" ;\n          hvdc:actualDt ?gateOutAt .\n  }\n  FILTER(!BOUND(?gateOutAt) || (?gateOutAt > ?releasedAt + \"PT72H\"^^xsd:duration))\n}\n```\n\nCreates DEM/DET risk KPI only; Cost domain owns charge audit.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5325,7 +5325,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.8 SPARQL — Communication open action effect on operations",
     "text": "```sparql\nPREFIX comm: <http://samsung.com/project-logistics/communication#>\n\nSELECT ?target (COUNT(?request) AS ?openActions) WHERE {\n  ?request a comm:ActionRequest ;\n           comm:requestStatus \"OPEN\" ;\n           comm:targetObjectRef ?target .\n}\nGROUP BY ?target\n```\n\nUsed for dashboard backlog. Communication domain owns the action object.",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5337,7 +5337,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "5.9 RAG Check Rules",
     "text": "| RAG item | Trigger | Required action |\n|---|---|---|\n| Regulation / permit status appears in Ops data | customs, FANR, DCD, ADNOC, CICPA, GatePass fields | Re-check current evidence in document/compliance owner |\n| Cost value changes | invoice, DEM/DET, SQM billing, overage | Reconcile with CostGuard before dashboard approval |\n| Marine readiness status appears | M115/M116/M117, stability, lashing, weather | Link to CONSOLIDATED-04 evidence |\n| PII appears in source report | phone/e-mail or raw contact details | Mask or exclude before report artifact |\n| Spreadsheet row conflicts with system event | date/status discrepancy | Create `DataQualityFinding` and action request |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5348,8 +5348,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-operations · CONSOLIDATED-09",
     "version": "2.0-final",
     "sectionPath": "5.10 Human-gate",
-    "text": "Human-gate is required when:\n\n| Condition | Owner |\n|---|---|\n| KPI output would trigger operational state change | Target domain owner |\n| Cost exposure > 100,000.00 AED | Cost owner |\n| AGI/DAS M130 lacks MOSB/LCT evidence | Material + Marine owner |\n| Document evidence contradicts ERP/WMS event | LDG + target domain owner |\n| Report contains PII or restricted site access info | Data governance owner |\n| Dashboard suggests compliance decision | Compliance owner |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "text": "Human-gate is required when:\n\n| Condition | Owner |\n|---|---|\n| KPI output would trigger operational state change | Target domain owner |\n| Cost exposure > 100,000.00 AED | Cost owner |\n| AGI/DAS M130 lacks MOSB/LCT evidence | Material + Marine owner backfill queue |\n| Document evidence contradicts ERP/WMS event | LDG + target domain owner |\n| Report contains PII or restricted site access info | Data governance owner |\n| Dashboard suggests compliance decision | Compliance owner |\n\n---",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5361,7 +5361,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.1 Compliance Role",
     "text": "`CONSOLIDATED-09` provides analytics views and exception lists. It does not create compliance truth. Current authority status must remain with compliance/document owners and be refreshed through RAG and Human-gate when action date matters.\n\n| Area | Ops metric | Owner |\n|---|---|---|\n| Incoterms 2020 | Cost/risk responsibility summary by lane | Cost / Contract |\n| MOIAT / Customs | BOE readiness, M92 release, M100 gate-out risk | Customs / Document / Material |\n| FANR | certificate evidence completeness | Compliance / Document |\n| DCD / DG | DG storage/reporting risk | Warehouse / HSE / Document |\n| ADNOC / CICPA | GatePass, offshore/site access readiness | Material / Site / Port |\n| Port authority | PortCall / ServiceEvent delay and release blockers | Port operations |\n| Privacy | report artifact PII leakage | Communication / Data governance |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5373,7 +5373,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "6.2 Report Publication Guard",
     "text": "1. Every report artifact stores `generatedAt`, `sourceDatasetHash`, `mappingVersion`, and `validationStatus`.\n2. Any report containing unresolved high-risk findings is marked `BLOCKED`.\n3. PII-bearing source columns are excluded or masked before dashboard publication.\n4. Cost dashboards show CostGuard result as consumed evidence; they do not change verdict.\n5. Regulatory dashboards show evidence completeness, not authority approval as a fact unless a valid `ApprovalAction` exists.\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5385,7 +5385,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time)",
     "text": "| Option | Scope | Pros | Cons | Est. cost | Risk | Time |\n|---|---|---|---|---:|---|---:|\n| A | Lite Ops Mapping | Fast Excel-to-KPI mapping; preserves current reporting | Limited semantic validation | 40,000.00 AED | MEDIUM | 2.00 weeks |\n| B | Full Ops KG Validation | RDF/SHACL/SPARQL validation, reproducible analytics | Requires mapping governance | 95,000.00 AED | MEDIUM | 5.00 weeks |\n| C | Ops Twin Dashboard | Route/stock/site/MOSB/cost/action integrated dashboard | More integrations and owner review | 150,000.00 AED | HIGH | 7.00 weeks |\n| D | Predictive Ops Control | ETA MAPE, DEM/DET prediction, exception forecasting | Needs historical data quality and model governance | 230,000.00 AED | HIGH | 10.00 weeks |\n\nRecommended baseline: **Option B** for stable validation and monthly reporting. Use **Option C** when operations needs daily cross-domain control.\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5397,7 +5397,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI)",
     "text": "| Phase | Duration | Work package | KPI |\n|---|---:|---|---|\n| Prepare | 1.00 week | Confirm dataset inventory, header dictionary, owner matrix, mapping version | Dataset registry coverage ≥ 95.00% |\n| Pilot | 2.00 weeks | Build 5-sheet report and route/stock/site KPI with sample data | RoutingPattern calculation consistency = 100.00% |\n| Build | 3.00 weeks | Add RDF mapping, SHACL/SPARQL validation, snapshot generation | Validation pass rate ≥ 98.00% |\n| Operate | Ongoing | Daily dashboard, weekly exception review, monthly closeout report | ReportRefreshSLA ≤ 4.00 hrs |\n| Scale | 4.00 weeks | Add predictive ETA, DEM/DET risk, action closure automation | ETA MAPE ≤ 12.00% |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5409,7 +5409,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.1 Foundry Functions",
     "text": "| Function | Input | Output | Guard |\n|---|---|---|---|\n| `ingestOperationDataset` | Excel/API payload | `OperationDataset` | Hash and schema check |\n| `normalizeOperationRecord` | source row | `OperationRecord` | Header and date normalization |\n| `resolveOperationAnyKey` | OperationRecord keys | target object links | Identity confidence threshold |\n| `computeRoutingPatternKPI` | ShipmentUnit + milestone events | `RoutingPatternKPI` | Master route dictionary only |\n| `buildStockSnapshotView` | Warehouse events + stock records | `StockSnapshotView` | Double-count check |\n| `computeMOSBDwellMetric` | M115/M116/M117 events | `MOSBDwellMetric` | MOSB offshore-staging model |\n| `computeCostGuardSummary` | CostGuardResult + invoice aging | `CostGuardSummary` | Cost domain verdict read-only |\n| `publishReportArtifact` | AnalyticsRun + validations | `ReportArtifact` | Block if high-risk finding |\n| `openOpsFindingAction` | DataQualityFinding | Communication `ActionRequest` | Target owner assigned |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5421,7 +5421,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.2 RPA / Command Hooks",
     "text": "```text\n/logi-master kpi-dash --deep --KRsummary\n/logi-master report --deep --AEDonly\n/logi-master weather-tie --routing-pattern-analysis\n/visualize_data --type=heatmap operations-validation.json\n```",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5433,7 +5433,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "9.3 LLM Guardrail",
     "text": "| LLM output | Allowed use | Not allowed |\n|---|---|---|\n| KPI explanation | Narrative summary for dashboard | Changing KPI values |\n| Anomaly summary | Create review queue | Closing exception without owner |\n| Header mapping suggestion | Draft DataMappingRule | Publishing without validation |\n| ETA risk summary | Analyst alert | Replacing ETA source of truth |\n| Report note | Management summary | Regulatory decision |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5444,8 +5444,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-operations · CONSOLIDATED-09",
     "version": "2.0-final",
     "sectionPath": "9.4 Dashboard Alert Rules",
-    "text": "| Alert | Condition | Severity |\n|---|---|---|\n| Route missing | `hasRoutingPattern` absent | WARN |\n| AGI/DAS gate missing | M130 without M115/M116/M117 or approved exception | HIGH |\n| DEM/DET risk | M92 to M100 > 72.00 hrs | HIGH |\n| Duplicate stock | duplicate stock-in rows for same shipment/location/date | HIGH |\n| PII leakage | raw contact fields appear in report artifact | CRITICAL |\n| Cost overage | consumed CostGuardResult = HIGH/CRITICAL | HIGH/CRITICAL |\n| Open action breach | communication SLA breached | WARN/HIGH |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "text": "| Alert | Condition | Severity |\n|---|---|---|\n| Route missing | `hasRoutingPattern` absent | WARN |\n| AGI/DAS MOSB evidence missing | M130/site date exists without M115/M116/M117 | AMBER/WARN |\n| DEM/DET risk | M92 to M100 > 72.00 hrs | HIGH |\n| Duplicate stock | duplicate stock-in rows for same shipment/location/date | HIGH |\n| PII leakage | raw contact fields appear in report artifact | CRITICAL |\n| Cost overage | consumed CostGuardResult = HIGH/CRITICAL | HIGH/CRITICAL |\n| Open action breach | communication SLA breached | WARN/HIGH |\n\n---",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5456,8 +5456,8 @@ export const CORPUS_CHUNKS = [
     "title": "hvdc-operations · CONSOLIDATED-09",
     "version": "2.0-final",
     "sectionPath": "10.1 QA Checklist",
-    "text": "| # | Check | Expected |\n|---:|---|---|\n| 1.00 | Operations does not redefine core classes | PASS |\n| 2.00 | `ShipmentRoutingPattern` values match master dictionary | PASS |\n| 3.00 | WHP is consumed as warehouse evidence only | PASS |\n| 4.00 | MOSB is reported as offshore staging / marine interface | PASS |\n| 5.00 | Excel row status does not override source-system truth | PASS |\n| 6.00 | OperationDataset has hash, source, row count, mapping version | PASS |\n| 7.00 | OperationRecord has source row and event date | PASS |\n| 8.00 | Any-key resolution supports HVDC_CODE, BL, BOE, DO, invoice, package, container | PASS |\n| 9.00 | Two-track WH/site date model keeps WH and site metrics separate | PASS |\n| 10.00 | Stock double-count query returns 0.00 critical rows | PASS |\n| 11.00 | AGI/DAS M130 requires MOSB/LCT evidence or human-gated exception | PASS |\n| 12.00 | Report artifact includes validation status and source hash | PASS |\n| 13.00 | CostGuard result is read-only consumed evidence | PASS |\n| 14.00 | Communication SLA action metrics come from CONSOLIDATED-08 | PASS |\n| 15.00 | PII is masked before report publication | PASS |\n| 16.00 | Bulk/vessel analytics consume marine events from CONSOLIDATED-04 | PASS |\n| 17.00 | Regulatory status views are evidence completeness, not legal interpretation | PASS |\n| 18.00 | KPI decimal formatting uses 2.00 precision where numeric anchors are shown | PASS |\n| 19.00 | Validation p95 target remains < 5.00s | PASS |\n| 20.00 | ZERO/Failsafe is used when evidence or owner is missing | PASS |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "text": "| # | Check | Expected |\n|---:|---|---|\n| 1.00 | Operations does not redefine core classes | PASS |\n| 2.00 | `ShipmentRoutingPattern` values match master dictionary | PASS |\n| 3.00 | WHP is consumed as warehouse evidence only | PASS |\n| 4.00 | MOSB is reported as offshore staging / marine interface | PASS |\n| 5.00 | Excel row status does not override source-system truth | PASS |\n| 6.00 | OperationDataset has hash, source, row count, mapping version | PASS |\n| 7.00 | OperationRecord has source row and event date | PASS |\n| 8.00 | Any-key resolution supports HVDC_CODE, BL, BOE, DO, invoice, package, container | PASS |\n| 9.00 | Two-track WH/site date model keeps WH and site metrics separate | PASS |\n| 10.00 | Stock double-count query returns 0.00 critical rows | PASS |\n| 11.00 | AGI/DAS M130 accepts site date and creates MOSB evidence backfill when M115/M116/M117 is missing | PASS |\n| 12.00 | Report artifact includes validation status and source hash | PASS |\n| 13.00 | CostGuard result is read-only consumed evidence | PASS |\n| 14.00 | Communication SLA action metrics come from CONSOLIDATED-08 | PASS |\n| 15.00 | PII is masked before report publication | PASS |\n| 16.00 | Bulk/vessel analytics consume marine events from CONSOLIDATED-04 | PASS |\n| 17.00 | Regulatory status views are evidence completeness, not legal interpretation | PASS |\n| 18.00 | KPI decimal formatting uses 2.00 precision where numeric anchors are shown | PASS |\n| 19.00 | Validation p95 target remains < 5.00s | PASS |\n| 20.00 | ZERO/Failsafe is used when evidence or owner is missing | PASS |",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5469,7 +5469,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.2 Assumptions",
     "text": "| Assumption | Impact | Mitigation |\n|---|---|---|\n| Source Excel headers vary across reports | Mapping instability | Versioned `DataMappingRule` and header alias table |\n| Some shipment rows lack direct HVDC_CODE | Any-key resolution coverage risk | Resolve through BL, DO, BOE, invoice, PO, package, container |\n| SQM may be estimated for some cargo | Billing metric uncertainty | Mark estimated values and require cost owner review |\n| Site dates may be manually entered | Site KPI uncertainty | Reconcile against SiteReceipt/POD/GRN |\n| Marine events may be delayed in source systems | MOSB/LCT KPI lag | Flag stale data and request update through communication action |\n| Report users may expect spreadsheet-style status override | Semantic drift risk | Keep status evidence separate from operational truth |",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5481,7 +5481,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "10.3 ZERO / Fail-safe",
     "text": "| 단계 | 이유 | 위험 | 요청데이터 | 다음조치 |\n|---|---|---|---|---|\n| Report publish paused | Source hash or mapping version missing | Non-reproducible KPI | Dataset hash, mapping rule version | Re-run ingest and mapping |\n| KPI publish paused | Target object unresolved | False aggregation | HVDC key / BL / DO / invoice / package key | Run Any-key resolver |\n| Site receipt metric paused | Spreadsheet date conflicts with SiteReceipt | Wrong site status | POD/GRN/MRS/MIS evidence | Material handling owner review |\n| Cost metric paused | CostGuard verdict missing | Misleading financial view | Invoice and CostGuardResult | Cost owner review |\n| Compliance view paused | Current evidence missing | Wrong regulatory implication | Permit/SOP/current source evidence | RAG + compliance human-gate |\n| Report artifact paused | PII detected | Privacy leakage | Redaction policy and masked extract | Redact and revalidate |\n\n---",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]
@@ -5493,7 +5493,7 @@ export const CORPUS_CHUNKS = [
     "version": "2.0-final",
     "sectionPath": "11. CmdRec",
     "text": "```text\n/switch_mode RHYTHM + /logi-master kpi-dash --deep --KRsummary\n/logi-master report --deep --AEDonly\n/visualize_data --type=heatmap CONSOLIDATED-09-validation-report.json\n```",
-    "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+    "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
     "domains": [
       "operations"
     ]

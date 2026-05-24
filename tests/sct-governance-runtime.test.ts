@@ -53,12 +53,12 @@ const scenarios: RuntimeScenario[] = [
     humanGateRequired: true
   },
   {
-    name: "AGI DAS M130 close without chain evidence is blocked",
+    name: "AGI DAS M130 close without chain evidence is delivered with MOSB backfill",
     question: "BL-AUH-002 AGI/DAS M130 닫아도 돼? M115/M116/M117은 아직 없어.",
-    governanceGate: "ZERO",
-    acceptedRuntimeVerdicts: ["BLOCK", "NO_EVIDENCE"],
-    requiredReasonCodes: ["M130_CHAIN_EVIDENCE_REQUIRED", "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED"],
-    humanGateRequired: true
+    governanceGate: "AMBER",
+    acceptedRuntimeVerdicts: ["WARN", "BLOCK", "NO_EVIDENCE"],
+    requiredReasonCodes: ["MOSB_EVIDENCE_MISSING"],
+    humanGateRequired: false
   },
   {
     name: "site receipt without SITE_RECEIPT does not pass",

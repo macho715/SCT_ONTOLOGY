@@ -89,7 +89,7 @@ Independent Test: MOSB/LCT evidence complete, missing, stale, exception-approved
 Acceptance Scenarios:
 
 1. Given AGI/DAS route가 MOSB-inclusive이고 M115/M116/M117 evidence가 모두 존재한다, When M130 closure 질문이 들어온다, Then App은 PASS 또는 WARN verdict와 evidence list를 반환한다.
-2. Given M115/M116/M117 evidence 중 하나 이상이 누락된다, When M130 closure 질문이 들어온다, Then App은 BLOCK verdict와 missing evidence list를 반환한다.
+2. Given AGI/DAS site date 또는 M130 evidence가 존재하고 M115/M116/M117 evidence 중 하나 이상이 누락된다, When M130 closure 질문이 들어온다, Then App은 M130을 SiteReceipt/DELIVERED로 인정하고 AMBER/WARN backfill finding을 반환한다.
 3. Given approved exception record가 존재한다, When evidence 일부가 누락된다, Then App은 exception condition, approver role, audit record를 표시하고 limited PASS/WARN을 반환한다.
 
 ### User Story 5 - Invoice/CostGuard 답변 및 Human-gate (Priority: P2)
@@ -167,7 +167,7 @@ Acceptance Scenarios:
 - FR-012: System MUST show MULTIPLE_CANDIDATES when any-key confidence is below 0.95 or multiple candidates are plausible.
 - FR-013: System MUST render Ontology Path Viewer from identifier to relevant object path when GraphPath is available.
 - FR-014: System MUST validate answers using SHACL/SPARQL/RAG freshness/Human-gate rules before final display.
-- FR-015: System MUST block AGI/DAS M130 closure answer unless M115/M116/M117 evidence or approved exception exists.
+- FR-015: System MUST accept AGI/DAS site date as M130/SiteReceipt evidence and mark missing M115/M116/M117 as AMBER/WARN `MOSB_EVIDENCE_MISSING` backfill required.
 - FR-016: System MUST enforce Flow Code as WHP-only and block route classification use.
 - FR-017: System MUST mask phone numbers and email addresses in UI, logs, reports, and exports.
 - FR-018: System MUST allow operational names to be displayed only where project policy permits and only when relevant to role routing.

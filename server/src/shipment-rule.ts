@@ -138,10 +138,12 @@ function buildRisks(shipment: SampleShipment): Array<Record<string, unknown>> {
   const missingMosb = ["M115", "M116", "M117"].filter((code) => !hasMilestone(shipment, code));
   if (["AGI", "DAS", "AGI/DAS"].includes(cargoType) && hasMilestone(shipment, "M130") && missingMosb.length > 0) {
     risks.push({
-      severity: "BLOCK",
+      severity: "WARN",
       rule: "AGI/DAS MOSB Gate",
-      detail: `M130 exists but missing ${missingMosb.join(", ")}.`,
-      human_gate: true
+      detail: `M130 site arrival is accepted as delivered; missing ${missingMosb.join(", ")} MOSB-chain evidence requires backfill.`,
+      finding: "MOSB_EVIDENCE_MISSING",
+      backfill_required: true,
+      human_gate: false
     });
   }
 

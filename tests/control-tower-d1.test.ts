@@ -210,10 +210,18 @@ describe("Control Tower D1 MCP lookup integration", () => {
         shipmentUnitId: "HVDC-ADOPT-PPL-0003",
         declaredDestination: "AGI|MIR",
         routingPattern: "WH_MOSB_SITE",
-        status: "BLOCK",
+        status: "WARN",
         appliedRule: "V-AGIDAS-001",
-        missingMilestones: ["M115"],
-        humanGateRequired: true
+        missingMilestones: ["M115", "M116", "M117"],
+        siteReceiptStatus: "ARRIVED",
+        deliveryStatus: "DELIVERED",
+        dataQualityFinding: {
+          code: "MOSB_EVIDENCE_MISSING",
+          severity: "AMBER",
+          action: "Backfill M115/M116/M117 evidence",
+          backfillRequired: true
+        },
+        humanGateRequired: false
       });
     });
   });

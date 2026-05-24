@@ -176,12 +176,12 @@ export function validateGrounding(args: {
   if (AGI_DAS_M130.test(args.question) && M130.test(args.question)) {
     findings.push({
       ruleId: "V-AGIDAS-001",
-      reasonCode: "M130_CHAIN_EVIDENCE_REQUIRED",
-      severity: "BLOCK",
-      status: "BLOCK",
+      reasonCode: "MOSB_EVIDENCE_MISSING",
+      severity: "WARN",
+      status: "WARN",
       targetObject: "SiteReceipt/M130",
       evidenceIds,
-      message: "AGI/DAS M130 closure requires MOSB/LCT chain evidence such as M115/M116/M117 or approved exception."
+      message: "AGI/DAS site date is accepted as M130 Site Arrived / delivered; missing M115/M116/M117 MOSB-chain evidence is an AMBER backfill gap."
     });
   }
 
@@ -503,19 +503,19 @@ function composeSummary(question: string, verdict: Verdict, route: IntentRoute):
 
   if (AGI_DAS_M130.test(question) && M130.test(question)) {
     return {
-      summary: "AGI/DAS M130 closure는 현재 근거만으로 확정할 수 없습니다. MOSB/LCT chain evidence 확인 전 BLOCK입니다.",
-      businessImpact: "M115/M116/M117 등 선행 evidence 없이 site receipt를 닫으면 false receipt, claim, cost audit exposure가 발생할 수 있습니다.",
+      summary: "AGI/DAS site date가 있으면 M130 Site Arrived / 현장 배송 완료로 인정합니다. M115/M116/M117 누락은 BLOCK이 아니라 AMBER backfill 대상입니다.",
+      businessImpact: "site receipt를 부정하면 실제 배송 완료 건이 미완료로 남아 KPI와 재고가 왜곡됩니다. MOSB chain 누락은 배송 부정이 아니라 evidence gap으로 관리합니다.",
       details: [
         "CONSOLIDATED-00 master spine을 기준으로 material chain과 marine evidence를 함께 봐야 합니다.",
-        "MOSB-inclusive route는 M115/M116/M117 evidence 또는 승인된 exception이 필요합니다.",
-        "승인 없는 write/action/report close는 Human-gate 대상으로 처리합니다."
+        "Site track과 MOSB track을 분리해 AGI/DAS site date는 M130.actualDt로 먼저 인정합니다.",
+        "M115/M116/M117이 없으면 MOSB_EVIDENCE_MISSING finding을 만들고 Backfill Required로 처리합니다."
       ],
       actions: [
         {
-          actionType: "REQUEST_MOSB_LCT_EVIDENCE",
+          actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
           ownerRole: "Marine / Material Chain Owner",
-          parameters: { requiredEvidence: "M115/M116/M117 or approved exception" },
-          humanGateRequired: true,
+          parameters: { requiredEvidence: "M115/M116/M117 backfill evidence", dataQualityFinding: "MOSB_EVIDENCE_MISSING" },
+          humanGateRequired: false,
           dueAt: null
         }
       ]

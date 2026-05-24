@@ -33,7 +33,7 @@ Any-key Control Tower · Invoice COST-GUARD · MOSB Route Gate · Document Guard
 | Repository Governance | AGENTS.md: CONSOLIDATED-00 우선, Flow Code는 WHP.confirmedFlowCode만 허용 | route logic은 RoutingPattern/JourneyStage/MilestoneEvent/JourneyLeg만 사용 |
 | Document/OCR | CONSOLIDATED-03: Document/OCR output은 EvidenceAssertion/VerificationResult/AuditRecord | Document Guardian은 evidence-only; operational truth 직접 변경 금지 |
 | Cost | CONSOLIDATED-05/00: Δ%, PASS/WARN/HIGH/CRITICAL, >100,000.00 AED Human-gate | Invoice COST-GUARD는 dry-run verdict + proof 생성 |
-| Material/MOSB | CONSOLIDATED-06/00: AGI/DAS M130 전 M115 필요, M116/M117는 예외 없으면 필요 | MOSB Route Gate에서 M130 close BLOCK 판단 |
+| Material/MOSB | CONSOLIDATED-06/00: AGI/DAS site date는 M130 인정, M115/M116/M117 누락은 backfill 필요 | MOSB Route Gate에서 AMBER/WARN 판단 |
 | Communication/Team | CONSOLIDATED-08 + Team Matrix: communication은 evidence layer, milestone별 role mapping | Team Action Router는 담당 role/action만 제안하고 core class를 재정의하지 않음 |
 | **충돌 처리 원칙: Obsidian memory와 공식 ontology evidence가 충돌하면 CONSOLIDATED-00 master spine을 우선한다. MemoryHit는 EvidenceCandidate이며 ApprovalAction 없이는 transaction truth를 바꾸지 않는다.** | | |
 
@@ -151,8 +151,8 @@ CostGuardResult example:
 | **Item** | **Implementation** |
 | 입력 | ShipmentUnit, declaredDestination, routingPattern, milestones M115/M116/M117/M130, site receipt request |
 | 대상 route | AGI/DAS + MOSB\_DIRECT / WH\_MOSB / MIXED |
-| 핵심 로직 | M130 Site Arrived close 시도 시 M115 MOSB Staged 존재 확인. 일반 offshore transit이면 M116 LCT/Barge Loaded, M117 Sail-away Approved도 확인. |
-| Block 조건 | AGI/DAS offshore route인데 M130 actualDt가 있으나 M115 actualDt가 없으면 BLOCK. M116/M117 누락은 approved exception 없으면 WARN/BLOCK. |
+| 핵심 로직 | M130 Site Arrived/site date는 배송 완료로 인정하고, M115 MOSB Staged, M116 LCT/Barge Loaded, M117 Sail-away Approved 누락은 backfill 대상으로 확인. |
+| Block 조건 | AGI/DAS offshore route인데 M130 actualDt/site date가 있으면 DELIVERED로 인정. M115/M116/M117 누락은 MOSB_EVIDENCE_MISSING AMBER/WARN backfill. |
 | Output | RouteGateCard: PASS/BLOCK, missingMilestones, requiredEvidence, ownerRole, nextAction, humanGate |
 
 Rule V-AGIDAS-001:
@@ -160,7 +160,7 @@ IF declaredDestination IN ["AGI", "DAS"]
 AND routingPattern IN ["MOSB\_DIRECT", "WH\_MOSB", "MIXED"]
 AND M130.actualDt IS NOT NULL
 AND M115.actualDt IS NULL
-THEN BLOCK: "M130 cannot close. MOSB staging evidence M115 required."
+THEN WARN: "M130 accepted from site date. Backfill M115/M116/M117 MOSB evidence."
 
 # 9. Use Case 4 — Document Guardian
 
@@ -215,7 +215,7 @@ ActionProposal example:
 | 1 | MCP Router skeleton 작성: domain route, risk gate, tool call log | router.py / mcp\_session\_log | 질문 20건 domain 분류 ≥ 90.00% |
 | 2 | identifier\_index 구축: BL/BOE/DO/Invoice/HVDC\_CODE/Container/PO/Site key 정규화 | identifier\_index table | Any-key resolution ≥ 95.00% |
 | 3 | ShipmentUnit card 생성: currentStage/routing/location/milestone/document/cost 연결 | ShipmentTwinCard JSON | 카드 p95 < 5.00s |
-| 4 | MOSB Route Gate rule 구현 | V-AGIDAS-001 validator | AGI/DAS M130 누락 케이스 100.00% BLOCK |
+| 4 | MOSB Route Gate rule 구현 | V-AGIDAS-001 validator | AGI/DAS M130 + MOSB 누락 케이스 100.00% AMBER/WARN backfill |
 | 5 | Document Guardian validator 구현 | VerificationResult/AuditRecord | NumericIntegrity = 100.00% |
 | 6 | CostGuard calculator 구현 | CostGuardResult + proof JSON | 모든 line에 Δ%, band, verdict 부여 |
 | 7 | Team Action Router 구현 | ActionQueue + ownerRole mapping | open exception별 next action ≥ 95.00% |
@@ -237,7 +237,7 @@ ActionProposal example:
 | **Gate** | **Rule** | | | **Status Action** | |
 | Identity | identifierScheme/value/normalized/sourceSystem required | | | 누락 시 ZERO: source key 요청 | |
 | Route | RoutingPattern enum only; Flow Code를 route로 사용 금지 | | | 위반 시 BLOCK + migration note | |
-| MOSB | AGI/DAS MOSB route M130 close 전 M115 필요 | | | M115 누락 시 BLOCK | |
+| MOSB | AGI/DAS site date/M130 인정, M115 backfill 필요 | | | M115 누락 시 AMBER/WARN backfill | |
 | Document | CI/PL/BL/BOE/DO key/qty/weight consistency | | | 불일치 WARN/BLOCK | |
 | Cost | EA×Rate=Amount±0.01, Σ line=total±2.00%, Δ% band required | | | 불일치 BLOCK | |
 | Human-gate | >100,000.00 AED, HIGH/CRITICAL, HS/customs/safety/route mutation | | | approvalRef 없으면 dry-run only | |
@@ -369,7 +369,7 @@ IF invoiceTotal > 100000.00 or band in ["HIGH", "CRITICAL"]:
 | CostGuard V-COST-001/002/003 규칙 | ✅ DONE | |
 | CostGuard Human-gate > 100,000 AED | ✅ DONE | |
 | CostGuard rate_ref DB lookup | ⚠️ PARTIAL | 현재 인라인 계산만, RateRef 테이블 join 미구현 |
-| MOSB Gate V-AGIDAS-001 (M130 전 M115 필수) | ✅ DONE | |
+| MOSB Gate V-AGIDAS-001 (M130 인정 + MOSB evidence backfill) | ✅ DONE | |
 | MOSB Gate V-AGIDAS-002 (M116/M117 WARN) | ✅ DONE | |
 | MOSB Gate approvedExceptionRef bypass | ✅ DONE | |
 | Document Guardian qty/weight/containerNo/packageCount | ✅ DONE | |

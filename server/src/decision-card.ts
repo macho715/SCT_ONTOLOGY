@@ -136,6 +136,14 @@ export const RULE_MATRIX: Readonly<Record<string, DecisionRule>> = {
     blockedActions: ["Route classification", "Customs classification", "Invoice bucket", "Operations KPI bucket"],
     severity: "P0"
   },
+  "V-AGIDAS-001": {
+    ruleId: "V-AGIDAS-001",
+    ruleName: "AGI/DAS MOSB evidence backfill",
+    reason: "AGI/DAS site date is accepted as M130 delivered; missing M115/M116/M117 MOSB evidence requires backfill",
+    requiredInputs: ["M130.actualDt", "M115/M116/M117 backfill evidence"],
+    blockedActions: [],
+    severity: "P1"
+  },
   "SYS-ROUTER-001": {
     ruleId: "SYS-ROUTER-001",
     ruleName: "System QA intent isolation",
@@ -164,6 +172,7 @@ export const REASON_CODE_TO_RULE: Readonly<Record<string, string>> = {
   AMBIGUOUS_ANY_KEY: "SCT-CONF-006",
   FLOW_CODE_SCOPE_VIOLATION: "A-FLOW-001",
   FLOW_CODE_SCOPE_INFO: "A-FLOW-001",
+  MOSB_EVIDENCE_MISSING: "V-AGIDAS-001",
   M130_CHAIN_EVIDENCE_REQUIRED: "SCT-DOC-002",
   SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED: "SCT-DOC-002",
   SHIPMENT_MISSING_DOCUMENTS: "SCT-SCHEMA-007",

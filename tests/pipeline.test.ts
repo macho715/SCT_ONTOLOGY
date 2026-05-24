@@ -15,11 +15,11 @@ function actionText(action: ReturnType<typeof ask>["actions"][number]): string {
 }
 
 describe("HVDC ontology grounded answer pipeline", () => {
-  it("blocks AGI/DAS M130 closure without MOSB/LCT chain evidence", () => {
+  it("warns and requires backfill when AGI/DAS M130 has site evidence but MOSB/LCT chain evidence is missing", () => {
     const answer = ask("AGI M130 닫아도 돼? BL-535 관련");
-    expect(answer.verdict).toBe("BLOCK");
+    expect(answer.verdict).toBe("WARN");
     expect(answer.validation.some((item) => item.ruleId === "V-AGIDAS-001")).toBe(true);
-    expect(answer.validation.some((item) => item.reasonCode === "M130_CHAIN_EVIDENCE_REQUIRED")).toBe(true);
+    expect(answer.validation.some((item) => item.reasonCode === "MOSB_EVIDENCE_MISSING")).toBe(true);
     expect(answer.route.requiredDocs.some((doc) => doc.includes("CONSOLIDATED-00"))).toBe(true);
   });
 
@@ -179,8 +179,8 @@ describe("HVDC ontology grounded answer pipeline", () => {
       expect.arrayContaining([
         expect.objectContaining({
           ruleId: "V-SHIPMENT-AGIDAS-001",
-          reasonCode: "SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED",
-          status: "BLOCK",
+          reasonCode: "MOSB_EVIDENCE_MISSING",
+          status: "WARN",
           evidenceIds: []
         }),
         expect.objectContaining({
@@ -194,9 +194,9 @@ describe("HVDC ontology grounded answer pipeline", () => {
     expect(merged.actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          actionType: "REQUEST_SHIPMENT_RULE_HUMAN_GATE",
+          actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
           ownerRole: "Marine / Material Chain Owner",
-          humanGateRequired: true
+          humanGateRequired: false
         }),
         expect.objectContaining({
           actionType: "REQUEST_FINANCE_GATE_REVIEW",
@@ -220,7 +220,7 @@ describe("HVDC ontology grounded answer pipeline", () => {
     );
     expect(answer.actions).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ actionType: "REQUEST_SHIPMENT_RULE_HUMAN_GATE", humanGateRequired: true }),
+        expect.objectContaining({ actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE", humanGateRequired: false }),
         expect.objectContaining({ actionType: "REQUEST_FINANCE_GATE_REVIEW", humanGateRequired: true })
       ])
     );
@@ -575,17 +575,17 @@ describe("mergeShipmentValidation unit coverage", () => {
     expect(result.actions).toHaveLength(0);
   });
 
-  it("AGI/DAS MOSB Gate risk produces BLOCK finding and human gate action", () => {
+  it("AGI/DAS MOSB Gate risk produces WARN finding and backfill action", () => {
     const result = mergeShipmentValidation(makeRule({
       risks: [{ rule: "AGI/DAS MOSB Gate check", detail: "Missing M115 evidence." }]
     }));
     const finding = result.findings.find((f) => f.ruleId === "V-SHIPMENT-AGIDAS-001");
     expect(finding).toBeDefined();
-    expect(finding?.severity).toBe("BLOCK");
-    expect(finding?.reasonCode).toBe("SHIPMENT_AGIDAS_MOSB_CHAIN_REQUIRED");
-    const action = result.actions.find((a) => a.actionType === "REQUEST_SHIPMENT_RULE_HUMAN_GATE");
+    expect(finding?.severity).toBe("WARN");
+    expect(finding?.reasonCode).toBe("MOSB_EVIDENCE_MISSING");
+    const action = result.actions.find((a) => a.actionType === "BACKFILL_MOSB_CHAIN_EVIDENCE");
     expect(action).toBeDefined();
-    expect(action?.humanGateRequired).toBe(true);
+    expect(action?.humanGateRequired).toBe(false);
   });
 
   it("all rule findings always carry empty evidenceIds array", () => {

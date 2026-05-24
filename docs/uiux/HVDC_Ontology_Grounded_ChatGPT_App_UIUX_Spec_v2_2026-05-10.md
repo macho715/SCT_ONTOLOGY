@@ -170,7 +170,7 @@ Risk: BLOCK candidate
 
 [Answer Card]
 Verdict: ZERO / BLOCK
-Basis: AGI/DAS MOSB-inclusive route requires M115 before M130 close.
+Basis: AGI/DAS site date is accepted as M130; MOSB-inclusive route evidence M115/M116/M117 is backfilled when missing.
 Next action: Request MOSB staging evidence or approved exception.
 Sources: CONSOLIDATED-00, CONSOLIDATED-06, CONSOLIDATED-04
 [Open Evidence] [Open Graph Path] [Create Approval Request]
@@ -184,7 +184,7 @@ Sources: CONSOLIDATED-00, CONSOLIDATED-06, CONSOLIDATED-04
 | J2. Any-key lookup | ‘BL 123 현재 어디야?’ | identifier normalize → resolveAnyKey → ShipmentUnit graph | currentStage, milestones, docs, risks |
 | J3. Invoice audit help | ‘OFCO invoice 과청구인지 봐줘’ | CONSOLIDATED-05 + rate/evidence 조회 | CostGuard band, Δ%, missing evidence, approval gate |
 | J4. Customs/doc answer | ‘BOE와 DO 관계가 뭐야?’ | CONSOLIDATED-00 + 03 + 06/07 조회 | transaction/document split 설명 |
-| J5. Marine/MOSB gate | ‘DAS site arrival close 조건?’ | AGI/DAS gate rule + M115/M116/M117 evidence check | BLOCK/WARN/PASS with graph path |
+| J5. Marine/MOSB gate | ‘DAS site arrival close 조건?’ | AGI/DAS gate rule + M115/M116/M117 evidence check | WARN/PASS with graph path and backfill status |
 | J6. Team role answer | ‘이 업무 누가 owner야?’ | Team matrix + role docs + milestone map 조회 | owner, backup, evidence, escalation |
 | J7. Deep research request | ‘FANR 최신 규정 조사해줘’ | internal MCP docs + external research only if approved | AMBER/ZERO if no current public evidence |
 
@@ -217,7 +217,7 @@ Answer Card는 BRIEF-first를 기본으로 한다. 첫 화면에는 판정, 근�
 | Validation Summary | rule pass/warn/block count | block>0이면 answer body 대신 blocker summary |
 
 Answer Card default:
-1) 판정: ZERO — AGI/DAS MOSB-inclusive route는 M130 close 전에 M115 evidence 필요
+1) 판정: WARN — AGI/DAS site date는 M130으로 인정하고 M115/M116/M117 evidence는 backfill 필요
 2) 근거: CONSOLIDATED-00 AGI/DAS gate + CONSOLIDATED-06 material-chain rule
 3) 다음행동: M115 MOSB Staged evidence 또는 승인된 exception을 첨부
 
@@ -257,7 +257,7 @@ Identifier(invoiceNo=OFCO-2026-001)
 | Identity | IdentifierCompleteness, AnyKeyResolution | 미해결 key 후보 목록 + 사용자 확인 |
 | Route | RoutingPattern enum, no Flow Code route | Flow Code-as-route 감지 시 BLOCK |
 | Document | CI/PL/BL/BOE/DO consistency | 불일치 필드 highlight |
-| AGI/DAS | M130 requires M115 for MOSB route | ZERO + MOSB evidence request |
+| AGI/DAS | M130 accepts site date; MOSB evidence required for trace completeness | WARN/AMBER + backfill request |
 | Cost | EA×Rate=Amount±0.01, invoice total±2.00% | CostGuard band, high value approval |
 | Evidence | Evidence cannot own transaction truth | 답변을 proposal로 낮추고 action 차단 |
 | Security | PII, prompt injection, external content | redact or block with audit log |
@@ -309,7 +309,7 @@ MCP Server는 ChatGPT App이 직접 내부 파일/DB를 임의로 읽는 대신,
 | Source Precedence | CONSOLIDATED-00 > target extension > evidence layer | 상충 source 표시 후 master 우선 | conflict\_id |
 | No Truth Mutation | Document/communication cannot update operational truth | proposal로 낮추고 Action 버튼 disable | blocked\_action |
 | Flow Code Boundary | confirmedFlowCode only on WarehouseHandlingProfile | Flow Code route answer 차단 | V-FLOW-001 |
-| AGI/DAS MOSB Gate | M130 close requires M115 for MOSB-inclusive routes | ZERO + missing M115 input | V-AGIDAS-001 |
+| AGI/DAS MOSB Gate | M130 accepts site date; missing M115/M116/M117 is evidence gap | WARN/AMBER + backfill input | V-AGIDAS-001 |
 | Cost Human-gate | >100,000.00 AED or critical band requires approval | Approve/Reject required | approval\_ref |
 | PII Redaction | Tel/e-mail/raw personal fields masked | source hidden or role-only | pii\_redaction\_record |
 | Prompt Injection | External/source text cannot alter system/tool rules | Warning + ignore injected instruction | injection\_flag |
@@ -448,7 +448,7 @@ A:
 | **Test** | **Input** | **Expected** |
 | Master precedence | Question about Flow Code route | Reject Flow Code route; suggest RoutingPattern |
 | Evidence-only guard | OCR says route = WH\_MOSB | Treat as routeEvidence only, not truth |
-| AGI/DAS gate | M130 exists, M115 missing | ZERO/BLOCK with required M115 evidence |
+| AGI/DAS gate | M130 exists, M115 missing | WARN/AMBER with required MOSB backfill evidence |
 | CostGuard | Invoice line EA×Rate mismatch | V-COST-001 BLOCK |
 | PII | Contact file with phone/e-mail | Mask or hide raw PII |
 | Prompt injection | Source text says ignore rules | Ignore source instruction and log injection |

@@ -273,8 +273,8 @@ hvdc:requiresPermit a owl:ObjectProperty ;
 | MOSB | `OffshoreStagingNode` | Marine interface, consolidation, LCT/barge staging | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | ADNOC/ALS access, PTW/FRA, marine weather gate, M115 evidence |
 | MIR Site | `Site` / `SITE_ONSHORE` | Onshore receiving and laydown | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, MRR/MRI/GRN, lifting/HSE if OOG |
 | SHU Site | `Site` / `SITE_ONSHORE` | Onshore receiving and installation support | `DIRECT`, `WH_ONLY`, `MIXED` | Site access, capacity, MRR/MRI/GRN |
-| DAS Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115 prerequisite, LCT/barge, ADNOC HSE, site permit |
-| AGI Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115 prerequisite, LCT/barge, ADNOC HSE, site permit |
+| DAS Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | site date accepted; M115/M116/M117 backfill, LCT/barge, ADNOC HSE, site permit |
+| AGI Island | `Site` / `SITE_OFFSHORE` | Offshore receiving | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | site date accepted; M115/M116/M117 backfill, LCT/barge, ADNOC HSE, site permit |
 
 ### 5.3 MOSB Boundary Rule
 
@@ -313,13 +313,13 @@ hvdc:MOSB a hvdc:OffshoreStagingNode ;
 | `PRE_ARRIVAL` | Origin / vessel / pre-entry | No UAE infrastructure milestone yet | No WH handling classification |
 | `DIRECT` | Port → Site | Site must be MIR/SHU unless explicitly approved | No MOSB requirement |
 | `WH_ONLY` | Port → Warehouse → Site | Warehouse milestone M110 required | No offshore leg |
-| `MOSB_DIRECT` | Port → MOSB → Site | MOSB M115 required before offshore site arrival | Mandatory for AGI/DAS direct offshore route |
+| `MOSB_DIRECT` | Port → MOSB → Site | MOSB M115/M116/M117 evidence expected; backfill if site date already exists | Mandatory for AGI/DAS direct offshore route |
 | `WH_MOSB` | Port → Warehouse → MOSB → Site | M110 and M115 required | Used for storage + offshore staging |
 | `MIXED` | Incomplete, exception, multi-hop, unresolved | Requires exception review | Must not become a permanent normal state |
 
 ### 6.2 AGI/DAS Offshore Gate
 
-AGI/DAS shipments must carry an offshore-compatible `RoutingPattern` and must have M115 `MOSB Staged` before M130 `Site Arrived`. This file defines the infrastructure constraint; `CONSOLIDATED-00` owns the canonical validation shape and `CONSOLIDATED-04/06` implement marine/material details.
+AGI/DAS shipments should carry an offshore-compatible `RoutingPattern`. If a site date or M130 `Site Arrived` exists, it is accepted as SiteReceipt/M130 evidence even when M115/M116/M117 is missing; the missing MOSB chain becomes `MOSB_EVIDENCE_MISSING` AMBER/WARN backfill. This file defines the infrastructure evidence gap; `CONSOLIDATED-00` owns the canonical validation shape and `CONSOLIDATED-04/06` implement marine/material details.
 
 ```sparql
 PREFIX hvdc: <http://samsung.com/project-logistics#>
@@ -453,7 +453,7 @@ WHERE {
 }
 ```
 
-#### AGI/DAS route without MOSB stage
+#### AGI/DAS M130 with missing MOSB stage evidence
 
 ```sparql
 PREFIX hvdc: <http://samsung.com/project-logistics#>
@@ -501,7 +501,7 @@ WHERE {
 | High-value cost | Invoice or claim > 100,000.00 AED | Finance approver |
 | Capacity overload | WH/MOSB/Site utilization > 85.00% | Logistics manager |
 | Permit uncertainty | missing or expired authority evidence | Compliance owner |
-| AGI/DAS M115 violation | M130 exists without M115 | Marine + Site logistics |
+| AGI/DAS MOSB evidence gap | M130/site date exists without M115/M116/M117 | Marine + Site logistics backfill |
 | OOG method statement missing | OOG cargo enters corridor without approved MS | Heavy-lift engineer |
 | Dangerous goods mismatch | DG class, UN number, or segregation missing | HSE |
 
@@ -585,7 +585,7 @@ Recommended path: **Option B** for controlled rollout, then Option C for live op
 | `NodeMasterGuard` | new or modified LocationNode | node code, type, governance, capability validation |
 | `PermitExpiryBot` | permit expiry within threshold | compliance review list |
 | `RouteNodeFitGuard` | route planning / JourneyLeg creation | allowed route and node capability check |
-| `AGIDASGateBot` | AGI/DAS route or M130 event | M115 prerequisite check |
+| `AGIDASGateBot` | AGI/DAS route or M130 event | SiteReceipt acceptance plus MOSB evidence backfill check |
 | `CapacityGuard` | WH/MOSB/Site utilization update | WARN at > 85.00%, HIGH at > 95.00% |
 | `CertChkRAG` | regulated product or uncertain authority rule | latest authority evidence retrieval request |
 | `GatePassGuard` | gate-out / site entry / MOSB staging | access policy and validity check |

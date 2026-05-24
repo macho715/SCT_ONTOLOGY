@@ -228,7 +228,7 @@ KPI 목표는 `MarinePlanCoverage ≥ 95.00%`, `DeckPressurePassRate = 100.00%`,
 | `M117` | Sail-away Approved | weather/tide gate, stability approval, marine clearance, vessel readiness | Cannot depart if weather gate is HOLD/CLOSED without override |
 | `M118` | Offshore Arrival / Alongside | ATA AGI/DAS, berth/landing confirmation, site readiness | Cannot discharge if site access or lifting permit missing |
 | `M119` | Offshore Discharged | discharge checklist, receiving handover, damage/shortage note | Must create exception if OSD found |
-| `M130` | Site Arrived | site receipt / MRR / POD / GRN evidence | AGI/DAS requires prior M115/M116/M117 evidence unless exception approved |
+| `M130` | Site Arrived | site receipt / MRR / POD / GRN evidence | AGI/DAS site date is accepted as delivered; missing M115/M116/M117 becomes AMBER/WARN backfill |
 
 ### 4.3 MarineRoutingPattern Rules
 
@@ -245,7 +245,7 @@ KPI 목표는 `MarinePlanCoverage ≥ 95.00%`, `DeckPressurePassRate = 100.00%`,
 
 1. If `declaredDestination IN (AGI, DAS)`, the shipment must carry `ShipmentRoutingPattern IN (MOSB_DIRECT, WH_MOSB, MIXED)` or an explicit exception.
 2. If a marine leg is present, `MarineRoutingPattern` must be one of `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT`, `SPLIT_MARINE_LEG`, `EXCEPTIONAL_HEAVY_LIFT`.
-3. `M130 Site Arrived` for AGI/DAS is invalid without prior M115, M116, and M117 unless `ExceptionStatus = APPROVED_OVERRIDE`.
+3. `M130 Site Arrived` for AGI/DAS is valid when site date evidence exists. Missing prior M115, M116, or M117 creates `MOSB_EVIDENCE_MISSING` with AMBER/WARN severity and backfill required unless an approved exception explains the gap.
 4. MOSB laydown/storage is modeled as `LaydownArea` or `StorageCapability` attached to `OffshoreStagingNode`, not as a top-level `Warehouse`.
 
 ---
@@ -512,7 +512,7 @@ ShipmentUnit
 |---|---|---|---|
 | `MarineOperationBaseShape` | `MarineOperation` | operationId, status, ShipmentUnit link required | VIOLATION |
 | `MarineRoutingPatternShape` | `MarineOperation` | valid `MarineRoutingPattern` enum | VIOLATION |
-| `AGIDASMarineChainShape` | `ShipmentUnit` | AGI/DAS M130 requires M115/M116/M117 unless approved exception | VIOLATION |
+| `AGIDASMarineChainShape` | `ShipmentUnit` | AGI/DAS M130 accepts site date and flags missing M115/M116/M117 as backfill | WARN/AMBER |
 | `MOSBNodeBoundaryShape` | `LocationNode` | MOSB cannot be top-level Warehouse | VIOLATION |
 | `DeckPressureShape` | `StowagePosition` | deck pressure <= deck limit | VIOLATION |
 | `OOGDataCompletenessShape` | `OOGCargoUnit` | dimensions, weight, COG required | VIOLATION |
@@ -623,7 +623,7 @@ WHERE {
 | Lashing plan missing before M117 | Sea passage securing not evidenced | approved lashing plan and inspection |
 | Stability report missing before M117 | Sail-away safety not evidenced | approved stability case |
 | Deck capacity missing for assigned deck | Deck pressure cannot be validated | deck area load limits |
-| AGI/DAS M130 without M115/M116/M117 | MOSB/LCT chain broken | milestone evidence or approved exception |
+| AGI/DAS M130 without M115/M116/M117 | MOSB/LCT evidence gap; delivery still accepted if site date exists | milestone backfill evidence or approved exception |
 | Expired/missing PTW/JSA/TRA/gate pass | Authority/HSE gate not closed | valid permit evidence |
 | Weather/port control closed and no override | Go/no-go decision unsafe | official go/no-go approval |
 | OSD found and no exception record | Claim/audit chain broken | exception/OSDR/NCR record |

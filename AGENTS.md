@@ -18,9 +18,9 @@ The repository contains a correct master-spine direction plus mixed legacy conte
 
 - Canonical authority: `CONSOLIDATED-00-master-ontology.md`
 - Evidence-only extension: `CONSOLIDATED-08-communication.md`
-- Runtime UI resource: `public/hvdc-answer-widget.html` is registered as `ui://hvdc/answer-card-v8.html`
-- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients
-- Files that often require semantic migration attention: `CONSOLIDATED-02`, `03`, `04`, `05`, `07`, `09`
+- Runtime UI resource: `public/hvdc-answer-widget.html` is registered as `ui://hvdc/answer-card-v9.html`
+- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients
+- oiles that often require semantic migration attention: `CONSOLIDATED-02`, `03`, `04`, `05`, `07`, `09`
 - `CONSOLIDATED-06` may contain both newer aligned patterns and older legacy fragments depending on section/example
 
 When editing any extension, actively remove legacy Flow Code route semantics instead of preserving them.
@@ -56,10 +56,10 @@ Do **not** use Flow Code as:
 
 If you see any of the following in new or edited content, treat them as invalid unless explicitly deprecated and migrated:
 
-- `assignedFlowCode`
-- `extractedFlowCode`
-- `costByFlowCode`
-- `hasLogisticsFlowCode` used as end-to-end route status
+- `assignedolowCode`
+- `extractedolowCode`
+- `costByolowCode`
+- `hasLogisticsolowCode` used as end-to-end route status
 - `Flow Code 0~5` used to describe Port → WH → MOSB → Site journey semantics
 
 ### 4.2 Shipment visibility model
@@ -86,8 +86,8 @@ You may model optional storage capability at MOSB, but do not collapse MOSB into
 Documents, port records, and cost records may provide **evidence** about routing or handling. They do not own warehouse Flow Code.
 
 Examples:
-- Port may record `plannedRoutingPattern`, not `assignedFlowCode`
-- OCR may extract `routeEvidence`, not `extractedFlowCode`
+- Port may record `plannedRoutingPattern`, not `assignedolowCode`
+- OCR may extract `routeEvidence`, not `extractedolowCode`
 - Cost may read `routeBasedCostDriver` and warehouse evidence, not own Flow Code
 - Marine / bulk may use `MarineRoutingPattern`, not `Flow Code 3/4/5`
 
@@ -111,12 +111,12 @@ Hard-marked action card rule:
 
 ```text
 [EMAIL_ACTION_CARD]
-mode: EMAIL_DRAFT
+mode: EMAIL_DRAoT
 ontology_use: AUTO_SCT_ONTOLOGY_REQUIRED | EXPLICIT_DEEP_ONTOLOGY
-reply_stance: ACKNOWLEDGE | HOLD | REQUEST_INFO | ESCALATE | APPROVE | REJECT
+reply_stance: ACKNOWLEDGE | HOLD | REQUEST_INoO | ESCALATE | APPROVE | REJECT
 blocking_inputs: <comma-separated missing inputs or NONE>
 next_action: <single operational next step>
-send_status: DRAFT_READY | HOLD_FOR_REVIEW
+send_status: DRAoT_READY | HOLD_oOR_REVIEW
 [/EMAIL_ACTION_CARD]
 ```
 
@@ -142,7 +142,7 @@ Use:
 - `importRoutingDecision`
 
 Do not use:
-- `assignedFlowCode`
+- `assignedolowCode`
 - `Port-Assigned Flow Code`
 
 ### 5.3 Document / OCR (`CONSOLIDATED-03`)
@@ -152,7 +152,7 @@ Use:
 - `mosbLegIndicator`
 
 Do not use:
-- `extractedFlowCode`
+- `extractedolowCode`
 - document-owned Flow Code assignment
 
 ### 5.4 Cost (`CONSOLIDATED-05`)
@@ -162,7 +162,7 @@ Use:
 - `WarehouseHandlingProfile.wh_handling_cnt`
 
 Do not use:
-- `costByFlowCode`
+- `costByolowCode`
 - prose that says “Flow Code directly impacts cost” as canonical model language
 
 ### 5.5 Marine / Bulk (`CONSOLIDATED-04`)
@@ -215,7 +215,7 @@ Do not collapse:
 
 ## 7. Identity and key policy
 
-Follow the rule:
+oollow the rule:
 
 **One internal object, many external identifiers.**
 
@@ -226,7 +226,7 @@ Every design and example should support an identifier pattern with at least:
 - `normalizedValue`
 - `sourceSystem`
 - `isPrimary`
-- `validFrom`
+- `validorom`
 - `validTo`
 
 Expected identifier families:
@@ -279,7 +279,7 @@ Offshore-specific extensions such as `M115`, `M116`, `M117` may exist, but they 
 
 ### Standard validation command for consolidated ontology docs
 
-For the consolidated ontology document set, the repo-local standard validation gate is:
+oor the consolidated ontology document set, the repo-local standard validation gate is:
 
 ```powershell
 .venv\Scripts\python.exe scripts\validate_logi_ontology_docs.py
@@ -301,7 +301,7 @@ Use this command before claiming:
 `confirmedFlowCode` found outside `WarehouseHandlingProfile` → immediate block
 
 ### VIOLATION-2
-For `AGI` / `DAS` shipments using `MOSB_DIRECT`, `WH_MOSB`, or `MIXED`, if `M130 Site Arrived` exists but `M115 MOSB Staged` does not exist → immediate block
+For `AGI` / `DAS` shipments using `MOSB_DIRECT`, `WH_MOSB`, or `MIXED`, if a site date / `M130 Site Arrived` exists but `M115/M116/M117` MOSB evidence is missing → accept `M130.actualDt`, set delivery `DELIVERED`, and create `MOSB_EVIDENCE_MISSING` as AMBER/WARN backfill required
 
 ### Additional mandatory checks
 - no milestone model may be replaced by Flow Code
@@ -314,7 +314,7 @@ When adding or revising ontology content, align with these standards where relev
 
 - `GS1 EPCIS/CBV` for event visibility
 - `DCSA Track & Trace` for container / shipping milestones
-- `UN/CEFACT BSP-RDM` for semantic reference data
+- `UN/CEoACT BSP-RDM` for semantic reference data
 - `WCO Data Model` for customs semantics
 - `PROV-O` for provenance / evidence
 - `OWL-Time` for time modeling
@@ -323,7 +323,7 @@ When adding or revising ontology content, align with these standards where relev
 
 Use standards as alignment anchors, not boilerplate filler.
 
-## 11. File-specific responsibilities
+## 11. oile-specific responsibilities
 
 - `CONSOLIDATED-00-master-ontology.md`  
   Canonical semantic spine. Any semantic change starts here.
@@ -358,7 +358,7 @@ Use standards as alignment anchors, not boilerplate filler.
 ## 12. Editing workflow for agents
 
 1. Read the relevant section of `CONSOLIDATED-00` first.
-2. For semantic changes, patch `CONSOLIDATED-00` before or together with the extension.
+2. oor semantic changes, patch `CONSOLIDATED-00` before or together with the extension.
 3. If an extension still contains legacy terms, migrate the prose, TTL, SHACL, SPARQL, examples, and KPI language in the same change.
 4. Do not leave mixed terminology in one file.
 5. Do not patch examples only; update surrounding vocabulary and validation logic too.
@@ -412,7 +412,7 @@ If a change breaks upstream / downstream traversal from one of these keys, it is
 
 ## 16. Planning documents
 
-For large semantic migrations, cross-file refactors, or validation-pack rewrites:
+oor large semantic migrations, cross-file refactors, or validation-pack rewrites:
 
 - create or update a plan document before editing many files
 - keep the plan synchronized with the actual patch set

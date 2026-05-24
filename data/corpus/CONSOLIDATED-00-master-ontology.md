@@ -98,7 +98,7 @@ HVDC 물류 온톨로지의 master spine은 `ShipmentUnit`을 중심으로 Proje
 | `CONSOLIDATED-03-document-ocr.md` | LDG/OCR trust layer and cross-document validation | Documents extract `routeEvidence`, `destinationEvidence`, `mosbLegIndicator` only |
 | `CONSOLIDATED-04-barge-bulk-cargo.md` | Marine, bulk, OOG, lashing, stability, LCT/barge extension | Uses `MarineRoutingPattern`, `MarineEvent`, `OperationTask`, M115/M116/M117 |
 | `CONSOLIDATED-05-invoice-cost.md` | Invoice, rate reference, CostGuard, PRISM.KERNEL | Cost reads route + WH evidence; it does not own warehouse classification |
-| `CONSOLIDATED-06-material-handling.md` | Customs → WH → MOSB → Site material chain | Canonicalizes JourneyStage, milestones, AGI/DAS M115→M130 rule |
+| `CONSOLIDATED-06-material-handling.md` | Customs → WH → MOSB → Site material chain | Canonicalizes JourneyStage, milestones, AGI/DAS SiteReceipt/M130 acceptance plus MOSB evidence backfill rule |
 | `CONSOLIDATED-07-port-operations.md` | OFCO/PortCall/ServiceEvent/Tariff hub | Port records `plannedRoutingPattern` and `declaredDestination` as evidence |
 | `CONSOLIDATED-08-communication.md` | Email/chat evidence and action layer | Evidence only; no core logistics class redefinition |
 | `CONSOLIDATED-09-operations.md` | Ops analytics, routing KPI, reporting | Consumes `hasRoutingPattern`, milestone, stock, cost semantics |
@@ -734,7 +734,7 @@ Raw source
 | `V-FLOW-001` | `confirmedFlowCode` | subject must be `WarehouseHandlingProfile` | BLOCK |
 | `V-FLOW-002` | `WarehouseHandlingProfile` | confirmation requires M110 actual timestamp | BLOCK |
 | `V-ROUTE-001` | `ShipmentUnit` | RoutingPattern enum only | BLOCK |
-| `V-AGIDAS-001` | AGI/DAS unit | M130 requires M115 for MOSB-inclusive routes | BLOCK |
+| `V-AGIDAS-001` | AGI/DAS unit | site date/M130 is accepted as delivered; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` backfill | WARN/AMBER |
 | `V-DOC-001` | CI/PL/BL/BOE/DO | cross-document key, qty, weight consistency | WARN/BLOCK |
 | `V-CUSTOMS-001` | `CustomsEntry` | BOE document must be linked but not collapsed | BLOCK |
 | `V-RELEASE-001` | `ReleaseOrder` | DO document must exist before M100 | BLOCK |
@@ -812,7 +812,7 @@ hvdc:WarehouseHandlingConfirmationShape a sh:NodeShape ;
 hvdc:AGIDASStagingShape a sh:NodeShape ;
   sh:targetClass hvdc:ShipmentUnit ;
   sh:sparql [
-    sh:message "VIOLATION-2: AGI/DAS shipment missing MOSB staging milestone M115 before Site Arrived M130." ;
+    sh:message "VIOLATION-2: AGI/DAS shipment has Site Arrived M130 while MOSB chain evidence is missing; accept M130 and create MOSB_EVIDENCE_MISSING backfill." ;
     sh:select """
       PREFIX hvdc: <http://samsung.com/project-logistics#>
       SELECT $this WHERE {
@@ -894,7 +894,7 @@ WHERE {
 |---|---|
 | Invoice total > 100,000.00 AED | Finance Approver |
 | CostGuard `HIGH` / `CRITICAL` | Cost Control Lead |
-| AGI/DAS M130 without M115 | Marine Lead + Site Logistics |
+| AGI/DAS M130 without M115/M116/M117 | Marine Lead + Site Logistics backfill queue |
 | WHP override | Warehouse Manager |
 | Permit expired or missing | Compliance Lead |
 | OSD / NCR / damage / shortage | QA/QC + Claims |
@@ -939,7 +939,7 @@ WHERE {
 IF regulated product AND missing valid MOIAT/FANR/DCD permit → block DO / GatePass / Site Issue.
 IF hsCode missing on InvoiceLine / MaterialMaster → block BOE draft.
 IF gatePass expired before gate-out → block M100.
-IF AGI/DAS offshore cargo lacks marine approval evidence → block M117/M130.
+IF AGI/DAS site date exists and marine approval evidence is missing → accept M130, mark DELIVERED, and create AMBER/WARN MOSB_EVIDENCE_MISSING backfill; block only M117 marine approval if execution approval itself is requested.
 ```
 
 ---
@@ -1058,7 +1058,7 @@ hvdc:flowEvidenceSource a owl:ObjectProperty ;
 | `PreArrivalGuard` | M80 ATA / arrival notice | Validate CI/PL/BL/BOE/permit readiness |
 | `GateOutGuard` | M100 action attempt | Check DO, BOE cleared, gate pass validity |
 | `WHPInjector` | M110 WH Received | Create or update WarehouseHandlingProfile |
-| `AGIDASGuard` | M130 Site Arrived attempt | Require M115 for AGI/DAS MOSB routes |
+| `AGIDASGuard` | M130 Site Arrived attempt | Accept AGI/DAS site date as M130 and backfill missing M115/M116/M117 evidence |
 | `CostGuardBot` | Invoice loaded | Compute Δ%, band, proof artifact |
 | `OSDRClaimBot` | M132 OSD event | Create OSDR/Claim draft and evidence pack |
 | `ComplianceRAG` | Missing/expired permit | Retrieve latest approved SOP/authority evidence |

@@ -6,13 +6,13 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 ## Current State
 - Runtime: Cloudflare Workers MCP HTTP server at `/mcp`.
 - Default production endpoint: `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
-- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v8.html`.
+- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v9.html`.
 - `ask_hvdc_ontology` is data-only. It must not attach `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
-- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v8.html`.
+- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v9.html`.
 - UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Protected upload/write tools may write only to Cloudflare R2/D1 managed storage after OAuth Bearer scope and Human-gate approval.
-- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
+- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
 - New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed. Cloudflare production deployment is a separate manual release step unless an approved deployment workflow exists.
@@ -45,7 +45,7 @@ Never invent facts, fields, routes, cost rules, approval rules, or compliance in
 ## Semantic Boundaries
 - `Flow Code` is WHP-only.
 - Do not use `Flow Code` for route classification, port routing, customs stage, invoice bucket, or operations KPI bucket.
-- AGI/DAS M130 closure must be blocked unless M115/M116/M117 evidence or an approved exception exists.
+- AGI/DAS site date / M130 is accepted as SiteReceipt evidence; missing M115/M116/M117 is `MOSB_EVIDENCE_MISSING` AMBER/WARN backfill, not a delivery block.
 - Any-key resolution must support BL, BOE, DO, Invoice, HVDC code, site, and milestone identifiers.
 - If any-key confidence is ambiguous, return review state instead of choosing silently.
 
@@ -134,7 +134,7 @@ Before reporting completion, verify relevant items:
 - `CONSOLIDATED-00` route inclusion for ontology/operations questions
 - evidence exists and actually supports the answer
 - `NO_EVIDENCE` path returns no unsupported answer
-- AGI/DAS M130 missing-chain case blocks
+- AGI/DAS M130 missing-chain case warns and creates MOSB backfill
 - Flow Code misuse blocks outside WHP-only meaning
 - Human-gate applies to write/send/export/report/invoice/cost/approval requests
 - PII masking remains effective

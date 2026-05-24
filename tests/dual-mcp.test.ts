@@ -80,14 +80,21 @@ describe("MOSB Route Gate (V-AGIDAS-001)", () => {
     expect(result.humanGateRequired).toBe(false);
   });
 
-  it("BLOCK when AGI destination + M130 closed + M115 missing (V-AGIDAS-001)", () => {
+  it("WARN when AGI destination + M130 closed + M115 missing creates AMBER backfill (V-AGIDAS-001)", () => {
     const result = checkMosbGate("SU-002", "AGI", "MOSB_DIRECT", [
       { code: "M130", actualDt: "2025-01-10T00:00:00Z" }
     ]);
-    expect(result.status).toBe("BLOCK");
+    expect(result.status).toBe("WARN");
     expect(result.appliedRule).toBe("V-AGIDAS-001");
     expect(result.missingMilestones).toContain("M115");
-    expect(result.humanGateRequired).toBe(true);
+    expect(result.siteReceiptStatus).toBe("ARRIVED");
+    expect(result.deliveryStatus).toBe("DELIVERED");
+    expect(result.dataQualityFinding).toMatchObject({
+      code: "MOSB_EVIDENCE_MISSING",
+      severity: "AMBER",
+      backfillRequired: true
+    });
+    expect(result.humanGateRequired).toBe(false);
   });
 
   it("PASS when all MOSB chain milestones present for AGI", () => {
@@ -120,21 +127,22 @@ describe("MOSB Route Gate (V-AGIDAS-001)", () => {
     expect(result.status).toBe("PASS");
   });
 
-  it("DAS destination triggers the same BLOCK rule as AGI", () => {
+  it("DAS destination triggers the same AMBER backfill rule as AGI", () => {
     const result = checkMosbGate("SU-006", "DAS", "MOSB_DIRECT", [
       { code: "M130", actualDt: "2025-01-10T00:00:00Z" }
     ]);
-    expect(result.status).toBe("BLOCK");
+    expect(result.status).toBe("WARN");
     expect(result.appliedRule).toBe("V-AGIDAS-001");
   });
 
-  it("BLOCK when D1-style destination and routing strings imply AGI MOSB delivery", () => {
+  it("WARN when D1-style destination and routing strings imply AGI MOSB delivery with missing MOSB evidence", () => {
     const result = checkMosbGate("SU-007", "AGI|MIR", "WH_MOSB_SITE", [
       { code: "M130_SITE_RECEIVED", actualDt: "2025-01-10T00:00:00Z" }
     ]);
-    expect(result.status).toBe("BLOCK");
+    expect(result.status).toBe("WARN");
     expect(result.appliedRule).toBe("V-AGIDAS-001");
     expect(result.missingMilestones).toContain("M115");
+    expect(result.dataQualityFinding?.code).toBe("MOSB_EVIDENCE_MISSING");
   });
 });
 

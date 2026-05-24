@@ -60,7 +60,7 @@ semantic_patch:
   - "Program route truth uses ShipmentRoutingPattern + JourneyStage + JourneyLeg + MilestoneEvent."
   - "WarehouseHandlingProfile.confirmedFlowCode remains warehouse-only and is created/confirmed under CONSOLIDATED-02."
   - "MOSB is OffshoreStagingNode / MarineInterfaceNode, not Warehouse."
-  - "AGI/DAS site arrival is blocked unless MOSB/LCT chain evidence exists or a human-gated exception is approved."
+  - "AGI/DAS site arrival is accepted when site date exists; missing MOSB/LCT chain evidence creates AMBER/WARN backfill required."
 ---
 
 # hvdc-material-handling · CONSOLIDATED-06
@@ -193,7 +193,7 @@ KPI 목표는 `MaterialTraceCoverage ≥ 95.00%`, `AGIDASGateCompliance = 100.00
 | Bulk cargo | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M92/M100→M115→M116→M117→M130 | Marine readiness gate before M117 |
 | Transformer / OOG | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M100/M121→M115→M116→M117→M130 | Lift/stability/lashing evidence required |
 | MIR / SHU onshore | `DIRECT`, `WH_ONLY`, `MIXED` | M92→M100→M130 or M110→M121→M130 | MOSB not required unless routing evidence says otherwise |
-| AGI / DAS offshore | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115→M116→M117→M130 | M130 blocked without MOSB/LCT chain or approved exception |
+| AGI / DAS offshore | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | M115→M116→M117→M130 plus site-date M130 acceptance | Site date creates delivered M130; missing MOSB/LCT chain is AMBER/WARN backfill |
 | Dangerous Goods | Any allowed route with DG control | Permit/DCD/FANR/DG storage checks | Permit or segregation failure blocks M100/M110/M115 |
 
 ### 3.5 Milestone Chain
@@ -260,7 +260,7 @@ hvdc:evidencedByDocument a owl:ObjectProperty ;
 1. `MaterialHandlingCase` must resolve to exactly one `ShipmentUnit` through Any-key identity.
 2. `MaterialHandlingCase.hasRoutingPattern` must use `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, or `MIXED` only.
 3. `confirmedFlowCode` must not appear on `MaterialHandlingCase`, `SiteReceipt`, `CustomsReleaseGate`, `MOSBStagingTask`, `PortCall`, `Document`, `Invoice`, or `MarineOperation`.
-4. AGI/DAS material cannot reach M130 unless M115 exists, and M116/M117 are required unless direct exception approval is attached.
+4. AGI/DAS material with a site date can reach M130 and `DeliveryStatus=DELIVERED`; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` with AMBER/WARN severity and backfill required.
 5. `SiteReceipt` is the transaction owner; `MRR`, `MRI`, `POD`, `GRN`, and `OSDR` are evidence documents.
 
 ---
@@ -306,7 +306,7 @@ hvdc:evidencedByDocument a owl:ObjectProperty ;
 | `RecordWHReceipt` | WMS receipt | M110, `WarehouseInterfaceHandoff` | WH route or warehouse appointment evidence |
 | `RecordMOSBStaging` | MOSB laydown confirmation | M115, `MOSBStagingTask` | AGI/DAS or MOSB-inclusive route |
 | `ApproveSailAway` | marine readiness approval | M117, `MarineReadinessGate` | M115/M116 + stowage/lashing/stability/weather readiness |
-| `RecordSiteArrival` | site receipt event | M130, `SiteReceipt` | AGI/DAS requires M115 and usually M116/M117 |
+| `RecordSiteArrival` | site receipt event | M130, `SiteReceipt` | AGI/DAS site date is accepted; missing M115/M116/M117 becomes backfill |
 | `RecordInspectionGood` | QA/QC good inspection | M131, MAR | MRR/MRI evidence |
 | `RecordInspectionOSD` | shortage/damage/overage/wrong item | M132, OSDR, `MaterialException` | photo/MRI/OSDR proof pack |
 | `CloseMaterialIssue` | POD/GRN/MRS/MIS posted | M140 | quantity reconciliation |
@@ -352,7 +352,7 @@ Views   : Any-key trace, route gate board, AGI/DAS blocker, site GRN closure, OS
 | `MH-PERMIT-001` | regulated material | permit/certificate not expired at gate event | BLOCK |
 | `MH-DEMDET-001` | M92→M100 | alert if gate-out not completed within 72.00 hrs after DO release | WARN/HIGH |
 | `MH-WH-001` | `WH_ONLY` / `WH_MOSB` | M110 required before WH stock appears | BLOCK |
-| `MH-MOSB-001` | AGI/DAS | M130 requires M115; M116/M117 required unless approved exception | BLOCK |
+| `MH-MOSB-001` | AGI/DAS | M130 site date is accepted; missing M115/M116/M117 creates `MOSB_EVIDENCE_MISSING` | WARN/AMBER |
 | `MH-MARINE-001` | M117 | marine readiness gate must pass or carry approved exception | BLOCK |
 | `MH-SITE-001` | `SiteReceipt` | M130 must link site code and delivery evidence | BLOCK |
 | `MH-OSD-001` | M132 | OSDR + photo/inspection evidence required | BLOCK |
@@ -534,7 +534,7 @@ WHERE {
 |---|---|---|
 | MOIAT/FANR/DCD/ADNOC rule or permit mismatch | Re-check approved SOP / authority source on action date | Compliance Lead |
 | HS/BOE classification confidence < 0.95 | Review BOE/CI/PL/COO and broker note | Customs Lead |
-| AGI/DAS M130 without M115/M116/M117 | Require marine exception pack | Marine Lead + Site Logistics |
+| AGI/DAS M130 without M115/M116/M117 | Backfill MOSB/LCT evidence; delivery remains accepted when site date exists | Marine Lead + Site Logistics |
 | OOG/heavy cargo missing weight, dimension, COG, lift point | Request engineering document pack | Heavy Lift Engineer |
 | M132 OSD with high-value material | Require photo/MRI/OSDR/NCR pack | QA/QC + Claims |
 | Invoice/DEM/DET charge linked to delayed gate-out | Reconcile M92/M100 timestamps and rate master | Cost Control Lead |
@@ -547,7 +547,7 @@ WHERE {
 | Customs gate | BOE/DO/permit missing or expired | Customs / Compliance Lead | BOE, DO, permit/certificate |
 | Warehouse gate | WHP override or special storage | Warehouse Manager | M110/M111 evidence, storage note |
 | Marine gate | M117 approval or OOG/heavy lift | Marine Lead / Engineer / HSE | stowage, lashing, stability, weather, PTW |
-| AGI/DAS gate | M130 attempt without complete MOSB chain | Marine Lead + Site Logistics | approved bypass exception |
+| AGI/DAS gate | M130/site date with incomplete MOSB chain | Marine Lead + Site Logistics | backfill M115/M116/M117 evidence |
 | Site OSD gate | M132 OSD | QA/QC + Claims | OSDR, photos, MRI, NCR |
 | Cost gate | high DEM/DET, WH, marine, trucking dispute | Cost Control Lead | milestone evidence + invoice line |
 | Privacy gate | personnel contact evidence | Data Steward | masked contact/token only |
@@ -591,7 +591,7 @@ WHERE {
 ```text
 IF regulated material AND permit missing/expired           → BLOCK M90/M91/M100
 IF DG cargo AND DCD/DG segregation evidence missing        → BLOCK M110/M115
-IF AGI/DAS AND MOSB/LCT evidence missing                   → BLOCK M130
+IF AGI/DAS AND site date exists but MOSB/LCT evidence missing → ACCEPT M130, DELIVERED, AMBER/WARN backfill
 IF OOG/heavy cargo AND lift/stability/lashing pack missing → BLOCK M116/M117
 IF Site access permit missing                              → BLOCK M130
 IF OCR/confidence evidence below threshold                 → HUMAN-GATE before action write
@@ -639,7 +639,7 @@ IF OCR/confidence evidence below threshold                 → HUMAN-GATE before
 | `resolveAnyKey` | BL/container/DO/invoice/case/HVDC code | `ShipmentUnit` + confidence | confidence < 0.95 → review |
 | `computeCurrentStage` | milestone events | `JourneyStage` | missing predecessor → blocker |
 | `validateMaterialGate` | case + docs + permits + milestones | pass/warn/block | action submit gate |
-| `validateAGIDASGate` | destination + route + M115/M116/M117/M130 | pass/block | M130 gate |
+| `validateAGIDASGate` | destination + route + M115/M116/M117/M130 | pass/warn | M130 acceptance + MOSB backfill gate |
 | `openOSDRClaimPack` | M132 + inspection evidence | OSDR/NCR/Claim draft | QA/QC approval |
 | `linkCostEvidence` | M92/M100/M110/M115/M130 events + invoice lines | cost evidence link | CostGuard remains cost domain |
 
@@ -680,7 +680,7 @@ IF OCR/confidence evidence below threshold                 → HUMAN-GATE before
 | Alert | Condition | Recipient role |
 |---|---|---|
 | `DO_RELEASE_NO_GATEOUT` | M92 actual + 72.00 hrs and no M100 | Port / Customs / Transport Lead |
-| `AGIDAS_MISSING_MOSB` | AGI/DAS M130 candidate without M115 | Marine Lead + Site Logistics |
+| `AGIDAS_MISSING_MOSB` | AGI/DAS M130 accepted with missing M115/M116/M117 | Marine Lead + Site Logistics backfill |
 | `M117_BLOCKED` | marine readiness gate incomplete | Marine / HSE / Heavy Lift Engineer |
 | `OSD_OPEN` | M132 or OSDR uploaded | QA/QC + Claims |
 | `GRN_OVERDUE` | M130 + 48.00 hrs without M140 | Site Logistics |
@@ -702,7 +702,7 @@ IF OCR/confidence evidence below threshold                 → HUMAN-GATE before
 | 6.00 | Customs release | M100 requires M92 and blocker-free permit status |
 | 7.00 | DEM/DET alert | M92→M100 delay > 72.00 hrs creates alert |
 | 8.00 | WH interface | M110/M111/M120/M121 linked without assigning `confirmedFlowCode` |
-| 9.00 | AGI/DAS gate | M130 blocked without M115 and marine chain evidence/exception |
+| 9.00 | AGI/DAS gate | M130 accepted from site date; missing marine chain evidence becomes AMBER/WARN backfill |
 | 10.00 | Marine gate | M117 requires stowage/lashing/stability/weather approval or exception |
 | 11.00 | Site receipt | M130 creates/links `SiteReceipt` and MRR evidence |
 | 12.00 | Inspection outcome | M131 creates MAR; M132 creates OSDR/Exception |
@@ -731,7 +731,7 @@ IF OCR/confidence evidence below threshold                 → HUMAN-GATE before
 |---|---|---|---|---|
 | Customs gate | BOE/DO/permit evidence missing | illegal release / port hold / DEM-DET | BOE, DO, permit, clearance timestamp | block M100 and request customs evidence |
 | WH gate | M110 event missing for WH route | phantom stock / cost mismatch | WMS receipt, WH appointment, warehouse event | block WH stock creation |
-| MOSB gate | AGI/DAS lacks M115/M116/M117 | offshore delivery trace break | MOSB staging, LCT load, sail-away approval | block M130 unless approved exception |
+| MOSB gate | AGI/DAS lacks M115/M116/M117 | offshore evidence gap; delivery accepted from site date | MOSB staging, LCT load, sail-away approval | accept M130 and backfill evidence |
 | Site gate | MRR/MRI/POD/GRN missing | receipt/issue mismatch | MRR, MRI, POD, GRN, MRS/MIS | block M140 closure |
 | OSD gate | OSD without OSDR/NCR proof | claim leakage | OSDR, photos, inspection report, NCR | open exception/claim and block closeout |
 | Cost gate | invoice line lacks material event evidence | overbilling / dispute | invoice line, milestone, task, rate evidence | route to CostGuard review |

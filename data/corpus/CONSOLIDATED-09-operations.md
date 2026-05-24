@@ -436,7 +436,7 @@ Human-gate is required when:
 |---|---|
 | KPI output would trigger operational state change | Target domain owner |
 | Cost exposure > 100,000.00 AED | Cost owner |
-| AGI/DAS M130 lacks MOSB/LCT evidence | Material + Marine owner |
+| AGI/DAS M130 lacks MOSB/LCT evidence | Material + Marine owner backfill queue |
 | Document evidence contradicts ERP/WMS event | LDG + target domain owner |
 | Report contains PII or restricted site access info | Data governance owner |
 | Dashboard suggests compliance decision | Compliance owner |
@@ -534,7 +534,7 @@ Recommended baseline: **Option B** for stable validation and monthly reporting. 
 | Alert | Condition | Severity |
 |---|---|---|
 | Route missing | `hasRoutingPattern` absent | WARN |
-| AGI/DAS gate missing | M130 without M115/M116/M117 or approved exception | HIGH |
+| AGI/DAS MOSB evidence missing | M130/site date exists without M115/M116/M117 | AMBER/WARN |
 | DEM/DET risk | M92 to M100 > 72.00 hrs | HIGH |
 | Duplicate stock | duplicate stock-in rows for same shipment/location/date | HIGH |
 | PII leakage | raw contact fields appear in report artifact | CRITICAL |
@@ -559,7 +559,7 @@ Recommended baseline: **Option B** for stable validation and monthly reporting. 
 | 8.00 | Any-key resolution supports HVDC_CODE, BL, BOE, DO, invoice, package, container | PASS |
 | 9.00 | Two-track WH/site date model keeps WH and site metrics separate | PASS |
 | 10.00 | Stock double-count query returns 0.00 critical rows | PASS |
-| 11.00 | AGI/DAS M130 requires MOSB/LCT evidence or human-gated exception | PASS |
+| 11.00 | AGI/DAS M130 accepts site date and creates MOSB evidence backfill when M115/M116/M117 is missing | PASS |
 | 12.00 | Report artifact includes validation status and source hash | PASS |
 | 13.00 | CostGuard result is read-only consumed evidence | PASS |
 | 14.00 | Communication SLA action metrics come from CONSOLIDATED-08 | PASS |

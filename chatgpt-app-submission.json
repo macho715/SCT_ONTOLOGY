@@ -191,11 +191,11 @@
   },
   "test_cases": [
     {
-      "description": "Answer an AGI/DAS site closure question with blocking validation.",
+      "description": "Answer an AGI/DAS site closure question with delivered M130 plus AMBER/WARN MOSB evidence backfill validation.",
       "user_prompt": "AGI M130 닫아도 돼? BL-535 관련",
       "file_attachment_urls": null,
       "tools_triggered": "ask_hvdc_ontology",
-      "expected_output": "Returns a BLOCK verdict with required CONSOLIDATED documents, evidence snippets, validation findings, a human-gate next action, and the HVDC answer card.",
+      "expected_output": "Returns an AMBER/WARN verdict with required CONSOLIDATED documents, evidence snippets, MOSB_EVIDENCE_MISSING validation, a backfill next action, and the HVDC answer card.",
       "expected_output_url": null
     },
     {

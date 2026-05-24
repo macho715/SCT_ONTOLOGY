@@ -1,6 +1,6 @@
 // MOSB Route Gate — V-AGIDAS-001
-// AGI/DAS offshore routes require M115 MOSB staging evidence before M130 Site Arrived closes.
-// M116 LCT/Barge Loaded and M117 Sail-away Approved are also checked unless exception approved.
+// AGI/DAS site receipt dates are accepted as M130 Site Arrived evidence.
+// Missing M115/M116/M117 MOSB-chain evidence is an AMBER/WARN backfill gap, not a delivery block.
 
 export type RouteGateStatus = "PASS" | "WARN" | "BLOCK";
 
@@ -12,6 +12,14 @@ export type RouteGateCard = {
   appliedRule: string | null;
   missingMilestones: string[];
   requiredEvidence: string[];
+  siteReceiptStatus?: "ARRIVED";
+  deliveryStatus?: "DELIVERED";
+  dataQualityFinding?: {
+    code: "MOSB_EVIDENCE_MISSING";
+    severity: "AMBER";
+    action: string;
+    backfillRequired: true;
+  };
   ownerRole: string;
   nextAction: string;
   humanGateRequired: boolean;
@@ -99,20 +107,32 @@ export function checkMosbGate(
   const missingMilestones: string[] = [];
   const requiredEvidence: string[] = [];
 
-  // V-AGIDAS-001: M130 close requires M115
+  // V-AGIDAS-001: M130 is accepted from site evidence; missing M115 becomes AMBER backfill.
   if (m130Closed && !m115Staged) {
-    missingMilestones.push("M115");
-    requiredEvidence.push("MOSB staging record", "Staging confirmation from Marine Supervisor");
+    missingMilestones.push("M115", ...(!m116Loaded ? ["M116"] : []), ...(!m117SailAway ? ["M117"] : []));
+    requiredEvidence.push(
+      "Backfill M115 MOSB staging record",
+      "Backfill M116 LCT/Barge load manifest",
+      "Backfill M117 sail-away approval document"
+    );
     return {
       ...base,
-      status: "BLOCK",
+      status: "WARN",
       appliedRule: "V-AGIDAS-001",
       missingMilestones,
       requiredEvidence,
+      siteReceiptStatus: "ARRIVED",
+      deliveryStatus: "DELIVERED",
+      dataQualityFinding: {
+        code: "MOSB_EVIDENCE_MISSING",
+        severity: "AMBER",
+        action: "Backfill M115/M116/M117 evidence",
+        backfillRequired: true
+      },
       ownerRole: "Marine Supervisor",
-      nextAction: "Provide M115 MOSB staging evidence before M130 can be closed.",
-      humanGateRequired: true,
-      message: "BLOCK: M130 Site Arrived cannot close without M115 MOSB Staged evidence (V-AGIDAS-001)."
+      nextAction: "Keep M130 Site Arrived as delivered; backfill missing M115/M116/M117 MOSB-chain evidence.",
+      humanGateRequired: false,
+      message: "AMBER/WARN: M130 Site Arrived is accepted from AGI/DAS site date; MOSB-chain evidence is missing and must be backfilled (V-AGIDAS-001)."
     };
   }
 

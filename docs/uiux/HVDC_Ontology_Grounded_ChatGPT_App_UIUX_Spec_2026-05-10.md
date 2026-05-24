@@ -65,7 +65,7 @@ KPI/ROI: Answer Grounding Coverage 100.00%, Source Traceability ≥ 95.00%, Any-
 | **사용자 질문 유형** | **앱이 해야 할 일** | **주 조회 문서** |
 | --- | --- | --- |
 | ‘이 자재 현재 상태?’ | Any-key 추출 → ShipmentUnit 연결 → milestone/currentStage 반환 | 00, 06, 09 |
-| ‘AGI/DAS M130 닫아도 돼?’ | RoutingPattern + M115/M116/M117 evidence check → block/pass 판단 | 00, 04, 06, 08 |
+| ‘AGI/DAS M130 닫아도 돼?’ | RoutingPattern + site date + M115/M116/M117 evidence check → delivered/warn/pass 판단 | 00, 04, 06, 08 |
 | ‘이 invoice 과청구야?’ | InvoiceLine → RateRef/TariffRef → CostGuardResult → Human-gate | 05, 03, 07 |
 | ‘Flow Code 어디에 써?’ | WHP-only rule 설명, route classification 금지 표시 | 00, 02, AGENTS |
 | ‘누가 담당?’ | Milestone/role matrix 조회, PII masking 후 role-level 답변 | Team Matrix, person docs, 08 |
@@ -222,7 +222,7 @@ hvdcapp:referencesCoreTwin rdfs:domain hvdcapp:GroundedAnswer ; rdfs:range hvdc:
 
 **Grounded Answer Card sample**
 
-[Verdict: BLOCK] AGI/DAS M130 closure cannot be confirmed
+[Verdict: WARN] AGI/DAS M130 is accepted from site date; MOSB evidence backfill required
 - Why: MOSB/LCT chain evidence is missing or stale.
 - Ontology route: CONSOLIDATED-00 -> CONSOLIDATED-06 -> CONSOLIDATED-04 -> CONSOLIDATED-08
 - Evidence: M115/M116/M117 required for MOSB-inclusive AGI/DAS route.
@@ -269,19 +269,19 @@ MCP tool은 ChatGPT에게 앱 사용법을 알려주는 ‘manual’ 역할을 �
 
 {
  "answerId": "ans\_20260510\_001",
- "verdict": "BLOCK",
+ "verdict": "WARN",
  "dataStatus": "OK",
  "businessResultVisible": true,
  "fallbackUsed": false,
- "summary": "AGI/DAS site arrival closure requires MOSB/LCT chain evidence.",
- "businessImpact": "Closing without evidence may create false site receipt and audit exposure.",
+ "summary": "AGI/DAS site date is accepted as M130 Site Arrived; MOSB/LCT chain evidence must be backfilled.",
+ "businessImpact": "Blocking delivered site receipts may distort KPI and inventory; missing MOSB evidence remains an audit backfill gap.",
  "usedSources": [
  {"docId":"CONSOLIDATED-00", "role":"canonical spine", "version":"2.0-final"},
  {"docId":"CONSOLIDATED-06", "role":"material-chain owner", "version":"2.0-final"}
  ],
  "resolvedEntities": [{"entityType":"ShipmentUnit", "targetRid":"su\_...", "confidence":0.97}],
- "validation": [{"ruleId":"V-AGIDAS-001", "reasonCode":"M130_CHAIN_EVIDENCE_REQUIRED", "status":"BLOCK", "severity":"BLOCK"}],
- "actions": [{"actionType":"REQUEST\_MOSB\_EVIDENCE", "ownerRole":"Marine Lead", "humanGateRequired":true}]
+ "validation": [{"ruleId":"V-AGIDAS-001", "reasonCode":"MOSB_EVIDENCE_MISSING", "status":"WARN", "severity":"WARN"}],
+ "actions": [{"actionType":"BACKFILL\_MOSB\_CHAIN\_EVIDENCE", "ownerRole":"Marine Lead", "humanGateRequired":false}]
 }
 
 `uiTemplate` metadata belongs to `render_hvdc_answer_card`. Data tools such as `ask_hvdc_ontology` and `search_ontology_corpus` return structured evidence data without directly attaching the iframe. In the current runtime, `ask_hvdc_ontology` also omits `structuredContent.ui`; `render_hvdc_answer_card` adds `ui.templateUrl`, `templateVersion`, and `schemaVersion` only when the card is actually rendered.
@@ -437,7 +437,7 @@ Validation은 답변 후 장식이 아니라 답변 생성 전 필수 gate다. f
 | Master Spine | 모든 질문 | CONSOLIDATED-00 조회 완료 | BLOCK if omitted |
 | Any-key | identifier 포함 질문 | candidate confidence ≥ 0.95 또는 human review | MULTIPLE\_CANDIDATES |
 | Flow Code | route/warehouse 질문 | Flow Code는 WHP-only로 제한 | SEMANTIC\_BLOCK |
-| AGI/DAS | M130/Site closure | M115/M116/M117 evidence or approved exception | BLOCK |
+| AGI/DAS | M130/Site closure | site date plus M115/M116/M117 backfill evidence | WARN/AMBER |
 | CostGuard | invoice/rate 질문 | line arithmetic + band + threshold check | PASS/WARN/HIGH/CRITICAL |
 | PII | role/person 답변 | phone/email masked; role-only where possible | REDACTED |
 | Currentness | 법/요율/SOP 질문 | approved current source refreshed | STALE\_SOURCE |
@@ -583,11 +583,11 @@ WHERE {
 │ Route: 00 Master → 06 Material Handling → 04 Marine → 08 Communication │
 │ Confidence: 0.96 | Freshness: corpus 2026-04-27 | PII: masked │
 ├──────────────────────────────────────────────────────────────────────────┤
-│ Verdict: BLOCK │
-│ Summary: M130 closure requires MOSB/LCT evidence for AGI/DAS routes. │
-│ Business impact: false site receipt, claim/cost audit exposure. │
-│ Next action: request M115/M116/M117 evidence and approval action. │
-│ [Open Evidence] [Open Graph Path] [Create Approval Request] │
+│ Verdict: WARN │
+│ Summary: M130 is accepted from AGI/DAS site date; MOSB/LCT evidence needs backfill. │
+│ Business impact: blocking delivered receipts may distort KPI and inventory. │
+│ Next action: backfill M115/M116/M117 evidence. │
+│ [Open Evidence] [Open Graph Path] [Create Backfill Task] │
 └──────────────────────────────────────────────────────────────────────────┘
 
 ## A2. Evidence Drawer
@@ -599,9 +599,9 @@ Evidence Drawer
 Source: CONSOLIDATED-06-material-handling.md
 Role: material-chain execution continuity
 Section: Governance & Scope Boundary / AGI-DAS gate
-Snippet: AGI/DAS site arrival is blocked unless MOSB/LCT chain evidence exists...
+Snippet: AGI/DAS site arrival is accepted when site date exists; missing MOSB/LCT chain evidence creates backfill...
 Truth owner: Material Handling / Marine evidence owner
-Validation: V-AGIDAS-001 = BLOCK
+Validation: V-AGIDAS-001 = WARN/AMBER
 Hash: sha256:...
 PII: none
 
