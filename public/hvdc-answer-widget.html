@@ -148,6 +148,12 @@
       .decision-card-table th { color: #1e293b; background: #e2eaf4; font-weight: 900; }
       .decision-card-table tr:last-child td { border-bottom: none; }
       .decision-trace .decision-card-panel:last-child { grid-column: 1 / -1; font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace; font-size: 0.86rem; line-height: 1.55; background: #f8fafc; }
+      .case-status-card { border: 1px solid #b7c7dc; border-radius: 22px; padding: 22px; margin: 0 0 20px; background: linear-gradient(145deg, #ffffff, #f3f8ff); color: #0f172a; box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12); color-scheme: light; }
+      .case-status-card h2 { margin: 0 0 10px; font-size: 1.2rem; color: #0f172a; }
+      .case-status-card p, .case-status-card td, .case-status-card th, .case-status-card div { color: #0f172a; }
+      .case-status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 14px 0; }
+      .case-status-metric { border: 1px solid #9fb3cc; border-radius: 16px; padding: 14px; background: #fff; overflow-wrap: anywhere; }
+      .case-status-metric strong { display: block; margin-bottom: 6px; color: #334155; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
       .evidence { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
       .evidence:first-of-type { border-top: none; }
       .trace-line { display: inline; }
@@ -491,13 +497,151 @@
 
       function normalizeToolOutput(payload) {
         if (!payload) return null;
-        if (payload.structuredContent) return payload.structuredContent;
-        if (payload.params?.structuredContent) return payload.params.structuredContent;
-        if (payload.result?.structuredContent) return payload.result.structuredContent;
-        if (payload.result?.content?.[0]?.structuredContent) return payload.result.content[0].structuredContent;
-        if (payload.toolOutput) return payload.toolOutput;
-        if (payload.answer) return payload.answer;
-        return payload;
+        const output =
+          payload.structuredContent ??
+          payload.params?.structuredContent ??
+          payload.result?.structuredContent ??
+          payload.result?.content?.[0]?.structuredContent ??
+          payload.toolOutput ??
+          payload.answer ??
+          payload;
+        return normalizeCaseStatusOutput(output);
+      }
+
+      function reportStatusToVerdict(status) {
+        const normalized = String(status ?? "").toUpperCase();
+        if (normalized === "NO_EVIDENCE") return "ZERO";
+        if (normalized === "WARN") return "WARN";
+        if (normalized === "BLOCK") return "BLOCK";
+        return "PASS";
+      }
+
+      function formatReportDate(value) {
+        return displayValue(value, "-");
+      }
+
+      function caseCardValue(report, label) {
+        return asArray(report?.caseCard).find((field) => field?.label === label)?.value ?? null;
+      }
+
+      function canonicalEventSummary(report) {
+        return asArray(report?.canonicalEvents)
+          .slice(0, 8)
+          .map((event) => `${displayValue(event.eventType)} ${formatReportDate(event.eventDate)} ${displayValue(event.siteCode, "-")}`)
+          .join(" | ");
+      }
+
+      function normalizeCaseStatusOutput(output) {
+        const report = output?.report && typeof output.report === "object" ? output.report : null;
+        if (!report || output.verdict) return output;
+        const verdict = reportStatusToVerdict(report.reportStatus);
+        const latest = report.latestStatus ?? {};
+        const whDwell = report.whDwell ?? {};
+        const siteIntake = report.siteIntake ?? {};
+        const shipment = report.shipment ?? {};
+        const warning = asArray(report.validationFindings).find((finding) => String(finding?.severity ?? "").toUpperCase().includes("WARN"));
+        const summary = `${report.shipmentUnitId} ${displayValue(latest.latestEventType, "status")} / ${formatReportDate(latest.latestEventDate)}`;
+        const businessImpact = warning
+          ? `${displayValue(warning.reasonCode, "WARN")} remains open. Site receipt can still be accepted when actual site date is present.`
+          : "Case status projection is loaded from the WH Status D1 Control Tower.";
+        return {
+          ...output,
+          report,
+          verdict,
+          validationStatus: verdict,
+          summary,
+          businessImpact,
+          details: [
+            `Case No: ${displayValue(caseCardValue(report, "Case No.") ?? report.cargoSummary?.sourceLineId)}`,
+            `Current location: ${displayValue(shipment.currentLocation ?? latest.siteCode)}`,
+            `Latest status: ${displayValue(latest.latestEventType)} / ${formatReportDate(latest.latestEventDate)}`,
+            `Warehouse In: ${formatReportDate(report.warehouseDates?.warehouseIn ?? whDwell.warehouseIn)}`,
+            `Warehouse Out: ${formatReportDate(report.warehouseDates?.warehouseOut ?? whDwell.warehouseOut)}`,
+            `Dwell days: ${displayValue(whDwell.dwellDays, "-")}`,
+            `Site intake: ${formatReportDate(siteIntake.siteReceiptDate)} / ${displayValue(siteIntake.siteCodes, "-")}`,
+            `Canonical events: ${canonicalEventSummary(report) || "No canonical events"}`
+          ],
+          route: {
+            routeId: `control-tower-${report.shipmentUnitId}`,
+            requiredDocs: ["hvdc_wh_status.xlsx", "D1 canonical_shipment_events", "status_latest_per_su"],
+            confidence: 1,
+            routingReason: "Case No lookup loaded from Control Tower D1 projection."
+          },
+          evidence: [
+            {
+              id: `CT-${report.shipmentUnitId}`,
+              docId: "hvdc_wh_status.xlsx",
+              title: "WH Status Control Tower projection",
+              version: "D1",
+              sectionPath: `sourceRow ${displayValue(asArray(report.canonicalEvents)[0]?.sourceRow ?? report.cargoSummary?.sourceLineId)}`,
+              snippet: `${summary}. ${businessImpact}`,
+              docHash: displayValue(asArray(report.canonicalEvents)[0]?.ingestId, "D1 projection"),
+              confidence: 1,
+              sourceType: "control_tower_d1"
+            }
+          ],
+          validation: asArray(report.validationFindings).map((finding) => ({
+            ruleId: displayValue(finding.ruleId, "CONTROL-TOWER"),
+            reasonCode: displayValue(finding.reasonCode, "STATUS_CHECK"),
+            status: String(finding.severity ?? report.reportStatus ?? "INFO").toUpperCase().includes("WARN") ? "WARN" : reportStatusToVerdict(finding.severity ?? report.reportStatus),
+            message: `${displayValue(finding.field, "field")}=${displayValue(finding.value, "-")}`
+          })),
+          actions: asArray(report.openActions),
+          piiMasked: true,
+          generatedAt: displayValue(report.generatedAt, new Date().toISOString()),
+          decisionCard: {
+            schemaVersion: "sct.card.v2.1",
+            cardId: `case-status-${report.shipmentUnitId}`,
+            routeId: `control-tower-${report.shipmentUnitId}`,
+            intent: "CASE_STATUS_LOOKUP",
+            intentGroup: "CONTROL_TOWER",
+            generatedAt: report.generatedAt,
+            verdict,
+            finalGovernanceVerdict: report.reportStatus,
+            primaryReason: summary,
+            nextAction: warning ? "Backfill MOSB chain evidence" : "No open action",
+            unblockSummary: warning ? displayValue(warning.reasonCode) : "No blocking finding",
+            humanGateState: warning ? "BACKFILL_REQUIRED" : "NOT_REQUIRED",
+            allowedNow: ["read", "case_status_review"],
+            blockedUntilApproved: [],
+            blockedBy: asArray(report.validationFindings).map((finding) => ({
+              ruleId: displayValue(finding.ruleId, "CONTROL-TOWER"),
+              ruleName: displayValue(finding.reasonCode, "Status finding"),
+              reason: `${displayValue(finding.field, "field")}=${displayValue(finding.value, "-")}`,
+              requiredInputs: ["MOSB chain evidence", "source row", "case no"],
+              missingInputs: String(finding.reasonCode ?? "").includes("MOSB") ? ["M115/M116/M117 evidence"] : [],
+              blockedActions: [],
+              severity: displayValue(finding.severity, "INFO")
+            })),
+            evidenceCoverage: [
+              { domain: "latestStatus", status: latest.latestEventType ? "PASS" : "ZERO", required: 1, available: latest.latestEventType ? 1 : 0, directSupportRatio: latest.latestEventType ? 1 : 0 },
+              { domain: "canonicalEvents", status: asArray(report.canonicalEvents).length ? "PASS" : "ZERO", required: 1, available: asArray(report.canonicalEvents).length, directSupportRatio: asArray(report.canonicalEvents).length ? 1 : 0 },
+              { domain: "whDwell", status: whDwell.dwellDays !== null && whDwell.dwellDays !== undefined ? "PASS" : "WARN", required: 1, available: whDwell.dwellDays !== null && whDwell.dwellDays !== undefined ? 1 : 0, directSupportRatio: whDwell.dwellDays !== null && whDwell.dwellDays !== undefined ? 1 : 0 },
+              { domain: "siteIntake", status: siteIntake.siteReceiptDate ? "PASS" : "WARN", required: 1, available: siteIntake.siteReceiptDate ? 1 : 0, directSupportRatio: siteIntake.siteReceiptDate ? 1 : 0 }
+            ],
+            actions: warning ? [
+              {
+                actionId: "ACT-MOSB-BACKFILL",
+                ownerRole: "Marine / Material Chain Owner",
+                actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
+                actionLabel: "Backfill MOSB chain evidence",
+                requiredInput: "M115/M116/M117 evidence",
+                approvalRequired: false,
+                approvalStatus: "NotRequired",
+                status: "Open",
+                dueAt: null
+              }
+            ] : [],
+            trace: {
+              sourceHash: displayValue(asArray(report.canonicalEvents)[0]?.ingestId, "D1 projection"),
+              rulePackVersion: "control-tower-d1",
+              promptVersion: "case-status-card-v1",
+              approvalStatus: "NotRequired",
+              routeId: `control-tower-${report.shipmentUnitId}`,
+              generatedAt: report.generatedAt
+            }
+          }
+        };
       }
 
       function rememberToolInput(params) {
@@ -826,6 +970,52 @@
         `;
       }
 
+      function renderCaseStatusCard(report) {
+        if (!report || typeof report !== "object") return "";
+        const latest = report.latestStatus ?? {};
+        const whDwell = report.whDwell ?? {};
+        const siteIntake = report.siteIntake ?? {};
+        const shipment = report.shipment ?? {};
+        const cargoRows = asArray(report.caseCard).slice(0, 36).map((field) => `
+          <tr><td>${escapeHtml(displayValue(field.label))}</td><td>${escapeHtml(displayValue(field.value ?? field.isoDate, "-"))}</td></tr>
+        `).join("");
+        const eventRows = asArray(report.canonicalEvents).map((event, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(displayValue(event.eventType))}</td>
+            <td>${escapeHtml(formatReportDate(event.eventDate))}</td>
+            <td>${escapeHtml(displayValue(event.siteCode, "-"))}</td>
+            <td>${escapeHtml(displayValue(event.zoneCode, "-"))}</td>
+            <td>${escapeHtml(displayValue(event.sourceFile))}</td>
+            <td>${escapeHtml(displayValue(event.sourceRow, "-"))}</td>
+          </tr>
+        `).join("");
+        return `
+          <section class="case-status-card" aria-label="HVDC Case Status Card">
+            <h2>HVDC Case Status Card</h2>
+            <p><strong>${escapeHtml(report.shipmentUnitId)}</strong> / ${escapeHtml(displayValue(report.reportStatus))}</p>
+            <div class="case-status-grid">
+              <div class="case-status-metric"><strong>Current location</strong>${escapeHtml(displayValue(shipment.currentLocation ?? latest.siteCode, "-"))}</div>
+              <div class="case-status-metric"><strong>Latest status</strong>${escapeHtml(displayValue(latest.latestEventType, "-"))} / ${escapeHtml(formatReportDate(latest.latestEventDate))}</div>
+              <div class="case-status-metric"><strong>Warehouse In</strong>${escapeHtml(formatReportDate(report.warehouseDates?.warehouseIn ?? whDwell.warehouseIn))}</div>
+              <div class="case-status-metric"><strong>Warehouse Out</strong>${escapeHtml(formatReportDate(report.warehouseDates?.warehouseOut ?? whDwell.warehouseOut))}</div>
+              <div class="case-status-metric"><strong>Dwell days</strong>${escapeHtml(displayValue(whDwell.dwellDays, "-"))}</div>
+              <div class="case-status-metric"><strong>Site intake</strong>${escapeHtml(formatReportDate(siteIntake.siteReceiptDate))} / ${escapeHtml(displayValue(siteIntake.siteCodes, "-"))}</div>
+            </div>
+            <h3>Base Case Card</h3>
+            <table class="decision-card-table">
+              <thead><tr><th>Field</th><th>Value</th></tr></thead>
+              <tbody>${cargoRows || `<tr><td colspan="2" class="empty">No case card fields returned.</td></tr>`}</tbody>
+            </table>
+            <h3>canonicalEvents</h3>
+            <table class="decision-card-table">
+              <thead><tr><th>No</th><th>Event Type</th><th>Event Date</th><th>Site</th><th>Zone</th><th>Source File</th><th>Source Row</th></tr></thead>
+              <tbody>${eventRows || `<tr><td colspan="7" class="empty">No canonical events returned.</td></tr>`}</tbody>
+            </table>
+          </section>
+        `;
+      }
+
       function render(answer) {
         if (!answer || typeof answer !== "object") {
           renderFallback("malformed tool output", "The iframe received no readable structuredContent.");
@@ -897,6 +1087,7 @@
         root.innerHTML = `
           <div class="card">
             ${renderDecisionCard(answer)}
+            ${renderCaseStatusCard(answer.report)}
             <section aria-labelledby="verdict-title">
               <div class="top">
                 <div>

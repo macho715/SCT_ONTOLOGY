@@ -973,7 +973,14 @@ export const HVDC_TOOL_DESCRIPTORS = {
     description: "Use this to return the D1 Control Tower status projection for one HVDC WH Status Case No. from hvdc_wh_status.xlsx.",
     inputSchema: { caseNo: z.string().min(1) },
     outputSchema: { report: controlTowerShipmentReportSchema.nullable() },
-    _meta: {},
+    _meta: {
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
+      ui: {
+        resourceUri: WIDGET_URI,
+        visibility: ["model", "app"]
+      }
+    },
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
   },
   validate_answer: {
@@ -1272,6 +1279,18 @@ function buildAskResultMeta(answer: GroundedAnswer): Record<string, unknown> {
   };
 }
 
+function buildCaseStatusResultMeta(): Record<string, unknown> {
+  return {
+    "openai/outputTemplate": WIDGET_URI,
+    uiTemplate: WIDGET_URI,
+    piiMasked: true,
+    ui: {
+      resourceUri: WIDGET_URI,
+      visibility: ["model", "app"]
+    }
+  };
+}
+
 function mergeResolvedEntities(primary: ResolvedEntity[], secondary: ResolvedEntity[]): ResolvedEntity[] {
   const seen = new Set<string>();
   const merged: ResolvedEntity[] = [];
@@ -1547,7 +1566,8 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
         span.setAttribute("hvdc.report_found", report ? "true" : "false");
         return {
           structuredContent: { report },
-          content: [{ type: "text", text: JSON.stringify({ found: Boolean(report), shipmentUnitId: report?.shipmentUnitId ?? null }) }]
+          content: [{ type: "text", text: JSON.stringify({ found: Boolean(report), shipmentUnitId: report?.shipmentUnitId ?? null }) }],
+          _meta: buildCaseStatusResultMeta()
         };
       });
     }
