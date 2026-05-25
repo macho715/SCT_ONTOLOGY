@@ -132,8 +132,8 @@
       .decision-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 14px; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; }
       .decision-tab-button { border: 1px solid #94a3b8; border-radius: 8px; background: #f8fafc; color: #0f172a; padding: 9px 12px; font-weight: 800; cursor: pointer; }
       .decision-tab-button[aria-selected="true"] { background: #0f172a; border-color: #0f172a; color: #fff; }
-      .decision-tab-panel[hidden] { display: none; }
       .decision-tab-panel { margin-top: 16px; }
+      .decision-tab-panel + .decision-tab-panel { border-top: 1px solid #cbd5e1; padding-top: 18px; }
       .block-reason-box { border: 1px solid #fca5a5; background: linear-gradient(180deg, #fff7f7, #fff1f2); border-radius: 22px; padding: 18px; margin: 20px 0; }
       .human-gate-banner { border: 1px solid #fb923c; background: linear-gradient(180deg, #fff7ed, #ffedd5); border-radius: 22px; padding: 18px; margin: 20px 0; }
       .block-reason-box h3, .unblock-checklist h3, .human-gate-banner h3, .evidence-coverage h3, .action-table-wrap h3, .decision-trace h3 { margin: 0 0 14px; font-size: 1.03rem; letter-spacing: -0.02em; color: #0f172a; }
@@ -395,9 +395,8 @@
           button.tabIndex = button === tabButton ? 0 : -1;
         });
         cardRoot.querySelectorAll(".decision-tab-panel").forEach((panel) => {
-          panel.hidden = panel.id !== targetPanelId;
-          if (panel.id === targetPanelId) panel.removeAttribute("hidden");
-          else panel.setAttribute("hidden", "");
+          panel.hidden = false;
+          panel.removeAttribute("hidden");
         });
         persistWidgetUiState({ activeTab: tabButton.dataset.decisionTabId ?? targetPanelId });
         notifyIntrinsicHeight();
@@ -963,8 +962,8 @@
             role="tabpanel"
             id="${baseId}-${id}-panel"
             aria-labelledby="${baseId}-${id}-tab"
-            ${index === 0 ? "" : "hidden"}
           >
+            <h3>${escapeHtml(label)}</h3>
             ${content || `<p class="empty">No ${escapeHtml(label.toLowerCase())} data returned.</p>`}
           </div>
         `).join("");
@@ -1148,7 +1147,7 @@
               ${uiStatusHtml}
               ${warningsHtml}
             </div>
-            <details>
+            <details open>
               <summary>Evidence Drawer</summary>
               <div class="details-body">
                 <dl class="meta">
@@ -1165,7 +1164,7 @@
                 <ul>${validationHtml}</ul>
               </div>
             </details>
-            <details>
+            <details open>
               <summary>ONTOLOGY PATH</summary>
               <div class="details-body">
                 ${graphHtml}
