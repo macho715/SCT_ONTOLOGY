@@ -395,9 +395,9 @@
           button.tabIndex = button === tabButton ? 0 : -1;
         });
         cardRoot.querySelectorAll(".decision-tab-panel").forEach((panel) => {
-          if (panel instanceof HTMLElement) {
-            panel.hidden = panel.id !== targetPanelId;
-          }
+          panel.hidden = panel.id !== targetPanelId;
+          if (panel.id === targetPanelId) panel.removeAttribute("hidden");
+          else panel.setAttribute("hidden", "");
         });
         persistWidgetUiState({ activeTab: tabButton.dataset.decisionTabId ?? targetPanelId });
         notifyIntrinsicHeight();
@@ -405,7 +405,7 @@
 
       function toggleDetailsSummary(summary) {
         const drawer = summary.closest("details");
-        if (!(drawer instanceof HTMLDetailsElement)) return;
+        if (!drawer || drawer.tagName?.toLowerCase() !== "details") return;
         drawer.open = !drawer.open;
         persistWidgetUiState({ [drawer.dataset.drawerKey ?? summary.textContent?.trim() ?? "details"]: drawer.open });
         notifyIntrinsicHeight();
@@ -413,6 +413,11 @@
 
       function getInteractionEventTarget() {
         return typeof document?.addEventListener === "function" ? document : root;
+      }
+
+      function closestElement(target, selector) {
+        if (!target || typeof target.closest !== "function") return null;
+        return target.closest(selector);
       }
 
       function normalizeUiState(answer) {
@@ -1278,16 +1283,15 @@
 
       getInteractionEventTarget().addEventListener("click", (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const tabButton = target.closest("[data-decision-tab-target]");
-        if (tabButton instanceof HTMLElement) {
+        const tabButton = closestElement(target, "[data-decision-tab-target]");
+        if (tabButton) {
           event.preventDefault();
           event.stopPropagation();
           activateDecisionTab(tabButton);
           return;
         }
-        const summary = target.closest("summary");
-        if (summary instanceof HTMLElement && summary.closest("details")) {
+        const summary = closestElement(target, "summary");
+        if (summary && summary.closest("details")) {
           event.preventDefault();
           event.stopPropagation();
           toggleDetailsSummary(summary);
@@ -1299,9 +1303,8 @@
 
       getInteractionEventTarget().addEventListener("keydown", (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const tabButton = target.closest("[data-decision-tab-target]");
-        if (!(tabButton instanceof HTMLElement)) return;
+        const tabButton = closestElement(target, "[data-decision-tab-target]");
+        if (!tabButton) return;
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         activateDecisionTab(tabButton);
