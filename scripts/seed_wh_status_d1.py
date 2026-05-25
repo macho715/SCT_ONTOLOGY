@@ -196,6 +196,8 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
         atd = iso_date(get(record, "ATD"))
         eta = iso_date(get(record, "ETA/ATA", "ETA"))
         ata = iso_date(get(record, "ATA"))
+        wh_in = iso_date(get(record, "first in wh", "First In WH", "WH In", "Warehouse In"))
+        wh_out = iso_date(get(record, "last out wh", "Last Out WH", "WH Out", "Warehouse Out"))
         mosb_dt = iso_date(get(record, "MOSB"))
         site_dates = {dest: iso_date(get(record, dest)) for dest in ("MIR", "SHU", "DAS", "AGI")}
         required = [dest for dest in ("MIR", "SHU", "DAS", "AGI") if is_required(record, dest)]
@@ -241,7 +243,16 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
                 f"VALUES ({sql(scheme)}, {sql(value)}, {sql(norm)}, {sql(SOURCE_SYSTEM)}, 'ShipmentUnit', {sql(shipment_id)}, 0.98);"
             )
             stats["identifiers"] += 1
-        for code, dt in [("M50_ETD", etd), ("M61_ATD", atd), ("M80_ETA", eta), ("M80_ATA", ata), ("M115_MOSB_STAGED", mosb_dt), ("M130_FINAL_DELIVERED", final_delivery)]:
+        for code, dt in [
+            ("M50_ETD", etd),
+            ("M61_ATD", atd),
+            ("M80_ETA", eta),
+            ("M80_ATA", ata),
+            ("M110_WAREHOUSE_RECEIVED", wh_in),
+            ("M121_WAREHOUSE_DISPATCHED", wh_out),
+            ("M115_MOSB_STAGED", mosb_dt),
+            ("M130_FINAL_DELIVERED", final_delivery),
+        ]:
             if not dt:
                 continue
             lines.append(
