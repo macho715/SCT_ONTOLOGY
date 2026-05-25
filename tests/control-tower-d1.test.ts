@@ -56,7 +56,15 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           customsClosed: null,
           finalDelivered: "2024-02-26"
         },
+        warehouseDates: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13",
+          warehouseInMilestone: "M110_WAREHOUSE_RECEIVED",
+          warehouseOutMilestone: "M121_WAREHOUSE_DISPATCHED"
+        },
         milestones: [
+          { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
+          { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
           { milestoneCode: "M130_SITE_RECEIVED", occurredAt: "2024-02-26", sourceColumn: "AGI", sourceLineId: "CASE-0003" }
         ],
         destinationRequirements: [
@@ -166,7 +174,15 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           customsClosed: "2024-02-24",
           finalDelivered: "2024-02-25"
         },
+        warehouseDates: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13",
+          warehouseInMilestone: "M110_WAREHOUSE_RECEIVED",
+          warehouseOutMilestone: "M121_WAREHOUSE_DISPATCHED"
+        },
         milestones: [
+          { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
+          { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
           { milestoneCode: "M60_ETA", occurredAt: "2024-02-20", sourceColumn: "BG", sourceLineId: "LS-000123" },
           { milestoneCode: "M70_ATA", occurredAt: "2024-02-21", sourceColumn: "BH", sourceLineId: "LS-000123" }
         ],
@@ -265,6 +281,7 @@ describe("Control Tower D1 MCP lookup integration", () => {
       const content = result.structuredContent as {
         controlTowerReports: Array<{
           shipmentDates: { eta: string; ata: string };
+          warehouseDates: { warehouseIn: string; warehouseOut: string };
           cargoSummary: { vendor: string; poNo: string };
           siteReceipts: Array<{ locationCode: string; actualReceiptDt: string }>;
           siteReceiptSummary: { latestReceiptDt: string };
@@ -281,6 +298,10 @@ describe("Control Tower D1 MCP lookup integration", () => {
         },
         siteReceiptSummary: {
           latestReceiptDt: "2024-02-26"
+        },
+        warehouseDates: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13"
         }
       });
       expect(content.controlTowerReports[0].siteReceipts[0]).toMatchObject({
@@ -301,6 +322,7 @@ describe("Control Tower D1 MCP lookup integration", () => {
         report: {
           shipmentUnitId: string;
           reportStatus: string;
+          warehouseDates: { warehouseIn: string; warehouseOut: string };
           shipment: { deliveryStatus?: string; currentStage: string; currentLocation: string };
           validationFindings: Array<{ reasonCode: string }>;
         };
@@ -311,6 +333,10 @@ describe("Control Tower D1 MCP lookup integration", () => {
         shipment: {
           currentStage: "M130_SITE_ARRIVED",
           currentLocation: "AGI"
+        },
+        warehouseDates: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13"
         }
       });
       expect(content.report.validationFindings[0]).toMatchObject({

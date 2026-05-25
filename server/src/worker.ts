@@ -17,6 +17,7 @@ import {
   type ControlTowerShipmentUnit,
   type ControlTowerSiteReceiptSummary,
   type ControlTowerValidationFinding,
+  type ControlTowerWarehouseDates,
   type CreateUploadUrlInput,
   type CreateUploadUrlResult,
   type HvdcControlTowerLookup,
@@ -361,6 +362,10 @@ function firstMilestoneDate(milestones: ControlTowerMilestoneEvent[], suffix: st
   return milestones.find((milestone) => milestone.milestoneCode.toUpperCase().endsWith(suffix))?.occurredAt ?? null;
 }
 
+function firstMilestoneByCode(milestones: ControlTowerMilestoneEvent[], code: string): ControlTowerMilestoneEvent | null {
+  return milestones.find((milestone) => milestone.milestoneCode.toUpperCase() === code) ?? null;
+}
+
 function shipmentDatesFromMilestones(
   milestones: ControlTowerMilestoneEvent[],
   finalDeliveryDt: string | null
@@ -375,6 +380,17 @@ function shipmentDatesFromMilestones(
     customsStarted: firstMilestoneDate(milestones, "_CUSTOMS_STARTED"),
     customsClosed: firstMilestoneDate(milestones, "_CUSTOMS_CLOSED"),
     finalDelivered: firstMilestoneDate(milestones, "_FINAL_DELIVERED") ?? finalDeliveryDt
+  };
+}
+
+function warehouseDatesFromMilestones(milestones: ControlTowerMilestoneEvent[]): ControlTowerWarehouseDates {
+  const warehouseIn = firstMilestoneByCode(milestones, "M110_WAREHOUSE_RECEIVED");
+  const warehouseOut = firstMilestoneByCode(milestones, "M121_WAREHOUSE_DISPATCHED");
+  return {
+    warehouseIn: warehouseIn?.occurredAt ?? null,
+    warehouseOut: warehouseOut?.occurredAt ?? null,
+    warehouseInMilestone: warehouseIn?.milestoneCode ?? null,
+    warehouseOutMilestone: warehouseOut?.milestoneCode ?? null
   };
 }
 
@@ -619,6 +635,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
         },
         shipment,
         shipmentDates: shipmentDatesFromMilestones(milestones, shipment.finalDeliveryDt),
+        warehouseDates: warehouseDatesFromMilestones(milestones),
         milestones,
         destinationRequirements,
         siteReceipts,
