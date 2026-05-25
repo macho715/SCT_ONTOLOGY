@@ -144,15 +144,15 @@ const chatGptFormatInput = {
       businessResultVisible: true,
       fallbackUsed: false,
       cardEnabled: true,
-      templateUrl: "ui://hvdc/answer-card-v9.html",
-      templateVersion: "answer-card-v9",
+      templateUrl: "ui://hvdc/answer-card-v10.html",
+      templateVersion: "answer-card-v10",
       schemaVersion: "1.0.0",
       doNotChange: ["verdict", "validationStatus", "evidenceIds", "actions"]
     }
   },
   _meta: {
-    "openai/outputTemplate": "ui://hvdc/answer-card-v9.html",
-    uiTemplate: "ui://hvdc/answer-card-v9.html",
+    "openai/outputTemplate": "ui://hvdc/answer-card-v10.html",
+    uiTemplate: "ui://hvdc/answer-card-v10.html",
     piiMasked: false
   }
 };

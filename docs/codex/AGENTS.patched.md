@@ -6,13 +6,13 @@ This repository builds the HVDC Ontology Grounded ChatGPT App: a corpus-only, ev
 ## Current State
 - Runtime: Cloudflare Workers MCP HTTP server at `/mcp`.
 - Default production endpoint: `https://hvdc-ontology-chatgpt-app.mscho715.workers.dev/mcp`.
-- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v9.html`.
+- UI resource: `public/hvdc-answer-widget.html` registered as `ui://hvdc/answer-card-v10.html`.
 - `ask_hvdc_ontology` is data-only. It must not attach `openai/outputTemplate`, `_meta.ui.resourceUri`, or `structuredContent.ui`.
-- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v9.html`.
+- `render_hvdc_answer_card` owns the answer card template and points to `ui://hvdc/answer-card-v10.html`.
 - UI failures are isolated as `uiRenderStatus`; they must not change `verdict`, `validationStatus`, `evidenceIds`, or `actions`.
 - Runtime evidence source: approved Markdown under `data/corpus/`.
 - Protected upload/write tools may write only to Cloudflare R2/D1 managed storage after OAuth Bearer scope and Human-gate approval.
-- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
+- Compatibility widget aliases remain available at `ui://hvdc/answer-card-v9.html`, `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, and `ui://hvdc/render_hvdc_answer_card.html` for stale ChatGPT clients.
 - Review artifacts: `data/index/corpus_index.json`, `data/index/corpus_inventory.csv`, `data/index/source_role_map.json`.
 - Development guidance: `.agents/skills/*/SKILL.md`; these are not runtime tools.
 - New runtime or documentation changes remain local until commit, push, and GitHub Actions are confirmed. Cloudflare production deployment is a separate manual release step unless an approved deployment workflow exists.

@@ -133,11 +133,11 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     );
     expect(askOutputSchema.shipmentRule).toBeDefined();
     expect((askOutputSchema as { ui?: unknown }).ui).toBeUndefined();
-    expect((askMetaRecord.ui as { resourceUri?: string }).resourceUri).toBe("ui://hvdc/answer-card-v9.html");
-    expect(askMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v9.html");
+    expect((askMetaRecord.ui as { resourceUri?: string }).resourceUri).toBe("ui://hvdc/answer-card-v10.html");
+    expect(askMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v10.html");
     expect(askMetaRecord["openai/widgetAccessible"]).toBe(true);
-    expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v9.html");
-    expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v9.html");
+    expect(renderMeta.ui.resourceUri).toBe("ui://hvdc/answer-card-v10.html");
+    expect(renderMetaRecord["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v10.html");
     expect(renderMetaRecord["openai/widgetAccessible"]).toBe(true);
     expect((HVDC_TOOL_DESCRIPTORS.search_ontology_corpus._meta as Record<string, unknown>).ui).toBeUndefined();
     expect(Object.keys(HVDC_TOOL_DESCRIPTORS)).toContain("render_hvdc_answer_card");
@@ -154,17 +154,17 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
 
   it("keeps active Codex guidance aligned with the versioned widget resource", () => {
     for (const guidance of [rootAgentGuidance, codexAgentGuidance]) {
+      expect(guidance).toContain("ui://hvdc/answer-card-v10.html");
       expect(guidance).toContain("ui://hvdc/answer-card-v9.html");
       expect(guidance).toContain("ui://hvdc/answer-card-v8.html");
-      expect(guidance).toContain("ui://hvdc/answer-card-v7.html");
       expect(guidance).toContain("ui://hvdc/answer-card-v6.html");
       expect(guidance).toContain("ui://hvdc/answer-card-v5.html");
       expect(guidance).not.toContain("ui://hvdc/answer-card-v4.html");
     }
 
+    expect(systemArchitecture).toContain("ui://hvdc/answer-card-v10.html");
     expect(systemArchitecture).toContain("ui://hvdc/answer-card-v9.html");
     expect(systemArchitecture).toContain("ui://hvdc/answer-card-v8.html");
-    expect(systemArchitecture).toContain("ui://hvdc/answer-card-v7.html");
     expect(systemArchitecture).toContain("ui://hvdc/answer-card-v6.html");
     expect(systemArchitecture).toContain("ui://hvdc/answer-card-v5.html");
     expect(systemArchitecture).toContain("ui://hvdc/render_hvdc_answer_card.html");
@@ -194,9 +194,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
     await Promise.all([mcpServer.connect(serverTransport), client.connect(clientTransport)]);
 
     try {
-      const canonical = await client.readResource({ uri: "ui://hvdc/answer-card-v9.html" });
-      const previous = await client.readResource({ uri: "ui://hvdc/answer-card-v8.html" });
-      const legacy = await client.readResource({ uri: "ui://hvdc/answer-card-v7.html" });
+      const canonical = await client.readResource({ uri: "ui://hvdc/answer-card-v10.html" });
+      const previous = await client.readResource({ uri: "ui://hvdc/answer-card-v9.html" });
+      const legacy = await client.readResource({ uri: "ui://hvdc/answer-card-v8.html" });
       const v6Alias = await client.readResource({ uri: "ui://hvdc/answer-card-v6.html" });
       const v5Alias = await client.readResource({ uri: "ui://hvdc/answer-card-v5.html" });
       const renderAlias = await client.readResource({ uri: "ui://hvdc/render_hvdc_answer_card.html" });
@@ -207,9 +207,9 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       const v5AliasContent = v5Alias.contents[0];
       const renderAliasContent = renderAlias.contents[0];
 
-      expect(canonicalContent?.uri).toBe("ui://hvdc/answer-card-v9.html");
-      expect(previousContent?.uri).toBe("ui://hvdc/answer-card-v8.html");
-      expect(legacyContent?.uri).toBe("ui://hvdc/answer-card-v7.html");
+      expect(canonicalContent?.uri).toBe("ui://hvdc/answer-card-v10.html");
+      expect(previousContent?.uri).toBe("ui://hvdc/answer-card-v9.html");
+      expect(legacyContent?.uri).toBe("ui://hvdc/answer-card-v8.html");
       expect(v6AliasContent?.uri).toBe("ui://hvdc/answer-card-v6.html");
       expect(v5AliasContent?.uri).toBe("ui://hvdc/answer-card-v5.html");
       expect(renderAliasContent?.uri).toBe("ui://hvdc/render_hvdc_answer_card.html");
@@ -270,8 +270,8 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       });
       const askMeta = askResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
 
-      expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v9.html");
-      expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v9.html");
+      expect(askMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v10.html");
+      expect(askMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v10.html");
       expect(askMeta.piiMasked).toBe(false);
       expect((askResult.structuredContent as { ui?: unknown }).ui).toBeUndefined();
 
@@ -281,11 +281,11 @@ describe("Apps SDK/MCP descriptor contract parity", () => {
       });
       const renderMeta = renderResult._meta as { ui?: { resourceUri?: string; visibility?: string[] }; [key: string]: unknown };
 
-      expect(renderMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v9.html");
-      expect(renderMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v9.html");
+      expect(renderMeta["openai/outputTemplate"]).toBe("ui://hvdc/answer-card-v10.html");
+      expect(renderMeta.ui?.resourceUri).toBe("ui://hvdc/answer-card-v10.html");
       expect(renderMeta.ui?.visibility).toEqual(["model", "app"]);
       expect((renderResult.structuredContent as { ui?: { templateUrl?: string } }).ui?.templateUrl).toBe(
-        "ui://hvdc/answer-card-v9.html"
+        "ui://hvdc/answer-card-v10.html"
       );
 
       const legacyStructuredContent = { ...(askResult.structuredContent as Record<string, unknown>) };

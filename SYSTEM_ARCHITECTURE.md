@@ -35,7 +35,7 @@
 
 ChatGPT, Claude, Cursor는 클라이언트가 다르지만 운영 기준 endpoint는 같다.
 
-- ChatGPT는 App tool descriptor와 `ui://hvdc/answer-card-v9.html` resource metadata를 사용한다. `v8/v7/v6/v5`는 stale ChatGPT session 호환 alias로 유지한다.
+- ChatGPT는 App tool descriptor와 `ui://hvdc/answer-card-v10.html` resource metadata를 사용한다. `v9/v8/v7/v6/v5`는 stale ChatGPT session 호환 alias로 유지한다.
 - Claude는 remote MCP HTTP 또는 `mcp-remote` stdio bridge를 통해 같은 `/mcp`에 연결한다.
 - Cursor는 MCP client 설정이 이 URL을 가리킬 때 같은 Worker-hosted tool inventory를 본다.
 
@@ -109,7 +109,7 @@ flowchart LR
 - MCP HTTP 경로는 `/mcp`이다. 루트 `/`와 `/healthz`는 Cloudflare health response를 돌려준다.
 - MCP 구현은 `agents/mcp`의 `createMcpHandler`와 `@modelcontextprotocol/sdk`의 `McpServer`를 사용한다.
 - ChatGPT App UI resource는 `server/src/hvdc-server.ts`에서 `@modelcontextprotocol/ext-apps`의 `registerAppResource`로 등록한다.
-- UI resource URI는 `ui://hvdc/answer-card-v9.html`이다.
+- UI resource URI는 `ui://hvdc/answer-card-v10.html`이다.
 - 실제 HTML 파일은 `public/hvdc-answer-widget.html`이다.
 
 ### Claude 레이어 (Cloudflare 원격 MCP)
@@ -157,7 +157,7 @@ flowchart TD
 
   CGT_Endpoint --> McpHandler["createMcpHandler<br/>agents/mcp"]
   McpHandler --> ExtApps["registerAppTool / registerAppResource<br/>server/src/hvdc-server.ts"]
-  ExtApps --> WidgetResource["ui://hvdc/answer-card-v9.html"]
+  ExtApps --> WidgetResource["ui://hvdc/answer-card-v10.html"]
   WidgetResource --> WidgetFile["public/hvdc-answer-widget.html"]
 
   ClaudeRender["server/src/claude-render.ts<br/>legacy/local markdown fallback"]
@@ -240,7 +240,7 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 | Tool | 구현 파일 | ChatGPT 출력 | Claude 출력 |
 | --- | --- | --- | --- |
 | `ask_hvdc_ontology` | `server/src/answer.ts` | `structuredContent` + answer card template metadata | Cloudflare MCP text/structured result |
-| `render_hvdc_answer_card` | Cloudflare: `server/src/hvdc-server.ts`<br/>Legacy local: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v9.html` iframe 위젯 | Cloudflare MCP text/structured result 또는 legacy markdown fallback |
+| `render_hvdc_answer_card` | Cloudflare: `server/src/hvdc-server.ts`<br/>Legacy local: `server/src/claude-render.ts` | `ui://hvdc/answer-card-v10.html` iframe 위젯 | Cloudflare MCP text/structured result 또는 legacy markdown fallback |
 | `route_question` | `server/src/router.ts` | JSON route | JSON route |
 | `search_ontology_corpus` | `server/src/corpus.ts` | generated corpus EvidenceSnippet | generated corpus EvidenceSnippet |
 | `resolve_any_key` | `server/src/router.ts` | identifier 후보 | identifier 후보 |
@@ -269,15 +269,15 @@ Cloudflare Worker(`server/src/worker.ts` + `server/src/hvdc-server.ts`)와 Claud
 
 ## UI resource와 public widget
 
-`server/src/hvdc-server.ts`는 generated widget module을 읽어서 `ui://hvdc/answer-card-v9.html` resource로 등록한다.
+`server/src/hvdc-server.ts`는 generated widget module을 읽어서 `ui://hvdc/answer-card-v10.html` resource로 등록한다.
 
 - resource 등록은 `registerAppResource`가 담당한다.
 - resource MIME type은 `RESOURCE_MIME_TYPE`을 사용한다.
-- `ask_hvdc_ontology`는 답변 JSON과 텍스트 fallback을 반환하고, ChatGPT 카드 표시를 위해 tool/result metadata로 `ui://hvdc/answer-card-v9.html`을 가리킨다.
+- `ask_hvdc_ontology`는 답변 JSON과 텍스트 fallback을 반환하고, ChatGPT 카드 표시를 위해 tool/result metadata로 `ui://hvdc/answer-card-v10.html`을 가리킨다.
 - `ask_hvdc_ontology`의 `structuredContent`에는 `ui` 객체를 넣지 않는다. `ui.templateUrl`은 render tool에서만 붙인다.
-- `render_hvdc_answer_card` descriptor도 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v9.html`을 가리킨다.
+- `render_hvdc_answer_card` descriptor도 `_meta.ui.resourceUri`와 `_meta["openai/outputTemplate"]`으로 `ui://hvdc/answer-card-v10.html`을 가리킨다.
 - 사용자에게 보이는 최종 HVDC 답변은 `ask_hvdc_ontology` 한 번으로 카드 표시까지 시도한다. `render_hvdc_answer_card`는 이미 준비된 답변을 명시적으로 다시 렌더링할 때 사용한다.
-- 호환성 alias resource는 `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, `ui://hvdc/render_hvdc_answer_card.html`이다.
+- 호환성 alias resource는 `ui://hvdc/answer-card-v9.html`, `ui://hvdc/answer-card-v8.html`, `ui://hvdc/answer-card-v7.html`, `ui://hvdc/answer-card-v6.html`, `ui://hvdc/answer-card-v5.html`, `ui://hvdc/render_hvdc_answer_card.html`이다.
 - `public/hvdc-answer-widget.html`은 verdict, route documents, evidence drawer, validation gate, ontology path를 렌더링한다.
 - widget CSS는 긴 action id, protected fields, route reason, validation text가 카드 밖으로 잘리지 않도록 줄바꿈과 responsive grid를 적용한다.
 - widget은 자체 fallback text를 가진다.
@@ -563,7 +563,7 @@ classDiagram
 
 이 저장소의 현재 아키텍처는 **Cloudflare Workers/R2/D1 remote MCP + Claude/Cursor/ChatGPT 공통 Cloudflare 연결**이다.
 
-- **ChatGPT 레이어**: `server/src/worker.ts`가 Cloudflare Workers에서 `/mcp`를 열고, `server/src/hvdc-server.ts`가 `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v9.html` iframe 위젯을 연결한다.
+- **ChatGPT 레이어**: `server/src/worker.ts`가 Cloudflare Workers에서 `/mcp`를 열고, `server/src/hvdc-server.ts`가 `@modelcontextprotocol/ext-apps`의 `registerAppTool`로 ChatGPT App tool descriptor를 등록한다. `render_hvdc_answer_card`는 `ui://hvdc/answer-card-v10.html` iframe 위젯을 연결한다.
 - **Claude 레이어**: Claude Code, Claude Desktop, claude.ai는 같은 Cloudflare Worker `/mcp`에 연결한다. stdio만 지원하는 경로는 `start-hvdc-mcp.cmd`가 `mcp-remote`로 Cloudflare에 프록시한다.
 - **공유 코어**: `answer.ts`, `corpus.ts`, `router.ts`, `redact.ts`, `types.ts`는 두 서버가 공유한다.
 - **GitHub Actions와 Cloudflare**: `npm run verify`가 generated worker assets, typecheck, tests, Worker dry-run을 같은 검증 경계로 묶는다. Cloudflare 배포 경계는 `npm run worker:deploy`이다.
