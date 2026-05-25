@@ -105,6 +105,12 @@ export type ControlTowerWarehouseDates = {
   warehouseOutMilestone: string | null;
 };
 
+export type ControlTowerCaseCardField = {
+  label: string;
+  value: string | null;
+  isoDate: string | null;
+};
+
 export type ControlTowerCargoSummary = {
   sourceLineId: string | null;
   vendor: string | null;
@@ -130,6 +136,7 @@ export type ControlTowerShipmentReport = {
   shipment: ControlTowerShipmentUnit | null;
   shipmentDates: ControlTowerShipmentDates;
   warehouseDates: ControlTowerWarehouseDates;
+  caseCard: ControlTowerCaseCardField[];
   milestones: ControlTowerMilestoneEvent[];
   destinationRequirements: ControlTowerDestinationRequirement[];
   siteReceipts: ControlTowerReceiptEvent[];
@@ -522,6 +529,13 @@ const controlTowerShipmentReportSchema = z.object({
     warehouseInMilestone: z.string().nullable(),
     warehouseOutMilestone: z.string().nullable()
   }),
+  caseCard: z.array(
+    z.object({
+      label: z.string(),
+      value: z.string().nullable(),
+      isoDate: z.string().nullable()
+    })
+  ),
   milestones: z.array(
     z.object({
       milestoneCode: z.string(),

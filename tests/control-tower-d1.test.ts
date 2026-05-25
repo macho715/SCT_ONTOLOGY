@@ -62,6 +62,13 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           warehouseInMilestone: "M110_WAREHOUSE_RECEIVED",
           warehouseOutMilestone: "M121_WAREHOUSE_DISPATCHED"
         },
+        caseCard: [
+          { label: "SCT Ref.No", value: "5000761114", isoDate: null },
+          { label: "Site", value: "AGI", isoDate: null },
+          { label: "Case No.", value: "CASE-0003", isoDate: null },
+          { label: "ETD/ATD", value: "2024-01-10", isoDate: "2024-01-10" },
+          { label: "DHL WH", value: null, isoDate: null }
+        ],
         milestones: [
           { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
           { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
@@ -180,6 +187,13 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           warehouseInMilestone: "M110_WAREHOUSE_RECEIVED",
           warehouseOutMilestone: "M121_WAREHOUSE_DISPATCHED"
         },
+        caseCard: [
+          { label: "SCT Ref.No", value: "5000761114", isoDate: null },
+          { label: "Site", value: "AGI", isoDate: null },
+          { label: "Case No.", value: "HVDC-ADOPT-PPL-0003", isoDate: null },
+          { label: "ETD/ATD", value: "2024-01-10", isoDate: "2024-01-10" },
+          { label: "DHL WH", value: null, isoDate: null }
+        ],
         milestones: [
           { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
           { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
@@ -282,6 +296,7 @@ describe("Control Tower D1 MCP lookup integration", () => {
         controlTowerReports: Array<{
           shipmentDates: { eta: string; ata: string };
           warehouseDates: { warehouseIn: string; warehouseOut: string };
+          caseCard: Array<{ label: string; value: string | null; isoDate: string | null }>;
           cargoSummary: { vendor: string; poNo: string };
           siteReceipts: Array<{ locationCode: string; actualReceiptDt: string }>;
           siteReceiptSummary: { latestReceiptDt: string };
@@ -304,6 +319,13 @@ describe("Control Tower D1 MCP lookup integration", () => {
           warehouseOut: "2025-05-13"
         }
       });
+      expect(content.controlTowerReports[0].caseCard.map((field) => field.label)).toEqual([
+        "SCT Ref.No",
+        "Site",
+        "Case No.",
+        "ETD/ATD",
+        "DHL WH"
+      ]);
       expect(content.controlTowerReports[0].siteReceipts[0]).toMatchObject({
         locationCode: "AGI",
         actualReceiptDt: "2024-02-26"
@@ -323,6 +345,7 @@ describe("Control Tower D1 MCP lookup integration", () => {
           shipmentUnitId: string;
           reportStatus: string;
           warehouseDates: { warehouseIn: string; warehouseOut: string };
+          caseCard: Array<{ label: string; value: string | null; isoDate: string | null }>;
           shipment: { deliveryStatus?: string; currentStage: string; currentLocation: string };
           validationFindings: Array<{ reasonCode: string }>;
         };
@@ -338,6 +361,11 @@ describe("Control Tower D1 MCP lookup integration", () => {
           warehouseIn: "2024-01-19",
           warehouseOut: "2025-05-13"
         }
+      });
+      expect(content.report.caseCard).toContainEqual({
+        label: "Case No.",
+        value: "CASE-0003",
+        isoDate: null
       });
       expect(content.report.validationFindings[0]).toMatchObject({
         reasonCode: "MOSB_EVIDENCE_MISSING"

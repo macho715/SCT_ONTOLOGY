@@ -78,6 +78,12 @@ const CHECKS: SeedCheck[] = [
     expect: (cnt) => cnt >= 7560,
     hint: "run: npm run d1:seed-wh-status",
   },
+  {
+    label: "WH Status case cards projected (≥7560)",
+    sql: "SELECT COUNT(*) AS cnt FROM wh_status_case_card",
+    expect: (cnt) => cnt >= 7560,
+    hint: "run migrations then: npm run d1:seed-wh-status",
+  },
 ];
 
 let failures = 0;

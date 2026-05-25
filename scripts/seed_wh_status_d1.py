@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -13,6 +14,62 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = ROOT / "wh status" / "hvdc_wh_status.xlsx"
 SQL_PATH = ROOT / ".tmp" / "wh_status_d1_seed.sql"
 SOURCE_SYSTEM = "hvdc_wh_status.xlsx"
+CASE_CARD_COLUMNS = [
+    "SCT Ref.No",
+    "Site",
+    "Case No.",
+    "Pkg",
+    "Storage",
+    "Description",
+    "L(CM)",
+    "W(CM)",
+    "H(CM)",
+    "CBM",
+    "N.W(kgs)",
+    "G.W(kgs)",
+    "Stack",
+    "HS Code",
+    "Currency",
+    "Price",
+    "Vessel",
+    "COE",
+    "POL",
+    "POD",
+    "ETD/ATD",
+    "ETA/ATA",
+    "DHL WH",
+    "DSV Indoor",
+    "DSV Al Markaz",
+    "AAA Storage",
+    "DSV Outdoor",
+    "DSV MZP",
+    "MOSB",
+    "Hauler Indoor",
+    "JDN MZD",
+    "Shifting",
+    "MIR",
+    "SHU",
+    "DAS",
+    "AGI",
+]
+DATE_CARD_COLUMNS = {
+    "ETD/ATD",
+    "ETA/ATA",
+    "DHL WH",
+    "DSV Indoor",
+    "DSV Al Markaz",
+    "AAA Storage",
+    "DSV Outdoor",
+    "DSV MZP",
+    "MOSB",
+    "Hauler Indoor",
+    "JDN MZD",
+    "Shifting",
+    "MIR",
+    "SHU",
+    "DAS",
+    "AGI",
+}
 NS = {
     "x": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
@@ -170,6 +227,19 @@ def merge_records(records: list[dict[str, str]]) -> list[dict[str, str]]:
     return list(merged.values())
 
 
+def case_card_json(record: dict[str, str]) -> str:
+    fields = []
+    for column in CASE_CARD_COLUMNS:
+        raw_value = get(record, column)
+        value = raw_value or None
+        fields.append({
+            "label": column,
+            "value": value,
+            "isoDate": iso_date(raw_value) if column in DATE_CARD_COLUMNS and raw_value else None,
+        })
+    return json.dumps(fields, ensure_ascii=False, separators=(",", ":"))
+
+
 def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
     lines = [
         "DELETE FROM action_queue WHERE shipment_unit_id LIKE 'WHCASE-%';",
@@ -177,6 +247,7 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
         "DELETE FROM receipt_event WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM destination_requirement WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM milestone_event WHERE shipment_unit_id LIKE 'WHCASE-%';",
+        "DELETE FROM wh_status_case_card WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM identifier_index WHERE source_system = 'hvdc_wh_status.xlsx' OR target_rid LIKE 'WHCASE-%';",
         "DELETE FROM shipment_unit WHERE shipment_unit_id LIKE 'WHCASE-%';",
     ]
@@ -224,6 +295,11 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
             "INSERT OR REPLACE INTO shipment_unit "
             "(shipment_unit_id, source_line_id, vendor, category, po_no, invoice_no, incoterms, declared_destination_set, declared_destination_count, current_stage, current_location, routing_pattern, latest_receipt_dt, final_delivery_dt, site_completion_rate, missing_required_destination, received_without_flag) "
             f"VALUES ({sql(shipment_id)}, {sql(source_line)}, {sql(vendor)}, {sql(category)}, {sql(sct_ref)}, {sql(invoice)}, {sql(flow_code)}, {sql(declared)}, {len(required_set)}, {sql(current_stage)}, {sql(current_location)}, {sql(route)}, {sql(latest_receipt)}, {sql(final_delivery)}, {completion}, {sql(missing)}, NULL);"
+        )
+        lines.append(
+            "INSERT OR REPLACE INTO wh_status_case_card "
+            "(shipment_unit_id, case_no, card_json, source_system, updated_at) "
+            f"VALUES ({sql(shipment_id)}, {sql(normalize_case(case_no))}, {sql(case_card_json(record))}, {sql(SOURCE_SYSTEM)}, datetime('now'));"
         )
         stats["cases"] += 1
         identifiers = [

@@ -9,6 +9,7 @@ import {
   type AttachUploadedFileResult,
   type CompleteUploadInput,
   type CompleteUploadResult,
+  type ControlTowerCaseCardField,
   type ControlTowerDestinationRequirement,
   type ControlTowerMilestoneEvent,
   type ControlTowerReceiptEvent,
@@ -277,6 +278,10 @@ type ControlTowerActionRow = {
   reason_code: string | null;
 };
 
+type ControlTowerCaseCardRow = {
+  card_json: string | null;
+};
+
 function storageUnavailable(message: string) {
   return {
     status: "STORAGE_UNAVAILABLE" as const,
@@ -392,6 +397,23 @@ function warehouseDatesFromMilestones(milestones: ControlTowerMilestoneEvent[]):
     warehouseInMilestone: warehouseIn?.milestoneCode ?? null,
     warehouseOutMilestone: warehouseOut?.milestoneCode ?? null
   };
+}
+
+function parseCaseCard(row: ControlTowerCaseCardRow | null): ControlTowerCaseCardField[] {
+  if (!row?.card_json) return [];
+  try {
+    const parsed = JSON.parse(row.card_json);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((field) => field && typeof field === "object" && typeof field.label === "string")
+      .map((field) => ({
+        label: String(field.label),
+        value: typeof field.value === "string" ? field.value : null,
+        isoDate: typeof field.isoDate === "string" ? field.isoDate : null
+      }));
+  } catch {
+    return [];
+  }
 }
 
 function siteReceiptSummary(
@@ -570,7 +592,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
 
       const shipment = shipmentRowToUnit(shipmentRow);
 
-      const [milestoneRows, destinationRows, receiptRows, validationRows, actionRows] = await Promise.all([
+      const [milestoneRows, destinationRows, receiptRows, validationRows, actionRows, caseCardRow] = await Promise.all([
         db.prepare(
           `SELECT milestone_code, actual_dt, evidence_doc_id
              FROM milestone_event
@@ -613,7 +635,15 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
             LIMIT 20`
         )
           .bind(shipmentUnitId)
-          .all<ControlTowerActionRow>()
+          .all<ControlTowerActionRow>(),
+        db.prepare(
+          `SELECT card_json
+             FROM wh_status_case_card
+            WHERE shipment_unit_id = ?
+            LIMIT 1`
+        )
+          .bind(shipmentUnitId)
+          .first<ControlTowerCaseCardRow>()
       ]);
 
       const milestones = (milestoneRows.results ?? []).map((row) => milestoneRowToEvent(row, shipment.sourceLineId));
@@ -636,6 +666,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
         shipment,
         shipmentDates: shipmentDatesFromMilestones(milestones, shipment.finalDeliveryDt),
         warehouseDates: warehouseDatesFromMilestones(milestones),
+        caseCard: parseCaseCard(caseCardRow),
         milestones,
         destinationRequirements,
         siteReceipts,
