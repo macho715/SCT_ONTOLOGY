@@ -965,7 +965,14 @@ export const HVDC_TOOL_DESCRIPTORS = {
       candidates: z.array(resolvedEntitySchema),
       controlTowerReports: z.array(controlTowerShipmentReportSchema).default([])
     },
-    _meta: {},
+    _meta: {
+      "openai/outputTemplate": WIDGET_URI,
+      "openai/widgetAccessible": true,
+      ui: {
+        resourceUri: WIDGET_URI,
+        visibility: ["model", "app"]
+      }
+    },
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
   },
   get_hvdc_case_status: {
@@ -1549,7 +1556,8 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
         span.setAttribute("hvdc.report_count", controlTowerReports.length);
         return {
           structuredContent: { candidates, controlTowerReports },
-          content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length, reportCount: controlTowerReports.length }) }]
+          content: [{ type: "text", text: JSON.stringify({ candidateCount: candidates.length, reportCount: controlTowerReports.length }) }],
+          _meta: buildCaseStatusResultMeta()
         };
       });
     }

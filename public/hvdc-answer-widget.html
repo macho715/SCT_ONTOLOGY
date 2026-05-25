@@ -537,7 +537,9 @@
       }
 
       function normalizeCaseStatusOutput(output) {
-        const report = output?.report && typeof output.report === "object" ? output.report : null;
+        const report = output?.report && typeof output.report === "object"
+          ? output.report
+          : asArray(output?.controlTowerReports).find((candidate) => candidate && typeof candidate === "object") ?? null;
         if (!report || output.verdict) return output;
         const verdict = reportStatusToVerdict(report.reportStatus);
         const latest = report.latestStatus ?? {};
