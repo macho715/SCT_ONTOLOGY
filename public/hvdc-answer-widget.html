@@ -416,8 +416,29 @@
       }
 
       function closestElement(target, selector) {
-        if (!target || typeof target.closest !== "function") return null;
-        return target.closest(selector);
+        const node = target?.nodeType === 3 ? target.parentElement : target;
+        if (!node || typeof node.closest !== "function") return null;
+        return node.closest(selector);
+      }
+
+      function bindInteractiveElements() {
+        root.querySelectorAll("[data-decision-tab-target]").forEach((button) => {
+          button.onclick = (event) => {
+            event.preventDefault();
+            activateDecisionTab(button);
+          };
+          button.onkeydown = (event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            activateDecisionTab(button);
+          };
+        });
+        root.querySelectorAll("details").forEach((drawer) => {
+          drawer.ontoggle = () => {
+            persistWidgetUiState({ [drawer.dataset.drawerKey ?? drawer.querySelector("summary")?.textContent?.trim() ?? "details"]: drawer.open });
+            notifyIntrinsicHeight();
+          };
+        });
       }
 
       function normalizeUiState(answer) {
@@ -486,6 +507,7 @@
             </section>
           </div>
         `;
+        bindInteractiveElements();
       }
 
       function renderLoading(message = "Waiting for tool output from ChatGPT.") {
@@ -1294,9 +1316,6 @@
         }
         const summary = closestElement(target, "summary");
         if (summary && summary.closest("details")) {
-          event.preventDefault();
-          event.stopPropagation();
-          toggleDetailsSummary(summary);
           return;
         }
         const rawEvidenceId = target.dataset.evidenceId;
