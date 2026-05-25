@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -14,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = ROOT / "wh status" / "hvdc_wh_status.xlsx"
 SQL_PATH = ROOT / ".tmp" / "wh_status_d1_seed.sql"
 SOURCE_SYSTEM = "hvdc_wh_status.xlsx"
+TOOL_VER = "seed_wh_status_d1.py@ssot-v1"
 CASE_CARD_COLUMNS = [
     "SCT Ref.No",
     "Site",
@@ -69,6 +71,21 @@ DATE_CARD_COLUMNS = {
     "SHU",
     "DAS",
     "AGI",
+}
+WAREHOUSE_EVENT_COLUMNS = {
+    "DHL WH": ("DHL", "WAREHOUSE"),
+    "DSV Indoor": ("DSV_AUH", "INDOOR"),
+    "DSV Al Markaz": ("AMZ", "INDOOR"),
+    "AAA Storage": ("AAA", "OPEN_YARD"),
+    "DSV Outdoor": ("DSV_AUH", "OUTDOOR"),
+    "DSV MZP": ("MOSB", "OPEN_YARD"),
+}
+SITE_EVENT_COLUMNS = {
+    "MOSB": "MOSB_SITE",
+    "MIR": "MIR",
+    "SHU": "SHU",
+    "DAS": "DAS",
+    "AGI": "AGI",
 }
 NS = {
     "x": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
@@ -163,9 +180,10 @@ def parse_workbook(path: Path) -> tuple[list[str], list[dict[str, str]]]:
         raise RuntimeError("Cannot find Case No. header")
     headers = raw_rows[header_idx]
     records = []
-    for row in raw_rows[header_idx + 1:]:
+    for source_row, row in enumerate(raw_rows[header_idx + 1:], start=header_idx + 2):
         record = {headers[i].strip(): row[i].strip() if i < len(row) else "" for i in range(len(headers)) if headers[i].strip()}
         if any(record.values()):
+            record["__source_row"] = str(source_row)
             records.append(record)
     return headers, records
 
@@ -240,8 +258,51 @@ def case_card_json(record: dict[str, str]) -> str:
     return json.dumps(fields, ensure_ascii=False, separators=(",", ":"))
 
 
-def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
+def event_id(shipment_id: str, event_type: str, source_column: str) -> str:
+    suffix = normalize_case(source_column)
+    return f"EVT-{shipment_id}-{event_type}-{suffix}"
+
+
+def append_event(
+    lines: list[str],
+    *,
+    shipment_id: str,
+    case_no: str,
+    case_norm: str,
+    event_type: str,
+    event_date: str | None,
+    event_rank: int,
+    site_code: str | None,
+    zone_code: str | None,
+    ref_doc_no: str | None,
+    remarks: str | None,
+    source_sheet: str | None,
+    source_row: int,
+    source_column: str,
+    ingest_id: str,
+) -> int:
+    if not event_date:
+        return 0
+    event = event_id(shipment_id, event_type, source_column)
+    lines.append(
+        "INSERT OR REPLACE INTO canonical_shipment_events "
+        "(event_id, su_id, case_no_raw, case_norm, event_type, event_date, event_rank, site_code, zone_code, ref_doc_no, remarks, source_column, source_file, source_sheet, source_row, ingest_id, created_at) "
+        f"VALUES ({sql(event)}, {sql(shipment_id)}, {sql(case_no)}, {sql(case_norm)}, {sql(event_type)}, {sql(event_date)}, {event_rank}, {sql(site_code)}, {sql(zone_code)}, {sql(ref_doc_no)}, {sql(remarks)}, {sql(source_column)}, {sql(SOURCE_SYSTEM)}, {sql(source_sheet)}, {source_row}, {sql(ingest_id)}, datetime('now'));"
+    )
+    lines.append(
+        "INSERT OR REPLACE INTO row_index "
+        "(ingest_id, source_row, su_id, case_norm, derived_event_id, source_file) "
+        f"VALUES ({sql(ingest_id)}, {source_row}, {sql(shipment_id)}, {sql(case_norm)}, {sql(event)}, {sql(SOURCE_SYSTEM)});"
+    )
+    return 1
+
+
+def build_sql(records: list[dict[str, str]], ingest_id: str, source_hash: str, total_rows: int) -> tuple[str, dict[str, int]]:
     lines = [
+        "DELETE FROM row_index WHERE ingest_id IN (SELECT ingest_id FROM ingest_audit WHERE source_file = 'hvdc_wh_status.xlsx');",
+        "DELETE FROM canonical_shipment_events WHERE source_file = 'hvdc_wh_status.xlsx';",
+        "DELETE FROM ref_case_map WHERE source_file = 'hvdc_wh_status.xlsx';",
+        "DELETE FROM ingest_audit WHERE source_file = 'hvdc_wh_status.xlsx';",
         "DELETE FROM action_queue WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM validation_log WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM receipt_event WHERE shipment_unit_id LIKE 'WHCASE-%';",
@@ -250,13 +311,18 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
         "DELETE FROM wh_status_case_card WHERE shipment_unit_id LIKE 'WHCASE-%';",
         "DELETE FROM identifier_index WHERE source_system = 'hvdc_wh_status.xlsx' OR target_rid LIKE 'WHCASE-%';",
         "DELETE FROM shipment_unit WHERE shipment_unit_id LIKE 'WHCASE-%';",
+        "INSERT OR REPLACE INTO ingest_audit "
+        "(ingest_id, source_file, source_hash, total_rows, loaded_rows, tool_ver, load_ts) "
+        f"VALUES ({sql(ingest_id)}, {sql(SOURCE_SYSTEM)}, {sql(source_hash)}, {total_rows}, {len(records)}, {sql(TOOL_VER)}, datetime('now'));",
     ]
-    stats = {"cases": 0, "agi_das": 0, "mosb_backfill": 0, "identifiers": 0}
+    stats = {"cases": 0, "agi_das": 0, "mosb_backfill": 0, "identifiers": 0, "events": 0}
     for idx, record in enumerate(records, start=1):
         case_no = get(record, "Case No.", "Case No", "CaseNo")
         if not case_no:
             continue
         shipment_id = f"WHCASE-{normalize_case(case_no)}"
+        case_norm = normalize_case(case_no)
+        source_row = int(float(record.get("__source_row", idx)))
         invoice = get(record, "Shipment Invoice No.", "Shipment Invoice No", "Invoice No", "Invoice")
         sct_ref = get(record, "SCT Ref.No", "SCT Ref No", "SCT Ref")
         vendor = get(record, "Source_Vendor", "Source Vendor", "Vendor")
@@ -297,11 +363,121 @@ def build_sql(records: list[dict[str, str]]) -> tuple[str, dict[str, int]]:
             f"VALUES ({sql(shipment_id)}, {sql(source_line)}, {sql(vendor)}, {sql(category)}, {sql(sct_ref)}, {sql(invoice)}, {sql(flow_code)}, {sql(declared)}, {len(required_set)}, {sql(current_stage)}, {sql(current_location)}, {sql(route)}, {sql(latest_receipt)}, {sql(final_delivery)}, {completion}, {sql(missing)}, NULL);"
         )
         lines.append(
+            "INSERT OR REPLACE INTO ref_case_map "
+            "(case_norm, case_raw, su_id, source_file, first_seen_at, last_seen_at, rule_ver) "
+            f"VALUES ({sql(case_norm)}, {sql(case_no)}, {sql(shipment_id)}, {sql(SOURCE_SYSTEM)}, datetime('now'), datetime('now'), 'case-norm-v1');"
+        )
+        lines.append(
             "INSERT OR REPLACE INTO wh_status_case_card "
             "(shipment_unit_id, case_no, card_json, source_system, updated_at) "
             f"VALUES ({sql(shipment_id)}, {sql(normalize_case(case_no))}, {sql(case_card_json(record))}, {sql(SOURCE_SYSTEM)}, datetime('now'));"
         )
         stats["cases"] += 1
+        source_sheet = get(record, "Source_Sheet", "Source Sheet") or None
+        stats["events"] += append_event(
+            lines,
+            shipment_id=shipment_id,
+            case_no=case_no,
+            case_norm=case_norm,
+            event_type="M040_DEPARTED",
+            event_date=etd,
+            event_rank=10,
+            site_code=get(record, "POL") or None,
+            zone_code=None,
+            ref_doc_no=invoice or None,
+            remarks="ETD/ATD",
+            source_sheet=source_sheet,
+            source_row=source_row,
+            source_column="ETD/ATD",
+            ingest_id=ingest_id,
+        )
+        stats["events"] += append_event(
+            lines,
+            shipment_id=shipment_id,
+            case_no=case_no,
+            case_norm=case_norm,
+            event_type="M050_ARRIVED",
+            event_date=eta,
+            event_rank=20,
+            site_code=get(record, "POD") or None,
+            zone_code=None,
+            ref_doc_no=invoice or None,
+            remarks="ETA/ATA",
+            source_sheet=source_sheet,
+            source_row=source_row,
+            source_column="ETA/ATA",
+            ingest_id=ingest_id,
+        )
+        for column, (site_code, zone_code) in WAREHOUSE_EVENT_COLUMNS.items():
+            stats["events"] += append_event(
+                lines,
+                shipment_id=shipment_id,
+                case_no=case_no,
+                case_norm=case_norm,
+                event_type="WH_RECEIPT",
+                event_date=iso_date(get(record, column)),
+                event_rank=40,
+                site_code=site_code,
+                zone_code=zone_code,
+                ref_doc_no=invoice or None,
+                remarks=column,
+                source_sheet=source_sheet,
+                source_row=source_row,
+                source_column=column,
+                ingest_id=ingest_id,
+            )
+        stats["events"] += append_event(
+            lines,
+            shipment_id=shipment_id,
+            case_no=case_no,
+            case_norm=case_norm,
+            event_type="WH_ISSUE",
+            event_date=wh_out,
+            event_rank=60,
+            site_code=current_location,
+            zone_code=None,
+            ref_doc_no=invoice or None,
+            remarks="last out wh",
+            source_sheet=source_sheet,
+            source_row=source_row,
+            source_column="last out wh",
+            ingest_id=ingest_id,
+        )
+        for column, site_code in SITE_EVENT_COLUMNS.items():
+            stats["events"] += append_event(
+                lines,
+                shipment_id=shipment_id,
+                case_no=case_no,
+                case_norm=case_norm,
+                event_type="SITE_RECEIPT",
+                event_date=iso_date(get(record, column)),
+                event_rank=80,
+                site_code=site_code,
+                zone_code=None,
+                ref_doc_no=invoice or None,
+                remarks=column,
+                source_sheet=source_sheet,
+                source_row=source_row,
+                source_column=column,
+                ingest_id=ingest_id,
+            )
+        stats["events"] += append_event(
+            lines,
+            shipment_id=shipment_id,
+            case_no=case_no,
+            case_norm=case_norm,
+            event_type="M100_FINAL_DELIVERED",
+            event_date=final_delivery,
+            event_rank=90,
+            site_code=current_location,
+            zone_code=None,
+            ref_doc_no=invoice or None,
+            remarks="final delivery from latest site receipt",
+            source_sheet=source_sheet,
+            source_row=source_row,
+            source_column="Final_Location",
+            ingest_id=ingest_id,
+        )
         identifiers = [
             ("CASE_NO", case_no),
             ("ShipmentUnit", shipment_id),
@@ -372,7 +548,10 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Only generate SQL and print stats")
     args = parser.parse_args()
     headers, rows = parse_workbook(WORKBOOK)
-    sql_text, stats = build_sql(merge_records(rows))
+    source_hash = hashlib.sha256(WORKBOOK.read_bytes()).hexdigest()
+    ingest_id = f"wh-status-{source_hash[:16]}"
+    merged_rows = merge_records(rows)
+    sql_text, stats = build_sql(merged_rows, ingest_id, source_hash, len(rows))
     SQL_PATH.parent.mkdir(exist_ok=True)
     SQL_PATH.write_text(sql_text, encoding="utf-8")
     print(f"WH Status D1 seed SQL: {SQL_PATH}")
@@ -382,6 +561,8 @@ def main() -> int:
     print(f"- AGI/DAS site cases: {stats['agi_das']}")
     print(f"- MOSB backfill warnings: {stats['mosb_backfill']}")
     print(f"- identifier rows: {stats['identifiers']}")
+    print(f"- canonical events: {stats['events']}")
+    print(f"- ingest id: {ingest_id}")
     if args.remote:
         npx = "npx.cmd" if os.name == "nt" else "npx"
         return subprocess.call([

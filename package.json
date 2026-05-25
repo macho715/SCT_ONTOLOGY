@@ -25,6 +25,8 @@
     "d1:seed-control-tower": "python scripts/seed_control_tower_d1.py --remote",
     "d1:seed-wh-status": "python scripts/seed_wh_status_d1.py --remote",
     "d1:seed-wh-status:dry": "python scripts/seed_wh_status_d1.py --dry-run",
+    "d1:reconcile-wh-status": "python scripts/reconcile_wh_status_d1.py",
+    "d1:rollback-wh-status:dry": "python scripts/rollback_wh_status_ingest.py --ingest-id",
     "seed:local": "SEED_DRY_RUN=false tsx scripts/seed-d1.ts",
     "seed:remote": "SEED_DRY_RUN=false tsx scripts/seed-d1.ts --remote",
     "seed:dry": "SEED_DRY_RUN=true tsx scripts/seed-d1.ts",

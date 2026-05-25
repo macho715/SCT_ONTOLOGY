@@ -69,6 +69,43 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           { label: "ETD/ATD", value: "2024-01-10", isoDate: "2024-01-10" },
           { label: "DHL WH", value: null, isoDate: null }
         ],
+        canonicalEvents: [
+          {
+            eventId: "EVT-WHCASE-CASE-0003-WH_RECEIPT-DSV-OUTDOOR",
+            eventType: "WH_RECEIPT",
+            eventDate: "2024-01-19",
+            siteCode: "DSV_AUH",
+            zoneCode: "OUTDOOR",
+            sourceFile: "hvdc_wh_status.xlsx",
+            sourceRow: 2,
+            ingestId: "wh-status-test"
+          },
+          {
+            eventId: "EVT-WHCASE-CASE-0003-WH_ISSUE-LAST-OUT-WH",
+            eventType: "WH_ISSUE",
+            eventDate: "2025-05-13",
+            siteCode: "AGI",
+            zoneCode: null,
+            sourceFile: "hvdc_wh_status.xlsx",
+            sourceRow: 2,
+            ingestId: "wh-status-test"
+          }
+        ],
+        latestStatus: {
+          latestEventType: "SITE_RECEIPT",
+          latestEventDate: "2024-02-26",
+          siteCode: "AGI",
+          zoneCode: null
+        },
+        whDwell: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13",
+          dwellDays: 480
+        },
+        siteIntake: {
+          siteReceiptDate: "2024-02-26",
+          siteCodes: "AGI"
+        },
         milestones: [
           { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
           { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "CASE-0003" },
@@ -194,6 +231,43 @@ async function withClient(fn: (client: Client) => Promise<void>) {
           { label: "ETD/ATD", value: "2024-01-10", isoDate: "2024-01-10" },
           { label: "DHL WH", value: null, isoDate: null }
         ],
+        canonicalEvents: [
+          {
+            eventId: "EVT-WHCASE-LS-000123-WH_RECEIPT-DSV-OUTDOOR",
+            eventType: "WH_RECEIPT",
+            eventDate: "2024-01-19",
+            siteCode: "DSV_AUH",
+            zoneCode: "OUTDOOR",
+            sourceFile: "hvdc_wh_status.xlsx",
+            sourceRow: 2,
+            ingestId: "wh-status-test"
+          },
+          {
+            eventId: "EVT-WHCASE-LS-000123-WH_ISSUE-LAST-OUT-WH",
+            eventType: "WH_ISSUE",
+            eventDate: "2025-05-13",
+            siteCode: "AGI",
+            zoneCode: null,
+            sourceFile: "hvdc_wh_status.xlsx",
+            sourceRow: 2,
+            ingestId: "wh-status-test"
+          }
+        ],
+        latestStatus: {
+          latestEventType: "SITE_RECEIPT",
+          latestEventDate: "2024-02-26",
+          siteCode: "AGI",
+          zoneCode: null
+        },
+        whDwell: {
+          warehouseIn: "2024-01-19",
+          warehouseOut: "2025-05-13",
+          dwellDays: 480
+        },
+        siteIntake: {
+          siteReceiptDate: "2024-02-26",
+          siteCodes: "AGI"
+        },
         milestones: [
           { milestoneCode: "M110_WAREHOUSE_RECEIVED", occurredAt: "2024-01-19", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
           { milestoneCode: "M121_WAREHOUSE_DISPATCHED", occurredAt: "2025-05-13", sourceColumn: "hvdc_wh_status.xlsx", sourceLineId: "LS-000123" },
@@ -297,6 +371,8 @@ describe("Control Tower D1 MCP lookup integration", () => {
           shipmentDates: { eta: string; ata: string };
           warehouseDates: { warehouseIn: string; warehouseOut: string };
           caseCard: Array<{ label: string; value: string | null; isoDate: string | null }>;
+          canonicalEvents: Array<{ eventType: string; eventDate: string | null }>;
+          whDwell: { warehouseIn: string | null; warehouseOut: string | null; dwellDays: number | null } | null;
           cargoSummary: { vendor: string; poNo: string };
           siteReceipts: Array<{ locationCode: string; actualReceiptDt: string }>;
           siteReceiptSummary: { latestReceiptDt: string };
@@ -326,6 +402,14 @@ describe("Control Tower D1 MCP lookup integration", () => {
         "ETD/ATD",
         "DHL WH"
       ]);
+      expect(content.controlTowerReports[0].canonicalEvents[0]).toMatchObject({
+        eventType: "WH_RECEIPT",
+        eventDate: "2024-01-19"
+      });
+      expect(content.controlTowerReports[0].whDwell).toMatchObject({
+        warehouseIn: "2024-01-19",
+        warehouseOut: "2025-05-13"
+      });
       expect(content.controlTowerReports[0].siteReceipts[0]).toMatchObject({
         locationCode: "AGI",
         actualReceiptDt: "2024-02-26"
@@ -346,6 +430,8 @@ describe("Control Tower D1 MCP lookup integration", () => {
           reportStatus: string;
           warehouseDates: { warehouseIn: string; warehouseOut: string };
           caseCard: Array<{ label: string; value: string | null; isoDate: string | null }>;
+          canonicalEvents: Array<{ eventType: string; eventDate: string | null }>;
+          whDwell: { warehouseIn: string | null; warehouseOut: string | null; dwellDays: number | null } | null;
           shipment: { deliveryStatus?: string; currentStage: string; currentLocation: string };
           validationFindings: Array<{ reasonCode: string }>;
         };
@@ -366,6 +452,11 @@ describe("Control Tower D1 MCP lookup integration", () => {
         label: "Case No.",
         value: "CASE-0003",
         isoDate: null
+      });
+      expect(content.report.canonicalEvents.map((event) => event.eventType)).toContain("WH_RECEIPT");
+      expect(content.report.whDwell).toMatchObject({
+        warehouseIn: "2024-01-19",
+        warehouseOut: "2025-05-13"
       });
       expect(content.report.validationFindings[0]).toMatchObject({
         reasonCode: "MOSB_EVIDENCE_MISSING"

@@ -111,6 +111,35 @@ export type ControlTowerCaseCardField = {
   isoDate: string | null;
 };
 
+export type ControlTowerCanonicalEvent = {
+  eventId: string;
+  eventType: string;
+  eventDate: string | null;
+  siteCode: string | null;
+  zoneCode: string | null;
+  sourceFile: string;
+  sourceRow: number | null;
+  ingestId: string;
+};
+
+export type ControlTowerLatestStatus = {
+  latestEventType: string | null;
+  latestEventDate: string | null;
+  siteCode: string | null;
+  zoneCode: string | null;
+};
+
+export type ControlTowerWhDwell = {
+  warehouseIn: string | null;
+  warehouseOut: string | null;
+  dwellDays: number | null;
+};
+
+export type ControlTowerSiteIntake = {
+  siteReceiptDate: string | null;
+  siteCodes: string | null;
+};
+
 export type ControlTowerCargoSummary = {
   sourceLineId: string | null;
   vendor: string | null;
@@ -137,6 +166,10 @@ export type ControlTowerShipmentReport = {
   shipmentDates: ControlTowerShipmentDates;
   warehouseDates: ControlTowerWarehouseDates;
   caseCard: ControlTowerCaseCardField[];
+  canonicalEvents: ControlTowerCanonicalEvent[];
+  latestStatus: ControlTowerLatestStatus | null;
+  whDwell: ControlTowerWhDwell | null;
+  siteIntake: ControlTowerSiteIntake | null;
   milestones: ControlTowerMilestoneEvent[];
   destinationRequirements: ControlTowerDestinationRequirement[];
   siteReceipts: ControlTowerReceiptEvent[];
@@ -536,6 +569,33 @@ const controlTowerShipmentReportSchema = z.object({
       isoDate: z.string().nullable()
     })
   ),
+  canonicalEvents: z.array(
+    z.object({
+      eventId: z.string(),
+      eventType: z.string(),
+      eventDate: z.string().nullable(),
+      siteCode: z.string().nullable(),
+      zoneCode: z.string().nullable(),
+      sourceFile: z.string(),
+      sourceRow: z.number().nullable(),
+      ingestId: z.string()
+    })
+  ),
+  latestStatus: z.object({
+    latestEventType: z.string().nullable(),
+    latestEventDate: z.string().nullable(),
+    siteCode: z.string().nullable(),
+    zoneCode: z.string().nullable()
+  }).nullable(),
+  whDwell: z.object({
+    warehouseIn: z.string().nullable(),
+    warehouseOut: z.string().nullable(),
+    dwellDays: z.number().nullable()
+  }).nullable(),
+  siteIntake: z.object({
+    siteReceiptDate: z.string().nullable(),
+    siteCodes: z.string().nullable()
+  }).nullable(),
   milestones: z.array(
     z.object({
       milestoneCode: z.string(),

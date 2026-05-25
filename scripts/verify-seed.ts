@@ -84,6 +84,30 @@ const CHECKS: SeedCheck[] = [
     expect: (cnt) => cnt >= 7560,
     hint: "run migrations then: npm run d1:seed-wh-status",
   },
+  {
+    label: "WH Status case map projected (≥7560)",
+    sql: "SELECT COUNT(*) AS cnt FROM ref_case_map WHERE source_file = 'hvdc_wh_status.xlsx'",
+    expect: (cnt) => cnt >= 7560,
+    hint: "run migrations then: npm run d1:seed-wh-status",
+  },
+  {
+    label: "WH Status canonical events projected (≥20000)",
+    sql: "SELECT COUNT(*) AS cnt FROM canonical_shipment_events WHERE source_file = 'hvdc_wh_status.xlsx'",
+    expect: (cnt) => cnt >= 20000,
+    hint: "run migrations then: npm run d1:seed-wh-status",
+  },
+  {
+    label: "WH Status ingest audit projected (≥1)",
+    sql: "SELECT COUNT(*) AS cnt FROM ingest_audit WHERE source_file = 'hvdc_wh_status.xlsx'",
+    expect: (cnt) => cnt >= 1,
+    hint: "run migrations then: npm run d1:seed-wh-status",
+  },
+  {
+    label: "WH Status row index projected (≥20000)",
+    sql: "SELECT COUNT(*) AS cnt FROM row_index WHERE source_file = 'hvdc_wh_status.xlsx'",
+    expect: (cnt) => cnt >= 20000,
+    hint: "run migrations then: npm run d1:seed-wh-status",
+  },
 ];
 
 let failures = 0;

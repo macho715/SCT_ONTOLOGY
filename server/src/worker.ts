@@ -282,6 +282,35 @@ type ControlTowerCaseCardRow = {
   card_json: string | null;
 };
 
+type ControlTowerCanonicalEventRow = {
+  event_id: string;
+  event_type: string;
+  event_date: string | null;
+  site_code: string | null;
+  zone_code: string | null;
+  source_file: string;
+  source_row: number | null;
+  ingest_id: string;
+};
+
+type ControlTowerLatestStatusRow = {
+  latest_event_type: string | null;
+  latest_event_date: string | null;
+  site_code: string | null;
+  zone_code: string | null;
+};
+
+type ControlTowerWhDwellRow = {
+  warehouse_in: string | null;
+  warehouse_out: string | null;
+  dwell_days: number | null;
+};
+
+type ControlTowerSiteIntakeRow = {
+  site_receipt_date: string | null;
+  site_codes: string | null;
+};
+
 function storageUnavailable(message: string) {
   return {
     status: "STORAGE_UNAVAILABLE" as const,
@@ -414,6 +443,19 @@ function parseCaseCard(row: ControlTowerCaseCardRow | null): ControlTowerCaseCar
   } catch {
     return [];
   }
+}
+
+function canonicalEventRowToReport(row: ControlTowerCanonicalEventRow) {
+  return {
+    eventId: row.event_id,
+    eventType: row.event_type,
+    eventDate: row.event_date,
+    siteCode: row.site_code,
+    zoneCode: row.zone_code,
+    sourceFile: row.source_file,
+    sourceRow: row.source_row,
+    ingestId: row.ingest_id
+  };
 }
 
 function siteReceiptSummary(
@@ -592,7 +634,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
 
       const shipment = shipmentRowToUnit(shipmentRow);
 
-      const [milestoneRows, destinationRows, receiptRows, validationRows, actionRows, caseCardRow] = await Promise.all([
+      const [milestoneRows, destinationRows, receiptRows, validationRows, actionRows, caseCardRow, canonicalEventRows, latestStatusRow, whDwellRow, siteIntakeRow] = await Promise.all([
         db.prepare(
           `SELECT milestone_code, actual_dt, evidence_doc_id
              FROM milestone_event
@@ -643,7 +685,40 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
             LIMIT 1`
         )
           .bind(shipmentUnitId)
-          .first<ControlTowerCaseCardRow>()
+          .first<ControlTowerCaseCardRow>(),
+        db.prepare(
+          `SELECT event_id, event_type, event_date, site_code, zone_code, source_file, source_row, ingest_id
+             FROM canonical_shipment_events
+            WHERE su_id = ?
+            ORDER BY event_date, event_rank, event_id
+            LIMIT 80`
+        )
+          .bind(shipmentUnitId)
+          .all<ControlTowerCanonicalEventRow>(),
+        db.prepare(
+          `SELECT latest_event_type, latest_event_date, site_code, zone_code
+             FROM status_latest_per_su
+            WHERE su_id = ?
+            LIMIT 1`
+        )
+          .bind(shipmentUnitId)
+          .first<ControlTowerLatestStatusRow>(),
+        db.prepare(
+          `SELECT warehouse_in, warehouse_out, dwell_days
+             FROM status_wh_dwell
+            WHERE su_id = ?
+            LIMIT 1`
+        )
+          .bind(shipmentUnitId)
+          .first<ControlTowerWhDwellRow>(),
+        db.prepare(
+          `SELECT site_receipt_date, site_codes
+             FROM status_site_intake
+            WHERE su_id = ?
+            LIMIT 1`
+        )
+          .bind(shipmentUnitId)
+          .first<ControlTowerSiteIntakeRow>()
       ]);
 
       const milestones = (milestoneRows.results ?? []).map((row) => milestoneRowToEvent(row, shipment.sourceLineId));
@@ -667,6 +742,22 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
         shipmentDates: shipmentDatesFromMilestones(milestones, shipment.finalDeliveryDt),
         warehouseDates: warehouseDatesFromMilestones(milestones),
         caseCard: parseCaseCard(caseCardRow),
+        canonicalEvents: (canonicalEventRows.results ?? []).map(canonicalEventRowToReport),
+        latestStatus: latestStatusRow ? {
+          latestEventType: latestStatusRow.latest_event_type,
+          latestEventDate: latestStatusRow.latest_event_date,
+          siteCode: latestStatusRow.site_code,
+          zoneCode: latestStatusRow.zone_code
+        } : null,
+        whDwell: whDwellRow ? {
+          warehouseIn: whDwellRow.warehouse_in,
+          warehouseOut: whDwellRow.warehouse_out,
+          dwellDays: whDwellRow.dwell_days
+        } : null,
+        siteIntake: siteIntakeRow ? {
+          siteReceiptDate: siteIntakeRow.site_receipt_date,
+          siteCodes: siteIntakeRow.site_codes
+        } : null,
         milestones,
         destinationRequirements,
         siteReceipts,
