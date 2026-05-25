@@ -273,6 +273,17 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("Protected fields");
   });
 
+  it("scrolls and highlights clicked decision tabs and drawer targets", () => {
+    expect(widgetHtml).toContain("scrollAndHighlight");
+    expect(widgetHtml).toContain("scrollIntoView");
+    expect(widgetHtml).toContain("hvdc-scroll-highlight");
+    expect(widgetHtml).toContain("hvdc-section-flash");
+    expect(widgetHtml).toContain("data-drawer-key=\"evidence\"");
+    expect(widgetHtml).toContain("data-drawer-key=\"ontology-path\"");
+    expect(widgetHtml).toContain("window.setTimeout(() => {");
+    expect(widgetHtml).toContain("target.classList?.remove?.(\"hvdc-scroll-highlight\")");
+  });
+
   it("renders mixed evidence trace fixture into answer content and drawer rows", () => {
     const html = renderWidgetFixture({
       answerId: "fixture",
