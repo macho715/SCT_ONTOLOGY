@@ -1298,6 +1298,251 @@ function buildCaseStatusResultMeta(): Record<string, unknown> {
   };
 }
 
+function extractCaseNo(question: string): string | null {
+  const match = /(?:case\s*no\.?|case|케이스)\s*[:#-]?\s*([A-Za-z0-9][A-Za-z0-9._-]{1,40})/i.exec(question);
+  return match?.[1] ?? null;
+}
+
+function reportVerdict(report: ControlTowerShipmentReport): "PASS" | "WARN" | "BLOCK" | "ZERO" {
+  if (report.reportStatus === "NO_EVIDENCE") return "ZERO";
+  if (report.reportStatus === "BLOCK") return "BLOCK";
+  if (report.reportStatus === "WARN") return "WARN";
+  return "PASS";
+}
+
+function caseCardField(report: ControlTowerShipmentReport, label: string): string | null {
+  return report.caseCard.find((field) => field.label === label)?.value ?? null;
+}
+
+function firstReportWarning(report: ControlTowerShipmentReport): ControlTowerValidationFinding | null {
+  return report.validationFindings.find((finding) => (finding.severity ?? "").toUpperCase().includes("WARN")) ?? null;
+}
+
+function caseStatusAnswer(report: ControlTowerShipmentReport): GroundedAnswer {
+  const verdict = reportVerdict(report);
+  const warning = firstReportWarning(report);
+  const latest = report.latestStatus;
+  const whDwell = report.whDwell;
+  const siteIntake = report.siteIntake;
+  const generatedAt = report.generatedAt;
+  const evidenceId = `CT-${report.shipmentUnitId}`;
+  const summary = `Case No. ${caseCardField(report, "Case No.") ?? report.cargoSummary.sourceLineId ?? report.shipmentUnitId} -> ${report.shipmentUnitId}, latest ${latest?.latestEventType ?? report.shipment?.currentStage ?? "UNKNOWN"} / ${latest?.latestEventDate ?? report.shipment?.finalDeliveryDt ?? "-"}.`;
+  const businessImpact = warning
+    ? `${warning.reasonCode ?? "WARN"} remains open; site receipt and final delivery remain accepted when actual site date exists.`
+    : "Control Tower case status is complete with no open validation warning.";
+  const validation = report.validationFindings.map((finding): GroundedAnswer["validation"][number] => ({
+    ruleId: finding.ruleId,
+    reasonCode: finding.reasonCode === "MOSB_EVIDENCE_MISSING" ? "MOSB_EVIDENCE_MISSING" : "MISSING_MASTER_EVIDENCE",
+    severity: (finding.severity ?? "INFO").toUpperCase().includes("BLOCK")
+      ? "BLOCK"
+      : (finding.severity ?? "INFO").toUpperCase().includes("WARN")
+        ? "WARN"
+        : "INFO",
+    status: (finding.severity ?? "INFO").toUpperCase().includes("BLOCK")
+      ? "BLOCK"
+      : (finding.severity ?? "INFO").toUpperCase().includes("WARN")
+        ? "WARN"
+        : "PASS",
+    targetObject: report.shipmentUnitId,
+    evidenceIds: [evidenceId],
+    message: `${finding.reasonCode ?? finding.ruleId}: ${finding.field ?? "field"}=${finding.value ?? "-"}`
+  }));
+  const openActionRequired = Boolean(warning);
+
+  return {
+    answerId: `case-status-${report.shipmentUnitId}`,
+    verdict,
+    dataStatus: "OK",
+    businessResultVisible: true,
+    fallbackUsed: false,
+    summary,
+    businessImpact,
+    details: [
+      `Vendor: ${report.cargoSummary.vendor ?? "-"}`,
+      `Invoice No.: ${report.cargoSummary.invoiceNo ?? "-"}`,
+      `Description: ${caseCardField(report, "Description") ?? "-"}`,
+      `Current location: ${report.shipment?.currentLocation ?? latest?.siteCode ?? "-"}`,
+      `Latest status: ${latest?.latestEventType ?? "-"} / ${latest?.latestEventDate ?? "-"}`,
+      `Warehouse In: ${report.warehouseDates.warehouseIn ?? whDwell?.warehouseIn ?? "-"}`,
+      `Warehouse Out: ${report.warehouseDates.warehouseOut ?? whDwell?.warehouseOut ?? "-"}`,
+      `Dwell days: ${whDwell?.dwellDays ?? "-"}`,
+      `Site intake: ${siteIntake?.siteReceiptDate ?? "-"} / ${siteIntake?.siteCodes ?? "-"}`
+    ],
+    evidenceIds: [evidenceId],
+    validationStatus: report.reportStatus === "NO_EVIDENCE" ? "NO_EVIDENCE" : report.reportStatus,
+    route: {
+      routeId: `control-tower-${report.shipmentUnitId}`,
+      intent: "LOGISTICS_DECISION",
+      domains: ["operations", "warehouse"],
+      requiredDocs: ["hvdc_wh_status.xlsx", "D1 canonical_shipment_events", "status_latest_per_su"],
+      rulePackIds: ["CONTROL_TOWER_CASE_STATUS"],
+      allowedActions: ["read", "case_status_review"],
+      blockedActions: [],
+      confidence: 1,
+      routingReason: "Case No lookup loaded from Cloudflare D1 Control Tower projection."
+    },
+    resolvedEntities: [
+      {
+        entityType: "ShipmentUnit",
+        identifierScheme: "caseNo",
+        identifierValue: report.cargoSummary.sourceLineId ?? report.shipmentUnitId,
+        normalizedValue: report.cargoSummary.sourceLineId ?? report.shipmentUnitId,
+        targetRid: report.shipmentUnitId,
+        confidence: 0.99
+      }
+    ],
+    evidence: [
+      {
+        id: evidenceId,
+        docId: "hvdc_wh_status.xlsx",
+        title: "WH Status Control Tower projection",
+        version: "D1",
+        sectionPath: `sourceRow ${report.canonicalEvents[0]?.sourceRow ?? report.cargoSummary.sourceLineId ?? "-"}`,
+        snippet: `${summary} ${businessImpact}`,
+        docHash: report.canonicalEvents[0]?.ingestId ?? "D1 projection",
+        confidence: 1,
+        sourceType: "kg"
+      }
+    ],
+    evidenceTrace: [
+      { targetType: "summary", targetIndex: null, answerText: summary, supportState: "SUPPORTED", evidenceIds: [evidenceId] },
+      { targetType: "businessImpact", targetIndex: null, answerText: businessImpact, supportState: "SUPPORTED", evidenceIds: [evidenceId] }
+    ],
+    validation,
+    actions: openActionRequired
+      ? [
+          {
+            actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
+            ownerRole: "Marine / Material Chain Owner",
+            parameters: { shipmentUnitId: report.shipmentUnitId, requiredEvidence: "M115/M116/M117" },
+            humanGateRequired: false,
+            auditRecordRequired: true,
+            writeBackMode: "READ_ONLY",
+            dueBasis: "Before MOSB chain closure audit",
+            dueAt: null
+          }
+        ]
+      : [],
+    graphPath: {
+      startNode: report.cargoSummary.sourceLineId ?? report.shipmentUnitId,
+      edges: [
+        { from: report.cargoSummary.sourceLineId ?? report.shipmentUnitId, relation: "resolves_to", to: report.shipmentUnitId },
+        { from: report.shipmentUnitId, relation: "has_latest_status", to: latest?.latestEventType ?? report.shipment?.currentStage ?? "UNKNOWN" },
+        { from: report.shipmentUnitId, relation: "has_site_intake", to: siteIntake?.siteCodes ?? report.shipment?.currentLocation ?? "UNKNOWN" }
+      ],
+      endNode: latest?.latestEventType ?? report.shipment?.currentStage ?? "UNKNOWN",
+      operationalObjects: [report.shipmentUnitId],
+      pathConfidence: 1
+    },
+    decisionCard: {
+      schemaVersion: "sct.card.v2.1",
+      cardId: `case-status-${report.shipmentUnitId}`,
+      routeId: `control-tower-${report.shipmentUnitId}`,
+      intent: "LOGISTICS_DECISION",
+      intentGroup: "OPERATIONAL",
+      generatedAt,
+      verdict: verdict === "ZERO" ? "ZERO" : verdict,
+      finalGovernanceVerdict: verdict === "ZERO" ? "ZERO" : report.reportStatus === "PASS" ? "PASS" : report.reportStatus === "BLOCK" ? "BLOCK" : "WARN",
+      verdictMappingRule: {
+        ruleId: "CARD-GOV-VERDICT-001",
+        inputVerdict: verdict,
+        mappedVerdict: verdict === "ZERO" ? "ZERO" : report.reportStatus === "PASS" ? "PASS" : report.reportStatus === "BLOCK" ? "BLOCK" : "WARN",
+        reason: warning ? "Delivered/site receipt accepted, but MOSB evidence backfill remains open." : "Case status projection has no open warning."
+      },
+      severity: warning ? "P1" : "P2",
+      primaryReason: summary,
+      nextAction: warning ? "BACKFILL_MOSB_CHAIN_EVIDENCE" : "No open action",
+      unblockSummary: warning ? "Backfill M115/M116/M117 MOSB chain evidence" : "No blocking finding",
+      piiStatus: "None",
+      dataClass: "P1",
+      security: {
+        piiStatus: "PASS",
+        ndaStatus: "PASS",
+        sourceCorpusAuditStatus: "PASS",
+        sensitiveAccessed: false,
+        piiMasked: true,
+        rawContactExposed: false,
+        internalRateExposed: false,
+        auditRuleIds: ["CONTROL-TOWER-PII-001"]
+      },
+      blockedBy: warning
+        ? [
+            {
+              ruleId: warning.ruleId,
+              ruleName: warning.reasonCode ?? "MOSB evidence missing",
+              reason: "MOSB chain evidence is missing while site receipt is accepted.",
+              requiredInputs: ["M115", "M116", "M117"],
+              missingInputs: ["M115", "M116", "M117"],
+              blockedActions: ["MOSB chain closure audit"],
+              severity: "P1"
+            }
+          ]
+        : [],
+      allowedActions: ["read", "case_status_review"],
+      blockedActions: warning ? ["MOSB chain closure audit"] : [],
+      allowedNow: ["read", "case_status_review"],
+      blockedUntilApproved: warning ? ["MOSB chain closure audit"] : [],
+      humanGateState: warning ? "NEEDS_REVIEW" : "READ_ONLY",
+      evidenceCoverage: [
+        { domain: "latestStatus", status: latest?.latestEventType ? "PASS" : "WARN", required: 1, available: latest?.latestEventType ? 1 : 0, directSupportRatio: latest?.latestEventType ? 1 : 0 },
+        { domain: "canonicalEvents", status: report.canonicalEvents.length ? "PASS" : "WARN", required: 1, available: report.canonicalEvents.length, directSupportRatio: report.canonicalEvents.length ? 1 : 0 },
+        { domain: "whDwell", status: whDwell?.dwellDays !== null && whDwell?.dwellDays !== undefined ? "PASS" : "WARN", required: 1, available: whDwell?.dwellDays !== null && whDwell?.dwellDays !== undefined ? 1 : 0, directSupportRatio: whDwell?.dwellDays !== null && whDwell?.dwellDays !== undefined ? 1 : 0 },
+        { domain: "siteIntake", status: siteIntake?.siteReceiptDate ? "PASS" : "WARN", required: 1, available: siteIntake?.siteReceiptDate ? 1 : 0, directSupportRatio: siteIntake?.siteReceiptDate ? 1 : 0 }
+      ],
+      actions: openActionRequired
+        ? [
+            {
+              actionId: "ACT-MOSB-BACKFILL",
+              ownerRole: "Marine / Material Chain Owner",
+              ownerNameMasked: null,
+              actionType: "BACKFILL_MOSB_CHAIN_EVIDENCE",
+              actionLabel: "Backfill MOSB chain evidence",
+              requiredInput: "M115/M116/M117 evidence",
+              allowedNow: ["read", "collect evidence"],
+              blockedUntilApproved: [],
+              humanGateRequired: false,
+              auditRecordRequired: true,
+              writeBackMode: "READ_ONLY",
+              approvalRequired: false,
+              approvalStatus: "NotRequired",
+              status: "Open",
+              evidenceIds: [evidenceId],
+              blockedUntil: ["M115/M116/M117 evidence"],
+              dueBasis: "Before MOSB chain closure audit",
+              dueAt: null
+            }
+          ]
+        : [],
+      trace: {
+        sourceHash: report.canonicalEvents[0]?.ingestId ?? "D1 projection",
+        rulePackVersion: "control-tower-d1",
+        rulePackIds: ["CONTROL_TOWER_CASE_STATUS"],
+        rulePackExecution: [
+          {
+            rulePackId: "CONTROL_TOWER_CASE_STATUS",
+            fired: true,
+            skippedReason: null,
+            evidenceOnly: false,
+            blockedByRuleId: warning?.ruleId ?? null,
+            decisionImpact: "Loads WH status, canonical events, latest status, WH dwell, and site intake.",
+            checkedAt: generatedAt
+          }
+        ],
+        schemaPatchVersion: "case-status-card-v1",
+        sourceCorpusVersion: "hvdc_wh_status.xlsx-D1",
+        promptVersion: "case-status-card-v1",
+        approvalActor: null,
+        approvalStatus: "NotRequired",
+        sensitiveAccessed: false,
+        generatedAt,
+        routeId: `control-tower-${report.shipmentUnitId}`
+      }
+    },
+    piiMasked: true,
+    generatedAt
+  };
+}
+
 function mergeResolvedEntities(primary: ResolvedEntity[], secondary: ResolvedEntity[]): ResolvedEntity[] {
   const seen = new Set<string>();
   const merged: ResolvedEntity[] = [];
@@ -1466,7 +1711,9 @@ export function createHvdcServer(options: HvdcServerOptions = {}): McpServer {
     async ({ question, userRole, language }) => {
       return withSpan("ask_hvdc_ontology", async (span) => {
         span.setAttribute("hvdc.user_role", userRole ?? "ops_user");
-        const answer = answerQuestion({ question, userRole, language });
+        const caseNo = extractCaseNo(question);
+        const report = caseNo ? await options.controlTower?.getCaseStatus?.(caseNo) ?? null : null;
+        const answer = report ? caseStatusAnswer(report) : answerQuestion({ question, userRole, language });
         span.setAttribute("hvdc.verdict", answer.verdict);
         span.setAttribute("hvdc.validation_status", answer.validationStatus);
         await options.audit?.(buildAuditRecord("ask_hvdc_ontology", { question, userRole, language }, answer, answer.piiMasked));
