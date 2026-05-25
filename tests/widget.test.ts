@@ -130,12 +130,22 @@ describe("HVDC answer widget", () => {
     expect(widgetHtml).toContain("overflow-x: hidden");
     expect(widgetHtml).toContain("scrollbar-gutter: stable");
     expect(widgetHtml).toContain("overscroll-behavior: contain");
+    expect(widgetHtml).toContain(".table-scroll");
+    expect(widgetHtml).toContain("overflow-x: auto");
     expect(widgetHtml).toContain("grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr))");
     expect(widgetHtml).toContain("overflow-wrap: anywhere");
     expect(widgetHtml).toContain("word-break: break-word");
     expect(widgetHtml).toContain("padding: 12px 12px 44px");
     expect(widgetHtml).toContain("class=\"details-body\"");
     expect(widgetHtml).toContain("reasonCode");
+  });
+
+  it("keeps case status tables inside scrollable card containers", () => {
+    expect(widgetHtml).toContain("case-status-table-section");
+    expect(widgetHtml).toContain("aria-label=\"Base Case Card table\"");
+    expect(widgetHtml).toContain("aria-label=\"canonicalEvents table\"");
+    expect(widgetHtml).toContain("decision-card-table compact");
+    expect(widgetHtml).toContain("Timeline columns stay inside the card");
   });
 
   it("does not fetch external resources from the iframe", () => {

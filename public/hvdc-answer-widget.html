@@ -155,17 +155,42 @@
       .coverage-item { border: 1px solid #9fb3cc; border-radius: 18px; padding: 16px; background: rgba(255, 255, 255, 0.95); color: #0f172a; box-shadow: 0 10px 24px rgba(30, 41, 59, 0.05); }
       .coverage-item strong { display: block; color: #111827; line-height: 1.2; margin-bottom: 10px; }
       .coverage-status { display: inline-flex; align-items: center; border-radius: 999px; margin: 0 0 8px; padding: 4px 9px; font-weight: 900; font-size: 0.72rem; letter-spacing: 0.06em; color: #1d4ed8; background: #dbeafe; border: 1px solid #93c5fd; }
-      .decision-card-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.91rem; background: rgba(255, 255, 255, 0.97); border: 1px solid #cbd5e1; border-radius: 20px; overflow: hidden; color: #0f172a; box-shadow: 0 12px 28px rgba(30, 41, 59, 0.07); }
-      .decision-card-table th, .decision-card-table td { text-align: left; border-bottom: 1px solid #d7e0eb; padding: 14px 16px; vertical-align: top; color: #0f172a; }
+      .table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-radius: 20px;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 12px 28px rgba(30, 41, 59, 0.07);
+        background:
+          linear-gradient(90deg, rgba(248, 250, 252, 1), rgba(248, 250, 252, 0)) left center / 22px 100% no-repeat,
+          linear-gradient(270deg, rgba(248, 250, 252, 1), rgba(248, 250, 252, 0)) right center / 22px 100% no-repeat,
+          rgba(255, 255, 255, 0.97);
+        scrollbar-gutter: stable;
+      }
+      .decision-card-table { width: 100%; min-width: 620px; border-collapse: separate; border-spacing: 0; font-size: 0.91rem; background: rgba(255, 255, 255, 0.97); color: #0f172a; }
+      .decision-card-table.compact { min-width: 760px; table-layout: fixed; }
+      .decision-card-table th, .decision-card-table td { text-align: left; border-bottom: 1px solid #d7e0eb; padding: 14px 16px; vertical-align: top; color: #0f172a; overflow-wrap: anywhere; word-break: break-word; }
       .decision-card-table th { color: #1e293b; background: #e2eaf4; font-weight: 900; }
       .decision-card-table tr:last-child td { border-bottom: none; }
       .decision-trace .decision-card-panel:last-child { grid-column: 1 / -1; font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace; font-size: 0.86rem; line-height: 1.55; background: #f8fafc; }
-      .case-status-card { border: 1px solid #b7c7dc; border-radius: 22px; padding: 22px; margin: 0 0 20px; background: linear-gradient(145deg, #ffffff, #f3f8ff); color: #0f172a; box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12); color-scheme: light; }
-      .case-status-card h2 { margin: 0 0 10px; font-size: 1.2rem; color: #0f172a; }
+      .case-status-card { position: relative; overflow: hidden; border: 1px solid #9fb3cc; border-radius: 28px; padding: 24px; margin: 0 0 22px; background:
+        radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.15), transparent 34%),
+        linear-gradient(145deg, #ffffff 0%, #f5f9ff 54%, #eef6ff 100%); color: #0f172a; box-shadow: 0 22px 58px rgba(15, 23, 42, 0.14); color-scheme: light; }
+      .case-status-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 7px; background: linear-gradient(90deg, #0f172a, #2563eb 42%, #f59e0b 78%, #dc2626); }
+      .case-status-card h2 { margin: 0 0 10px; font-size: 1.28rem; letter-spacing: -0.035em; color: #0f172a; }
+      .case-status-card h3 { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; font-size: 1rem; color: #0f172a; }
+      .case-status-card h3::before { content: ""; width: 9px; height: 9px; border-radius: 999px; background: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
       .case-status-card p, .case-status-card td, .case-status-card th, .case-status-card div { color: #0f172a; }
       .case-status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 14px 0; }
-      .case-status-metric { border: 1px solid #9fb3cc; border-radius: 16px; padding: 14px; background: #fff; overflow-wrap: anywhere; }
-      .case-status-metric strong { display: block; margin-bottom: 6px; color: #334155; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      .case-status-metric { border: 1px solid #9fb3cc; border-radius: 18px; padding: 15px; background: rgba(255, 255, 255, 0.92); overflow-wrap: anywhere; box-shadow: inset 0 1px 0 rgba(255,255,255,0.78), 0 10px 22px rgba(30, 41, 59, 0.06); }
+      .case-status-metric strong { display: block; margin-bottom: 7px; color: #334155; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .case-status-meta { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 4px; }
+      .case-status-pill { display: inline-flex; align-items: center; border: 1px solid #93c5fd; border-radius: 999px; padding: 4px 10px; background: #dbeafe; color: #1d4ed8; font-size: 0.76rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+      .case-status-pill.warn { border-color: #fbbf24; background: #fef3c7; color: #92400e; }
+      .case-status-table-section { min-width: 0; max-width: 100%; }
+      .case-status-table-note { margin: 6px 0 10px; color: #475569; font-size: 0.86rem; }
       .evidence { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
       .evidence:first-of-type { border-top: none; }
       .trace-line { display: inline; }
@@ -203,6 +228,9 @@
         .card { padding: 12px; }
         .meta { grid-template-columns: minmax(0, 1fr); gap: 2px; }
         .meta dt { margin-top: 6px; }
+        .decision-card-v2, .case-status-card { padding: 20px 16px; border-radius: 22px; }
+        .case-status-grid { grid-template-columns: 1fr; }
+        .decision-card-table, .decision-card-table.compact { min-width: 680px; font-size: 0.86rem; }
       }
     </style>
   </head>
@@ -1040,6 +1068,7 @@
         const whDwell = report.whDwell ?? {};
         const siteIntake = report.siteIntake ?? {};
         const shipment = report.shipment ?? {};
+        const reportStatus = safeStatus(report.reportStatus ?? "INFO");
         const cargoRows = asArray(report.caseCard).slice(0, 36).map((field) => `
           <tr><td>${escapeHtml(displayValue(field.label))}</td><td>${escapeHtml(displayValue(field.value ?? field.isoDate, "-"))}</td></tr>
         `).join("");
@@ -1056,8 +1085,12 @@
         `).join("");
         return `
           <section class="case-status-card" aria-label="HVDC Case Status Card">
+            <div class="case-status-meta">
+              <span class="case-status-pill ${reportStatus === "WARN" ? "warn" : ""}">${escapeHtml(reportStatus)}</span>
+              <span>${escapeHtml(displayValue(report.shipmentUnitId))}</span>
+            </div>
             <h2>HVDC Case Status Card</h2>
-            <p><strong>${escapeHtml(report.shipmentUnitId)}</strong> / ${escapeHtml(displayValue(report.reportStatus))}</p>
+            <p>${escapeHtml(displayValue(shipment.currentStage ?? latest.latestEventType ?? latest.eventType, "-"))} / ${escapeHtml(displayValue(shipment.currentLocation ?? latest.siteCode, "-"))}</p>
             <div class="case-status-grid">
               <div class="case-status-metric"><strong>Current location</strong>${escapeHtml(displayValue(shipment.currentLocation ?? latest.siteCode, "-"))}</div>
               <div class="case-status-metric"><strong>Latest status</strong>${escapeHtml(displayValue(latest.latestEventType, "-"))} / ${escapeHtml(formatReportDate(latest.latestEventDate))}</div>
@@ -1066,16 +1099,26 @@
               <div class="case-status-metric"><strong>Dwell days</strong>${escapeHtml(displayValue(whDwell.dwellDays, "-"))}</div>
               <div class="case-status-metric"><strong>Site intake</strong>${escapeHtml(formatReportDate(siteIntake.siteReceiptDate))} / ${escapeHtml(displayValue(siteIntake.siteCodes, "-"))}</div>
             </div>
-            <h3>Base Case Card</h3>
-            <table class="decision-card-table">
-              <thead><tr><th>Field</th><th>Value</th></tr></thead>
-              <tbody>${cargoRows || `<tr><td colspan="2" class="empty">No case card fields returned.</td></tr>`}</tbody>
-            </table>
-            <h3>canonicalEvents</h3>
-            <table class="decision-card-table">
-              <thead><tr><th>No</th><th>Event Type</th><th>Event Date</th><th>Site</th><th>Zone</th><th>Source File</th><th>Source Row</th></tr></thead>
-              <tbody>${eventRows || `<tr><td colspan="7" class="empty">No canonical events returned.</td></tr>`}</tbody>
-            </table>
+            <section class="case-status-table-section" aria-label="Base Case Card">
+              <h3>Base Case Card</h3>
+              <p class="case-status-table-note">Excel source fields are fixed inside this card with horizontal scroll when needed.</p>
+              <div class="table-scroll" tabindex="0" aria-label="Base Case Card table">
+                <table class="decision-card-table">
+                  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                  <tbody>${cargoRows || `<tr><td colspan="2" class="empty">No case card fields returned.</td></tr>`}</tbody>
+                </table>
+              </div>
+            </section>
+            <section class="case-status-table-section" aria-label="canonicalEvents">
+              <h3>canonicalEvents</h3>
+              <p class="case-status-table-note">Timeline columns stay inside the card; use horizontal scroll for narrow ChatGPT frames.</p>
+              <div class="table-scroll" tabindex="0" aria-label="canonicalEvents table">
+                <table class="decision-card-table compact">
+                  <thead><tr><th>No</th><th>Event Type</th><th>Event Date</th><th>Site</th><th>Zone</th><th>Source File</th><th>Source Row</th></tr></thead>
+                  <tbody>${eventRows || `<tr><td colspan="7" class="empty">No canonical events returned.</td></tr>`}</tbody>
+                </table>
+              </div>
+            </section>
           </section>
         `;
       }
