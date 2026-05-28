@@ -33,9 +33,11 @@ import { extractIdentifierLookupVariants, normalizeLookupToken } from "./identif
 import type { MilestoneRecord } from "./mosb-gate.js";
 import type { ActionProposal } from "./team-action-router.js";
 import type { ResolvedEntity } from "./types.js";
+import { withKvCache, ctKey } from "./kv-cache.js";
 
 type Env = RateLimitEnv & {
   ALLOWED_ORIGIN?: string;
+  ALLOWED_ORIGINS?: string;
   WIDGET_DOMAIN?: string;
   MCP_AUTH_TOKEN?: string;
   MCP_AUTH_SCOPES?: string;
@@ -43,6 +45,9 @@ type Env = RateLimitEnv & {
   OAUTH_RESOURCE_ID?: string;
   MCP_AUDIT_DB?: D1Database;
   HVDC_FILES?: R2Bucket;
+  HVDC_CACHE?: KVNamespace;
+  KV_CACHE_ENABLED?: string;
+  AUTH_REQUIRED?: string;
   OTEL_ENABLED?: string;
   OTEL_EXPORTER_OTLP_ENDPOINT?: string;
   OTEL_EXPORTER_OTLP_HEADERS?: string;
@@ -621,6 +626,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
     },
 
     async getShipmentReport(shipmentUnitId: string): Promise<ControlTowerShipmentReport | null> {
+      return withKvCache(env, ctKey(shipmentUnitId), 300, async () => {
       const shipmentRow = await db.prepare(
         `SELECT ${SHIPMENT_UNIT_COLUMNS}
            FROM shipment_unit
@@ -768,6 +774,7 @@ function createControlTowerLookup(env: Env): HvdcControlTowerLookup {
         message: `Control Tower shipment report loaded for ${shipmentUnitId}.`,
         generatedAt: new Date().toISOString()
       };
+      }); // end withKvCache
     },
 
     async listMilestones(shipmentUnitId: string): Promise<MilestoneRecord[]> {

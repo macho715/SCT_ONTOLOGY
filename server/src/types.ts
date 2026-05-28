@@ -1,5 +1,10 @@
 import type { DecisionCardPayload } from "./decision-card.js";
 
+export interface CacheConfig {
+  key: string;
+  ttlSec: number;
+}
+
 export type DomainHint =
   | "system"
   | "master"

@@ -17,3 +17,9 @@ __pycache__/
 hvdc_email_drafting_guard_patch_2026-05-12/
 Ontology insight upgrade/
 HVDC_FINAL_10x_2026-04-27/
+.tmp/
+.codex/
+.vitest-cache/
+coverage/
+20260528_project-upgrade-report.md
+20260528_plan-doc.md
