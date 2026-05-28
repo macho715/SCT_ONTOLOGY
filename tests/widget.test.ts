@@ -392,6 +392,48 @@ describe("HVDC answer widget", () => {
     expect(html).not.toContain("aaaabbbbccccddddeeee.ffffgggghhhhiiiijjjj.kkkkllllmmmmnnnnoooo");
   });
 
+  it("keeps ISO dates visible while masking phone numbers", () => {
+    const html = renderWidgetFixture({
+      answerId: "case-date-fixture",
+      verdict: "WARN",
+      dataStatus: "OK",
+      businessResultVisible: true,
+      fallbackUsed: false,
+      summary: "Case status fixture",
+      businessImpact: "Warehouse timeline must keep dates but mask +971 50 123 4567",
+      details: [],
+      evidenceIds: [],
+      validationStatus: "WARN",
+      route: { routeId: "r1", requiredDocs: ["CONSOLIDATED-00"], confidence: 0.95, routingReason: "fixture" },
+      evidence: [],
+      evidenceTrace: [],
+      validation: [],
+      actions: [],
+      piiMasked: true,
+      generatedAt: "2026-05-25T00:00:00Z",
+      report: {
+        shipmentUnitId: "WHCASE-207721",
+        reportStatus: "WARN",
+        shipment: { currentStage: "M100_FINAL_DELIVERED", currentLocation: "DAS" },
+        latestStatus: { latestEventType: "M100_FINAL_DELIVERED", latestEventDate: "2025-05-13" },
+        warehouseDates: { warehouseIn: "2024-01-19", warehouseOut: "2025-05-13" },
+        whDwell: { warehouseIn: "2024-01-19", warehouseOut: "2025-05-13", dwellDays: 480 },
+        siteIntake: { siteReceiptDate: "2025-05-13", siteCodes: "DAS" },
+        caseCard: [{ label: "Case No.", value: "207721.0" }],
+        canonicalEvents: [
+          { eventType: "M040_DEPARTED", eventDate: "2023-12-01", siteCode: "Gothenburg", zoneCode: "-", sourceFile: "hvdc_wh_status.xlsx", sourceRow: 2 },
+          { eventType: "M100_FINAL_DELIVERED", eventDate: "2025-05-13", siteCode: "DAS", zoneCode: "-", sourceFile: "hvdc_wh_status.xlsx", sourceRow: 2 }
+        ]
+      }
+    });
+
+    expect(html).toContain("2023-12-01");
+    expect(html).toContain("2024-01-19");
+    expect(html).toContain("2025-05-13");
+    expect(html).toContain("[masked-phone]");
+    expect(html).not.toContain("+971 50 123 4567");
+  });
+
   it("renders ONTOLOGY PATH graphPath start, edges, end, and confidence", () => {
     const html = renderWidgetFixture({
       answerId: "graph-path-fixture",
