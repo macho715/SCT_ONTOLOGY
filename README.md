@@ -4,6 +4,30 @@
 
 현재 상태는 Cloudflare Workers 운영 기준입니다. MCP 서버, 15개 tool, Dual-MCP 검증 엔진, 온톨로지 corpus 번들, Evidence Drawer 위젯, OAuth Bearer 보호 upload/write 도구, D1 감사 로그, R2 파일 저장소, golden eval, GitHub Actions 검증이 들어 있습니다.
 
+## Overview
+
+이 프로젝트는 Cloudflare Workers 기반 ChatGPT Apps MCP 서버, HVDC ontology corpus 검색, Decision Card v2.1, Case Status Card, D1/R2 운영 저장소, 그리고 WH status case-event SSOT projection을 한 저장소에서 관리합니다.
+
+## Quick Start
+
+1. `npm ci`로 의존성을 설치합니다.
+2. `npm run generate:worker-assets`로 Worker 번들 자산을 재생성합니다.
+3. `npm run verify`로 typecheck, tests, Worker dry-run을 실행합니다.
+4. `npm run worker:deploy`로 검증 후 Cloudflare Worker에 배포합니다.
+
+
+## 2026-05-25 Current Operating Snapshot
+
+쉽게 말하면: 현재 운영 기준은 Cloudflare Worker `main` commit `5af135f`, Widget v10, Case Status Card, WH status D1 projection, 그리고 302-test release gate입니다. 자세한 최신 동기화 문서는 `docs/SYSTEM_ARCHITECTURE.md`, `docs/LAYOUT.md`, `docs/GUIDE.md`, `docs/CHANGELOG.md`를 보십시오.
+
+| 항목 | 최신 기준 | 검증 또는 코드 근거 |
+|---|---|---|
+| GitHub main HEAD | `5af135f` | `fix: contain case status tables in widget card` pushed to `origin/main`. |
+| Cloudflare Worker | Version ID `fcad3b6d-1ee5-420f-b3e7-3a030e5210f5` | `npm run worker:deploy` completed after `npm run verify`. |
+| Widget resource | `ui://hvdc/answer-card-v10.html` | `server/src/hvdc-server.ts` resource metadata and deployed MCP smoke. |
+| Verification | 22 test files / 302 tests passed | `npm run worker:deploy` internal `npm run verify`. |
+| Case status smoke | `WHCASE-207721`, `WARN`, `M100_FINAL_DELIVERED`, `canonicalEvents=6`, `caseCard=36` | `/mcp get_hvdc_case_status caseNo=207721` with MCP Accept header. |
+| WH status workflow | Excel -> D1 projection -> case card / canonical events | `scripts/seed_wh_status_d1.py`, `migrations/0006_wh_status_case_card.sql`, `migrations/0007_case_event_ssot.sql`. |
 ## 2026-05-15 Latest Operating Snapshot
 
 쉽게 말하면: GitHub main 화면의 현재 기준은 Cloudflare 운영 Worker와 `main` commit `91f6329`입니다. 아래 표가 최신 source of truth이며, 이전 2026-05-14/2026-05-15 섹션은 과거 snapshot으로 보존합니다.
@@ -502,3 +526,5 @@ Implementation evidence:
 - `server/src/worker.ts` adds the D1 report join across `shipment_unit`, `milestone_event`, `receipt_event`, `destination_requirement`, `validation_log`, and `action_queue`.
 - `tests/control-tower-d1.test.ts` verifies that `resolve_any_key` returns ETA, ATA, cargo, and site receipt data in one result.
 - Operating smoke for `SCT0001` returned `reportCount=1`, `ETA=2024-03-22`, `ATA=2024-03-22`, and site receipts for `SHU=2024-03-28`, `MIR=2024-04-18`.
+
+

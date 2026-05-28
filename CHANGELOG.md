@@ -2,6 +2,23 @@
 
 이 문서는 현재 저장소 상태와 확인된 Git 이력을 기준으로 작성한다.
 
+
+## Unreleased - 2026-05-25 Widget v10 and project docs sync
+
+### Added
+
+- Added synchronized project-doc-pipeline outputs under `docs/SYSTEM_ARCHITECTURE.md`, `docs/LAYOUT.md`, `docs/CHANGELOG.md`, and `docs/GUIDE.md`.
+- Added current README snapshot for Cloudflare Worker `5af135f`, Widget v10, Case Status Card, and WH status D1 projection.
+
+### Changed
+
+- Documented the current runtime baseline: `ui://hvdc/answer-card-v10.html`, `get_hvdc_case_status`, and warehouse status case-card projection from Excel/D1 evidence.
+
+### Verified
+
+- `npm run worker:deploy` completed with 22 test files and 302 tests passing before Cloudflare deployment.
+- Deployed Worker Version ID `fcad3b6d-1ee5-420f-b3e7-3a030e5210f5`.
+- Production smoke confirmed `/healthz` HTTP 200 and `/mcp get_hvdc_case_status caseNo=207721` returned `WHCASE-207721`, `WARN`, `M100_FINAL_DELIVERED`, `canonicalEvents=6`, and `caseCard=36`.
 ## Unreleased - 2026-05-14 Dual-MCP main, Cloudflare, and root documentation synchronization
 
 ### Addendum - 2026-05-14 current main and ChatGPT operations smoke
@@ -432,3 +449,4 @@ timeline
 
 - ChatGPT connector UI may cache an older tool schema until the connector is refreshed.
 - The report is read-only D1 Control Tower evidence. It does not certify live ERP/WMS/Foundry state unless those feeds are loaded into D1.
+
