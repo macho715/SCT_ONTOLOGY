@@ -10,7 +10,7 @@ WIDGET_DOMAIN = "https://hvdc-ontology-chatgpt-app.mscho715.workers.dev"
 MCP_AUTH_SCOPES = "files:upload files:write"
 OTEL_ENABLED = "true"
 AXIOM_DATASET = "hvdc-mcp-prod"
-KV_CACHE_ENABLED = "false"
+KV_CACHE_ENABLED = "true"
 AUTH_REQUIRED = "false"
 
 [[r2_buckets]]
@@ -45,3 +45,4 @@ name = "RATE_LIMITER_TOOL"
 type = "ratelimit"
 namespace_id = "1003"
 simple = { limit = 10, period = 3600 }
+
