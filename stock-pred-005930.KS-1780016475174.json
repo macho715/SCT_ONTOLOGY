@@ -1,0 +1,89 @@
+{
+  "generated": "2026-05-29T01:01:15.174Z",
+  "app": "STOCK·PRED v5.0",
+  "market": "KRX",
+  "symbol": "005930.KS",
+  "source": "PYKRX:CACHE",
+  "lastBar": {
+    "close": 308500,
+    "date": "2026-05-29",
+    "high": 319000,
+    "low": 308000,
+    "open": 309500,
+    "timestamp": 1779998400000,
+    "volume": 9039622,
+    "ema12": 289941.7176090335,
+    "ema26": 268529.8432910056,
+    "ema50": 242208.81727761758,
+    "rsi": 67.7286708129815,
+    "macd": 21411.874318027927,
+    "macdSignal": 20759.540603900634,
+    "macdHist": 652.3337141272932,
+    "bbUpper": 326267.9579575445,
+    "bbMid": 276925,
+    "bbLower": 227582.04204245555
+  },
+  "indicators": {
+    "rsi": 67.7286708129815,
+    "macd": 21411.874318027927,
+    "macdSignal": 20759.540603900634,
+    "macdHist": 652.3337141272932,
+    "bbUpper": 326267.9579575445,
+    "bbMid": 276925,
+    "bbLower": 227582.04204245555,
+    "ema12": 289941.7176090335,
+    "ema26": 268529.8432910056,
+    "ema50": 242208.81727761758
+  },
+  "modelEvidence": {
+    "ensemble_score": 91.88,
+    "evidence": {
+      "cv_gap": 5,
+      "feature_rows": 470,
+      "generated_at_utc": "2026-05-29T01:00:20+00:00",
+      "last_date": "727",
+      "lstm_enabled": true,
+      "lstm_requested": true,
+      "model_accuracy": 0.490028,
+      "model_auc": 0.529755,
+      "oof_coverage": 0.746809,
+      "row_count": 728,
+      "training_mode": "walk_forward_refit"
+    },
+    "model_kind": "xgb-cpu",
+    "model_scores": {
+      "logistic": 91.96,
+      "lstm": 99.04,
+      "main": 91.88,
+      "rnn": 99.57,
+      "xgboost": 88.81
+    },
+    "period": "3y",
+    "provider": "yfinance",
+    "requested_model_kind": "auto",
+    "schema_version": "model_scores.v1",
+    "signal": "BUY",
+    "status": "PASS",
+    "ticker": "005930.KS"
+  },
+  "browserDemoModels": {
+    "lr": 88,
+    "xgb": 78,
+    "lstm": 68,
+    "rnn": 77
+  },
+  "ensemble": 91.88,
+  "signal": "BUY",
+  "backtest": {
+    "initial": 10000,
+    "finalVal": 24242.110281482,
+    "bhFinal": 42906.815020862305,
+    "mlReturnPct": 142.42110281482002,
+    "bhReturnPct": 329.0681502086231,
+    "alphaPct": -186.64704739380304,
+    "sharpe": 1.1567027103190495,
+    "winRatePct": 25,
+    "totalTrades": 65,
+    "completedTrades": 32
+  }
+}
