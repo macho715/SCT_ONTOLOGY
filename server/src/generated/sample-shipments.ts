@@ -1,5 +1,6 @@
 export const SAMPLE_SHIPMENTS = [
   {
+    "schema_version": "3.2",
     "shipment_id": "SHP-0001",
     "routing_pattern": "PORT_TO_WH_TO_SITE",
     "identifiers": {
@@ -32,11 +33,13 @@ export const SAMPLE_SHIPMENTS = [
     "documents": [
       {
         "doc_type": "BOE",
-        "ref": "BOE-7788"
+        "ref": "BOE-7788",
+        "status": "available"
       },
       {
         "doc_type": "DO",
-        "ref": "DO-9911"
+        "ref": "DO-9911",
+        "status": "available"
       }
     ],
     "invoice_lines": [
@@ -69,6 +72,7 @@ export const SAMPLE_SHIPMENTS = [
     ]
   },
   {
+    "schema_version": "3.2",
     "shipment_id": "SHP-0002",
     "routing_pattern": "PORT_TO_MOSB_TO_SITE",
     "identifiers": {
@@ -105,7 +109,8 @@ export const SAMPLE_SHIPMENTS = [
     "documents": [
       {
         "doc_type": "BOE",
-        "ref": "BOE-8899"
+        "ref": "BOE-8899",
+        "status": "available"
       }
     ],
     "invoice_lines": [
@@ -134,6 +139,82 @@ export const SAMPLE_SHIPMENTS = [
       "Missing original DO",
       "AGI MOSB gate evidence incomplete",
       "M91 (BOE clearance milestone) not recorded — BOE document present but clearance event unconfirmed"
+    ]
+  },
+  {
+    "schema_version": "3.2",
+    "shipment_id": "SHP-0003",
+    "routing_pattern": "PORT_TO_MOSB_TO_SITE",
+    "identifiers": {
+      "BL": "BL-DXB-DAS-003",
+      "BOE": "BOE-3300",
+      "Invoice": "INV-DAS-3003",
+      "Container": "DAS-TRAILER-03",
+      "HVDC_CODE": "HVDC-ADOPT-DAS-0003",
+      "Package": "PKG-DAS-03",
+      "cargo_type": "DAS"
+    },
+    "milestones": [
+      {
+        "code": "M90",
+        "occurred_at": "2026-05-10T06:00:00+00:00",
+        "evidence_ref": "ATA-DAS-003"
+      },
+      {
+        "code": "M92",
+        "occurred_at": "2026-05-11T06:00:00+00:00",
+        "evidence_ref": "DO-DRAFT-003"
+      },
+      {
+        "code": "M100",
+        "occurred_at": "2026-05-12T06:00:00+00:00",
+        "evidence_ref": "GATE-DAS-003"
+      },
+      {
+        "code": "M115",
+        "occurred_at": null,
+        "evidence_ref": null
+      },
+      {
+        "code": "M130",
+        "occurred_at": "2026-05-15T14:00:00+00:00",
+        "evidence_ref": null
+      }
+    ],
+    "documents": [
+      {
+        "doc_type": "BOE",
+        "ref": "BOE-3300",
+        "status": "available"
+      },
+      {
+        "doc_type": "DO",
+        "ref": "DO-DAS-003",
+        "status": "pending"
+      },
+      {
+        "doc_type": "SITE_RECEIPT",
+        "ref": "SR-DAS-003",
+        "status": "pending"
+      }
+    ],
+    "invoice_lines": [
+      {
+        "line_id": "L1",
+        "item": "DAS offshore marine service",
+        "quantity": 1,
+        "rate": "150000.00",
+        "draft_amount": "150000.00",
+        "standard_amount": "135000.00",
+        "evidence_refs": [
+          "MarineEvent:DAS-44"
+        ]
+      }
+    ],
+    "open_exceptions": [
+      "DAS MOSB gate incomplete: M115 and M116 and M117 not recorded",
+      "M130 site arrival evidence_ref missing — no site arrival evidence on record",
+      "DO and SITE_RECEIPT documents in pending status — not treated as available"
     ]
   }
 ] as const;

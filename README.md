@@ -15,6 +15,16 @@
 3. `npm run verify`로 typecheck, tests, Worker dry-run을 실행합니다.
 4. `npm run worker:deploy`로 검증 후 Cloudflare Worker에 배포합니다.
 
+## Secret Setup
+
+Axiom OTLP 관찰성을 활성화하려면 배포 전 한 번만 실행합니다.
+
+```bash
+wrangler secret put AXIOM_TOKEN
+```
+
+`AXIOM_DATASET`은 이미 `wrangler.toml`에 설정되어 있으므로 토큰만 secret으로 등록하면 됩니다. 자세한 Axiom 쿼리, 알림 임계값, 운영 체크리스트는 [`docs/observability-runbook.md`](docs/observability-runbook.md)를 참조하십시오.
+
 
 ## 2026-05-25 Current Operating Snapshot
 
