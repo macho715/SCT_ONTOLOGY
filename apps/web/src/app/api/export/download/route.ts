@@ -3,14 +3,13 @@ import { STORE } from '@/lib/job-store';
 import { ErrorCodes, httpForError, type ErrorCode } from '@/lib/error-codes';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { EXPORTS_MAP, isDevStub } from '@/lib/export-store';
 
 export const runtime = 'nodejs';
 
 function err(code: ErrorCode, message: string) {
   return NextResponse.json({ code, message }, { status: httpForError(code) });
 }
-
-const EXPORTS_MAP = (globalThis.__invoice_audit_exports ??= new Map());
 
 export async function GET(req: Request): Promise<Response> {
   const url = new URL(req.url);
@@ -20,12 +19,10 @@ export async function GET(req: Request): Promise<Response> {
   const job = await STORE.getJob(jobId);
   if (!job) return err('JOB_NOT_FOUND', 'unknown job_id');
 
-  // 1. Zero verdict block check
   if (job.verdict === 'ZERO') {
     return err('ZERO_BLOCKED', 'Export blocked for jobs with ZERO verdict');
   }
 
-  // 2. Approval check
   if (job.status !== 'APPROVED') {
     return err('APPROVAL_REQUIRED', 'Job must be approved before download');
   }
@@ -35,15 +32,10 @@ export async function GET(req: Request): Promise<Response> {
     return err('INVALID_STATE', 'Job has not been exported yet');
   }
 
-  const isDevStub = () => {
-    const t = process.env.BLOB_READ_WRITE_TOKEN ?? '';
-    return t === '' || t.startsWith('dev-stub');
-  };
-
   let buffer: Buffer;
 
   if (isDevStub()) {
-    const filename = `exports/${jobId}/audit-pack-${record.result.manifest.sha256.slice(0, 8)}.xlsx`;
+    const filename = `exports/${jobId}/audit-pack-${(record.result as any).manifest.sha256.slice(0, 8)}.xlsx`;
     const target = join(process.cwd(), '.dev-blob', filename);
     if (!existsSync(target)) {
       return err('INVALID_STATE', 'Exported file not found on disk');
