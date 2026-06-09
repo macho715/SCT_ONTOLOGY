@@ -1,0 +1,127 @@
+import { NextResponse } from 'next/server';
+import { STORE } from '@/lib/job-store';
+import { buildExportRequest } from '@/lib/workbook-builder';
+import { ErrorCodes, httpForError, type ErrorCode } from '@/lib/error-codes';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+
+export const runtime = 'nodejs';
+
+function err(code: ErrorCode, message: string) {
+  return NextResponse.json({ code, message }, { status: httpForError(code) });
+}
+
+// Global store for exports to survive dev reload and share between route modules
+declare global {
+  // eslint-disable-next-line no-var
+  var __invoice_audit_exports: Map<string, { result: any; url: string }> | undefined;
+}
+
+const EXPORTS_MAP = (globalThis.__invoice_audit_exports ??= new Map());
+
+export async function POST(req: Request): Promise<Response> {
+  let body: { job_id?: string; generated_at?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return err('INVALID_STATE', 'invalid json body');
+  }
+
+  const jobId = body.job_id;
+  if (!jobId) {
+    return err('INVALID_STATE', 'job_id required');
+  }
+
+  const job = await STORE.getJob(jobId);
+  if (!job) {
+    return err('JOB_NOT_FOUND', 'unknown job_id');
+  }
+
+  // 1. Zero verdict block check
+  if (job.verdict === 'ZERO') {
+    return err('ZERO_BLOCKED', 'Export blocked for jobs with ZERO verdict');
+  }
+
+  // 2. Approval check
+  if (job.status !== 'APPROVED') {
+    return err('APPROVAL_REQUIRED', 'Job must be approved before export');
+  }
+
+  // Replay check
+  const replayKey = `${jobId}|${job.parser_version}|${job.rule_version}`;
+  const existing = EXPORTS_MAP.get(replayKey);
+  if (existing) {
+    return NextResponse.json({
+      ...existing.result,
+      info: 'EXPORT_REPLAY_DETECTED'
+    });
+  }
+
+  let exportReq;
+  try {
+    exportReq = await buildExportRequest(jobId, body.generated_at);
+  } catch (e) {
+    return err('EXPORT_FAILED', (e as Error).message);
+  }
+
+  const parserUrl = process.env.PARSER_WORKER_URL ?? 'http://127.0.0.1:8000';
+  let response;
+  try {
+    response = await fetch(`${parserUrl}/v1/export`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(exportReq)
+    });
+  } catch (e) {
+    return err('EXPORT_FAILED', `Failed to connect to exporter worker: ${(e as Error).message}`);
+  }
+
+  if (!response.ok) {
+    const txt = await response.text();
+    return err('EXPORT_FAILED', `Exporter worker returned error: ${txt}`);
+  }
+
+  const exportResult = await response.json();
+
+  const buffer = Buffer.from(exportResult.file_content_base64, 'base64');
+  const filename = `exports/${jobId}/audit-pack-${exportResult.manifest.sha256.slice(0, 8)}.xlsx`;
+  let publicUrl = '';
+
+  const isDevStub = () => {
+    const t = process.env.BLOB_READ_WRITE_TOKEN ?? '';
+    return t === '' || t.startsWith('dev-stub');
+  };
+
+  if (isDevStub()) {
+    const devBlobDir = join(process.cwd(), '.dev-blob');
+    const target = join(devBlobDir, filename);
+    mkdirSync(join(devBlobDir, `exports/${jobId}`), { recursive: true });
+    writeFileSync(target, buffer);
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://127.0.0.1:3000';
+    publicUrl = `${base}/api/dev/blob/${encodeURIComponent(filename)}`;
+  } else {
+    const { put } = await import('@vercel/blob');
+    const res = await put(filename, buffer, {
+      access: 'public',
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    publicUrl = res.url;
+  }
+
+  // Save to traces
+  await STORE.appendTrace(jobId, {
+    step: 'EXPORT',
+    input_ref: jobId,
+    output_ref: filename,
+    source_hash: undefined,
+    calculation_hash: exportResult.manifest.sha256,
+    attributedTo: 'excel-exporter'
+  });
+
+  const record = { result: exportResult, url: publicUrl };
+  EXPORTS_MAP.set(replayKey, record);
+  // Also index by jobId for simple lookup
+  EXPORTS_MAP.set(jobId, record);
+
+  return NextResponse.json(exportResult);
+}

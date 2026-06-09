@@ -1,0 +1,67 @@
+<h2>Spec v1.00 vs. actual repo — the key decision</h2>
+<p class="subtitle">The source spec describes a stack (Next.js + Vercel + Python FastAPI Worker) that contradicts what is already deployed (Cloudflare Workers + D1 + TypeScript MCP server). Pick the framing for the design we are about to build.</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Spec v1.00 (proposed)</div>
+    <div class="mockup-body">
+      <p><strong>Stack</strong></p>
+      <ul>
+        <li>Vercel Next.js UI</li>
+        <li>Vercel API Orchestrator</li>
+        <li>Vercel Blob (private)</li>
+        <li>Python FastAPI Worker</li>
+        <li>SCT_ONTOLOGY = decision engine only</li>
+        <li>7-sheet xlsx Audit Pack export</li>
+      </ul>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">Actually deployed</div>
+    <div class="mockup-body">
+      <p><strong>Stack</strong></p>
+      <ul>
+        <li>Cloudflare Workers (already live)</li>
+        <li>D1 SQLite (already seeded)</li>
+        <li>TypeScript MCP server, 9 functions</li>
+        <li>Vitest test suite (30+ files)</li>
+        <li>OpenAI agent (Python) for ad-hoc queries</li>
+        <li>wrangler deploy, seed scripts, PII scanners</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<p class="label" style="margin-top:1.5rem">How should we frame the design?</p>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="realign" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Realign spec → existing Cloudflare stack</h3>
+      <p>Treat the v1.00 spec as a wishlist. Rewrite it so Orchestrator = Workers routes, Worker = a Durable Object / Queue consumer, Blob = R2, xlsx = generated in-Worker. Smallest delta, fastest path to a working MVP.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="greenfield" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Greenfield: build the Vercel + Python stack</h3>
+      <p>Treat the existing CF/D1 server as a separate concern. Start a new Next.js project alongside it. Larger cost, but the v1.00 doc becomes a literal build plan.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Hybrid: keep CF/MCP, add a thin Next.js shell</h3>
+      <p>UI = Next.js hosted on Vercel (upload + results + approval). MCP server stays on Cloudflare. Worker = a small Python service for xlsx + PDF. Splits risks but adds two deploys.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="spec_rethink" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Step back: rethink what the platform actually is</h3>
+      <p>The 7-sheet Audit Pack and AMBER/ZERO gates are the real product. The "Vercel vs Cloudflare" debate is downstream. Decide intent first, then pick stack.</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:1rem">Click the option(s) you want, then reply in the terminal with your choice (and any reasoning).</p>
