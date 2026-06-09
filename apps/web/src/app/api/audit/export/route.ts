@@ -4,20 +4,13 @@ import { buildExportRequest } from '@/lib/workbook-builder';
 import { ErrorCodes, httpForError, type ErrorCode } from '@/lib/error-codes';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { EXPORTS_MAP, isDevStub } from '@/lib/export-store';
 
 export const runtime = 'nodejs';
 
 function err(code: ErrorCode, message: string) {
   return NextResponse.json({ code, message }, { status: httpForError(code) });
 }
-
-// Global store for exports to survive dev reload and share between route modules
-declare global {
-  // eslint-disable-next-line no-var
-  var __invoice_audit_exports: Map<string, { result: any; url: string }> | undefined;
-}
-
-const EXPORTS_MAP = (globalThis.__invoice_audit_exports ??= new Map());
 
 export async function POST(req: Request): Promise<Response> {
   let body: { job_id?: string; generated_at?: string };
@@ -87,11 +80,6 @@ export async function POST(req: Request): Promise<Response> {
   const filename = `exports/${jobId}/audit-pack-${exportResult.manifest.sha256.slice(0, 8)}.xlsx`;
   let publicUrl = '';
 
-  const isDevStub = () => {
-    const t = process.env.BLOB_READ_WRITE_TOKEN ?? '';
-    return t === '' || t.startsWith('dev-stub');
-  };
-
   if (isDevStub()) {
     const devBlobDir = join(process.cwd(), '.dev-blob');
     const target = join(devBlobDir, filename);
@@ -108,7 +96,6 @@ export async function POST(req: Request): Promise<Response> {
     publicUrl = res.url;
   }
 
-  // Save to traces
   await STORE.appendTrace(jobId, {
     step: 'EXPORT',
     input_ref: jobId,
