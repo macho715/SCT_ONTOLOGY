@@ -43,8 +43,12 @@ describe('types', () => {
   });
 
   it('AuditTraceStepSchema accepts Phase 1 steps', () => {
-    for (const step of ['UPLOAD','PARSE','VALIDATE','COSTGUARD','DOC_GUARDIAN','DECISION']) {
+    for (const step of ['UPLOAD','PARSE','SOURCE_DATA','VALIDATE','COSTGUARD','DOC_GUARDIAN','DECISION']) {
       expect(AuditTraceStepSchema.parse(step)).toBe(step);
     }
+  });
+
+  it('AuditTraceStepSchema rejects unknown step', () => {
+    expect(() => AuditTraceStepSchema.parse('UNKNOWN_STEP')).toThrow();
   });
 });
