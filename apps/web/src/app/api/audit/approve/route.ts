@@ -16,6 +16,11 @@ export async function POST(req: Request): Promise<Response> {
   const userRoleHeader = req.headers.get('x-user-role') || '';
   const userIdHeader = req.headers.get('x-user-id') || 'dev-user';
 
+  // C-01: Validate role before any business logic — prevents header spoofing
+  if (!isValidRole(userRoleHeader)) {
+    return err('FORBIDDEN', `Unknown or missing role: "${userRoleHeader}". Must be one of: COST_CONTROL_LEAD, FINANCE_APPROVER, MARINE_LEAD, COMPLIANCE_LEAD, WAREHOUSE_MANAGER, DOCUMENT_CONTROLLER`);
+  }
+
   let body: {
     job_id?: string;
     approval_scope?: 'AMBER_ACK' | 'ZERO_APPROVED';
@@ -53,13 +58,10 @@ export async function POST(req: Request): Promise<Response> {
 
   const activeTriggers = evaluateHumanGateTriggers(job, normalized, validation, result);
 
-  // If there are no triggers, we can approve directly.
-  // Otherwise, evaluate each trigger against the user's role.
   const resolvedTriggers: HumanGateTrigger[] = [];
 
   for (const trigger of activeTriggers) {
     const isZero = trigger.severity === 'ZERO';
-    const isAmber = trigger.severity === 'AMBER';
 
     if (isZero && scope !== 'ZERO_APPROVED') {
       return err('HUMAN_GATE_REQUIRED', `Trigger ${trigger.trigger_id} requires ZERO_APPROVED scope`);
@@ -81,7 +83,6 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  // Create approval record
   const approvalId = `appr_${randomUUID().replace(/-/g, '').slice(0, 10)}`;
   const prismProofRef = validation?.costguard_results?.[0]?.prism_kernel_proof_ref ?? `proof_${randomUUID().replace(/-/g, '').slice(0, 8)}`;
 
