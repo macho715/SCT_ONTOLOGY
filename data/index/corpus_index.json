@@ -5,16 +5,16 @@
       "file": "data/corpus/CONSOLIDATED-00-master-ontology.md",
       "title": "hvdc-master-ontology · CONSOLIDATED-00",
       "version": "2.0-final",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
-      "sizeBytes": 59291
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
+      "sizeBytes": 59671
     },
     {
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "file": "data/corpus/CONSOLIDATED-01-core-framework-infra.md",
       "title": "hvdc-core-framework-infra · CONSOLIDATED-01",
       "version": "2.0-final",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
-      "sizeBytes": 37492
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
+      "sizeBytes": 37797
     },
     {
       "docId": "CONSOLIDATED-02-warehouse-flow",
@@ -37,8 +37,8 @@
       "file": "data/corpus/CONSOLIDATED-04-barge-bulk-cargo.md",
       "title": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
       "version": "2.0-final",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
-      "sizeBytes": 42671
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
+      "sizeBytes": 42870
     },
     {
       "docId": "CONSOLIDATED-05-invoice-cost",
@@ -53,8 +53,8 @@
       "file": "data/corpus/CONSOLIDATED-06-material-chain.md",
       "title": "hvdc-material-handling · CONSOLIDATED-06",
       "version": "2.0-final",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
-      "sizeBytes": 48422
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
+      "sizeBytes": 48785
     },
     {
       "docId": "CONSOLIDATED-07-port-operations",
@@ -77,8 +77,16 @@
       "file": "data/corpus/CONSOLIDATED-09-operations.md",
       "title": "hvdc-operations · CONSOLIDATED-09",
       "version": "2.0-final",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
-      "sizeBytes": 32780
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
+      "sizeBytes": 32837
+    },
+    {
+      "docId": "CONSOLIDATED-10-card-governance",
+      "file": "data/corpus/CONSOLIDATED-10-card-governance.md",
+      "title": "CONSOLIDATED-10 Card Governance",
+      "version": "2.1",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "sizeBytes": 4600
     },
     {
       "docId": "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined",
@@ -102,952 +110,952 @@
       "id": "CONSOLIDATED-00-master-ontology#1",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "hvdc-master-ontology · CONSOLIDATED-00",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "hvdc-master-ontology · CONSOLIDATED-00"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#2",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "ExecSummary",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "ExecSummary HVDC 물류 온톨로지의 master spine은 `ShipmentUnit`을 중심으로 Project, Package, PO, Material, CargoUnit, Container, PortCall, CustomsEntry, ReleaseOrder, WarehouseTask, SiteReceipt, Document, MilestoneEvent, Exception, Cost 객체를 연결한다. 본 문서는 전"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#3",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Table of Contents",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Table of Contents 1. [Governance & Corpus Boundary](#part-1) 2. [Canonical Dictionaries](#part-2) 3. [Identity & Key Policy](#part-3) 4. [Core Master Data Model](#part-4) 5. [Execution Transaction Model](#part-5) 6. [Document & Evidence Mod"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#4",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 1: Governance & Corpus Boundary {#part-1}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 1: Governance & Corpus Boundary {#part-1}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#5",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "1.1 Master Governance Rule",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "1.1 Master Governance Rule 1. `CONSOLIDATED-00-master-ontology.md` is the **canonical semantic spine** for the repository. 2. Program-wide shipment visibility shall use **`RoutingPattern` + `JourneyStage` + `MilestoneEvent` + `JourneyLeg`**"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#6",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "1.2 Corpus Role Matrix",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "1.2 Corpus Role Matrix | File | Role in this master spine | Master integration rule | |---|---|---| | `CONSOLIDATED-01-core-framework-infra.md` | Standards, node infrastructure, compliance anchors | Reuse Party, Asset, Location, Contract, R"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#7",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "1.3 Data Layer Separation",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "1.3 Data Layer Separation | Layer | Purpose | Canonical classes | |---|---|---| | Master Data | Stable reference and planning data | `Project`, `Package`, `PurchaseOrder`, `Vendor`, `MaterialMaster`, `HVDCCodeTag`, `LocationNode`, `Equipmen"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#8",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "1.4 Non-collapse Rule",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "1.4 Non-collapse Rule | Do not collapse | Correct model | |---|---| | `CustomsEntry` into `BOEDocument` | `CustomsEntry` is a transaction; `BOEDocument` is evidence | | `ReleaseOrder` into `DeliveryOrderDocument` | `ReleaseOrder` is a relea"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#9",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 2: Canonical Dictionaries {#part-2}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 2: Canonical Dictionaries {#part-2}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#10",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "2.1 RoutingPattern Dictionary",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "2.1 RoutingPattern Dictionary `ShipmentRoutingPattern` is an end-to-end route classifier. It is a SKOS-controlled vocabulary and must be encoded as named concepts, not integers. | Pattern | Canonical path | Business meaning | Valid owner | "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#11",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "2.2 MarineRoutingPattern Dictionary",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "2.2 MarineRoutingPattern Dictionary | Pattern | Path | Owner domain | |---|---|---| | `DIRECT_MOSB` | Port → MOSB | `CONSOLIDATED-04`, `CONSOLIDATED-06` | | `WH_THEN_MOSB` | WH → MOSB | `CONSOLIDATED-04`, `CONSOLIDATED-06` | | `LCT_DIRECT` "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#12",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "2.3 JourneyStage Vocabulary",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "2.3 JourneyStage Vocabulary | Stage Code | Korean Name | Entry Milestone | Exit Milestone | Operational use | |---|---|---|---|---| | `PLANNING` | 계획 | M10 | M20 | Demand/readiness planning | | `ORIGIN_DISPATCH` | 원산지 출발 | M20 | M40 | Packi"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#13",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "2.4 Domain Vocabulary Crosswalk",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "2.4 Domain Vocabulary Crosswalk | Domain | Use | Do not use as canonical | |---|---|---| | Core shipment | `ShipmentRoutingPattern`, `JourneyStage`, `MilestoneEvent`, `JourneyLeg` | Numeric route codes | | Port | `plannedRoutingPattern`, `d"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#14",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "2.5 Status Vocabularies",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "2.5 Status Vocabularies | Vocabulary | Values | |---|---| | `ShipmentStatus` | `PLANNED`, `READY`, `IN_TRANSIT`, `ARRIVED`, `UNDER_CLEARANCE`, `RELEASED`, `WAREHOUSED`, `DISPATCHED`, `DELIVERED`, `CLOSED`, `EXCEPTION` | | `DocumentStatus` |"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#15",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 3: Identity & Key Policy {#part-3}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 3: Identity & Key Policy {#part-3}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#16",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "3.1 Identity Principle",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "3.1 Identity Principle **One internal object, many external identifiers.** Every operational object must be reachable from at least one external key, and every high-value object must carry normalized key lineage through `Identifier`. ```tur"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#17",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "3.2 Identifier Families",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "3.2 Identifier Families | Family | Identifier schemes | Target objects | |---|---|---| | Project | `projectCode`, `contractNo`, `siteWorkPackage` | `Project`, `Package` | | Procurement | `packageNo`, `poNo`, `vendorCode`, `releaseNo` | `Pac"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#18",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "3.3 Parent-Child Hierarchy",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "3.3 Parent-Child Hierarchy ```text Project └─ hasPackage → Package └─ coveredBy → PurchaseOrder └─ issuedTo → Vendor └─ supplies → MaterialMaster ├─ taggedBy → HVDCCodeTag └─ unitizedAs → CargoUnit ├─ packedIn → Container └─ belongsTo → Shi"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#19",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "3.4 Any-key Resolution Flow",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "3.4 Any-key Resolution Flow ```text Input key: ETA / HVDC_CODE / Vendor / PO / Package / Material / Shipment / Container / BL / BOE / DO / WH / Site / Claim / Invoice → normalize(identifierScheme, identifierValue) → Identifier.normalizedVal"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#20",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "3.5 Identity Quality Gates",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "3.5 Identity Quality Gates | Gate | Rule | Threshold | |---|---|---:| | `IdentifierCompleteness` | `identifierScheme`, `identifierValue`, `normalizedValue`, `sourceSystem` required | 100.00% | | `AnyKeyResolution` | Key resolves to an objec"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#21",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 4: Core Master Data Model {#part-4}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 4: Core Master Data Model {#part-4}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#22",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "4.1 Master Object Types",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "4.1 Master Object Types | Object Type | Primary internal key | Required properties | Notes | |---|---|---|---| | `Project` | `projectRid` | `projectCode`, `projectName`, `country`, `status` | Parent scope | | `Package` | `packageRid` | `pac"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#23",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "4.2 Location and Node Types",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "4.2 Location and Node Types | Object Type | Required properties | Classification rule | |---|---|---| | `LocationNode` | `nodeCode`, `nodeType`, `name`, `country`, `geoRef` | Superclass for all logistics nodes | | `Port` | `portCode`, `UNLO"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#24",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "4.3 Resource Types",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "4.3 Resource Types | Object Type | Required properties | Usage | |---|---|---| | `Carrier` | `carrierCode`, `carrierName`, `mode` | Main carriage / ocean / road / air | | `Forwarder` | `forwarderCode`, `name`, `serviceRole` | Freight forwar"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#25",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 5: Execution Transaction Model {#part-5}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 5: Execution Transaction Model {#part-5}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#26",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "5.1 Core Transaction Objects",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "5.1 Core Transaction Objects | Object Type | Required properties | Key links | |---|---|---| | `Shipment` | `shipmentId`, `mode`, `status`, `plannedRoutingPattern`, `origin`, `destination`, `ETD`, `ETA`, `ATD`, `ATA` | `hasUnit`, `hasPortCa"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#27",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "5.2 Transaction / Document Split",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "5.2 Transaction / Document Split ```text CustomsEntry --references--> BOEDocument ReleaseOrder --references--> DeliveryOrderDocument SiteReceipt --references--> MRR / MRI / MRS / MIS / POD / GRN / OSDR PortCall --evidencedBy--> ArrivalNotic"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#28",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "5.3 Foundry Ontology Object Mapping",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "5.3 Foundry Ontology Object Mapping | Foundry Object Type | Backing dataset family | Cardinality / notes | |---|---|---| | `ShipmentUnit` | TMS + ERP package + WMS + LDG linked facts | One central operational twin per traceable unit | | `Id"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#29",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "5.4 Action Types",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "5.4 Action Types | Action Type | Target | Required parameters | Guard | |---|---|---|---| | `ResolveAnyKey` | `Identifier` | `identifierScheme`, `identifierValue` | confidence ≥ 0.95 or human review | | `RecordPortRoutingEvidence` | `PortCa"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#30",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 6: Document & Evidence Model {#part-6}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 6: Document & Evidence Model {#part-6}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#31",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "6.1 Document Base Class",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "6.1 Document Base Class ```turtle hvdc:Document a owl:Class ; rdfs:label \"Logistics Document\" . hvdc:documentNo a owl:DatatypeProperty ; rdfs:domain hvdc:Document ; rdfs:range xsd:string . hvdc:docType a owl:DatatypeProperty ; rdfs:domain h"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#32",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "6.2 Document Types",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "6.2 Document Types | Document Type | Required properties | Primary validation | |---|---|---| | `CommercialInvoiceDocument` | `invoiceNo`, `vendor`, `currency`, `totalAmount`, `lineCount` | Invoice total = Σ line ± 2.00% | | `PackingListDoc"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#33",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "6.3 OCR / LDG Evidence Properties",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "6.3 OCR / LDG Evidence Properties | Property | Domain | Range | Ownership rule | |---|---|---|---| | `routeEvidence` | `Document` | string / SKOS concept | Evidence only; feeds routing decision | | `destinationEvidence` | `Document` | site "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#34",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "6.4 Evidence Layer Rules",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "6.4 Evidence Layer Rules 1. Evidence may support a routing, compliance, cost, or exception decision. 2. Evidence may not directly mutate the operational truth unless an approved Action writes the transaction object. 3. Communication records"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#35",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "6.5 OCR KPI Gates",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "6.5 OCR KPI Gates | KPI | Threshold | Action | |---|---:|---| | `MeanConf` | ≥ 0.92 | Below threshold → human review | | `TableAcc` | ≥ 0.98 | Below threshold → table re-extraction | | `NumericIntegrity` | 1.00 | Any break → block finance/c"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#36",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 7: End-to-End Process & Milestone Model {#part-7}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 7: End-to-End Process & Milestone Model {#part-7}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#37",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "7.1 MilestoneEvent Class",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "7.1 MilestoneEvent Class ```turtle hvdc:MilestoneEvent a owl:Class ; rdfs:label \"Logistics Milestone Event\" ; rdfs:comment \"First-class event containing planned, estimated, and actual timestamps.\" . hvdc:milestoneCode a owl:DatatypeProperty"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#38",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "7.2 Canonical Milestone Dictionary",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "7.2 Canonical Milestone Dictionary | Milestone | Name | Journey Stage | Owner domain | Required evidence | |---|---|---|---|---| | M10 | Cargo Ready | `PLANNING` | Vendor/Expeditor | readiness notice / inspection release | | M20 | Packed / "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#39",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "7.3 E2E 19-step Process Map",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "7.3 E2E 19-step Process Map | Step | Process | Primary milestone(s) | Key objects | Risk / exception | |---:|---|---|---|---| | 1 | Project / Package / PO Release | demand event | Project, Package, PO | Missing package/PO chain | | 2 | Vend"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#40",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "7.4 AGI/DAS Offshore Rule",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "7.4 AGI/DAS Offshore Rule ```text IF ShipmentUnit.declaredDestination IN (\"AGI\", \"DAS\") AND ShipmentUnit.routingPattern IN (\"MOSB_DIRECT\", \"WH_MOSB\", \"MIXED\") AND M130.actualDt IS NOT NULL AND M115.actualDt IS NULL THEN VIOLATION-2: Block s"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#41",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 8: Knowledge Graph Node/Edge Design {#part-8}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 8: Knowledge Graph Node/Edge Design {#part-8}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#42",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "8.1 Node Families",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "8.1 Node Families | Node family | Classes | Primary resolution keys | |---|---|---| | Master | Project, Package, PO, Vendor, MaterialMaster, HVDCCodeTag | projectCode, packageNo, poNo, vendorCode, materialCode, HVDC_CODE | | Transport | Shi"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#43",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "8.2 Edge Grammar",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "8.2 Edge Grammar ```turtle"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#44",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Containment / hierarchy",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Containment / hierarchy hvdc:hasPackage, hvdc:coveredBy, hvdc:issuedTo, hvdc:supplies, hvdc:unitizedAs, hvdc:containsCargoUnit, hvdc:packedIn, hvdc:hasUnit"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#45",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Identity",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Identity hvdc:hasIdentifier, hvdc:resolvesTo, hvdc:sameAsCandidate, hvdc:hasNormalizedKey"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#46",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Movement",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Movement hvdc:hasJourneyLeg, hvdc:departsFrom, hvdc:arrivesAt, hvdc:deliveredTo, hvdc:storedAt, hvdc:stagedAt"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#47",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Evidence / provenance",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Evidence / provenance hvdc:evidencedBy, hvdc:referencesDocument, hvdc:attachedTo, hvdc:provenanceOf, hvdc:validatedBy"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#48",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Status / event",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Status / event hvdc:hasMilestone, hvdc:hasInspection, hvdc:hasWarehouseEvent, hvdc:hasMarineEvent, hvdc:triggeredBy"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#49",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Responsibility",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Responsibility hvdc:operatedBy, hvdc:approvedBy, hvdc:handledBy, hvdc:assignedTo, hvdc:issuedBy"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#50",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Compliance",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Compliance hvdc:requiresPermit, hvdc:classifiedByHS, hvdc:conformsTo, hvdc:governedBy, hvdc:checkedBy"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#51",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Finance",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Finance hvdc:chargesFor, hvdc:mappedToCostCode, hvdc:linkedToInvoice, hvdc:usesRateRef, hvdc:accruesTo ```"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#52",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "8.3 Query Templates",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "8.3 Query Templates"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#53",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "ETA / ATA → Full Context",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "ETA / ATA → Full Context ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?unit ?eta ?stage ?routing ?location ?boe ?do ?whp ?site ?risk ?invoice WHERE { ?leg hvdc:estimat"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#54",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Any-key → ShipmentUnit Twin",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Any-key → ShipmentUnit Twin ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?unit ?scheme ?value ?stage ?routing ?doc ?milestone ?cost ?exception WHERE { ?id hvdc:identifierScheme ?scheme ; hvdc:normalizedValue ?value "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#55",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "BOE No. → Release and Cost Trace",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "BOE No. → Release and Cost Trace ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?entry ?unit ?shipment ?boe ?do ?gateOut ?invoice ?deltaPct ?band WHERE { ?entry a hvdc:CustomsEntry ; hvdc:boeRef ?boe . ?unit hvdc:hasC"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#56",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 9: Integration Architecture {#part-9}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 9: Integration Architecture {#part-9}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#57",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "9.1 Pipeline Pattern",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "9.1 Pipeline Pattern ```text Raw source → Bronze: source schema, ingest timestamp, source owner, file hash → Silver: normalized identifiers, dates, units, currencies, locations → Gold: canonical object tables + link tables + evidence tables"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#58",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "9.2 Source-to-Ontology Mapping",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "9.2 Source-to-Ontology Mapping | Source system / feed | Canonical objects | Link points | |---|---|---| | ERP / Procurement | Project, Package, PO, Vendor, MaterialMaster | Project→Package→PO→Vendor→Material | | Engineering tag register | H"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#59",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "9.3 Foundry Implementation Notes",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "9.3 Foundry Implementation Notes | Foundry layer | Implementation rule | |---|---| | Object Types | Create object types from Gold datasets only; raw records remain evidence/source lineage | | Link Types | Materialize edge tables for high-ca"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#60",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "9.4 Integration KPIs",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "9.4 Integration KPIs | KPI | Target | |---|---:| | Object mapping coverage | ≥ 95.00% | | Link completeness | ≥ 95.00% | | Any-key search precision | ≥ 95.00% | | Milestone coverage | ≥ 90.00% | | Validation p95 latency | < 5.00s | | Audit "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#61",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 10: Validation Rules: SHACL, SPARQL, RAG, Human-gate {#part-10}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 10: Validation Rules: SHACL, SPARQL, RAG, Human-gate {#part-10}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#62",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.1 Validation Control Matrix",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.1 Validation Control Matrix | Rule ID | Target | Logic | Severity | |---|---|---|---| | `V-IDENT-001` | `Identifier` | scheme/value/normalized/source required | BLOCK | | `V-SU-001` | `ShipmentUnit` | must have ≥1 Identifier, RoutingPatt"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#63",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.2 SHACL: ShipmentUnit Required Shape",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.2 SHACL: ShipmentUnit Required Shape ```turtle @prefix sh: <http://www.w3.org/ns/shacl#> . @prefix hvdc: <http://samsung.com/project-logistics#> . hvdc:ShipmentUnitRequiredShape a sh:NodeShape ; sh:targetClass hvdc:ShipmentUnit ; sh:prop"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#64",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.3 SHACL: Warehouse Boundary Shape",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.3 SHACL: Warehouse Boundary Shape ```turtle hvdc:FlowCodeBoundaryShape a sh:NodeShape ; sh:targetSubjectsOf hvdc:confirmedFlowCode ; sh:sparql [ sh:message \"VIOLATION-1: confirmedFlowCode found outside WarehouseHandlingProfile — immediat"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#65",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.4 SHACL: WHP Confirmation Requires M110",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.4 SHACL: WHP Confirmation Requires M110 ```turtle hvdc:WarehouseHandlingConfirmationShape a sh:NodeShape ; sh:targetClass hvdc:WarehouseHandlingProfile ; sh:sparql [ sh:message \"VIOLATION-1B: WarehouseHandlingProfile cannot be confirmed "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#66",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.5 SHACL: AGI/DAS MOSB Milestone Shape",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
-      "textPreview": "10.5 SHACL: AGI/DAS MOSB Milestone Shape ```turtle hvdc:AGIDASStagingShape a sh:NodeShape ; sh:targetClass hvdc:ShipmentUnit ; sh:sparql [ sh:message \"VIOLATION-2: AGI/DAS shipment missing MOSB staging milestone M115 before Site Arrived M13"
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
+      "textPreview": "10.5 SHACL: AGI/DAS MOSB Milestone Shape ```turtle hvdc:AGIDASStagingShape a sh:NodeShape ; sh:targetClass hvdc:ShipmentUnit ; sh:sparql [ sh:message \"VIOLATION-2: AGI/DAS shipment has Site Arrived M130 while MOSB chain evidence is missing;"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#67",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.6 SHACL: Invoice Numeric Integrity",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.6 SHACL: Invoice Numeric Integrity ```turtle hvdc:InvoiceLineNumericShape a sh:NodeShape ; sh:targetClass hvdc:InvoiceLine ; sh:sparql [ sh:message \"COST-GUARD: InvoiceLine amount must equal qty * rate within 0.01.\" ; sh:select \"\"\" PREFI"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#68",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.7 COST-GUARD Rule",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.7 COST-GUARD Rule ```text DeltaPct = (DraftAmount - StandardAmount) / StandardAmount * 100.00 Band: <= 2.00% PASS 2.01% - 5.00% WARN 5.01% - 10.00% HIGH > 10.00% CRITICAL Human-gate: invoiceTotal > 100,000.00 AED OR band IN (HIGH, CRITIC"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#69",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.8 SPARQL: Legacy Term Detection",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.8 SPARQL: Legacy Term Detection ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?s ?p ?o WHERE { ?s ?p ?o . FILTER(CONTAINS(LCASE(STR(?p)), \"assignedflowcode\") || CONTAINS(LCASE(STR(?p)), \"extractedflowcode\") || CON"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#70",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.9 RAG / Latest Evidence Gate",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "10.9 RAG / Latest Evidence Gate | Trigger | Required evidence refresh | |---|---| | Regulation / authority notice changed | RAG check against latest approved SOP / authority source | | MOIAT/FANR/DCD/ADNOC permit mismatch | Compliance owner"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#71",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "10.10 Human-gate Matrix",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
-      "textPreview": "10.10 Human-gate Matrix | Trigger | Approver | |---|---| | Invoice total > 100,000.00 AED | Finance Approver | | CostGuard `HIGH` / `CRITICAL` | Cost Control Lead | | AGI/DAS M130 without M115 | Marine Lead + Site Logistics | | WHP override"
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
+      "textPreview": "10.10 Human-gate Matrix | Trigger | Approver | |---|---| | Invoice total > 100,000.00 AED | Finance Approver | | CostGuard `HIGH` / `CRITICAL` | Cost Control Lead | | AGI/DAS M130 without M115/M116/M117 | Marine Lead + Site Logistics backfi"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#72",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 11: Compliance Controls {#part-11}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 11: Compliance Controls {#part-11}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#73",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "11.1 Compliance Object Model",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "11.1 Compliance Object Model | Object | Required properties | Links | |---|---|---| | `ComplianceRequirement` | `authority`, `requirementType`, `triggerCondition`, `effectiveDate`, `status` | appliesTo Material/Shipment/Site/Node | | `Permi"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#74",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "11.2 Incoterms 2020 Control",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "11.2 Incoterms 2020 Control | Control | Logic | |---|---| | `IncotermPresence` | PO / Shipment must carry `incoterm` and delivery place | | `RiskTransferPoint` | JourneyLeg responsibility changes at incoterm-defined point | | `CostResponsib"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#75",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "11.3 UAE Regulatory Controls",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "11.3 UAE Regulatory Controls | Authority / topic | Ontology handling | |---|---| | MOIAT | `MaterialMaster.isRegulatedProduct`, `requiresMOIATCoC`, `certificateRef`, `certificateExpiryDate` | | FANR | `requiresFANRPermit`, `radiationSourceF"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#76",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "11.4 Compliance Blockers",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "11.4 Compliance Blockers ```text IF regulated product AND missing valid MOIAT/FANR/DCD permit → block DO / GatePass / Site Issue. IF hsCode missing on InvoiceLine / MaterialMaster → block BOE draft. IF gatePass expired before gate-out → blo"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#77",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 12: Warehouse Flow Code Policy {#part-12}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 12: Warehouse Flow Code Policy {#part-12}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#78",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "12.1 Policy Scope",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "12.1 Policy Scope This part intentionally appears near the end of the master document. Warehouse Flow Code is a **warehouse-handling classification**, not the master route language. Allowed owner: ```text WarehouseHandlingProfile.confirmedF"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#79",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "12.2 WarehouseHandlingProfile Class",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "12.2 WarehouseHandlingProfile Class ```turtle hvdc:WarehouseHandlingProfile a owl:Class ; rdfs:label \"Warehouse Handling Profile\" ; rdfs:comment \"Warehouse-only profile created by M110 Warehouse Received / put-away evidence.\" . hvdc:confirm"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#80",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "12.3 Confirmed Flow Code Values",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "12.3 Confirmed Flow Code Values | Code | Warehouse handling meaning | Minimum evidence | Notes | |---:|---|---|---| | 0 | `PRE_WH_OR_TENTATIVE` | No M110 WH In evidence and pre-arrival/expected status | Tentative until evidence arrives | | "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#81",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "12.4 Legacy Migration Map",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "12.4 Legacy Migration Map | Legacy phrase | Canonical replacement | Owner | |---|---|---| | `Flow Code 0 = Pre Arrival` | `ShipmentRoutingPattern.PRE_ARRIVAL` or pre-arrival milestone state | `ShipmentUnit` / `PortCall` | | `Flow Code 1 = P"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#82",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "12.5 Warehouse Flow Validation Rules",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "12.5 Warehouse Flow Validation Rules 1. `confirmedFlowCode` can appear only on `WarehouseHandlingProfile`. 2. `flowConfirmationStatus = confirmed` requires M110 actual milestone. 3. `confirmedFlowCode` shall not be used as a KPI bucket for "
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#83",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "Part 13: Options, Roadmap, Automation, QA {#part-13}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "Part 13: Options, Roadmap, Automation, QA {#part-13}"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#84",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "13.1 Implementation Options",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "13.1 Implementation Options | Option | Scope | Pros | Cons | CostIndex | Risk | Time | |---|---|---|---|---:|---:|---:| | A. Master Spine MVP | `ShipmentUnit`, Identifier, Document, Milestone, Cost baseline | Fast search/COP enablement | Li"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#85",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "13.2 Roadmap",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "13.2 Roadmap | Phase | Scope | KPI | |---|---|---| | Prepare | Source inventory, object/link dictionary, namespace lock | Semantic blocker count = 0.00 | | Pilot | One onshore + one AGI/DAS + one invoice end-to-end | Key Resolution ≥ 95.00%"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#86",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "13.3 Automation Notes",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "13.3 Automation Notes | Automation | Trigger | Action | |---|---|---| | `AnyKeySearchBot` | User enters BL/BOE/Container/HVDC_CODE/Invoice | Resolve object and open ShipmentUnit twin | | `PreArrivalGuard` | M80 ATA / arrival notice | Valida"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#87",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "13.4 QA Checklist",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "13.4 QA Checklist | Check | PASS criteria | |---|---| | Canonical authority | This file governs all extensions | | Data separation | Master/transaction/document/event/exception/cost/evidence separated | | Flow boundary | `confirmedFlowCode`"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#88",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "13.5 Assumptions",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "13.5 Assumptions | Assumption | Reason | Risk | |---|---|---| | Gold datasets exist or will be built before Ontology mapping | Foundry object types should not map directly to raw data | Raw schema drift | | Project-specific MOIAT/FANR/DCD/A"
     },
     {
       "id": "CONSOLIDATED-00-master-ontology#89",
       "docId": "CONSOLIDATED-00-master-ontology",
       "sectionPath": "CmdRec {#cmdrec}",
-      "docHash": "b434076d04f6a7746b7368d836a367379461bc0125074ba12966ff9b844e2c09",
+      "docHash": "c0e3289c1007cec2a0f97d1e2e73bb3b2dd2115c95eb7000e8bd9c8c7d73b101",
       "textPreview": "CmdRec {#cmdrec} ```text /switch_mode PRIME + /logi-master report --deep --KRsummary ``` ```text /logi-master cert-chk --deep ``` ```text /logi-master invoice-audit --AEDonly ```"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#1",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "hvdc-core-framework-infra · CONSOLIDATED-01",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "hvdc-core-framework-infra · CONSOLIDATED-01"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#2",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "1. ExecSummary",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "1. ExecSummary `CONSOLIDATED-01`은 HVDC Logistics KG의 **reference framework + infrastructure-node extension**이다. 본 문서는 `CONSOLIDATED-00` master spine을 재정의하지 않고, 표준·규정·노드·운영 제약을 `ShipmentUnit`, `JourneyLeg`, `MilestoneEvent`, `LocationNode`, "
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#3",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "2. Governance & Scope Boundary",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "2. Governance & Scope Boundary"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#4",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "2.1 Master Governance Rule",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "2.1 Master Governance Rule 1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine. 2. `CONSOLIDATED-01` provides high-level standards, regulations, infrastructure nodes, and framework constraints only. 3. Program-wide shipm"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#5",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "2.2 Scope Matrix",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "2.2 Scope Matrix | Scope item | Included in CONSOLIDATED-01 | Excluded / delegated | |---|---|---| | Standards alignment | UN/CEFACT, WCO, DCSA, ICC, UN/LOCODE, ISO, BIMCO, PROV-O, OWL-Time, SKOS, DQV | Detailed API payloads and carrier-spe"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#6",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "2.3 Corpus Compatibility Anchors",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "2.3 Corpus Compatibility Anchors | Source | Required compatibility rule | |---|---| | `CONSOLIDATED-00` | Reuse `LocationNode`, `JourneyLeg`, `MilestoneEvent`, `RoutingPattern`, `RegulatoryRequirement`, `PermitDocument` | | `CONSOLIDATED-02"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#7",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "3. Standards Alignment Matrix",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "3. Standards Alignment Matrix"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#8",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "3.1 Reference Standards",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "3.1 Reference Standards | Standard / authority | Current framework role | Ontology binding | RAG status on 2026-04-27 | |---|---|---|---| | UN/CEFACT BSP-RDM | Buy-Ship-Pay semantic reference for party, shipment, consignment, transport mean"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#9",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "3.2 Standards-to-Domain Mapping",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "3.2 Standards-to-Domain Mapping | Domain | Primary standard anchor | HVDC object layer | Mandatory validation | |---|---|---|---| | Procurement / PO | UN/CEFACT BSP-RDM | `PurchaseOrder`, `Package`, `Vendor`, `MaterialMaster` | PO/package/m"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#10",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "4. Schema — RDF/OWL + SHACL Summary",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "4. Schema — RDF/OWL + SHACL Summary"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#11",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "4.1 Core Classes",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "4.1 Core Classes | Class | Type | Required properties | Purpose | |---|---|---|---| | `hvdc:FrameworkStandard` | Reference | `standardCode`, `version`, `authority`, `ragCheckedAt` | Standard registry | | `hvdc:RegulatoryRequirement` | Refer"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#12",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "4.2 Object Properties",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "4.2 Object Properties | Property | Domain → Range | Cardinality | Meaning | |---|---|---:|---| | `hvdc:nodePartOf` | `LocationNode → LocationNode` | N:1 | Terminal/yard/site subdivision hierarchy | | `hvdc:connectsTo` | `LocationNode → Loca"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#13",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "4.3 Data Properties",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "4.3 Data Properties | Property | Domain | Range | Constraint | |---|---|---|---| | `hvdc:nodeCode` | `LocationNode` | `xsd:string` | Required, unique within project | | `hvdc:nodeType` | `LocationNode` | enum | `PORT`, `TERMINAL`, `WAREHOUS"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#14",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "4.4 Turtle Skeleton",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "4.4 Turtle Skeleton ```turtle @prefix hvdc: <http://samsung.com/project-logistics#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . @prefix owl: <http://www.w3.org/2002/07/owl#> . @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ."
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#15",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "5. Infrastructure Node Model",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "5. Infrastructure Node Model"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#16",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "5.1 Node Type Dictionary",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "5.1 Node Type Dictionary | NodeType | Class | Description | Allowed journey stages | |---|---|---|---| | `PORT` | `Port` | Seaport or entry port | `PORT_ENTRY`, `TERMINAL_HANDLING`, `CUSTOMS_CLEARANCE` | | `TERMINAL` | `Terminal` | CY/CFS/b"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#17",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "5.2 Core Node Registry",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "5.2 Core Node Registry | Node | Canonical class | Function | RoutingPattern support | Compliance gates | |---|---|---|---|---| | Khalifa Port | `Port` | Container import, terminal handling, carrier event source | `DIRECT`, `WH_ONLY`, `MOSB_"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#18",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "5.3 MOSB Boundary Rule",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "5.3 MOSB Boundary Rule `MOSB` may have laydown, temporary holding, and staging functions, but the top-level class is `OffshoreStagingNode`, not `Warehouse`. If a physical sub-area inside MOSB is used for temporary storage, model it as `Stor"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#19",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "5.4 Transport Corridor Model",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "5.4 Transport Corridor Model | Corridor | Mode | From → To | Permit / gate | Primary milestones | |---|---|---|---|---| | Port-to-WH | Truck / trailer / SPMT | Port/terminal → Warehouse | DO, gate pass, OOG permit if required | M92 → M100 →"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#20",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "6. Routing & Journey Constraints",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "6. Routing & Journey Constraints"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#21",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "6.1 RoutingPattern Compatibility",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "6.1 RoutingPattern Compatibility | RoutingPattern | Required node sequence | Node constraints | Notes | |---|---|---|---| | `PRE_ARRIVAL` | Origin / vessel / pre-entry | No UAE infrastructure milestone yet | No WH handling classification | "
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#22",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "6.2 AGI/DAS Offshore Gate",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
-      "textPreview": "6.2 AGI/DAS Offshore Gate AGI/DAS shipments must carry an offshore-compatible `RoutingPattern` and must have M115 `MOSB Staged` before M130 `Site Arrived`. This file defines the infrastructure constraint; `CONSOLIDATED-00` owns the canonica"
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
+      "textPreview": "6.2 AGI/DAS Offshore Gate AGI/DAS shipments should carry an offshore-compatible `RoutingPattern`. If a site date or M130 `Site Arrived` exists, it is accepted as SiteReceipt/M130 evidence even when M115/M116/M117 is missing; the missing MOS"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#23",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "6.3 No Universal MOSB Assumption",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "6.3 No Universal MOSB Assumption Do not assert that all cargo must pass through MOSB. Correct logic: - MIR/SHU onshore cargo may be `DIRECT` or `WH_ONLY`. - AGI/DAS offshore cargo requires MOSB-inclusive routing or an explicit exception gat"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#24",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "7. Integration — Foundry ↔ ERP/WMS/ATLP/Port/Invoice",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "7. Integration — Foundry ↔ ERP/WMS/ATLP/Port/Invoice"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#25",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "7.1 Foundry Object Type Mapping",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "7.1 Foundry Object Type Mapping | Foundry Object Type | Source dataset | Key properties | Link Types | |---|---|---|---| | `FrameworkStandard` | standards registry / RAG table | `standardCode`, `version`, `authority`, `ragCheckedAt` | appli"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#26",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "7.2 Dataset Integration Points",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "7.2 Dataset Integration Points | Source system | Dataset | Ontology output | Validation | |---|---|---|---| | ERP / PMO | `project_po_package_material` | Project, Package, PO, Material, Vendor | PO-package-material completeness | | Port / O"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#27",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "7.3 Foundry Action Types",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "7.3 Foundry Action Types | Action | Target | Inputs | Guard | |---|---|---|---| | `RegisterLocationNode` | LocationNode | node code, type, owner, capabilities | node code uniqueness | | `UpdateCapacityProfile` | CapacityProfile | node, capa"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#28",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "8. Validation — SHACL / SPARQL / RAG / Human-gate",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "8. Validation — SHACL / SPARQL / RAG / Human-gate"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#29",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "8.1 SHACL Constraints",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "8.1 SHACL Constraints ```turtle @prefix sh: <http://www.w3.org/ns/shacl#> . @prefix hvdc: <http://samsung.com/project-logistics#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . hvdc:LocationNodeShape a sh:NodeShape ; sh:targetClass hv"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#30",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "8.2 SPARQL Audit Queries",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "8.2 SPARQL Audit Queries"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#31",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "Node without governance",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "Node without governance ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?node ?type WHERE { ?node a hvdc:LocationNode ; hvdc:nodeType ?type . FILTER NOT EXISTS { ?node hvdc:governedBy ?req . } } ```"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#32",
       "docId": "CONSOLIDATED-01-core-framework-infra",
-      "sectionPath": "AGI/DAS route without MOSB stage",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
-      "textPreview": "AGI/DAS route without MOSB stage ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?unit ?dest ?m130 WHERE { ?unit hvdc:declaredDestination ?dest ; hvdc:hasMilestone ?m130 . ?m130 hvdc:milestoneCode \"M130\" ; hvdc:actualD"
+      "sectionPath": "AGI/DAS M130 with missing MOSB stage evidence",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
+      "textPreview": "AGI/DAS M130 with missing MOSB stage evidence ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?unit ?dest ?m130 WHERE { ?unit hvdc:declaredDestination ?dest ; hvdc:hasMilestone ?m130 . ?m130 hvdc:milestoneCode \"M130\" ;"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#33",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "Capacity warning",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "Capacity warning ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?node ?util WHERE { ?node hvdc:hasCapacityProfile ?cap . ?cap hvdc:currentUtilizationPct ?util . FILTER(?util > 85.00) } ```"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#34",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "8.3 RAG Checks",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "8.3 RAG Checks | RAG check | Trigger | Required evidence | Human-gate | |---|---|---|---| | Standards version | Quarterly or schema release | Official authority source and `ragCheckedAt` | Ontology owner | | MOIAT product conformity | Regul"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#35",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "8.4 Human-gate Thresholds",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "8.4 Human-gate Thresholds | Gate | Trigger | Required role | |---|---|---| | High-value cost | Invoice or claim > 100,000.00 AED | Finance approver | | Capacity overload | WH/MOSB/Site utilization > 85.00% | Logistics manager | | Permit unc"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#36",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "9. Compliance — Incoterms / MOIAT / FANR / DCD / ADNOC",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "9. Compliance — Incoterms / MOIAT / FANR / DCD / ADNOC"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#37",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "9.1 Compliance Object Model",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "9.1 Compliance Object Model | Compliance area | Object | Evidence | Blocking rule | |---|---|---|---| | Incoterms 2020 | `IncotermTerm` | PO/contract term | cost/risk owner must match PO and invoice | | Customs / WCO | `CustomsEntry`, `BOED"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#38",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "9.2 Incoterms Control",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "9.2 Incoterms Control Incoterms are not route classifiers. They determine delivery obligation, cost responsibility, and risk transfer. Store them on PO/Shipment contract context and use them to validate invoice and release ownership. ```spa"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#39",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "9.3 Permit Control",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "9.3 Permit Control Permit validation is event-gated: | Event | Permit / evidence precondition | |---|---| | M50 Terminal Received | BL/manifest and port record exist | | M90 BOE Submitted | CI/PL/BL, HS, origin, value, permits if applicable"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#40",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "10. Options ≥3",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "10. Options ≥3 | Option | Description | Pros | Cons | CostIndex | Risk | Time | |---|---|---|---|---:|---:|---:| | A. Reference-first | Standards + node registry only | fast, low disruption, strong external alignment | weaker operational au"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#41",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale | Phase | Scope | KPI | |---|---|---| | Prepare | Confirm standards registry, node dictionary, authority matrix | NodeMasterCoverage ≥ 90.00% | | Pilot | 1.00 onshore route + 1.00 offs"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#42",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "12. Automation Notes — RPA / LLM / Sheets / TG Hooks",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "12. Automation Notes — RPA / LLM / Sheets / TG Hooks | Automation | Trigger | Output | |---|---|---| | `NodeMasterGuard` | new or modified LocationNode | node code, type, governance, capability validation | | `PermitExpiryBot` | permit expi"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#43",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "13. QA Checklist & Assumptions",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "13. QA Checklist & Assumptions"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#44",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "13.1 QA Checklist",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "13.1 QA Checklist | Check | PASS 기준 | |---|---| | Master spine alignment | `CONSOLIDATED-00` vocabulary reused, not redefined | | Flow boundary | Warehouse handling class not used as route/cost/document/marine classifier | | MOSB classifica"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#45",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "13.2 Assumptions",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "13.2 Assumptions - `CONSOLIDATED-00` remains the semantic authority for core classes and milestones. - Current operational facts such as site gate rules, permit lead time, authority forms, and ADNOC/CICPA details must be RAG-checked against"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#46",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "14. RAG Source Anchors",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "14. RAG Source Anchors | Anchor | Official source URL | Use in this document | |---|---|---| | UN/CEFACT RDM | https://unece.org/trade/uncefact/rdm | BSP-RDM semantic alignment | | WCO Data Model v4.2.0 | https://www.wcoomd.org/en/media/new"
     },
     {
       "id": "CONSOLIDATED-01-core-framework-infra#47",
       "docId": "CONSOLIDATED-01-core-framework-infra",
       "sectionPath": "15. CmdRec",
-      "docHash": "627fe78809767e062f1848bcd47965241c103ee7ac6704d4224e624933068f2f",
+      "docHash": "ade8f40868657b6a89b41e62db98428c2528a2f2d5a8dd7c26a8a0cb54a49dfe",
       "textPreview": "15. CmdRec ```text /switch_mode PRIME + /logi-master cert-chk --deep --KRsummary ``` ```text /logi-master report --deep --KRsummary ``` ```text /logi-master hs-risk --deep --AEDonly ```"
     },
     {
@@ -1726,385 +1734,385 @@
       "id": "CONSOLIDATED-04-barge-bulk-cargo#1",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "hvdc-barge-bulk-cargo · CONSOLIDATED-04",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "hvdc-barge-bulk-cargo · CONSOLIDATED-04"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#2",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "1. ExecSummary",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "1. ExecSummary `CONSOLIDATED-04`는 HVDC Logistics KG의 **marine / barge / bulk / OOG execution extension**이다. 본 문서는 MOSB staging, LCT/barge loading, seafastening, stability, lifting, discharge, marine handover를 `ShipmentUnit`, `CargoUnit`, `M"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#3",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "2. Governance & Scope Boundary",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "2. Governance & Scope Boundary"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#4",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "2.1 Master Governance Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "2.1 Master Governance Rule 1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine. 2. `CONSOLIDATED-04` owns **marine / barge / bulk / OOG execution semantics** only. 3. Program-wide shipment visibility uses `RoutingPattern"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#5",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "2.2 Included vs Delegated Scope",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "2.2 Included vs Delegated Scope | Scope item | Included in CONSOLIDATED-04 | Delegated / excluded | |---|---|---| | MOSB staging | M115, laydown, consolidation, marine readiness, staging inspection | Warehouse put-away and stock ownership i"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#6",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "2.3 Domain Boundary Crosswalk",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "2.3 Domain Boundary Crosswalk | Domain | Allowed interface with marine/bulk | Not allowed in CONSOLIDATED-04 | |---|---|---| | Core master | Read/write `MarineEvent`, `OperationTask`, `JourneyLeg`, `MilestoneEvent` links | Redefine `Shipmen"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#7",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "2.4 Legacy Migration Rules",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "2.4 Legacy Migration Rules | Legacy wording / pattern | Canonical replacement | Patch action | |---|---|---| | Marine domain using warehouse handling class language | `MarineRoutingPattern` and `offshoreDeliveryPattern` | Replace in all mar"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#8",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3. Schema — RDF/OWL + SHACL 요약",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3. Schema — RDF/OWL + SHACL 요약"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#9",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3.1 Marine Ontology Layer",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3.1 Marine Ontology Layer | Layer | Class / vocabulary | Purpose | |---|---|---| | Core cargo | `CargoUnit`, `BulkCargoUnit`, `OOGCargoUnit`, `HeavyLiftCargoUnit` | Marine-handled cargo object | | Marine operation | `MarineOperation`, `Barg"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#10",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3.2 Core Classes",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3.2 Core Classes | Class | Required properties | Key relations | Notes | |---|---|---|---| | `MarineOperation` | `operationId`, `operationType`, `operationStatus`, `plannedStart`, `actualStart`, `actualEnd` | `forShipmentUnit`, `hasMarineEv"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#11",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3.3 Controlled Vocabularies",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3.3 Controlled Vocabularies | Vocabulary | Values | Owner | |---|---|---| | `MarineRoutingPattern` | `DIRECT_MOSB`, `WH_THEN_MOSB`, `LCT_DIRECT`, `OFFSHORE_PENDING`, `SPLIT_MARINE_LEG`, `EXCEPTIONAL_HEAVY_LIFT` | `CONSOLIDATED-04` | | `Offs"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#12",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3.4 Object Property Map",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3.4 Object Property Map | Object property | Domain → Range | Meaning | |---|---|---| | `marine:forShipmentUnit` | `MarineOperation → ShipmentUnit` | Marine operation belongs to shipment unit | | `marine:hasMarineRoutingPattern` | `MarineOpe"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#13",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "3.5 Datatype Property Map",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "3.5 Datatype Property Map | Datatype property | Domain | Range / rule | |---|---|---| | `marine:grossWeightMt` | `CargoUnit` | `xsd:decimal`, `> 0.00` | | `marine:lengthM`, `marine:widthM`, `marine:heightM` | `CargoUnit` | `xsd:decimal`, `>"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#14",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "4. Routing & Milestone Model",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "4. Routing & Milestone Model"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#15",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "4.1 Separation of E2E Routing and Marine Leg",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "4.1 Separation of E2E Routing and Marine Leg | Layer | Vocabulary | Example | Owner | |---|---|---|---| | End-to-end shipment route | `ShipmentRoutingPattern` | `MOSB_DIRECT`, `WH_MOSB`, `MIXED` | `CONSOLIDATED-00` | | Journey stage | `Jour"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#16",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "4.2 Marine Milestone Chain",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "4.2 Marine Milestone Chain | Milestone | Name | Required evidence | Blocking rule | |---|---|---|---| | `M115` | MOSB Staged | MOSB staging request, laydown allocation, cargo inspection, ALS/Marine confirmation | Cannot proceed to M116 with"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#17",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "4.3 MarineRoutingPattern Rules",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "4.3 MarineRoutingPattern Rules | Pattern | Canonical path | Use case | Required milestones | |---|---|---|---| | `DIRECT_MOSB` | Port → MOSB → LCT/Barge → AGI/DAS | Bulk/OOG cargo bypasses warehouse and stages at MOSB | M100 → M115 → M116 →"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#18",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "4.4 AGI/DAS Offshore Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "4.4 AGI/DAS Offshore Rule 1. If `declaredDestination IN (AGI, DAS)`, the shipment must carry `ShipmentRoutingPattern IN (MOSB_DIRECT, WH_MOSB, MIXED)` or an explicit exception. 2. If a marine leg is present, `MarineRoutingPattern` must be o"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#19",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5. Marine Operations Process",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5. Marine Operations Process"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#20",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5.1 Prepare — Marine Readiness",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5.1 Prepare — Marine Readiness | Step | Input | Output | Gate | |---|---|---|---| | Cargo data capture | CI/PL, packing list, survey sheet, WMS, site request | normalized `CargoUnit` and `BulkCargoUnit` | Dimensions, weight, COG completenes"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#21",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5.2 MOSB Staging — M115",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5.2 MOSB Staging — M115 | Control | Required data | Fail condition | |---|---|---| | Cargo identity | `shipmentId`, `packageNo`, `HVDC_CODE`, cargo label | unresolved identity | | Physical condition | photo, inspection report, damage note |"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#22",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5.3 LCT / Barge Loading — M116",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5.3 LCT / Barge Loading — M116 | Control | Required data | Fail condition | |---|---|---| | Stowage | deck slot, cargo position, sequence | unapproved stowage plan | | Deck pressure | weight, footprint, deck allowable | pressure above limit"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#23",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5.4 Sail-away — M117",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5.4 Sail-away — M117 | Control | Required data | Fail condition | |---|---|---| | Weather | wind, sea state, visibility, forecast window | weather gate HOLD/CLOSED | | Tide / berth | tide window, berth availability, pilot/port control | win"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#24",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "5.5 Offshore Discharge and Site Handover — M118/M119/M130",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "5.5 Offshore Discharge and Site Handover — M118/M119/M130 | Control | Required data | Fail condition | |---|---|---| | Arrival | ATA, berth/landing confirmation, site access | arrival not confirmed | | Discharge method | crane/ramp/Hiab/SPM"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#25",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6. Stowage, Deck Pressure, Lashing, Stability, Lifting",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6. Stowage, Deck Pressure, Lashing, Stability, Lifting"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#26",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.1 Stowage Data Model",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.1 Stowage Data Model | Data item | Required for | Rule | |---|---|---| | `cargo.lengthM`, `cargo.widthM`, `cargo.heightM` | all OOG / project cargo | must be > 0.00 | | `cargo.grossWeightMt` | all cargo | must be > 0.00 | | `cargo.cogX/Y/"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#27",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.2 Deck Pressure Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.2 Deck Pressure Rule Formula: ```text footprintSqm = lengthM × widthM deckPressureTpm2 = grossWeightMt / footprintSqm PASS if deckPressureTpm2 <= DeckArea.maxUniformLoadTpm2 ZERO if grossWeightMt, lengthM, widthM, or deck capacity is miss"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#28",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.3 Lashing / Seafastening Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.3 Lashing / Seafastening Rule ```text Required input: - Cargo gross weight and COG - Expected acceleration / voyage condition - Lashing element WLL, angle, count - Effective capacity per direction - Minimum safety factor PASS if calculate"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#29",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.4 Stability Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.4 Stability Rule ```text Required input: - MarineAsset loading condition - Cargo list and deck positions - Ballast condition - GM, VCG, trim, list - Applicable operating limit / approval note PASS if StabilityCase.status IN (PASS, APPROVE"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#30",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.5 Lifting / Rigging Rule",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.5 Lifting / Rigging Rule ```text Required input: - Lift weight and COG - Lift points - Crane/Hiab/SPMT capacity - Rigging gear WLL - Sling angle and load share - Lift supervisor approval PASS if every rigging gear WLL >= calculated load s"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#31",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "6.6 Weather / Tide Gate",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "6.6 Weather / Tide Gate | Gate | PASS | AMBER | ZERO | |---|---|---|---| | Wind | within operation limit | forecast uncertain / near limit | above limit and no override | | Sea state | within marine plan | worsening trend | above limit and "
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#32",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "7. Integration — Foundry ↔ ERP/WMS/ATLP/Port/Invoice",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "7. Integration — Foundry ↔ ERP/WMS/ATLP/Port/Invoice"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#33",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "7.1 Foundry Object Type Mapping",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "7.1 Foundry Object Type Mapping | Foundry Object Type | Source dataset | Key properties | Link Types | |---|---|---|---| | `MarineOperation` | marine operation register | `operationId`, `operationType`, `status`, `plannedStart`, `actualEnd`"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#34",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "7.2 Dataset Integration Points",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "7.2 Dataset Integration Points | Source system | Dataset | Ontology output | Validation | |---|---|---|---| | ERP / PMO | `project_po_package_material` | `ShipmentUnit`, `CargoUnit`, `MaterialMaster` | package-material completeness | | WMS "
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#35",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "7.3 Link Model",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "7.3 Link Model ```text ShipmentUnit ├─ hasRoutingPattern → ShipmentRoutingPattern ├─ hasMilestone → M115 / M116 / M117 / M118 / M119 / M130 ├─ hasCargoUnit → CargoUnit / BulkCargoUnit / OOGCargoUnit ├─ hasMarineOperation → MarineOperation /"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#36",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8. Validation — SPARQL / RAG / Human-gate",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8. Validation — SPARQL / RAG / Human-gate"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#37",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.1 SHACL Gate Summary",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.1 SHACL Gate Summary | Shape | Target | Rule | Severity | |---|---|---|---| | `MarineOperationBaseShape` | `MarineOperation` | operationId, status, ShipmentUnit link required | VIOLATION | | `MarineRoutingPatternShape` | `MarineOperation`"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#38",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.2 SPARQL — AGI/DAS Marine Chain Compliance",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.2 SPARQL — AGI/DAS Marine Chain Compliance ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> PREFIX marine: <https://hvdc-project.com/ontology/marine/> SELECT ?unit ?dest ?pattern ?m115 ?m116 ?m117 ?m130 ?verdict WHERE { ?uni"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#39",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.3 SPARQL — Deck Pressure Exception",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.3 SPARQL — Deck Pressure Exception ```sparql PREFIX marine: <https://hvdc-project.com/ontology/marine/> SELECT ?operation ?cargo ?slot ?pressure ?limit WHERE { ?operation marine:hasStowagePlan ?plan . ?plan marine:hasStowagePosition ?slot"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#40",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.4 SPARQL — Missing Human Gate",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.4 SPARQL — Missing Human Gate ```sparql PREFIX marine: <https://hvdc-project.com/ontology/marine/> SELECT ?operation ?cargo ?riskClass WHERE { ?operation a marine:MarineOperation ; marine:hasCargoUnit ?cargo ; marine:riskClass ?riskClass "
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#41",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.5 RAG Check",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.5 RAG Check | Check | Evidence source | Rule | |---|---|---| | SOLAS / IMSBC applicability | approved project HSE / marine standard registry | use latest project-approved standard reference | | IMDG / DG cargo | DG declaration, SDS, permi"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#42",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "8.6 Human-gate Matrix",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "8.6 Human-gate Matrix | Condition | Required reviewer | Output | |---|---|---| | Cargo > 50.00 MT or OOG critical cargo | lifting engineer + marine superintendent | approved lifting/stowage plan | | Transformer / critical HVDC equipment | M"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#43",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "9. Compliance",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "9. Compliance"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#44",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "9.1 Standards / Authority Alignment",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "9.1 Standards / Authority Alignment | Area | Control | Ontology binding | |---|---|---| | Marine safety | SOLAS / project marine procedure | `MarinePermit`, `MarineWeatherWindow`, `MarineEvent` | | Bulk cargo | IMSBC / project cargo SOP | `"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#45",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "9.2 ZERO / Fail-safe Triggers",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "9.2 ZERO / Fail-safe Triggers | Trigger | Reason | Required data | |---|---|---| | OOG/heavy cargo without dimensions, gross weight, or COG | Cannot validate deck pressure, stability, or lift | dimensions, weight, COG, lift points | | Lashi"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#46",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "10. Options ≥3",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "10. Options ≥3 | Option | Description | Pros | Cons | Cost | Risk | Time | |---|---|---|---|---:|---|---:| | A. Baseline Marine Evidence Layer | Marine operation register + document evidence + M115/M116/M117 gates | 빠른 적용, 기존 Excel/MD 호환 | "
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#47",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "11. Roadmap — Prepare → Pilot → Build → Operate → Scale | Phase | Duration | Key work | KPI target | Owner | |---|---:|---|---|---| | Prepare | 1.00 week | marine object schema, identifier map, milestone map, document list | object coverage"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#48",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "12. Automation Notes",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "12. Automation Notes"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#49",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "12.1 RPA / LLM / Sheets / Telegram Hooks",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "12.1 RPA / LLM / Sheets / Telegram Hooks | Hook | Trigger | Action | Human gate | |---|---|---|---| | `MarineReadinessBot` | new cargo list / PL / WMS dispatch | create marine readiness checklist | approve before M115 | | `MOSBStagingBot` |"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#50",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "12.2 Command-ready Workflow",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "12.2 Command-ready Workflow ```text /logi-master stowage --deep --noheatmap /logi-master weather-tie --route MOSB-AGI --horizon 72h /logi-master report --marine --KRsummary ``` ---"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#51",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "13. QA Checklist & Assumptions",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "13. QA Checklist & Assumptions"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#52",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "13.1 QA Checklist",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "13.1 QA Checklist | No | Check | PASS condition | |---:|---|---| | 1.00 | Master spine alignment | `CONSOLIDATED-00` remains canonical | | 2.00 | Flow Code boundary | no marine/offshore classification by warehouse handling code | | 3.00 | M"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#53",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "13.2 Assumptions",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "13.2 Assumptions - 가정: 본 문서는 ontology/data-control layer이며, engineering calculation 결과 자체를 대체하지 않는다. - 가정: Deck allowable load, GM limit, wind/sea-state limits, tide/ramp constraints are project/vessel-specific and must be provided as appro"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#54",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "14. Validation Patch Log — 5 Parallel Passes",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "14. Validation Patch Log — 5 Parallel Passes | Pass | Review lane | Defect found | Patch applied | Result | |---:|---|---|---|---| | 1.00 | Master spine alignment | old document mixed marine class with end-to-end route wording | separated `"
     },
     {
       "id": "CONSOLIDATED-04-barge-bulk-cargo#55",
       "docId": "CONSOLIDATED-04-barge-bulk-cargo",
       "sectionPath": "15. CmdRec",
-      "docHash": "39e58227fade24c7a84abdacf8a478051660f9e81769958938291017e11da7c3",
+      "docHash": "9ad3e00dd6a4d0775378fa0b817c49b30b4891b56045033b84c189a5f29ff116",
       "textPreview": "15. CmdRec - `/switch_mode LATTICE + /logi-master stowage --deep --noheatmap` - `/switch_mode PRIME + /logi-master report --marine --KRsummary` - `/switch_mode ORACLE + /logi-master weather-tie --route MOSB-AGI --horizon 72h`"
     },
     {
@@ -2461,378 +2469,378 @@
       "id": "CONSOLIDATED-06-material-chain#1",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "hvdc-material-handling · CONSOLIDATED-06",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "hvdc-material-handling · CONSOLIDATED-06"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#2",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "1. ExecSummary",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "1. ExecSummary `CONSOLIDATED-06`는 HVDC Logistics KG의 **customs release → inland haulage → warehouse interface → MOSB/offshore staging → site receiving → inspection/issue/claim** material-chain extension이다. 본 문서는 `ShipmentUnit`의 물류 여정에서 자재 취"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#3",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "2. Governance & Scope Boundary",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "2. Governance & Scope Boundary"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#4",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "2.1 Master Governance Rule",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "2.1 Master Governance Rule 1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine. 2. `CONSOLIDATED-06` owns **material-chain execution continuity** between customs release, warehouse handoff, MOSB staging, site receipt, in"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#5",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "2.2 Included vs Delegated Scope",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "2.2 Included vs Delegated Scope | Scope item | Included in CONSOLIDATED-06 | Delegated / excluded | |---|---|---| | Customs release handoff | M90/M91/M92, BOE/DO evidence, permit blocker, release gate | Detailed customs declaration schema i"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#6",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "2.3 Domain Boundary Crosswalk",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "2.3 Domain Boundary Crosswalk | Domain | Allowed interface with material handling | Not allowed in CONSOLIDATED-06 | |---|---|---| | Master spine | Read/write links to `ShipmentUnit`, `JourneyLeg`, `MilestoneEvent`, `SiteReceipt`, `Exceptio"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#7",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "2.4 Migration Rules",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "2.4 Migration Rules | Legacy wording / pattern | Canonical replacement | Patch action | |---|---|---| | Flow Code 0~5 as customs→WH→MOSB→site route | `ShipmentRoutingPattern` + `JourneyStage` + `MilestoneEvent` | Replace in all route, KPI, "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#8",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3. Schema (RDF/OWL + SHACL 요약)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3. Schema (RDF/OWL + SHACL 요약)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#9",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.1 Ontology Layer Map",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.1 Ontology Layer Map | Layer | Class / vocabulary | Purpose | |---|---|---| | Core custody | `MaterialHandlingCase`, `CustodyTransfer`, `MaterialMove`, `HandlingInstruction` | Customs-to-site custody chain | | Shipment link | `ShipmentUni"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#10",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.2 Core Classes",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.2 Core Classes | Class | Required properties | Key relations | Notes | |---|---|---|---| | `MaterialHandlingCase` | `caseId`, `caseStatus`, `currentStage`, `declaredDestination`, `routingPattern`, `openedAt` | `forShipmentUnit`, `hasCusto"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#11",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.3 Core Properties",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.3 Core Properties | Property | Domain → Range | Cardinality | Rule | |---|---|---:|---| | `forShipmentUnit` | `MaterialHandlingCase → ShipmentUnit` | 1..1 | Case must resolve to one shipment unit | | `hasCurrentStage` | `MaterialHandlingC"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#12",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.4 Canonical Route and Stage Matrix",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.4 Canonical Route and Stage Matrix | Material category | Allowed `ShipmentRoutingPattern` | Mandatory stages | Blocking rule | |---|---|---|---| | Container cargo | `DIRECT`, `WH_ONLY`, `WH_MOSB`, `MIXED` | M92→M100→M110/M130 | DO evidenc"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#13",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.5 Milestone Chain",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.5 Milestone Chain | Milestone | Name | Stage | Material-handling meaning | Required evidence | |---|---|---|---|---| | M40 | Export Cleared | `ORIGIN_DISPATCH` | Origin export release | Export permit / export clearance | | M50 | Terminal "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#14",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.6 RDF/OWL Skeleton",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.6 RDF/OWL Skeleton ```turtle @prefix hvdc: <http://samsung.com/project-logistics#> . @prefix sh: <http://www.w3.org/ns/shacl#> . @prefix owl: <http://www.w3.org/2002/07/owl#> . @prefix xsd: <http://www.w3.org/2001/XMLSchema#> . hvdc:Mater"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#15",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "3.7 Key Rules",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "3.7 Key Rules 1. `MaterialHandlingCase` must resolve to exactly one `ShipmentUnit` through Any-key identity. 2. `MaterialHandlingCase.hasRoutingPattern` must use `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `MOSB_DIRECT`, `WH_MOSB`, or `MIXED` only."
     },
     {
       "id": "CONSOLIDATED-06-material-chain#16",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4. Integration (Foundry↔ERP/WMS/ATLP/Invoice)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4. Integration (Foundry↔ERP/WMS/ATLP/Invoice)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#17",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4.1 Object Type Mapping",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4.1 Object Type Mapping | Foundry Object Type | Source system / dataset | Key fields | Links | |---|---|---|---| | `ShipmentUnit` | ERP, freight forwarder, carrier feed, LDG | `shipmentId`, `blNo`, `containerNo`, `caseNo`, `hvdcCode` | `has"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#18",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4.2 Link Type Mapping",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4.2 Link Type Mapping | Link Type | From → To | Purpose | |---|---|---| | `resolvesToShipmentUnit` | `Identifier → ShipmentUnit` | Any-key search entry | | `opensMaterialCase` | `ShipmentUnit → MaterialHandlingCase` | Creates operational cu"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#19",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4.3 Action Workflow",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4.3 Action Workflow | Action | Trigger | Writes | Hard gate | |---|---|---|---| | `CreateMaterialHandlingCase` | `ShipmentUnit` ready or M80 arrival | `MaterialHandlingCase` | ≥1 identifier and route evidence | | `SubmitCustomsReleaseGate` "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#20",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4.4 Source System Crosswalk",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4.4 Source System Crosswalk | Source | Consumed fields | Output in KG | Validation | |---|---|---|---| | ERP / PO / Package | PO, package, material code, incoterm, site code | `MaterialMaster`, `Package`, `ShipmentUnit` | PO/package/materia"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#21",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "4.5 Foundry Pipeline",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "4.5 Foundry Pipeline ```text Bronze : raw ERP/WMS/ATLP/LDG/Port/MOSB/Site/Invoice records + immutable source lineage Silver : normalized identifiers, dates, units, site codes, route evidence, document entities Gold : ShipmentUnit, MaterialH"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#22",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5. Validation (SPARQL/RAG/Human-gate)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5. Validation (SPARQL/RAG/Human-gate)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#23",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.1 SHACL Control Matrix",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.1 SHACL Control Matrix | Rule ID | Target | Logic | Severity | |---|---|---|---| | `MH-IDENT-001` | `MaterialHandlingCase` | exactly one `forShipmentUnit` and ≥1 identifier | BLOCK | | `MH-ROUTE-001` | `MaterialHandlingCase` | valid `Ship"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#24",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.2 SHACL — MaterialHandlingCase Required Shape",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.2 SHACL — MaterialHandlingCase Required Shape ```turtle hvdc:MaterialHandlingCaseRequiredShape a sh:NodeShape ; sh:targetClass hvdc:MaterialHandlingCase ; sh:property [ sh:path hvdc:forShipmentUnit ; sh:minCount 1 ; sh:maxCount 1 ; sh:mes"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#25",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.3 SHACL — Flow Code Boundary",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.3 SHACL — Flow Code Boundary ```turtle hvdc:MaterialHandlingFlowCodeBoundaryShape a sh:NodeShape ; sh:targetSubjectsOf hvdc:confirmedFlowCode ; sh:sparql [ sh:message \"VIOLATION-1: confirmedFlowCode found outside WarehouseHandlingProfile."
     },
     {
       "id": "CONSOLIDATED-06-material-chain#26",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.4 SHACL — Customs Release Before Gate-out",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.4 SHACL — Customs Release Before Gate-out ```turtle hvdc:GateOutRequiresReleaseShape a sh:NodeShape ; sh:targetClass hvdc:MaterialHandlingCase ; sh:sparql [ sh:message \"M100 Gate-out requires M92 DO Released and cleared permit blockers.\" "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#27",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.5 SHACL — AGI/DAS MOSB + LCT Chain",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.5 SHACL — AGI/DAS MOSB + LCT Chain ```turtle hvdc:AGIDASMaterialChainShape a sh:NodeShape ; sh:targetClass hvdc:MaterialHandlingCase ; sh:sparql [ sh:message \"VIOLATION-2: AGI/DAS Site Arrival requires MOSB/LCT chain evidence or approved "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#28",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.6 SHACL — OSD Requires OSDR",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.6 SHACL — OSD Requires OSDR ```turtle hvdc:OSDRequiresOSDRShape a sh:NodeShape ; sh:targetClass hvdc:SiteReceipt ; sh:sparql [ sh:message \"M132 OSD inspection requires OSDR evidence and exception record.\" ; sh:select \"\"\" PREFIX hvdc: <htt"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#29",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.7 SHACL — Quantity Reconciliation",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.7 SHACL — Quantity Reconciliation ```turtle hvdc:SiteQuantityReconciliationShape a sh:NodeShape ; sh:targetClass hvdc:SiteReceipt ; sh:sparql [ sh:message \"Received + OSD quantity must reconcile with dispatched quantity within 0.00 tolera"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#30",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.8 SPARQL — Gate-out Delay After DO Release",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.8 SPARQL — Gate-out Delay After DO Release ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?case ?shipment ?doReleased ?gateOut WHERE { ?case a hvdc:MaterialHandlingCas"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#31",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.9 SPARQL — M140 Missing POD/GRN",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.9 SPARQL — M140 Missing POD/GRN ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?receipt ?shipment WHERE { ?case a hvdc:MaterialHandlingCase ; hvdc:forShipmentUnit ?shipment ; hvdc:hasSiteReceipt ?receipt . ?receipt "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#32",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.10 SPARQL — Legacy Term Detection",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.10 SPARQL — Legacy Term Detection ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?s ?p ?o WHERE { ?s ?p ?o . FILTER(REGEX(LCASE(STR(?p)), \"(assigned|extracted).*flow.*code\") || REGEX(LCASE(STR(?p)), \"cost.*flow.*cod"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#33",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.11 RAG Check",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.11 RAG Check | Trigger | RAG / latest-evidence action | Human gate | |---|---|---| | MOIAT/FANR/DCD/ADNOC rule or permit mismatch | Re-check approved SOP / authority source on action date | Compliance Lead | | HS/BOE classification confid"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#34",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "5.12 Human-gate Matrix",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "5.12 Human-gate Matrix | Gate | Trigger | Approver | Required proof | |---|---|---|---| | Customs gate | BOE/DO/permit missing or expired | Customs / Compliance Lead | BOE, DO, permit/certificate | | Warehouse gate | WHP override or special"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#35",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6. Compliance (Incoterms/MOIAT/FANR/DCD/ADNOC)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "6. Compliance (Incoterms/MOIAT/FANR/DCD/ADNOC)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#36",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6.1 Compliance Object Model",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "6.1 Compliance Object Model | Object | Required properties | Links | |---|---|---| | `RegulatoryRequirement` | `authority`, `requirementType`, `triggerCondition`, `effectiveDate`, `status` | applies to `MaterialMaster`, `ShipmentUnit`, `Loc"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#37",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6.2 Incoterms 2020 Controls",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "6.2 Incoterms 2020 Controls | Control | Logic | Material-handling impact | |---|---|---| | `IncotermPresence` | PO/shipment must carry incoterm and named place | Owner of transport risk is clear at each `JourneyLeg` | | `RiskTransferPoint` "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#38",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6.3 UAE Regulatory Controls",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "6.3 UAE Regulatory Controls | Authority / topic | Ontology handling | Blocking point | |---|---|---| | MOIAT | `requiresMOIATCoC`, `certificateRef`, `certificateExpiryDate`, `productCategory` | M91/M92 or M100 if certificate missing/expired"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#39",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6.4 Compliance Blockers",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
-      "textPreview": "6.4 Compliance Blockers ```text IF regulated material AND permit missing/expired → BLOCK M90/M91/M100 IF DG cargo AND DCD/DG segregation evidence missing → BLOCK M110/M115 IF AGI/DAS AND MOSB/LCT evidence missing → BLOCK M130 IF OOG/heavy c"
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
+      "textPreview": "6.4 Compliance Blockers ```text IF regulated material AND permit missing/expired → BLOCK M90/M91/M100 IF DG cargo AND DCD/DG segregation evidence missing → BLOCK M110/M115 IF AGI/DAS AND site date exists but MOSB/LCT evidence missing → ACCE"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#40",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "6.5 Privacy and NDA Guard",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "6.5 Privacy and NDA Guard 1. Personnel names may be retained when operationally required, but phone/e-mail fields must be masked before register write. 2. Driver and site access holders should be represented by `holderToken` or role referen"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#41",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time) | Option | Description | Pros | Cons | Est. cost | Risk | Time | |---|---|---|---|---:|---|---:| | A. Baseline Material Gate | M92/M100/M110/M130/M140 milestone and document gate only | 빠른 적용, 기존 Exc"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#42",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI) | Phase | Duration | Work package | KPI / Exit criterion | Owner | |---|---:|---|---|---| | Prepare | 1.00 week | source inventory, identifier dictionary, route/stage/milestone alignment,"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#43",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9. Automation notes (RPA/LLM/Sheets/TG hooks)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "9. Automation notes (RPA/LLM/Sheets/TG hooks)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#44",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9.1 Foundry Functions",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "9.1 Foundry Functions | Function | Input | Output | Gate | |---|---|---|---| | `resolveAnyKey` | BL/container/DO/invoice/case/HVDC code | `ShipmentUnit` + confidence | confidence < 0.95 → review | | `computeCurrentStage` | milestone events "
     },
     {
       "id": "CONSOLIDATED-06-material-chain#45",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9.2 RPA Hooks",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "9.2 RPA Hooks | Hook | Trigger | Action | |---|---|---| | `ATLPReleaseSync` | BOE/DO status change | update `CustomsReleaseGate`, create M90/M91/M92 candidate | | `GateOutBot` | port gate-out feed | create M100 candidate; alert if M92 missi"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#46",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9.3 LLM Guardrail",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "9.3 LLM Guardrail 1. LLM may summarize CI/PL/BL/BOE/DO/MRR/MRI/POD/GRN/OSDR and propose evidence links. 2. LLM shall not write M100/M110/M115/M117/M130/M140 directly without an approved Action. 3. LLM must preserve original unit/currency/da"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#47",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9.4 Sheets / Excel Mapping",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "9.4 Sheets / Excel Mapping | Sheet / dataset | Required normalized columns | |---|---| | Shipment tracker | `shipmentUnitId`, `caseNo`, `blNo`, `containerNo`, `routingPattern`, `declaredDestination`, `currentStage` | | Port/customs | `boeNo"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#48",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "9.5 TG / Alert Hooks",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
-      "textPreview": "9.5 TG / Alert Hooks | Alert | Condition | Recipient role | |---|---|---| | `DO_RELEASE_NO_GATEOUT` | M92 actual + 72.00 hrs and no M100 | Port / Customs / Transport Lead | | `AGIDAS_MISSING_MOSB` | AGI/DAS M130 candidate without M115 | Mar"
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
+      "textPreview": "9.5 TG / Alert Hooks | Alert | Condition | Recipient role | |---|---|---| | `DO_RELEASE_NO_GATEOUT` | M92 actual + 72.00 hrs and no M100 | Port / Customs / Transport Lead | | `AGIDAS_MISSING_MOSB` | AGI/DAS M130 accepted with missing M115/M"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#49",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "10. QA checklist & Assumptions(가정:)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "10. QA checklist & Assumptions(가정:)"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#50",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "10.1 QA Checklist",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "10.1 QA Checklist | No. | Check | Pass criterion | |---:|---|---| | 1.00 | Master spine alignment | Uses `ShipmentUnit`, `JourneyStage`, `JourneyLeg`, `MilestoneEvent` | | 2.00 | Route dictionary | Uses `PRE_ARRIVAL`, `DIRECT`, `WH_ONLY`, `"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#51",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "10.2 Assumptions(가정:)",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "10.2 Assumptions(가정:) 1. `CONSOLIDATED-00` remains canonical; this extension does not override master spine definitions. 2. Authority requirements and permit logic must be refreshed through RAG/current SOP before operational approval on the"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#52",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "10.3 ZERO / Fail-safe Table",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "10.3 ZERO / Fail-safe Table | 단계 | 이유 | 위험 | 요청데이터 | 다음조치 | |---|---|---|---|---| | Customs gate | BOE/DO/permit evidence missing | illegal release / port hold / DEM-DET | BOE, DO, permit, clearance timestamp | block M100 and request custom"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#53",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "10.4 Compatibility Patch Register — 5.00 Parallel Lanes",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "10.4 Compatibility Patch Register — 5.00 Parallel Lanes | Lane | Review focus | Patch applied | Status | |---:|---|---|---| | 1.00 | Master spine / AGENTS | Route status normalized to `RoutingPattern + JourneyStage + MilestoneEvent + Journe"
     },
     {
       "id": "CONSOLIDATED-06-material-chain#54",
       "docId": "CONSOLIDATED-06-material-chain",
       "sectionPath": "11. CmdRec",
-      "docHash": "159ef9fa1e587e553fbbae0d4b692e7dd62caf172b1b10187fb369688acdac16",
+      "docHash": "2bc7e2807a90c333534b159a6539b501640ef99fdc4883d53539a70e8d680871",
       "textPreview": "11. CmdRec ```text /switch_mode LATTICE + /logi-master cert-chk --deep --KRsummary /logi-master report --deep --AEDonly /visualize_data --type=heatmap CONSOLIDATED-06-validation-report.json ```"
     },
     {
@@ -3560,316 +3568,372 @@
       "id": "CONSOLIDATED-09-operations#1",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "hvdc-operations · CONSOLIDATED-09",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "hvdc-operations · CONSOLIDATED-09"
     },
     {
       "id": "CONSOLIDATED-09-operations#2",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "1. ExecSummary",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "1. ExecSummary `CONSOLIDATED-09`는 HVDC Logistics KG의 **operations analytics / reporting / KPI extension**이다. Excel, ERP, WMS, ATLP, LDG/OCR, Port, Cost, Marine, Communication 데이터를 `OperationDataset`, `OperationRecord`, `AnalyticsRun`, `KPIO"
     },
     {
       "id": "CONSOLIDATED-09-operations#3",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "2. Governance & Scope Boundary",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "2. Governance & Scope Boundary"
     },
     {
       "id": "CONSOLIDATED-09-operations#4",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "2.1 Master Governance Rule",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "2.1 Master Governance Rule 1. `CONSOLIDATED-00-master-ontology.md` is the canonical semantic spine. 2. `CONSOLIDATED-09` owns **analytics, reporting, KPI observations, dashboard views, dataset mappings, and report artifacts** only. 3. Opera"
     },
     {
       "id": "CONSOLIDATED-09-operations#5",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "2.2 Included vs Delegated Scope",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "2.2 Included vs Delegated Scope | Scope item | Included in CONSOLIDATED-09 | Delegated / excluded | |---|---|---| | Dataset normalization | Header cleanup, date normalization, key extraction, mapping rules | Source-system master ownership |"
     },
     {
       "id": "CONSOLIDATED-09-operations#6",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "2.3 Domain Boundary Crosswalk",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "2.3 Domain Boundary Crosswalk | Domain | Allowed interface with operations | Not allowed in CONSOLIDATED-09 | |---|---|---| | Master spine | Consume identity policy, route, stage, milestone, data layer separation | Redefine core classes | |"
     },
     {
       "id": "CONSOLIDATED-09-operations#7",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "2.4 Legacy Migration Rules",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "2.4 Legacy Migration Rules | Legacy wording / pattern | Canonical replacement | Patch action | |---|---|---| | Route KPI by warehouse route code | KPI by `ShipmentRoutingPattern` | Replace in dashboard and SPARQL | | Pre-arrival represented"
     },
     {
       "id": "CONSOLIDATED-09-operations#8",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3. Schema (RDF/OWL + SHACL 요약)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3. Schema (RDF/OWL + SHACL 요약)"
     },
     {
       "id": "CONSOLIDATED-09-operations#9",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3.1 Operations Ontology Layer",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3.1 Operations Ontology Layer | Layer | Class / vocabulary | Purpose | |---|---|---| | Dataset | `OperationDataset`, `OperationRecord`, `SourceRow`, `DataMappingRule`, `HeaderNormalizationRule` | Ingested spreadsheet/API rows and mapping lo"
     },
     {
       "id": "CONSOLIDATED-09-operations#10",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3.2 Core Classes",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3.2 Core Classes | Class | Required properties | Key relations | Notes | |---|---|---|---| | `OperationDataset` | `datasetId`, `sourceSystem`, `datasetType`, `extractDate`, `rowCount` | `hasSourceRow`, `usesMappingRule`, `producesAnalyticsR"
     },
     {
       "id": "CONSOLIDATED-09-operations#11",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3.3 Object Properties",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3.3 Object Properties | Property | Domain → Range | Cardinality | Purpose | |---|---|---:|---| | `resolvesToShipmentUnit` | `OperationRecord → ShipmentUnit` | 0..1 | Any-key identity join | | `evidencesMilestone` | `OperationRecord → Milest"
     },
     {
       "id": "CONSOLIDATED-09-operations#12",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3.4 Data Properties",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3.4 Data Properties | Property | Range | Rule | |---|---|---| | `hasRoutingPattern` | SKOS enum | Values match master `ShipmentRoutingPattern` only | | `eventDate` | `xsd:dateTime` | ISO-8601; no ambiguous local dates | | `quantityPkg` | de"
     },
     {
       "id": "CONSOLIDATED-09-operations#13",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "3.5 Canonical KPI Dictionary",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "3.5 Canonical KPI Dictionary | KPI code | Formula | Target | |---|---|---:| | `OPS_ROUTE_COVERAGE` | ShipmentUnits with valid `hasRoutingPattern` / total ShipmentUnits | ≥ 95.00% | | `OPS_MILESTONE_COVERAGE` | ShipmentUnits with required mi"
     },
     {
       "id": "CONSOLIDATED-09-operations#14",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4. Integration (Foundry↔ERP/WMS/ATLP/Invoice)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4. Integration (Foundry↔ERP/WMS/ATLP/Invoice)"
     },
     {
       "id": "CONSOLIDATED-09-operations#15",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4.1 Source-to-Object Mapping",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4.1 Source-to-Object Mapping | Source | Consumed data | Operations object | Target domain owner | |---|---|---|---| | ERP / Procurement | PO, package, material, vendor, delivery plan | `OperationDataset`, `OperationRecord` | Master / procur"
     },
     {
       "id": "CONSOLIDATED-09-operations#16",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4.2 Data Pipeline",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4.2 Data Pipeline ```text 1. Ingest - Read Excel/API rows. - Preserve source file hash, sheet name, row number, extraction date. 2. Normalize - Trim whitespace, normalize date formats, resolve column aliases. - Convert quantities to canonic"
     },
     {
       "id": "CONSOLIDATED-09-operations#17",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4.3 Two-track Date Model",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4.3 Two-track Date Model Operations supports a two-track date model but does not overwrite the canonical event timeline. | Track | Source columns | Canonical target | Reporting output | |---|---|---|---| | WH track | DSV Indoor, Outdoor, AA"
     },
     {
       "id": "CONSOLIDATED-09-operations#18",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4.4 5-Sheet Standard Report",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4.4 5-Sheet Standard Report | Sheet | Grain | Metrics | Source objects | |---|---|---|---| | `01_RoutingPattern` | ShipmentUnit | route pattern, stage, current location, exception status | ShipmentUnit, JourneyStage, MilestoneEvent | | `02_"
     },
     {
       "id": "CONSOLIDATED-09-operations#19",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "4.5 27-Sheet Snapshot Pattern",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "4.5 27-Sheet Snapshot Pattern `OperationalSnapshot` can generate detailed monthly snapshots by location group and domain. The B5 date or equivalent cutoff cell is treated as `snapshotDate`, while actual generation timestamp is `generatedAt`"
     },
     {
       "id": "CONSOLIDATED-09-operations#20",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5. Validation (SPARQL/RAG/Human-gate)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5. Validation (SPARQL/RAG/Human-gate)"
     },
     {
       "id": "CONSOLIDATED-09-operations#21",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.1 SHACL — OperationRecord identity and date",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.1 SHACL — OperationRecord identity and date ```turtle ops:OperationRecordShape a sh:NodeShape ; sh:targetClass ops:OperationRecord ; sh:property [ sh:path ops:recordId ; sh:minCount 1 ; sh:maxCount 1 ] ; sh:property [ sh:path ops:sourceRo"
     },
     {
       "id": "CONSOLIDATED-09-operations#22",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.2 SHACL — RoutingPattern controlled vocabulary",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.2 SHACL — RoutingPattern controlled vocabulary ```turtle ops:RoutingPatternObservationShape a sh:NodeShape ; sh:targetClass ops:OperationRecord ; sh:property [ sh:path ops:hasRoutingPattern ; sh:in ( \"PRE_ARRIVAL\" \"DIRECT\" \"WH_ONLY\" \"MOSB"
     },
     {
       "id": "CONSOLIDATED-09-operations#23",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.3 SPARQL — Operations must not redefine core truth",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.3 SPARQL — Operations must not redefine core truth ```sparql PREFIX ops: <http://samsung.com/project-logistics/operations#> PREFIX wh: <http://samsung.com/project-logistics/warehouse#> PREFIX cost: <http://samsung.com/project-logistics/co"
     },
     {
       "id": "CONSOLIDATED-09-operations#24",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.4 SPARQL — Missing route pattern coverage",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.4 SPARQL — Missing route pattern coverage ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?su WHERE { ?su a hvdc:ShipmentUnit . FILTER NOT EXISTS { ?su hvdc:hasRoutingPattern ?pattern } } ``` Metric: `OPS_ROUTE_COVER"
     },
     {
       "id": "CONSOLIDATED-09-operations#25",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.5 SPARQL — AGI/DAS offshore gate",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.5 SPARQL — AGI/DAS offshore gate ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> SELECT ?su ?site WHERE { ?su hvdc:finalDestination ?site ; hvdc:hasMilestone hvdc:M130 . FILTER(?site IN (\"AGI\", \"DAS\")) FILTER NOT EXISTS { ?"
     },
     {
       "id": "CONSOLIDATED-09-operations#26",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.6 SPARQL — WH stock double-count candidate",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.6 SPARQL — WH stock double-count candidate ```sparql PREFIX ops: <http://samsung.com/project-logistics/operations#> SELECT ?su ?location ?date (COUNT(?record) AS ?cnt) WHERE { ?record a ops:OperationRecord ; ops:resolvesToShipmentUnit ?su"
     },
     {
       "id": "CONSOLIDATED-09-operations#27",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.7 SPARQL — M92 to M100 DEM/DET risk",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.7 SPARQL — M92 to M100 DEM/DET risk ```sparql PREFIX hvdc: <http://samsung.com/project-logistics#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?su ?releasedAt ?gateOutAt WHERE { ?su hvdc:hasMilestoneEvent ?m92 . ?m92 hvdc:miles"
     },
     {
       "id": "CONSOLIDATED-09-operations#28",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.8 SPARQL — Communication open action effect on operations",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.8 SPARQL — Communication open action effect on operations ```sparql PREFIX comm: <http://samsung.com/project-logistics/communication#> SELECT ?target (COUNT(?request) AS ?openActions) WHERE { ?request a comm:ActionRequest ; comm:requestSt"
     },
     {
       "id": "CONSOLIDATED-09-operations#29",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.9 RAG Check Rules",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.9 RAG Check Rules | RAG item | Trigger | Required action | |---|---|---| | Regulation / permit status appears in Ops data | customs, FANR, DCD, ADNOC, CICPA, GatePass fields | Re-check current evidence in document/compliance owner | | Cos"
     },
     {
       "id": "CONSOLIDATED-09-operations#30",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "5.10 Human-gate",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "5.10 Human-gate Human-gate is required when: | Condition | Owner | |---|---| | KPI output would trigger operational state change | Target domain owner | | Cost exposure > 100,000.00 AED | Cost owner | | AGI/DAS M130 lacks MOSB/LCT evidence "
     },
     {
       "id": "CONSOLIDATED-09-operations#31",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "6. Compliance (Incoterms/MOIAT/FANR/DCD/ADNOC)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "6. Compliance (Incoterms/MOIAT/FANR/DCD/ADNOC)"
     },
     {
       "id": "CONSOLIDATED-09-operations#32",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "6.1 Compliance Role",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "6.1 Compliance Role `CONSOLIDATED-09` provides analytics views and exception lists. It does not create compliance truth. Current authority status must remain with compliance/document owners and be refreshed through RAG and Human-gate when a"
     },
     {
       "id": "CONSOLIDATED-09-operations#33",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "6.2 Report Publication Guard",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "6.2 Report Publication Guard 1. Every report artifact stores `generatedAt`, `sourceDatasetHash`, `mappingVersion`, and `validationStatus`. 2. Any report containing unresolved high-risk findings is marked `BLOCKED`. 3. PII-bearing source col"
     },
     {
       "id": "CONSOLIDATED-09-operations#34",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "7. Options ≥3 (Pros/Cons/Cost/Risk/Time) | Option | Scope | Pros | Cons | Est. cost | Risk | Time | |---|---|---|---|---:|---|---:| | A | Lite Ops Mapping | Fast Excel-to-KPI mapping; preserves current reporting | Limited semantic validatio"
     },
     {
       "id": "CONSOLIDATED-09-operations#35",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "8. Roadmap (Prepare→Pilot→Build→Operate→Scale + KPI) | Phase | Duration | Work package | KPI | |---|---:|---|---| | Prepare | 1.00 week | Confirm dataset inventory, header dictionary, owner matrix, mapping version | Dataset registry coverag"
     },
     {
       "id": "CONSOLIDATED-09-operations#36",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "9. Automation notes (RPA/LLM/Sheets/TG hooks)",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "9. Automation notes (RPA/LLM/Sheets/TG hooks)"
     },
     {
       "id": "CONSOLIDATED-09-operations#37",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "9.1 Foundry Functions",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "9.1 Foundry Functions | Function | Input | Output | Guard | |---|---|---|---| | `ingestOperationDataset` | Excel/API payload | `OperationDataset` | Hash and schema check | | `normalizeOperationRecord` | source row | `OperationRecord` | Head"
     },
     {
       "id": "CONSOLIDATED-09-operations#38",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "9.2 RPA / Command Hooks",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "9.2 RPA / Command Hooks ```text /logi-master kpi-dash --deep --KRsummary /logi-master report --deep --AEDonly /logi-master weather-tie --routing-pattern-analysis /visualize_data --type=heatmap operations-validation.json ```"
     },
     {
       "id": "CONSOLIDATED-09-operations#39",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "9.3 LLM Guardrail",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "9.3 LLM Guardrail | LLM output | Allowed use | Not allowed | |---|---|---| | KPI explanation | Narrative summary for dashboard | Changing KPI values | | Anomaly summary | Create review queue | Closing exception without owner | | Header mapp"
     },
     {
       "id": "CONSOLIDATED-09-operations#40",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "9.4 Dashboard Alert Rules",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
-      "textPreview": "9.4 Dashboard Alert Rules | Alert | Condition | Severity | |---|---|---| | Route missing | `hasRoutingPattern` absent | WARN | | AGI/DAS gate missing | M130 without M115/M116/M117 or approved exception | HIGH | | DEM/DET risk | M92 to M100 "
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
+      "textPreview": "9.4 Dashboard Alert Rules | Alert | Condition | Severity | |---|---|---| | Route missing | `hasRoutingPattern` absent | WARN | | AGI/DAS MOSB evidence missing | M130/site date exists without M115/M116/M117 | AMBER/WARN | | DEM/DET risk | M9"
     },
     {
       "id": "CONSOLIDATED-09-operations#41",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "10. QA checklist & Assumptions",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "10. QA checklist & Assumptions"
     },
     {
       "id": "CONSOLIDATED-09-operations#42",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "10.1 QA Checklist",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "10.1 QA Checklist | # | Check | Expected | |---:|---|---| | 1.00 | Operations does not redefine core classes | PASS | | 2.00 | `ShipmentRoutingPattern` values match master dictionary | PASS | | 3.00 | WHP is consumed as warehouse evidence o"
     },
     {
       "id": "CONSOLIDATED-09-operations#43",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "10.2 Assumptions",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "10.2 Assumptions | Assumption | Impact | Mitigation | |---|---|---| | Source Excel headers vary across reports | Mapping instability | Versioned `DataMappingRule` and header alias table | | Some shipment rows lack direct HVDC_CODE | Any-key"
     },
     {
       "id": "CONSOLIDATED-09-operations#44",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "10.3 ZERO / Fail-safe",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "10.3 ZERO / Fail-safe | 단계 | 이유 | 위험 | 요청데이터 | 다음조치 | |---|---|---|---|---| | Report publish paused | Source hash or mapping version missing | Non-reproducible KPI | Dataset hash, mapping rule version | Re-run ingest and mapping | | KPI pub"
     },
     {
       "id": "CONSOLIDATED-09-operations#45",
       "docId": "CONSOLIDATED-09-operations",
       "sectionPath": "11. CmdRec",
-      "docHash": "f017e4be4bbf382182baf758fb29be9490e956c1e9bb6aa895a1ed367db30569",
+      "docHash": "7def3155e3c302af55541b736d6fbe79b51191ac6c48770b8eefe45ccbb32d81",
       "textPreview": "11. CmdRec ```text /switch_mode RHYTHM + /logi-master kpi-dash --deep --KRsummary /logi-master report --deep --AEDonly /visualize_data --type=heatmap CONSOLIDATED-09-validation-report.json ```"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#1",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "CONSOLIDATED-10 Card Governance",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "CONSOLIDATED-10 Card Governance"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#2",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "1. Purpose",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "1. Purpose This extension defines governance behavior for SCT_ONTOLOGY CARD runtime output. It does not redefine the HVDC logistics master spine. `CONSOLIDATED-00-master-ontology.md` remains the semantic authority for shipment, milestone, F"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#3",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.1 SYSTEM_QA Hard Negative Rule",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.1 SYSTEM_QA Hard Negative Rule 1. System inspection, card rendering audit, schema patch, validation check, and rulepack gap analysis must route to `intentGroup=SYSTEM_QA`. 2. SYSTEM_QA requests may run `SYSTEM_QA_RULEPACK` and `PII_NDA_RU"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#4",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.2 Governance Verdict Mapping",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.2 Governance Verdict Mapping | Condition | finalGovernanceVerdict | |---|---| | SYSTEM_QA isolated and all mutation paths blocked, all audit fields complete | PASS | | SYSTEM_QA isolated but evidence, audit, or prompt trace is incomplete "
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#5",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.3 Flow Code RuleId Boundary",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.3 Flow Code RuleId Boundary Flow Code misuse must be blocked by `A-FLOW-001`. Do not use: - `SCT-SCHEMA-007` for Flow Code misuse. - Generic schema violation codes where `A-FLOW-001` applies. Required display: - `blockedBy.ruleId = A-FLOW"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#6",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.4 Security Audit Fields",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.4 Security Audit Fields Decision Card v2.1 must expose explicit security status: - `security.piiStatus` - `security.ndaStatus` - `security.sourceCorpusAuditStatus` - `security.sensitiveAccessed` - `security.piiMasked` - `security.rawConta"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#7",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.5 SHACL/SPARQL Governance Contract",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.5 SHACL/SPARQL Governance Contract Decision Card v2.1 must satisfy these logical constraints: - `schemaVersion = sct.card.v2.1` - `finalGovernanceVerdict in PASS, WARN, BLOCK, ZERO` - `trace.promptVersion != unknown` - SYSTEM_QA cards mus"
+    },
+    {
+      "id": "CONSOLIDATED-10-card-governance#8",
+      "docId": "CONSOLIDATED-10-card-governance",
+      "sectionPath": "2.6 Regression Prompts",
+      "docHash": "f78c4154b578f4c4ec7debeff325a32df9470ef267343a45b56a2f2659c4de29",
+      "textPreview": "2.6 Regression Prompts | Prompt | Expected | |---|---| | Card Governance v2가 이메일 발송으로 오분류되지 않는가? | `SYSTEM_QA`, `COMM_RULEPACK.fired=false` | | Card Governance v2가 비용 승인으로 오분류되지 않는가? | `COST_RULEPACK.fired=false` | | 시스템 패치 요청을 shipment exe"
     },
     {
       "id": "HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined#1",

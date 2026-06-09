@@ -2,11 +2,12 @@ import type { EvidenceSnippet, ResolvedEntity, ShipmentRuleResult } from "./type
 import { SAMPLE_SHIPMENTS } from "./generated/sample-shipments.js";
 
 type SampleShipment = {
+  schema_version?: string;
   shipment_id: string;
   routing_pattern: string;
   identifiers?: Record<string, string>;
   milestones?: Array<{ code: string; occurred_at?: string | null; evidence_ref?: string | null }>;
-  documents?: Array<{ doc_type: string; ref: string; status?: string }>;
+  documents?: Array<{ doc_type: string; ref: string; status?: "available" | "pending" | "rejected" }>;
   invoice_lines?: Array<{
     line_id: string;
     item: string;
@@ -137,13 +138,15 @@ function buildRisks(shipment: SampleShipment): Array<Record<string, unknown>> {
   const cargoType = normalizeKey(shipment.identifiers?.cargo_type ?? "");
   const missingMosb = ["M115", "M116", "M117"].filter((code) => !hasMilestone(shipment, code));
   if (["AGI", "DAS", "AGI/DAS"].includes(cargoType) && hasMilestone(shipment, "M130") && missingMosb.length > 0) {
+    const m130 = (shipment.milestones ?? []).find((m) => normalizeKey(m.code) === "M130");
+    const m130HasEvidence = Boolean(m130?.evidence_ref);
     risks.push({
-      severity: "WARN",
+      severity: m130HasEvidence ? "WARN" : "BLOCK",
       rule: "AGI/DAS MOSB Gate",
-      detail: `M130 site arrival is accepted as delivered; missing ${missingMosb.join(", ")} MOSB-chain evidence requires backfill.`,
+      detail: `M130 site arrival ${m130HasEvidence ? "is accepted as delivered" : "has no evidence"}; missing ${missingMosb.join(", ")} MOSB-chain evidence requires backfill.`,
       finding: "MOSB_EVIDENCE_MISSING",
       backfill_required: true,
-      human_gate: false
+      human_gate: !m130HasEvidence
     });
   }
 

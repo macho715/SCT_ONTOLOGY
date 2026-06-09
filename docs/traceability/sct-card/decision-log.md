@@ -1,6 +1,6 @@
 # SCT Card Decision Log
 
-- generatedAt: 2026-05-24T12:40:58.862Z
+- generatedAt: 2026-06-09T16:02:42.822Z
 - command: npm run report:sct-card
 - scope: SCT_ONTOLOGY_CARD_UPGRADE_SPEC_v1.0 and SCT_ONTOLOGY_CARD_GOVERNANCE_SPEC_v2 traceability bundle
 
