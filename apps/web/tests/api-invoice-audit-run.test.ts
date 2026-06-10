@@ -27,10 +27,18 @@ describe('POST /api/invoice-audit/run', () => {
   it('happy path: parse -> CF MCP -> gate -> 202 + verdict', async () => {
     const { jobId } = await setupJob();
     fetchMock
+      // parser worker
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ parse_result_id: 'pr1', job_id: jobId, file_id: 'f1', normalized: { invoice_id: 'inv1', invoice_header: { currency: 'AED' }, invoice_lines: [{ line_id: 'l1', description: 'TRUCKING', currency: 'AED', amount: 100, qty: 2, rate: 50, source_ref: { sheet: 'S', row: 2, col: '0' } }], evidence_candidates: [], parser_confidence: 0.9, parser_version: 'parser-0.1.0' } }) })
+      // route_question
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 1, result: { domain: 'invoice-cost', requiredCorpus: [] } }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 1.0, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { findings: [] } }) });
+      // dryrun_type_b_classify
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { classifications: [{ line_id: 'l1', type_b: 'THC', sct_code: '', confidence: 0.9 }] } }) })
+      // dryrun_rate_lookup (l1)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { status: 'VALID' } }) })
+      // check_cost_guard
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 4, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 1.0, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
+      // check_doc_guardian
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 5, result: { findings: [] } }) });
     process.env.CF_MCP_BASE_URL = 'https://cf.example';
     process.env.CF_MCP_TIMEOUT_MS = '1000';
     process.env.PARSER_WORKER_URL = 'http://localhost:8000';
