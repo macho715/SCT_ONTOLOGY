@@ -18,15 +18,21 @@ describe('cf-mcp-client', () => {
     fetchMock
       // route_question
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 1, result: { domain: 'invoice-cost', requiredCorpus: ['tariff_ref'] } }) })
+      // dryrun_type_b_classify
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { classifications: [{ line_id: 'l1', type_b: 'THC', sct_code: 'SCT.CHARGE.THC', confidence: 0.9 }] } }) })
+      // dryrun_rate_lookup (l1)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { status: 'VALID' } }) })
       // check_cost_guard
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 1.5, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 4, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 1.5, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
       // check_doc_guardian
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { findings: [] } }) });
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 5, result: { findings: [] } }) })
+      // ontology_evidence_map
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 6, result: { evidence_requirements: [] } }) });
 
     const client = createCfMcpClient({ baseUrl: 'https://cf.example/mcp', timeoutMs: 1000, retries: 0 });
     const r = await client.validate('job_1', { invoice_lines: [{ line_id: 'l1', description: 'TRUCKING', currency: 'AED', amount: 100 }], evidence_index: [] });
 
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(6);
     expect(r.costguard_results).toEqual([{ line_id: 'l1', band: 'PASS', verdict: 'ACCEPTABLE', delta_pct: 1.5, prism_kernel_proof_ref: 'proof_1', fx_policy_id: null }]);
     expect(r.gate_results).toHaveLength(1);
     expect(r.gate_results[0].gate_status).toBe('PASS');
@@ -63,8 +69,14 @@ describe('cf-mcp-client', () => {
 
     fetchMock
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 1, result: { domain: 'invoice-cost', requiredCorpus: [] } }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 0, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { findings: [] } }) });
+      // dryrun_type_b_classify
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 2, result: { classifications: [{ line_id: 'l1', type_b: 'THC', sct_code: 'SCT.CHARGE.THC', confidence: 0.9 }] } }) })
+      // dryrun_rate_lookup (l1)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 3, result: { status: 'VALID' } }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 4, result: { lineResults: [{ lineId: 'l1', band: 'PASS', deltaPct: 0, verdict: 'ACCEPTABLE', proofRef: 'proof_1' }] } }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 5, result: { findings: [] } }) })
+      // ontology_evidence_map
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ jsonrpc: '2.0', id: 6, result: { evidence_requirements: [] } }) });
 
     const client = createCfMcpClient({ baseUrl: 'https://cf.example/mcp', timeoutMs: 1000, retries: 0 });
     const r = await client.validate('job_fx_2', {

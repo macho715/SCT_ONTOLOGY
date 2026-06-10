@@ -7,7 +7,8 @@ describe('POST /api/audit/approve', () => {
     const res = await APPROVE_POST(
       new Request('http://test/api/audit/approve', {
         method: 'POST',
-        body: JSON.stringify({ job_id: 'job_nope', approval_scope: 'ZERO_APPROVED' })
+        body: JSON.stringify({ job_id: 'job_nope', approval_scope: 'ZERO_APPROVED' }),
+        headers: { 'x-user-role': 'COST_CONTROL_LEAD' }
       })
     );
     expect(res.status).toBe(404);
@@ -22,7 +23,8 @@ describe('POST /api/audit/approve', () => {
     const res = await APPROVE_POST(
       new Request('http://test/api/audit/approve', {
         method: 'POST',
-        body: JSON.stringify({ job_id: job.job_id, approval_scope: 'ZERO_APPROVED' })
+        body: JSON.stringify({ job_id: job.job_id, approval_scope: 'ZERO_APPROVED' }),
+        headers: { 'x-user-role': 'COST_CONTROL_LEAD' }
       })
     );
     expect(res.status).toBe(409);
@@ -35,7 +37,8 @@ describe('POST /api/audit/approve', () => {
     const res = await APPROVE_POST(
       new Request('http://test/api/audit/approve', {
         method: 'POST',
-        body: JSON.stringify({ job_id: job.job_id, approval_scope: 'AMBER_ACK' })
+        body: JSON.stringify({ job_id: job.job_id, approval_scope: 'AMBER_ACK' }),
+        headers: { 'x-user-role': 'COST_CONTROL_LEAD' }
       })
     );
     expect(res.status).toBe(400);
