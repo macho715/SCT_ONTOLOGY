@@ -1,0 +1,17 @@
+---
+source_file: "SCT_ONTOLOGY-main/server/src/hvdc-server.ts"
+type: "code"
+community: "hvdc-server.ts · caseStatusAnswer() · buildAuditRecord()"
+location: "L426"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/hvdc-serverts__caseStatusAnswer__buildAuditRecord
+---
+
+# attachUploadedFileOutputSchema
+
+## Connections
+- [[hvdc-server.ts]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/hvdc-serverts__caseStatusAnswer__buildAuditRecord

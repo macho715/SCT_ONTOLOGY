@@ -1,0 +1,17 @@
+---
+source_file: "SCT_ONTOLOGY-main/ontology-insight-upgrade/fixtures/resolver/expected_ambiguous_container.json"
+type: "code"
+community: "expected_ambiguous_container.json · canonicalContext · evidenceState"
+location: "L6"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/expected_ambiguous_containerjson__canonicalContext__evidenceState
+---
+
+# schemeHint
+
+## Connections
+- [[query]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/expected_ambiguous_containerjson__canonicalContext__evidenceState

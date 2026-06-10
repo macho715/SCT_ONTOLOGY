@@ -1,0 +1,18 @@
+---
+source_file: "SCT_ONTOLOGY-main/ontology-insight-upgrade/demo_with_mock.py"
+type: "code"
+community: "HVDCGatewayClient · hvdc_gateway_client.py · HVDCGatewayIntegration"
+location: "L1"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/HVDCGatewayClient__hvdc_gateway_clientpy__HVDCGatewayIntegration
+---
+
+# demo_with_mock.py
+
+## Connections
+- [[demo_with_mock()]] - `contains` [EXTRACTED]
+- [[start_mock_server()]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/HVDCGatewayClient__hvdc_gateway_clientpy__HVDCGatewayIntegration

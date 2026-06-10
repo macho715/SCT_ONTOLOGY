@@ -1,0 +1,19 @@
+---
+source_file: "SCT_ONTOLOGY-main/scripts/index_corpus.py"
+type: "code"
+community: "main() · index_corpus.py · repo_path()"
+location: "L16"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/main__index_corpuspy__repo_path
+---
+
+# repo_path()
+
+## Connections
+- [[Path_8]] - `references` [EXTRACTED]
+- [[index_corpus.py]] - `contains` [EXTRACTED]
+- [[main()_15]] - `calls` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/main__index_corpuspy__repo_path

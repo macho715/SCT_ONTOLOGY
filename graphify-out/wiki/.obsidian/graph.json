@@ -1,0 +1,1586 @@
+{
+  "colorGroups": [
+    {
+      "query": "tag:#community/HVDCGatewayClient_\u00b7_hvdc_gateway_client.py_\u00b7_HVDCGatewayIntegration",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/readOnlyHint_\u00b7_openWorldHint_\u00b7_destructiveHint",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-server.ts_\u00b7_caseStatusAnswer()_\u00b7_buildAuditRecord()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/readOnlyHint_\u00b7_openWorldHint_\u00b7_destructiveHint",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/worker.ts_\u00b7_authContext()_\u00b7_WriteFileDryRunResult",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/core.py_\u00b7_load_shipments()_\u00b7_Decimal",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_auditRecordRequired_\u00b7_actionType",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/decision-card.ts_\u00b7_deriveIntentGroup()_\u00b7_deriveHumanGateState()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/CONSOLIDATED-00_Master_Ontology_v2.1_(patch_2026-05-12)_\u00b7_AGENTS.md_\u2014_Repository-wide_AI_Agent_Governance_\u00b7_HVDC_OpenAI_Agent_SCT_ONTOLOGY_Integration_\u2014_Project_Document",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/HVDC_Master_Ontology_(CONSOLIDATED-00)_\u00b7_HVDC_Core_Framework_&_Infrastructure_Ontology_(CONSOLIDATED-01)_\u00b7_SCT_Ontology_Operating_Principles",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/answer.ts_\u00b7_answerQuestion()_\u00b7_validateGrounding()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Cloudflare_Workers_MCP_Server_\u00b7_CONSOLIDATED-00_Master_Ontology_\u00b7_Human-gate",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/hvdc_readonly_mcp_surface.py_\u00b7__envelope()_\u00b7_call_mcp_tool()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/Codebase_Architecture_Document_\u00b7_Corpus-First_Evidence_Principle_\u00b7_answerQuestion_Flow_(answer.ts)",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/expected_invoice_context.json_\u00b7_canonicalContext_\u00b7_costGuardResult",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/claude-server.ts_\u00b7_claude-render.ts_\u00b7_renderAnswerMarkdown()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/config.json_\u00b7_git_\u00b7_hooks",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/agent_app.py_\u00b7_deterministic_snapshot()_\u00b7__snapshot_for_key()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/config.json_\u00b7_git_\u00b7_hooks",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/source_role_map.json_\u00b7_CONSOLIDATED-06-material-chain_\u00b7_CONSOLIDATED-05-invoice-cost",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/HVDC_Ontology_Grounded_ChatGPT_App_Implementation_Plan_\u00b7_AGENTS.md_Patched_Rules_\u00b7_ZERO_/_Failsafe_States_(NO_EVIDENCE,_BLOCK,_STALE_SOURCE)",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/expected_ambiguous_container.json_\u00b7_canonicalContext_\u00b7_evidenceState",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/expected_conflicting_bl.json_\u00b7_canonicalContext_\u00b7_evidenceState",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/expected_hvdc_code_context.json_\u00b7_canonicalContext_\u00b7_shipmentUnit",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/CONSOLIDATED-00_Master_Ontology_Spine_\u00b7_ask_hvdc_ontology_MCP_Tool_(Data-only)_\u00b7_Human_Gate_-_Manual_Review_Threshold_Concept",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/SCT_Ontology_MCP_Operating_Update_v1.0_\u00b7_ZERO_Gate_\u00b7_SCT_Evidence_Matrix",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/index.ts_\u00b7_descriptor.test.ts_\u00b7_createHvdcServer()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/HVDCIntegrationEngine_\u00b7_hvdc_one_line.py_\u00b7_.run_full_integration()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/build_operational_risk_radar()_\u00b7_hvdc_operational_risk_radar.py_\u00b7_build_costguard_evidence_pack()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/expected_missing_boe.json_\u00b7_canonicalContext_\u00b7_evidenceState",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/scripts_\u00b7_seed:local_\u00b7_seed:dry",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/write_audit()_\u00b7_hvdc_api.py_\u00b7_verify_audit_integrity()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/FusekiSwapManager_\u00b7_.deploy_with_validation()_\u00b7_main()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/type_\u00b7_required_\u00b7_items",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_allowedNow_\u00b7_intent",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/Decision_Card_v2_Method_\u00b7_SCT_Ontology_Card_Upgrade_Progress_2026-05-18_\u00b7_Decision_Card_v2_Spec",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/hvdc_semantic_adapter.py_\u00b7_no_evidence_result()_\u00b7_adapt_invoice_risk()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_sct-answer-contract.schema.json_\u00b7_verdict",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/seed_wh_status_d1.py_\u00b7_build_sql()_\u00b7_get()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/shipment-rule.ts_\u00b7_evaluateShipmentRule()_\u00b7_buildRisks()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/output_\u00b7_actionBoundary_\u00b7_privacy",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/expected_canonical_invoice_risk.json_\u00b7_costGuardResult_\u00b7_invoiceEvidence",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test_hvdc_api.py_\u00b7_TestNLQEndpoint_\u00b7_TestIngestEndpoint",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/hvdc_any_key_resolver.py_\u00b7_normalize_identifier_value()_\u00b7__mask_payload()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/HVDCCodeExtractor_\u00b7_HVDCCodeMapping_\u00b7_.process_data_source()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/doc-guardian.ts_\u00b7_cost-guard.ts_\u00b7_checkDocGuardian()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/snapshot_\u00b7_identifiers_\u00b7_sample_bl_auh_002.json",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/mosb-gate.ts_\u00b7_checkMosbGate()_\u00b7_normalize()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/write_hash_meta()_\u00b7_audit_ndjson_and_hash.py_\u00b7_verify_hash()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/expected_canonical_stock_snapshot.json_\u00b7_warehouseHandlingProfile_\u00b7_operationalContext",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/rate-limit.ts_\u00b7_applyRateLimit()_\u00b7_worker-rate-limit.test.ts",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/HVDC_Ontology_Insight_System_README_\u00b7_Read-only_MCP_Surface_Contract_(Phase_5)_\u00b7_Any-key_Resolver_Contract_(Phase_3)",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/run_all_rules()_\u00b7_run_costguard()_\u00b7_run_all_rules_canonical()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_trace_\u00b7_sourceHash",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/report-sct-card.ts_\u00b7_main()_\u00b7_renderMetricsReport()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/expected_canonical_case_timeline.json_\u00b7_shipmentUnit_\u00b7_shipmentUnitId",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/corpus.ts_\u00b7_searchCorpus()_\u00b7_fmc-role-corpus.test.ts",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/oog_criteria_\u00b7_weight_tiers_\u00b7_risk_assessment",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/required_fields_\u00b7_data_quality_\u00b7_validation_rules",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/ttl_namespaces_\u00b7_risk_scoring_\u00b7_performance_targets",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_sourceCorpusAuditStatus_\u00b7_sensitiveAccessed",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/seed_control_tower_d1.py_\u00b7_main()_\u00b7_insert_statements()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/identifier-normalizer.ts_\u00b7_expandIdentifierVariants()_\u00b7_normalizeLookupToken()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/nlq_to_sparql.py_\u00b7_safe_execute_workflow()_\u00b7_generate_sparql()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_verdictMappingRule_\u00b7_ruleId",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/scan-sct-card-pii.mjs_\u00b7_main()_\u00b7_scanText()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/verify-bindings.ts_\u00b7_warn()_\u00b7_undocumented",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/Operational_Risk_Radar_-_Consolidated_Risk_View_\u00b7_Any-key_Resolver_-_Operational_Identifier_Resolution_\u00b7_CostGuard_Evidence_Pack_-_Invoice_Line_Evidence",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_evidenceScore_\u00b7_type",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_graphPath_\u00b7_startNodes",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/evals.test.ts_\u00b7_sct-governance-runtime.test.ts_\u00b7_answerToText()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/vendor_mapping_\u00b7_ref_extraction_\u00b7_hvdc_code_generation",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/system_health_check.py_\u00b7_main()_\u00b7_Any",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/riskSummary_\u00b7_expected_missing_evidence.json_\u00b7_totalCards",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/riskSummary_\u00b7_expected_radar_invoice.json_\u00b7_totalCards",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/riskSummary_\u00b7_expected_radar_site.json_\u00b7_totalCards",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/audit-source-corpus-pii.mjs_\u00b7_main()_\u00b7_toPosix()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/compilerOptions_\u00b7_tsconfig.json_\u00b7_types",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/expected_canonical_conflict_join.json_\u00b7_operationalContext_\u00b7_reason",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/invoice_\u00b7_local_invoice_risk.json_\u00b7_totalAmount",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/REQUIREMENTS.md_-_V1_Requirements_\u00b7_PROJECT.md_-_HVDC_Ontology_Insight_MCP_Merge_\u00b7_01-01-PLAN.md_-_Phase_1_Source_Hygiene_Plan",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-code-mapping-v2.6.2.json_\u00b7_header_normalization_\u00b7_hvdc_code_extraction",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_SCT_REF_\u00b7_REF_NO",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/synonyms_\u00b7_Invoice_\u00b7_vat_amount",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/DSV_\u00b7_data_source_rules_\u00b7_PKGS",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/team-action-router.ts_\u00b7_routeTeamAction()_\u00b7_parseMilestoneCode()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/scores_\u00b7_design-scorecard.json_\u00b7_verdict",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/System_Architecture_Document_\u00b7_Cloudflare_Worker_Runtime_\u00b7_Answer_Pipeline_(answer.ts/corpus.ts/router.ts)",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_any_key_resolver.py_\u00b7_mask_user_facing_value()_\u00b7_load_fixture()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/class_mappings_\u00b7_Package_\u00b7_Case",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_properties_\u00b7_HVDC_CODE",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_VAT_AMOUNT_\u00b7_TOTAL_AMOUNT",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/kv-cache.test.ts_\u00b7_kv-cache.ts_\u00b7_createControlTowerLookup()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/properties_\u00b7_HSCode_\u00b7_HS_CODE",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/mock_gateway_server.py_\u00b7_predict_eta()_\u00b7_not_found()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/upgrade_v37.ps1_\u00b7_Write-UpgradeLog()_\u00b7_Main()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/expected_costguard_pack.json_\u00b7_severity_\u00b7_reviewStance",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/audit_\u00b7_sourceCoverage_\u00b7_properties",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/main()_\u00b7_generate_worker_assets.py_\u00b7_write_ts()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/validate_logi_ontology_docs.py_\u00b7_main()_\u00b7_iter_lines()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/telemetry.ts_\u00b7_telemetry.test.ts_\u00b7_resolveTelemetryConfig()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/expected_costguard_pack.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/expected_resolve_key.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/validate_public_output()_\u00b7_test_semantic_adapter.py_\u00b7_test_adapter_fixtures_should_match_expected_canonical_output()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/package.json_\u00b7_engines_\u00b7_version",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/dependencies_\u00b7_zod_\u00b7_tsx",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/devDependencies_\u00b7_wrangler_\u00b7_vitest",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/shipment-validation.ts_\u00b7_mergeShipmentValidation()_\u00b7_ValidationFinding",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/Apache_Jena_Fuseki_-_Local_RDF_Triple_Store_\u00b7_ARCHITECTURE.md_-_Ontology_Insight_System_Architecture_\u00b7_audit-smoke.yml_-_HVDC_CI_Smoke_Workflow",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/Public_Surface_Boundary_(Phase_1,_HYGIENE-03)_\u00b7_OpenAPI_Schema_-_HVDC_Gateway_\u00b7_HVDC_Gateway_API_Production_Deployment_Guide",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Semantic_Adapter_(Local-to-Canonical_Mapping)_\u00b7_Project_Research_Summary:_HVDC_Ontology_Insight_MCP_Merge_\u00b7_Cloudflare_MCP_Worker_(Production_Boundary)",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/ask_hvdc_ontology_data-only_separation_\u00b7_Decoupled_Template_Render_Plan_(Option_A)_\u00b7_Patch2:_Apps_SDK_Resource_Plan_Analysis",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/expected_malformed_input.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/expected_risk_radar.json_\u00b7_validationStatus_\u00b7_topRiskTypes",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/expected_search_evidence.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/expected_secret_redaction.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/join_strategy_\u00b7_join_strategy_\u00b7_join_strategy",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/main()_\u00b7_index_corpus.py_\u00b7_repo_path()",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/sct-operating-contract.test.ts_\u00b7_splitCsvLine()_\u00b7_parseCsv()",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-batch-processor.sh_script_\u00b7_hvdc-batch-processor.sh_\u00b7_load_data()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/Audit_Evidence_Boundary_(Phase_1,_EVID-04)_\u00b7_PII_Masking_&_Audit_Logging_(SHA-256_integrity)_\u00b7_HVDC_Upgrade_Summary_Report_(v3.6-APEX_TDD)",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Phase_3_Plan:_Any-key_Resolver_&_Evidence_Contract_\u00b7_Phase_3_Research:_Any-key_Resolver_&_Evidence_Contract_\u00b7_Phase_3_Verification:_Any-key_Resolver",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/expected_validate_output.json_\u00b7_validationStatus_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/test_nlq_queries()_\u00b7_test_integration.py_\u00b7_test_end_to_end_integration()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/test_sparql_direct.py_\u00b7_test_hvdc_codes()_\u00b7_test_high_risk_invoices()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-operational-dashboard.ps1_\u00b7_Format-Results()_\u00b7_Format-JsonOutput()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-performance-monitor.ps1_\u00b7_Write-Log()_\u00b7_Test-QueryPerformance()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/local_conflict_join.json_\u00b7_sourceSystem_\u00b7_lookupScheme",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/local_stock_snapshot.json_\u00b7_sourceSystem_\u00b7_sourceQuery",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/search-log.json_\u00b7_visitedUrls_\u00b7_status",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/test_logi_master_enhanced_audit.sh_script_\u00b7_test_logi_master_enhanced_audit.sh_\u00b7_log_warn()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/Flow_Code_Guardrail_-_WarehouseHandlingProfile_Boundary_\u00b7_02-01-PLAN.md_-_Phase_2_Semantic_Adapter_Plan_\u00b7_Canonical_Semantic_Adapter_-_Local_to_MCP_Object_Mapping",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/HVDC_Ontology_Project_PLAN_DOC_(2026-05-14)_\u00b7_Local_Fuseki_vs_Production_Worker_Gap_\u00b7_HVDC_Ontology_Project_Upgrade_Scout_Report_(2026-05-14)",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/MANIFEST.json_\u00b7_version_\u00b7_project",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/arguments_\u00b7_query_costguard_pack.json_\u00b7_value",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/arguments_\u00b7_query_resolve_key.json_\u00b7_value",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/arguments_\u00b7_query_risk_radar.json_\u00b7_value",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/arguments_\u00b7_query_secret_redaction.json_\u00b7_value",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/Samsung_HVDC_Ontology_Insight_System_Guide_v1.0_\u00b7_HVDC_Gateway_API_Integration_Summary_v3.7_\u00b7_HVDC_Ontology_Insight_System_v3.7_Final_Project_Report",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/OFCO_\u00b7_processing_\u00b7_key_columns",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/PAY_\u00b7_processing_\u00b7_key_columns",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/nlq_query()_\u00b7_nlq_query_wrapper_flask.py_\u00b7_run_sparql()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/parameters_\u00b7_test_logi_master.json_\u00b7_realtime",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/deploy_cloudflare.ps1_\u00b7_Update-WranglerConfig()_\u00b7_Invoke-ToolCapture()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/rollback_wh_status_ingest.py_\u00b7_scalar()_\u00b7_main()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/verify-seed.ts_\u00b7_d1Query()_\u00b7_SeedCheck",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/local_case_timeline.json_\u00b7_sourceSystem_\u00b7_sourceQuery",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/benchmark-gate.json_\u00b7_limits_\u00b7_gate",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/design-benchmark.json_\u00b7_transferableElements_\u00b7_surface",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/query_search_evidence.json_\u00b7_arguments_\u00b7_toolName",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/ngrok_setup.ps1_\u00b7_Write-Log()_\u00b7_Test-Cmd()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_claude_gateway.json_\u00b7_origin_\u00b7_mode",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/resolver_index.json_\u00b7_version_\u00b7_records",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/HVDC_FMC_Role_Analysis_FINAL_10x_2026-04-27.combined.md_\u00b7_FMC_Role_Evidence_Corpus_Spec_\u00b7_FMC_Role_Evidence_Corpus_Plan",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/widget.test.ts_\u00b7_widgetHtml_\u00b7_renderWidgetFixture()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/test_claude_integration.py_\u00b7_test_macho_command()_\u00b7_test_logi_master_integration()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/print_usage()_\u00b7_gh-run.sh_script_\u00b7_gh-run.sh",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/corpus_index.json_\u00b7_docs_\u00b7_chunks",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/query_malformed_input.json_\u00b7_toolName_\u00b7_arguments",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/query_fuseki()_\u00b7_main()_\u00b7_check_fuseki_data.py",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/gpts_oneclick.ps1_\u00b7_Need()_\u00b7_Log()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/test_claude_command.json_\u00b7_parameters_\u00b7_command",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/SCT_ONTOLOGY_MCP_\u00b7_Obsidian_Memory_MCP_\u00b7_HVDC_Dual_MCP_Ontology_Implementation_Plan",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/query_ambiguous_container.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/query_conflicting_bl.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/query_hvdc_code.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/query_invoice_no.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/query_missing_boe.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/query_costguard_pack.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/query_missing_evidence.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/query_radar_invoice.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/query_radar_site.json_\u00b7_value_\u00b7_scheme",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/risk_evidence_index.json_\u00b7_version_\u00b7_profiles",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/approvalStatus_\u00b7_type_\u00b7_enum",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/blockedUntilApproved_\u00b7_items_\u00b7_type",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/ndaStatus_\u00b7_type_\u00b7_enum",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/piiStatus_\u00b7_type_\u00b7_enum",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/rulePackExecution_\u00b7_type_\u00b7_items",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/rulePackIds_\u00b7_type_\u00b7_items",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/security_\u00b7_type_\u00b7_required",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/validate_json()_\u00b7_main()_\u00b7_check_index_drift.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/rollback-named-graphs.ps1_\u00b7_Get-DefaultGraphCount()_\u00b7_Get-AllGraphs()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/seed-d1.ts_\u00b7_seedFiles_\u00b7_REMOTE",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/validate_email_drafting_guard.py_\u00b7_require()_\u00b7_forbid()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/Observability_Rate_Limit_KV_Cache_Design_\u00b7_OTel/Axiom_Observability_\u00b7_HVDC_CACHE",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/WH_Status_Ingest_Rollback_Dry_Run_\u00b7_WH_Status_Ingest_Event_(wh-status-561b91c4a7be1482)_\u00b7_Rollback_Event_(rollback-20260525073249)",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/patchTargets_\u00b7_patch-map.json",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/start-hvdc-fuseki.sh_script_\u00b7_start-hvdc-fuseki.sh",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/Codex_Setup_Guide_\u00b7_Agents_Skills_(.agents/skills/)",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/check-dashboard-status.ps1_\u00b7_Test-PortInUse()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/full-validation.ps1_\u00b7_Add-ValidationResult()",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/smoke-test.ps1_\u00b7_Test-Component()",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/start-dashboard-auto.ps1_\u00b7_Test-PortAvailable()",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/start-dashboard-clean.ps1_\u00b7_Test-PortAvailable()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/start-dashboard-fixed.ps1_\u00b7_Test-PortAvailable()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/start-dashboard-proxy.ps1_\u00b7_Test-PortAvailable()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/start-dashboard-ultimate.ps1_\u00b7_Test-PortAvailable()",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/test_nlq_final.json_\u00b7_q",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/test_nlq_query.json_\u00b7_q",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/update_openapi_schema.py_\u00b7_main()",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/TR_\uc9c4\ud589\uc0c1\ud669_(AGI_5th_Transformer_Load-out)_\u00b7_LCT_Bushra",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/promptVersion_\u00b7_type",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/schemaPatchVersion_\u00b7_type",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/verify-any-key-resolver.ps1_\u00b7_Invoke-Step()",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/verify-operational-risk-radar.ps1_\u00b7_Invoke-Step()",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/verify-readonly-mcp-surface.ps1_\u00b7_Invoke-Step()",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-ontology_\u00b7_.mcp.json",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/__init__.py",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/CONVENTIONS.md_-_Coding_Conventions",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/STRUCTURE.md_-_Codebase_Structure",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/quick_fix_ttl.py",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/setup-fuseki.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/test-proxy.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/Any-key_Control_Tower",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/MCPQuerySession",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/Auto_SCT_Ontology_Email_Draft_Plan",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-batch-loader.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-data-loader.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-named-graph-manager.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "tag:#community/hvdc-query-runner.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "tag:#community/migrate-to-named-graphs.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "tag:#community/verify-semantic-guardrails.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "tag:#community/verify-source-hygiene.ps1",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "tag:#community/sample_shipments.json",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "tag:#community/sample_shipments.json",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "tag:#community/vitest.config.ts",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+---
+source_file: "SCT_ONTOLOGY-main/server/src/team-action-router.ts"
+type: "code"
+community: "team-action-router.ts · routeTeamAction() · parseMilestoneCode()"
+location: "L16"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/team-action-routerts__routeTeamAction__parseMilestoneCode
+---
+
+# TeamActionResult
+
+## Connections
+- [[team-action-router.ts]] - `contains` [EXTRACTED]
+- [[types.ts]] - `re_exports` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/team-action-routerts__routeTeamAction__parseMilestoneCode
