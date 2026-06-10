@@ -90,7 +90,7 @@ export async function POST(req: Request): Promise<Response> {
   } else {
     const { put } = await import('@vercel/blob');
     const res = await put(filename, buffer, {
-      access: 'public',
+      access: 'private',
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
     publicUrl = res.url;

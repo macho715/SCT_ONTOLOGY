@@ -43,7 +43,11 @@ export async function GET(req: Request): Promise<Response> {
     buffer = readFileSync(target);
   } else {
     try {
-      const res = await fetch(record.url);
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured');
+      const res = await fetch(record.url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) {
         throw new Error(`Failed to fetch from blob: ${res.statusText}`);
       }
