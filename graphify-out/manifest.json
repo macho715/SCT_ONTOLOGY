@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "root": "SCT_ONTOLOGY-main/SCT_ONTOLOGY-main",
+  "nodes": 2940,
+  "edges": 4378,
+  "communities": 226,
+  "god_nodes": 10,
+  "surprising_connections": 5,
+  "outputs": [
+    "graph.json",
+    "graph.html",
+    "GRAPH_REPORT.md",
+    "wiki/"
+  ]
+}
