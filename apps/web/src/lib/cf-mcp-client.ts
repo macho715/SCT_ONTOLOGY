@@ -43,6 +43,7 @@ export function createCfMcpClient(opts: { baseUrl: string; timeoutMs: number; re
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json() as { result?: T; error?: { message: string } };
         if (json.error) throw new Error(json.error.message);
+        clearTimeout(timer);
         return { result: json.result as T, latency_ms, status: 'OK' };
       } catch (e) {
         lastErr = e;
@@ -65,7 +66,6 @@ export function createCfMcpClient(opts: { baseUrl: string; timeoutMs: number; re
       const sct_trace_id = `sct_${randomUUID().replace(/-/g, '').slice(0, 12)}`;
       const toolCalls: Array<{ tool: string; latency_ms: number; status: 'OK' | 'ERROR' | 'TIMEOUT' }> = [];
 
-      // Check and convert cross-currency lines using FxPolicy before running CostGuard
       const processedLines = [];
       let activeFxPolicyId: string | null = null;
 
@@ -95,10 +95,43 @@ export function createCfMcpClient(opts: { baseUrl: string; timeoutMs: number; re
       const route = await callTool<{ domain: string; requiredCorpus: string[] }>('route_question', { question: `audit:${jobId}`, userRole: 'ops_user' });
       toolCalls.push({ tool: 'route_question', latency_ms: route.latency_ms, status: route.status });
 
+      // C-02: dryrun_type_b_classify — classify each line into SCT Type-B category
+      const classifyLines = processedLines.map((l: any) => ({ line_id: l.line_id, description: l.description }));
+      const typeB = await callTool<{ classifications: Array<{ line_id: string; type_b: string; sct_code: string; confidence: number }> }>('dryrun_type_b_classify', { lines: classifyLines });
+      toolCalls.push({ tool: 'dryrun_type_b_classify', latency_ms: typeB.latency_ms, status: typeB.status });
+
+      const type_b_results: Array<{ line_id: string; type_b: string | null }> = typeB.result.classifications.map(c => ({
+        line_id: c.line_id,
+        type_b: c.type_b ?? null
+      }));
+
+      // C-02: dryrun_rate_lookup — one call per line, failures fall back gracefully
+      const rate_checks: Array<{ line_id: string; rate_status: string; validity_status: 'VALID'|'EXPIRED'|'PENDING'|null }> = [];
+      for (const line of processedLines as any[]) {
+        const classEntry = typeB.result.classifications.find(c => c.line_id === line.line_id);
+        const charge = line.description ?? classEntry?.type_b ?? '';
+        const unit = line.unit ?? 'per shipment';
+        try {
+          const rateRes = await callTool<{ status: string }>('dryrun_rate_lookup', { charge, unit });
+          toolCalls.push({ tool: 'dryrun_rate_lookup', latency_ms: rateRes.latency_ms, status: rateRes.status });
+          rate_checks.push({
+            line_id: line.line_id,
+            rate_status: rateRes.result.status,
+            validity_status: null
+          });
+        } catch {
+          rate_checks.push({
+            line_id: line.line_id,
+            rate_status: 'UNKNOWN',
+            validity_status: null
+          });
+        }
+      }
+
       const costguard = await callTool<{ lineResults: Array<{ lineId: string; band: 'PASS'|'WARN'|'HIGH'|'CRITICAL'; deltaPct: number | null; verdict: string; proofRef: string | null }> }>('check_cost_guard', {
         invoiceNo: jobId,
         currency: processedLines[0]?.currency ?? 'AED',
-        lines: processedLines.map(l => ({
+        lines: processedLines.map((l: any) => ({
           lineNo: l.line_id,
           item: l.description,
           qty: l.qty ?? 1,
@@ -113,6 +146,30 @@ export function createCfMcpClient(opts: { baseUrl: string; timeoutMs: number; re
 
       const doc = await callTool<{ findings: Array<{ lineId: string | null; code: string; severity: 'AMBER' | 'ZERO' }> }>('check_doc_guardian', { jobId, evidence: payload.evidence_index });
       toolCalls.push({ tool: 'check_doc_guardian', latency_ms: doc.latency_ms, status: doc.status });
+
+      // C-02: ontology_evidence_map — called once with all distinct SCT codes from type_b results
+      const evidence_requirements: Array<{ line_id: string; required_evidence: string[] }> = [];
+      const distinctSctCodes = [...new Set(
+        typeB.result.classifications
+          .map(c => c.sct_code)
+          .filter((code): code is string => Boolean(code))
+      )];
+
+      if (distinctSctCodes.length > 0) {
+        const evidenceMap = await callTool<{ evidence_requirements: Array<{ sct_code: string; required_evidence: string[] }> }>('ontology_evidence_map', { sct_codes: distinctSctCodes });
+        toolCalls.push({ tool: 'ontology_evidence_map', latency_ms: evidenceMap.latency_ms, status: evidenceMap.status });
+
+        // Map evidence requirements back to lines via sct_code → line_id
+        for (const evReq of evidenceMap.result.evidence_requirements) {
+          const matchingLines = typeB.result.classifications.filter(c => c.sct_code === evReq.sct_code);
+          for (const match of matchingLines) {
+            evidence_requirements.push({
+              line_id: match.line_id,
+              required_evidence: evReq.required_evidence
+            });
+          }
+        }
+      }
 
       const costguard_results = costguard.result.lineResults.map(lr => ({
         line_id: lr.lineId,
@@ -132,9 +189,9 @@ export function createCfMcpClient(opts: { baseUrl: string; timeoutMs: number; re
       return {
         sct_trace_id,
         cf_mcp_tool_calls: toolCalls,
-        type_b_results: [],
-        rate_checks: [],
-        evidence_requirements: [],
+        type_b_results,
+        rate_checks,
+        evidence_requirements,
         costguard_results,
         doc_guardian_results: doc.result.findings.map(f => ({
           line_id: f.lineId,

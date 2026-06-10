@@ -21,5 +21,6 @@ HVDC_FINAL_10x_2026-04-27/
 .codex/
 .vitest-cache/
 coverage/
+.dev-blob/
 20260528_project-upgrade-report.md
 20260528_plan-doc.md

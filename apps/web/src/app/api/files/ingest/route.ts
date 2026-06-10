@@ -3,6 +3,7 @@ import { uploadToBlob } from '@/lib/blob';
 import { createJobStore, STORE } from '@/lib/job-store';
 import { ErrorCodes, httpForError, type ErrorCode } from '@/lib/error-codes';
 import { SourceFileSchema } from '@/lib/types';
+import { randomUUID } from 'node:crypto';
 
 export const runtime = 'nodejs';
 void createJobStore;
@@ -37,7 +38,7 @@ export async function POST(req: Request): Promise<Response> {
   try { blobRes = await uploadToBlob(file, 'pending'); } catch (e) { return err('STORAGE_AUTH_FAILED', (e as Error).message); }
   const job = await STORE.createJob({ created_by: userId });
   const sourceFile = SourceFileSchema.parse({
-    file_id: `file_${Math.random().toString(36).slice(2, 14)}`,
+    file_id: `file_${randomUUID().replace(/-/g, '').slice(0, 12)}`,
     job_id: job.job_id,
     original_filename: file.name,
     file_type, mime_type: file.type || 'application/octet-stream',
