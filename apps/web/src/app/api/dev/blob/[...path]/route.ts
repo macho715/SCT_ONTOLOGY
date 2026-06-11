@@ -8,7 +8,11 @@ const DEV_BLOB_DIR = join(process.cwd(), '.dev-blob');
 
 function isDevStub(): boolean {
   const t = process.env.BLOB_READ_WRITE_TOKEN ?? '';
-  return t === '' || t.startsWith('dev-stub');
+  if (t !== '' && !t.startsWith('dev-stub')) return false;
+  if (process.env.VERCEL === '1') {
+    return false;
+  }
+  return true;
 }
 
 export async function GET(_req: Request, ctx: { params: Promise<{ path: string[] }> }): Promise<Response> {

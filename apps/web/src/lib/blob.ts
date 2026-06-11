@@ -14,7 +14,14 @@ const DEV_LOCAL_BLOB_DIR = join(process.cwd(), '.dev-blob');
 
 function isDevStubToken(): boolean {
   const t = process.env.BLOB_READ_WRITE_TOKEN ?? '';
-  return t === '' || t.startsWith('dev-stub');
+  if (t !== '' && !t.startsWith('dev-stub')) return false;
+  if (process.env.VERCEL === '1') {
+    throw new Error(
+      'STORAGE_AUTH_FAILED: BLOB_READ_WRITE_TOKEN is required in Vercel deployment. ' +
+      'Set it in Vercel Dashboard -> Project -> Settings -> Environment Variables.'
+    );
+  }
+  return true;
 }
 
 export async function uploadToBlob(file: File, jobId: string): Promise<BlobUploadResult> {
