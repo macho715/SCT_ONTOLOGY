@@ -45,7 +45,7 @@ export async function POST(req: Request): Promise<Response> {
   const existing = EXPORTS_MAP.get(replayKey);
   if (existing) {
     return NextResponse.json({
-      ...existing.result,
+      ...(existing.result as Record<string, unknown>),
       info: 'EXPORT_REPLAY_DETECTED'
     });
   }
@@ -90,7 +90,7 @@ export async function POST(req: Request): Promise<Response> {
   } else {
     const { put } = await import('@vercel/blob');
     const res = await put(filename, buffer, {
-      access: 'private',
+      access: 'public',
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
     publicUrl = res.url;
