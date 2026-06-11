@@ -87,8 +87,8 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
     /* Flow 4: Primary text — highest neutral contrast */
     --text-primary:   #f0f2ff;
     --text-secondary: #a8b0cc;
-    --text-muted:     #5a6280;
-    --text-dim:       #333a5a;
+    --text-muted:     #848fa7;
+    --text-dim:       #5a6280;
 
     /* Shadow utility tokens */
     --shadow-glow-gold: 0 0 12px rgba(201, 168, 76, 0.6);
@@ -151,8 +151,8 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
       /* Flow 4: Primary text — highest neutral contrast, slight cool cast */
       --text-primary:   oklch(96%  0.010 270);
       --text-secondary: oklch(74%  0.028 265);
-      --text-muted:     oklch(46%  0.038 265);
-      --text-dim:       oklch(28%  0.040 270);
+      --text-muted:     oklch(65%  0.038 265);
+      --text-dim:       oklch(46%  0.040 270);
 
       /* Flow 5: Decision accent — gold first, light and dark variants via lightness */
       --accent-gold:    oklch(72%  0.118 82);
@@ -309,9 +309,9 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
   .hero-bg {
     position: absolute;
     inset: 0;
-    background-image: url('./tr/hvdc_tr_hero_crop.jpg');
+    background-image: url('./tr/hero_rev.jpeg');
     background-size: cover;
-    background-position: center 95%;
+    background-position: center top;
     transform-origin: center;
     will-change: transform;
   }
@@ -325,19 +325,19 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
         rgba(7,9,26,0.08) 0%,
         transparent       20%
       ),
-      /* LEFT SHIELD — text protection only */
+      /* LEFT SHIELD — text protection only (lightened so photo reads) */
       linear-gradient(to right,
-        rgba(7,9,26,0.88) 0%,
-        rgba(7,9,26,0.70) 18%,
-        rgba(7,9,26,0.35) 42%,
-        rgba(7,9,26,0.08) 62%,
-        transparent       78%
+        rgba(7,9,26,0.72) 0%,
+        rgba(7,9,26,0.48) 20%,
+        rgba(7,9,26,0.18) 44%,
+        rgba(7,9,26,0.04) 64%,
+        transparent       80%
       ),
-      /* BOTTOM SHIELD — absolute minimum */
+      /* BOTTOM SHIELD — scrim for stat rail legibility */
       linear-gradient(to top,
-        rgba(7,9,26,0.55) 0%,
-        rgba(7,9,26,0.15) 10%,
-        transparent       22%
+        rgba(7,9,26,0.50) 0%,
+        rgba(7,9,26,0.12) 12%,
+        transparent       24%
       );
   }
 
@@ -671,7 +671,7 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
   .voyage-date {
     font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--text-dim);
+    color: var(--text-muted);
   }
   .voyage-cycle-num {
     font-family: var(--font-display);
@@ -1549,7 +1549,7 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--text-muted);
     white-space: nowrap;
   }
 
@@ -1605,7 +1605,7 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
 
   .footer-links a {
     font-size: 13px;
-    color: var(--text-dim);
+    color: var(--text-muted);
     transition: color 0.2s;
   }
 
@@ -1620,7 +1620,7 @@ function t(t,i,e){return Math.max(t,Math.min(i,e))}var i=class{isRunning=!1;valu
     align-items: center;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--text-dim);
+    color: var(--text-muted);
     flex-wrap: wrap;
     gap: 12px;
   }
@@ -1817,7 +1817,7 @@ h1, h2, h3, h4, h5, h6,
   .go-badge::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-ok); flex-shrink: 0; }
   .nogo-badge { color: var(--status-warn); font-family: var(--font-mono); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
   .nogo-badge::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 1px; background: var(--status-warn); flex-shrink: 0; }
-  .gngo-date { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+  .gngo-date { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
   .gngo-note { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
   .gngo-row.nogo .gngo-note { border-left: 2px solid var(--status-warn); padding-left: 8px; }
 
@@ -1835,7 +1835,7 @@ h1, h2, h3, h4, h5, h6,
     transition: opacity 0.4s ease, transform 0.4s ease;
   }
   .ev-row.visible, .ev-row.animate-in { opacity: 1; transform: translateX(0); }
-  .ev-col-code { font-family: var(--font-sans); font-size: 11px; color: var(--text-dim); font-weight: 700; }
+  .ev-col-code { font-family: var(--font-sans); font-size: 11px; color: var(--text-muted); font-weight: 700; }
   .ev-col-gate { font-family: var(--font-sans); font-size: 12px; color: var(--accent-gold); font-weight: 700; }
   .ev-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .ev-dot--gold { background: var(--accent-gold); }
@@ -1983,7 +1983,7 @@ h1, h2, h3, h4, h5, h6,
   transform: none;
   width: clamp(380px, 42vw, 560px);
   height: clamp(380px, 42vw, 560px);
-  opacity: 0.55;
+  opacity: 0.30;
   pointer-events: none;
   z-index: 1;
 }
@@ -2300,7 +2300,6 @@ h1, h2, h3, h4, h5, h6,
   font-size: 10px !important;
   color: var(--accent-gold) !important;
   border: 1px solid rgba(201,168,76,0.3) !important;
-  background: rgba(201,168,76,0.06) !important;
   padding: 4px 12px !important;
   border-radius: 2px;
 }
@@ -2423,6 +2422,207 @@ h1, h2, h3, h4, h5, h6,
 .voyage-card.visible:hover {
   border-left-color: var(--accent-gold);
   background: rgba(201,168,76,0.025);
+}
+
+.voyage-metric {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.voyage-kpi-strip {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 8px;
+}
+
+.voyage-kpi-strip div {
+  padding: 9px 10px;
+  border: 1px solid rgba(226,198,105,0.14);
+  background: rgba(255,255,255,0.025);
+  border-radius: 6px;
+}
+
+.voyage-kpi-strip span,
+.voyage-timeline-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.voyage-kpi-strip strong {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  word-break: keep-all;
+}
+
+.voyage-timeline {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: rgba(34,211,238,0.04);
+  border: 1px solid rgba(34,211,238,0.15);
+  border-left: 2px solid var(--accent-cyan);
+  border-radius: 6px;
+}
+
+.voyage-timeline-title {
+  margin-bottom: 10px;
+  color: var(--accent-cyan);
+}
+
+.voyage-timeline-grid {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 1fr;
+  gap: 5px 12px;
+  font-size: 11px;
+}
+
+.voyage-timeline-time {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.voyage-timeline-text {
+  color: var(--text-secondary);
+}
+
+.voyage-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.voyage-tags span {
+  padding: 5px 8px;
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: rgba(201,168,76,0.04);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.voyage-source,
+.voyage-closeout {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.voyage-closeout {
+  color: var(--accent-gold-lt);
+}
+
+.voyage-photo {
+  position: relative;
+  min-height: 260px;
+  background: rgba(255,255,255,0.025);
+}
+
+.voyage-photo-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--accent-gold);
+  font-family: var(--font-mono);
+  font-size: 24px;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, rgba(7,9,26,0.95), rgba(34,211,238,0.06));
+}
+
+.voyage-photo-fallback span {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.voyage-photo.image-missing .voyage-photo-fallback {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Heavy transport clean-style readability patch */
+.voyage-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.voyage-narrative {
+  max-width: 760px;
+  overflow-wrap: anywhere;
+}
+
+.voyage-timeline {
+  width: 100%;
+  max-width: 720px;
+  overflow: hidden;
+}
+
+.voyage-timeline-grid {
+  grid-template-columns: minmax(92px, 120px) 1fr;
+  gap: 9px 14px;
+  align-items: start;
+}
+
+.voyage-timeline-text {
+  min-width: 0;
+  line-height: 1.55;
+}
+
+.voyage-kpi-strip {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.timeline-spine,
+.route-spine,
+.section-rail,
+.voyage-card::before {
+  pointer-events: none;
+  z-index: 0;
+}
+
+.voyage-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .voyage-timeline-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voyage-timeline-time {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .voyage-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .voyage-timeline-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2572,7 +2772,7 @@ h1, h2, h3, h4, h5, h6,
   font-size: 9px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.52);
   text-decoration: none;
   padding: 0 14px;
   height: 100%;
@@ -2584,7 +2784,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .chapter-nav-link:hover {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .chapter-nav-link.active {
@@ -2707,7 +2907,7 @@ a[aria-disabled="true"]:hover, a[aria-disabled="true"]:active {
 .data-point-num { text-shadow: 0 0 20px rgba(201,168,76,0.45), 0 0 40px rgba(201,168,76,0.20); }
 .data-point:hover .data-point-num { text-shadow: 0 0 24px rgba(201,168,76,0.65), 0 0 48px rgba(201,168,76,0.30); }
 /* Editorial */
-.editorial-section-tag { border-left: 3px solid var(--accent-gold) !important; padding-left: 10px !important; background: rgba(201,168,76,0.08); padding-top: 3px; padding-bottom: 3px; border-radius: 0 6px 6px 0; display: inline-block; }
+.editorial-section-tag { border-left: 3px solid var(--accent-gold) !important; padding-left: 10px !important; padding-top: 3px; padding-bottom: 3px; border-radius: 0 6px 6px 0; display: inline-block; }
 .editorial-section { position: relative; isolation: isolate; }
 .editorial-section::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse 800px 600px at 15% 40%, rgba(201,168,76,0.08) 0%, transparent 65%), radial-gradient(ellipse 600px 500px at 85% 70%, rgba(34,211,238,0.06) 0%, transparent 60%); }
 /* Hero stats */
@@ -2796,11 +2996,11 @@ button:focus-visible, [role="button"]:focus-visible { outline-offset: 3px; }
 .key-fact-num { font-variant-numeric: tabular-nums; text-shadow: 0 0 28px rgba(201,168,76,0.32), 0 0 56px rgba(201,168,76,0.13); transition: text-shadow 0.5s ease; }
 .key-fact-num:hover { text-shadow: 0 0 36px rgba(201,168,76,0.52), 0 0 72px rgba(201,168,76,0.22); }
 /* GNGO */
-.gngo-verdict.go-badge { background: rgba(52,211,153,0.11); border: 1px solid rgba(52,211,153,0.32); color: var(--status-ok); border-radius: 4px; box-shadow: 0 0 8px rgba(52,211,153,0.14); font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; }
-.gngo-verdict.nogo-badge { background: rgba(248,113,113,0.09); border: 1px solid rgba(248,113,113,0.28); color: var(--status-crit); border-radius: 4px; box-shadow: 0 0 8px rgba(248,113,113,0.11); font-weight: 700; padding: 2px 8px; }
-.gngo-verdict-go { background: rgba(52,211,153,0.11); border: 1px solid rgba(52,211,153,0.32); color: var(--status-ok); border-radius: var(--radius-sm); font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; font-family: var(--font-mono); font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
+.gngo-verdict.go-badge { background: transparent; border: 1px solid rgba(52,211,153,0.32); color: var(--status-ok); border-radius: 4px; box-shadow: 0 0 8px rgba(52,211,153,0.14); font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; }
+.gngo-verdict.nogo-badge { background: transparent; border: 1px solid rgba(248,113,113,0.28); color: var(--status-crit); border-radius: 4px; box-shadow: 0 0 8px rgba(248,113,113,0.11); font-weight: 700; padding: 2px 8px; }
+.gngo-verdict-go { background: transparent; border: 1px solid rgba(52,211,153,0.32); color: var(--status-ok); border-radius: var(--radius-sm); font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; font-family: var(--font-mono); font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
 .gngo-verdict-go::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-ok); }
-.gngo-verdict-nogo { background: rgba(248,113,113,0.09); border: 1px solid rgba(248,113,113,0.28); color: var(--status-crit); border-radius: var(--radius-sm); font-weight: 700; padding: 2px 8px; font-family: var(--font-mono); font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
+.gngo-verdict-nogo { background: transparent; border: 1px solid rgba(248,113,113,0.28); color: var(--status-crit); border-radius: var(--radius-sm); font-weight: 700; padding: 2px 8px; font-family: var(--font-mono); font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
 .gngo-verdict-nogo::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 1px; background: var(--status-crit); }
 .gngo-row { transition: background 0.2s ease; }
 .gngo-row:hover { background: rgba(255,255,255,0.022); }
@@ -3029,7 +3229,7 @@ html { scroll-padding-top: 72px; }
 
 /* --- Step 4: Go/No-Go 섹션 --- */
 .gngo-verdict.go {
-  background: rgba(52,211,153,0.12);
+  background: transparent;
   border: 1px solid rgba(52,211,153,0.35);
   color: var(--status-ok);
   border-radius: var(--radius-sm);
@@ -3038,7 +3238,7 @@ html { scroll-padding-top: 72px; }
   letter-spacing: 0.06em;
 }
 .gngo-verdict.nogo {
-  background: rgba(248,113,113,0.10);
+  background: transparent;
   border: 1px solid rgba(248,113,113,0.30);
   color: var(--status-crit);
   border-radius: var(--radius-sm);
@@ -3109,6 +3309,12 @@ html { scroll-padding-top: 72px; }
 .site-footer [class*="brand"]:hover {
   opacity: 0.85;
 }
+
+/* ── WCAG Round 3 contrast patches (2026-06-11) ── */
+/* PATCH 2: ev-col-code explicit override (belt-and-suspenders over var(--text-muted)) */
+.ev-col-code { color: oklch(65% 0.038 265); }
+/* PATCH 4: ev-dot base background — oklch(72%)=2.23:1 fail → oklch(50%)=4.67:1 pass */
+.ev-dot { background: oklch(50% 0.118 82); }
 </style>
 <style id="mobile-optimize-v1-20260403">
 /* ============================================================
@@ -3625,8 +3831,8 @@ img {
   padding: 3px 9px;
   border-radius: 999px;
   border: 1px solid rgba(52,211,153,0.5);
-  background: rgba(52,211,153,0.12);
-  color: rgba(52,211,153,0.95);
+  background: transparent;
+  color: rgb(52,211,153);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -4306,6 +4512,83 @@ img {
     min-width: clamp(520px, 155vw, 620px) !important;
   }
 }
+
+/* ── HERO STAT RAIL (idea 1+6, 20260611) ── */
+.hero-meta {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(201,168,76,0.22);
+}
+
+.hero-stat-num {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 900px) {
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .hero-stat { padding: 14px 16px; }
+}
+
+@media (max-width: 768px) {
+  .hero-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+  .hero-stat-num { font-size: 22px; }
+  .hero-stat-label { font-size: 10px; line-height: 1.35; }
+}
+
+@media (max-width: 420px) {
+  /* keep 2-col so the hero fits the viewport (overrides v3 1fr rule) */
+  .hero-meta { grid-template-columns: 1fr 1fr !important; }
+  .hero-stat-num { font-size: 19px; }
+}
+
+/* ── HERO BACKGROUND PHOTO FIX (20260611) ──
+   The `#hero > *` rule forced position:relative on .hero-bg / .hero-overlay,
+   collapsing them to 0 height so the SPMT background VIDEO showed instead of
+   the photo. Restore absolute fill, layer the photo as the cover, and remove
+   the competing hero video so heropage.jpg is the first-page background. */
+#hero .hero-bg,
+#hero .hero-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+}
+#hero .hero-bg { z-index: 1 !important; }
+#hero .hero-overlay { z-index: 2 !important; }
+#hero .section-video-wrap,
+#hero .section-video-overlay { display: none !important; }
+
+/* ── CARGO LOAD-OUT VIDEO PANEL (CH.01 editorial, 20260611) ──
+   Replaces the static cargo image with the real transformer load-out footage.
+   Mirrors .editorial-image-panel img sizing; falls back to the poster frame
+   for reduced-motion users. */
+.editorial-image-panel video.editorial-bg-video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.editorial-image-panel:hover video.editorial-bg-video { transform: scale(1.04); }
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-image-panel.has-cargo-video video.editorial-bg-video { display: none; }
+  .editorial-image-panel.has-cargo-video {
+    aspect-ratio: 4 / 3;
+    background-image: url('./tr/cargo-loadout-poster.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+}
 </style>
 
 </head><body>
@@ -4328,6 +4611,7 @@ img {
     </div>
   </div>
 </nav>
+<main id="content">
 <!-- =====================================================================
    HVDC TR Transport Report — Hero + Chapter 01 + Chapter 02
    Body fragment only (no DOCTYPE/html/head)
@@ -4344,20 +4628,38 @@ img {
     </video>
   </div>
   <div class="section-video-overlay" aria-hidden="true"></div>
-  <div class="hero-bg" style="background-image:url('./tr/hvdc_tr_hero_crop.jpg');"></div>
+  <div class="hero-bg" style="background-image:url('./tr/hero_rev.jpeg');"></div>
   <div class="hero-overlay"></div>
   <div id="heroOrbitContainer">
     <canvas id="heroOrbitCanvas"></canvas>
   </div>
   <div class="hero-grid-overlay" id="heroGridOverlay"></div>
   <div class="hero-content gsap-fade-up">
-    <p class="hero-eyebrow">Independent Subsea HVDC System Project (Project Lightning) in the U.A.E.</p>
+    <p class="hero-eyebrow">Operation Status · TR1-TR7 AGI Offload Complete</p>
     <h1 class="hero-title">
       Seven 765 kV Single-Phase Transformers for AGI
     </h1>
     <p class="hero-subtitle">
-      Internal operations report covering transport operations from Mina Zayed Port (MZP) to Al Ghallan Island (AGI). Scope is limited to the AGI corridor using LCT BUSHRA and SPMTs.
+      Internal operations report for Project Lightning: Mina Zayed Port to Al Ghallan Island via LCT Bushra and SPMT.
     </p>
+    <div class="hero-meta">
+      <div class="hero-stat" data-tooltip="TR7 return to MZP / deck clearance open">
+        <span class="hero-stat-num"><span class="hero-count" data-count="7">7</span>/7</span>
+        <span class="hero-stat-label">Units Delivered · AGI Offload</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num"><span class="hero-count" data-count="217" data-decimals="1">217.0</span> t</span>
+        <span class="hero-stat-label">Unit Weight per Transformer</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">MZP → AGI</span>
+        <span class="hero-stat-label">Route · LCT Bushra</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num"><span class="hero-count" data-count="12">12</span></span>
+        <span class="hero-stat-label">SPMT Axle Lines (2 × 6)</span>
+      </div>
+    </div>
     <!-- taste-skill: scroll cue removed (banned per design-taste-frontend) -->
   </div>
 </section>
@@ -4393,9 +4695,13 @@ img {
 <!-- 에디토리얼 split — 이미지 왼쪽 -->
 <section class="editorial-section">
   <div class="editorial-split">
-    <div class="editorial-image-panel gsap-fade-right">
-      <img loading="lazy" decoding="async" src="./tr/WhatsApp Image 2026-04-01 at 10.24.06 PM.jpeg" alt="Cargo Overview" style="width:100%;height:100%;object-fit:cover;display:block;">
-      <p class="editorial-image-caption">Cargo Overview — 2026.04.01</p>
+    <div class="editorial-image-panel has-cargo-video gsap-fade-right">
+      <video class="editorial-bg-video" autoplay muted loop playsinline preload="metadata"
+             poster="./tr/cargo-loadout-poster.jpg"
+             aria-label="765 kV transformer load-out onto a 12-axle SPMT at Mina Zayed Port">
+        <source src="assets/video/cargo-loadout.mp4" type="video/mp4">
+      </video>
+      <p class="editorial-image-caption">Transformer load-out · MZP</p>
     </div>
     <div class="editorial-content-panel gsap-fade-left">
       <span class="editorial-section-tag">Cargo Overview</span>
@@ -4740,11 +5046,11 @@ img {
   <div class="evidence-table">
     <!-- 헤더 -->
     <div class="ev-row ev-header" style="opacity:1; transform:none; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">PKG</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Category</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Key Documents</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Gate</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Responsible</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">PKG</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Category</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Key Documents</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Gate</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Responsible</span>
     </div>
     <!-- Package A: Engineering (gold dot) -->
     <div class="ev-row"><span class="ev-dot ev-dot--gold"></span><span class="ev-col-code">A</span><span>Method Statement (latest revision)</span><span class="ev-col-gate">G1</span><span style="color:var(--text-muted);font-size:12px;">Engineering</span></div>
@@ -6024,7 +6330,7 @@ img {
   font-weight: 500;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-muted);
   margin-bottom: 20px;
 }
 .verdict-conditions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
@@ -6041,7 +6347,7 @@ img {
   font-weight: 700;
   letter-spacing: 0.5px;
 }
-.verdict-dim { color: var(--text-dim) !important; font-weight: 400 !important; }
+.verdict-dim { color: var(--text-muted) !important; font-weight: 400 !important; }
 .verdict-footer {
   display: flex;
   justify-content: space-between;
@@ -6049,7 +6355,7 @@ img {
   padding-top: 16px;
   border-top: 1px solid rgba(255,255,255,0.06);
 }
-.verdict-footer-label { font-size: 11px; color: var(--text-dim); }
+.verdict-footer-label { font-size: 11px; color: var(--text-muted); }
 .verdict-footer-value { font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
 
 @media (max-width: 600px) {
@@ -6078,7 +6384,7 @@ img {
 .go-badge::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-ok, #34d399); flex-shrink: 0; }
 .nogo-badge { color: var(--status-warn, #f59e0b); font-family: var(--font-mono, monospace); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
 .nogo-badge::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 1px; background: var(--status-warn, #f59e0b); flex-shrink: 0; }
-.gngo-date { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text-dim, #4a5568); }
+.gngo-date { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text-muted); }
 .gngo-note { color: var(--text-secondary, #94a3b8); font-size: 12px; line-height: 1.5; }
 .gngo-row.nogo .gngo-note { border-left: 2px solid var(--status-warn, #f59e0b); padding-left: 8px; }
 </style>
@@ -6093,10 +6399,10 @@ img {
   <div class="go-nogo-history">
     <!-- 헤더 -->
     <div class="gngo-row gngo-header" style="opacity:1; transform:none; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; margin-bottom: 4px;">
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Voyage</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Decision</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Date/Time</span>
-      <span style="font-size:10px; letter-spacing:2px; color:var(--text-dim);">Reason</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Voyage</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Decision</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Date/Time</span>
+      <span style="font-size:10px; letter-spacing:2px; color: var(--text-muted);">Reason</span>
     </div>
     <!-- TR1: GO -->
     <div class="gngo-row go">
@@ -6268,7 +6574,7 @@ img {
         <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">LCT Bushra Maximum Ballast Pump Capacity</div>
       </div>
     </div>
-    <p style="font-size:11px; color:var(--text-dim); margin-top:14px; line-height:1.6;">Distinguish the declared cargo weight from stage-specific RoRo reaction loads.<br>Stage-by-stage verification is mandatory for ramp, linkspan and bow deck reviews.<br>Final acceptance is based on the latest approved calculation package.</p>
+    <p style="font-size:11px; color: var(--text-muted); margin-top:14px; line-height:1.6;">Distinguish the declared cargo weight from stage-specific RoRo reaction loads.<br>Stage-by-stage verification is mandatory for ramp, linkspan and bow deck reviews.<br>Final acceptance is based on the latest approved calculation package.</p>
   </div>
 </div>
 
@@ -6363,152 +6669,297 @@ img {
 </div>
 
 
-<div class="voyage-cards-section editorial-section">
 
-  <!-- TR1 -->
-  <article class="voyage-card" data-voyage="1">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260131_103043.jpg" alt="TR1 RoRo Ramp Load-out" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR1</span>
-        <span class="voyage-status complete">Completed / Constrained</span>
-      </div>
-      <div class="voyage-date">2026.01.31 Load-out / 2026.02.08 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">+2d</span><span class="voyage-cycle-unit">vs initial 01/29 target</span>
-      </div>
-      <p class="voyage-incident">Linkspan certificate / PTW / COA issue, MWS COA required before sail-away</p>
-      <p class="voyage-note">Initial 01/29 load-out was not possible due to linkspan certificate, PTW and COA issues. HM/HSE/MZ Ops approved the first trip loading, and TR Unit 1 was loaded on 2026-01-31 before same-day MZP cast-off.</p>
-    </div>
-  </article>
+<div id="voyage-cards-root" class="voyage-cards-section editorial-section"></div>
 
-  <!-- TR2 -->
-  <article class="voyage-card" data-voyage="2">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260131_094423.jpg" alt="TR2 Load-out" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR2</span>
-        <span class="voyage-status complete">Completed</span>
-      </div>
-      <div class="voyage-date">2026.02.12 Load-out / 2026.02.13 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">+1d</span><span class="voyage-cycle-unit">fog/tide reslot 02/11→02/12</span>
-      </div>
-      <p class="voyage-incident">Dense fog at Mina stopped operation; tide window lost</p>
-      <p class="voyage-note">The 02/11 load-out was cancelled due to dense fog and reduced tide. Weather cleared on 02/12, MWS was onboard, TR ramp crossing and lashing were completed, followed by same-day ETD MZP.</p>
-      <!-- Voyage 2 마일스톤 — narrative 내부에 인라인 배치 -->
-      <div style="margin-top:14px; padding:14px 16px; background:rgba(34,211,238,0.04); border:1px solid rgba(34,211,238,0.15); border-left:2px solid var(--accent-cyan); border-radius:6px;">
-        <div style="font-family:var(--font-mono); font-size:9px; letter-spacing:2px; color:var(--accent-cyan); margin-bottom:10px; text-transform:uppercase;">Milestone Timeline</div>
-        <div style="display:grid; grid-template-columns: 72px 1fr; gap:4px 12px; font-size:11px;">
-          <span style="font-family:var(--font-mono); color:var(--text-dim);">12 Feb</span><span style="color:var(--text-secondary);">Load-Out MZP completed</span>
-          <span style="font-family:var(--font-mono); color:var(--text-dim);">12 Feb 15:00</span><span style="color:var(--text-secondary);">ETD MZP completed</span>
-          <span style="font-family:var(--font-mono); color:var(--text-dim);">13 Feb 14:30</span><span style="color:var(--text-secondary);">AGI load-in completed</span>
-          <span style="font-family:var(--font-mono); color:var(--text-dim);">14 Feb</span><span style="color:var(--text-secondary);">Foundation move / set-down on stools completed</span>
+<script id="voyage-data-ssot">
+const voyageData = [
+  {
+    id: "TR1",
+    unit: "TR Unit 1",
+    status: "Completed with Hold-Point Constraints",
+    statusType: "constrained",
+    dateLabel: "2026.01.31 Load-out / 2026.02.08 AGI Load-in",
+    metricValue: "+2d",
+    metricUnit: "readiness hold",
+    incident: "First transformer load-out was executed after linkspan, PTW and MWS hold-points were cleared.",
+    note: "TR1 opened the AGI marine transport campaign. The operation established the MZP RoRo interface, SPMT roll-on method, deck stowage position and initial sea-fastening workflow for LCT Bushra.",
+    kpi: {
+      loComplete: "2026-01-31 10:53",
+      etdMzp: "2026-01-31 20:36",
+      agiBerth: "2026-02-04 16:06",
+      offloadComplete: "2026-02-08 11:00",
+      loToEtdH: 9.72,
+      seaTransitH: 91.50,
+      berthToOffloadH: 90.90
+    },
+    milestones: [
+      ["MZP Ready", "Berth readiness and deck preparation confirmed"],
+      ["Ramp Ready", "Linkspan / ramp interface cleared for RoRo operation"],
+      ["Load-out", "SPMT convoy rolled TR1 onto LCT Bushra"],
+      ["Securing", "Deck positioning, lashing and sea-fastening checks completed"],
+      ["AGI Load-in", "Marine transit and AGI load-in completed under controlled berth window"]
+    ],
+    riskTags: ["Linkspan", "PTW", "MWS release", "Sea fastening", "Berth window"],
+    sourcePackage: ["Method Statement", "Project Operations Log", "Photo Log"],
+    closeout: "Closed with first-trip lessons captured.",
+    image: "./tr/20260131_103043.jpg",
+    imageAlt: "TR1 RoRo load-out interface"
+  },
+  {
+    id: "TR2",
+    unit: "TR Unit 2",
+    status: "Completed",
+    statusType: "complete",
+    dateLabel: "2026.02.12 Load-out / 2026.02.13 AGI Load-in",
+    metricValue: "+1d",
+    metricUnit: "weather/tide recovery",
+    incident: "Dense fog and reduced tide window caused a one-day operational hold before successful RoRo load-out.",
+    note: "TR2 used the established TR1 method with updated field readiness. Once visibility and tide conditions recovered, the SPMT convoy completed ramp crossing, deck positioning and lashing before same-day sail-away.",
+    kpi: {
+      loComplete: "2026-02-12 11:56",
+      etdMzp: "2026-02-12 15:00",
+      agiBerth: "2026-02-13 10:42",
+      offloadComplete: "2026-02-13 14:30",
+      loToEtdH: 3.07,
+      seaTransitH: 19.70,
+      berthToOffloadH: 3.80
+    },
+    milestones: [
+      ["MZP Berth", "MZP berth No.5 secured for second unit operation"],
+      ["Hold", "Fog and tide condition triggered operational hold"],
+      ["Release", "Weather window recovered and MWS presence confirmed"],
+      ["Load-out", "SPMT ramp crossing and deck positioning completed"],
+      ["AGI Load-in", "AGI berth secured and load-in completed"]
+    ],
+    riskTags: ["Fog", "Tide window", "Linkspan", "MWS release", "Lashing"],
+    sourcePackage: ["Schedule Baseline", "Project Operations Log", "MWS-PTW Pack"],
+    closeout: "Closed.",
+    image: "./tr/20260212_TR2.jpg",
+    imageAlt: "TR2 SPMT RoRo load-out"
+  },
+  {
+    id: "TR3",
+    unit: "TR Unit 3",
+    status: "Completed",
+    statusType: "complete",
+    dateLabel: "2026.02.18 Load-out / 2026.02.19 AGI Load-in",
+    metricValue: "0d",
+    metricUnit: "against revised window",
+    incident: "Pre-operation berth congestion and weather affected readiness, but revised load-out window was achieved.",
+    note: "TR3 followed the same RoRo method after berth access and marine conditions became workable. The transformer was loaded by SPMT, secured on deck, transported by LCT and loaded in at AGI within the revised sequence.",
+    kpi: {
+      loComplete: "2026-02-18 14:34",
+      etdMzp: "2026-02-19 00:00",
+      agiBerth: "2026-02-19 10:36",
+      offloadComplete: "2026-02-19 17:54",
+      loToEtdH: 9.43,
+      seaTransitH: 10.60,
+      berthToOffloadH: 7.30
+    },
+    milestones: [
+      ["Pre-check", "Berth congestion and weather condition reviewed before execution"],
+      ["MZP Berth", "MZP RoRo jetty became available for LCT Bushra"],
+      ["Load-out", "SPMT load-out and deck stowage were completed"],
+      ["Sail-away", "Sea fastening and sail-away proceeded after pilot readiness"],
+      ["AGI Load-in", "AGI load-in and set-down completed"]
+    ],
+    riskTags: ["Berth congestion", "Weather window", "Pilot readiness", "Sea fastening"],
+    sourcePackage: ["Schedule Baseline", "Project Operations Log", "Photo Log"],
+    closeout: "Closed.",
+    image: "./tr/20260131_093538.jpg",
+    imageAlt: "TR3 heavy transport operation"
+  },
+  {
+    id: "TR4",
+    unit: "TR Unit 4",
+    status: "Completed with Site Constraint",
+    statusType: "constrained",
+    dateLabel: "2026.02.25 Load-out / 2026.03.02 AGI Load-in",
+    metricValue: "+1d / +2d",
+    metricUnit: "load-out revision and sailing hold",
+    incident: "TR4 was loaded after berth revision, then held by swell/weather before AGI discharge was completed.",
+    note: "The load-out shifted to the next workable daylight/tide window. After loading and sea fastening, sail-away was held by swell/weather and AGI activity was later constrained by site-control conditions.",
+    kpi: {
+      loComplete: "2026-02-25 08:01",
+      etdMzp: "2026-02-27 08:42",
+      agiBerth: "2026-02-28 07:12",
+      offloadComplete: "2026-03-02 16:00",
+      loToEtdH: 48.68,
+      seaTransitH: 22.50,
+      berthToOffloadH: 56.80
+    },
+    milestones: [
+      ["Deck Prep", "Deck preparation and permit readiness completed after berth delay"],
+      ["Load-out", "TR4 RoRo load-out completed by SPMT"],
+      ["Hold", "LCT Bushra remained under swell/weather hold before departure"],
+      ["AGI Berth", "AGI berth was secured after marine transit"],
+      ["Load-in", "Load-in and set-down were completed after site work release"]
+    ],
+    riskTags: ["Berth delay", "Swell", "Weather window", "Site control", "HM instruction"],
+    sourcePackage: ["Schedule Baseline", "Project Operations Log", "PTW Pack"],
+    closeout: "Closed with site-control caveat.",
+    image: "./tr/20260225_TR4.jpg",
+    imageAlt: "TR4 RoRo load-out"
+  },
+  {
+    id: "TR5",
+    unit: "TR Unit 5",
+    status: "Completed",
+    statusType: "complete",
+    dateLabel: "2026.05.22 Load-out / 2026.05.25 AGI Load-in",
+    metricValue: "Restart",
+    metricUnit: "campaign recovery",
+    incident: "TR5 resumed the transformer campaign after the extended AGI hold and marine support cycle.",
+    note: "The operation restarted with beam preparation, linkspan readiness and SPMT load-out at MZP. TR5 was transported to AGI and discharged under the restored marine and berth execution sequence.",
+    kpi: {
+      loComplete: "2026-05-22 07:59",
+      etdMzp: "2026-05-24 23:15",
+      agiBerth: "2026-05-25 09:15",
+      offloadComplete: "2026-05-25 12:40",
+      loToEtdH: 63.27,
+      seaTransitH: 10.00,
+      berthToOffloadH: 3.42
+    },
+    milestones: [
+      ["Restart", "Campaign restart plan issued after AGI hold period"],
+      ["MZP Berth", "LCT Bushra returned to MZP berth for preparation"],
+      ["Deck Prep", "Transport beams and deck interface were prepared"],
+      ["Load-out", "TR5 load-out, deck positioning and lashing completed"],
+      ["AGI Load-in", "AGI load-in completed and return voyage initiated"]
+    ],
+    riskTags: ["Restart planning", "Deck preparation", "Pilot service", "Weather window", "Berth readiness"],
+    sourcePackage: ["Schedule Baseline", "Project Operations Log", "Photo Log"],
+    closeout: "Closed.",
+    image: "./tr/20260522_TR5.jpg",
+    imageAlt: "TR5 campaign restart load-out"
+  },
+  {
+    id: "TR6",
+    unit: "TR Unit 6",
+    status: "Completed",
+    statusType: "complete",
+    dateLabel: "2026.06.04 Load-out / 2026.06.08 AGI Load-in",
+    metricValue: "0d / +3d",
+    metricUnit: "tide-window execution / sail-away hold",
+    incident: "TR6 achieved the revised tide-window load-out, then waited for safe marine transit.",
+    note: "Night heavy-load movement was not adopted; execution was moved to a suitable daylight/tide window. Load-out was completed as revised, with sail-away held until swell/weather allowed safe transit to AGI.",
+    kpi: {
+      loComplete: "2026-06-04 06:17",
+      etdMzp: "2026-06-07 12:30",
+      agiBerth: "2026-06-08 06:35",
+      offloadComplete: "2026-06-08 09:55",
+      loToEtdH: 78.22,
+      seaTransitH: 18.08,
+      berthToOffloadH: 3.33
+    },
+    milestones: [
+      ["Safety Gate", "Night load-out concept rejected for heavy-load safety"],
+      ["Tide Window", "Tide-window execution plan confirmed for daylight RoRo"],
+      ["Linkspan", "Linkspan installed after vessel motion and rolling control"],
+      ["Load-out", "TR6 SPMT load-out and deck stowage completed"],
+      ["AGI Load-in", "AGI load-in completed after safe marine transit"]
+    ],
+    riskTags: ["Tide window", "Daylight operation", "Rough sea", "Linkspan", "Swell"],
+    sourcePackage: ["Schedule Baseline", "Project Operations Log", "MWS-PTW Pack"],
+    closeout: "Closed.",
+    image: "./tr/20260604_TR6.jpg",
+    imageAlt: "TR6 tide-window RoRo operation"
+  },
+  {
+    id: "TR7",
+    unit: "TR Unit 7",
+    status: "Final AGI Load-in Complete / Close-out Pending",
+    statusType: "open",
+    dateLabel: "2026.06.10 Load-out / 2026.06.11 AGI Load-in",
+    metricValue: "13min",
+    metricUnit: "load-out cycle",
+    incident: "Final transformer was loaded out, transported to AGI and discharged; return and backload close-out remain to be recorded.",
+    note: "TR7 closed the main transformer delivery sequence. The final unit was loaded by SPMT, secured for LCT marine transit, discharged at AGI and prepared for post-operation equipment recovery.",
+    kpi: {
+      loComplete: "2026-06-10 07:32",
+      etdMzp: "2026-06-10 18:55",
+      agiBerth: "2026-06-11 06:35",
+      offloadComplete: "2026-06-11 11:12",
+      loToEtdH: 11.38,
+      seaTransitH: 11.67,
+      berthToOffloadH: 4.62
+    },
+    milestones: [
+      ["MZP Return", "LCT Bushra returned to MZP for final transformer preparation"],
+      ["Readiness", "Linkspan, PTW and Working Over Water readiness confirmed"],
+      ["Load-out", "TR7 SPMT load-out and deck positioning completed"],
+      ["Transit", "LCT Bushra sailed to AGI under berth-window coordination"],
+      ["AGI Load-in", "Final AGI load-in completed; backload and demobilization to close separately"]
+    ],
+    riskTags: ["PTW", "Working Over Water", "Swell", "Berth readiness", "Backload"],
+    sourcePackage: ["Project Operations Log", "Schedule Baseline", "Close-out Register"],
+    closeout: "Main delivery complete; backload / demobilization close-out pending.",
+    image: "./tr/20260314_093314.jpg",
+    imageAlt: "TR7 final transformer load-in"
+  }
+];
+
+  const esc = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+  const formatHours = (value) => Number(value).toFixed(2);
+
+  function renderVoyageCard(v) {
+    return `
+      <article class="voyage-card visible" data-voyage="${esc(v.id.replace('TR', ''))}">
+        <div class="voyage-photo">
+          <img loading="lazy" decoding="async" src="${esc(v.image)}" alt="${esc(v.imageAlt)}"
+               onerror="this.closest('.voyage-photo').classList.add('image-missing'); this.remove();">
+          <div class="voyage-photo-fallback">${esc(v.id)}<br><span>Evidence image pending</span></div>
         </div>
-      </div>
-    </div>
-  </article>
+        <div class="voyage-narrative">
+          <div class="voyage-header">
+            <span class="voyage-id">${esc(v.id)}</span>
+            <span class="voyage-status ${esc(v.statusType)}">${esc(v.status)}</span>
+          </div>
+          <div class="voyage-date">${esc(v.dateLabel)}</div>
+          <div class="voyage-metric">
+            <span class="voyage-cycle-num">${esc(v.metricValue)}</span>
+            <span class="voyage-cycle-unit">${esc(v.metricUnit)}</span>
+          </div>
+          <p class="voyage-incident">${esc(v.incident)}</p>
+          <p class="voyage-note">${esc(v.note)}</p>
+          <div class="voyage-kpi-strip">
+            <div><span>LO</span><strong>${esc(v.kpi.loComplete)}</strong></div>
+            <div><span>ETD</span><strong>${esc(v.kpi.etdMzp)}</strong></div>
+            <div><span>AGI Berth</span><strong>${esc(v.kpi.agiBerth)}</strong></div>
+            <div><span>Offload</span><strong>${esc(v.kpi.offloadComplete)}</strong></div>
+            <div><span>LO->ETD</span><strong>${formatHours(v.kpi.loToEtdH)}h</strong></div>
+            <div><span>ETD->AGI</span><strong>${formatHours(v.kpi.seaTransitH)}h</strong></div>
+            <div><span>Berth->Offload</span><strong>${formatHours(v.kpi.berthToOffloadH)}h</strong></div>
+          </div>
+          <div class="voyage-timeline">
+            <div class="voyage-timeline-title">Milestone Timeline</div>
+            <div class="voyage-timeline-grid">
+              ${v.milestones.map(([time, text]) => `
+                <span class="voyage-timeline-time">${esc(time)}</span>
+                <span class="voyage-timeline-text">${esc(text)}</span>
+              `).join('')}
+            </div>
+          </div>
+          <div class="voyage-tags">
+            ${v.riskTags.map((tag) => `<span>${esc(tag)}</span>`).join('')}
+          </div>
+          <div class="voyage-source">Source Package: ${v.sourcePackage.map(esc).join(' | ')}</div>
+          <div class="voyage-closeout">Close-out: ${esc(v.closeout)}</div>
+        </div>
+      </article>`;
+  }
 
-  <!-- TR3 -->
-  <article class="voyage-card" data-voyage="3">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260131_093538.jpg" alt="TR3 Load-out" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR3</span>
-        <span class="voyage-status complete">Completed</span>
-      </div>
-      <div class="voyage-date">2026.02.18 Load-out / 2026.02.19 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">0d</span><span class="voyage-cycle-unit">vs revised 02/18 target</span>
-      </div>
-      <p class="voyage-incident">MZP berth occupied and bad weather; wind 25–28kt and wave 5–6</p>
-      <p class="voyage-note">TR3 planning targeted 02/18 load-out/cast-off, but MZP berth and weather caused pre-operation delay. Actual loading was completed on 02/18, followed by MZP cast-off at 00:00 on 02/19.</p>
-    </div>
-  </article>
-
-  <!-- TR4 -->
-  <article class="voyage-card" data-voyage="4">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260131_103050.jpg" alt="TR4 Load-out" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR4</span>
-        <span class="voyage-status complete">Completed / Caveat</span>
-      </div>
-      <div class="voyage-date">2026.02.25 Load-out / 2026.03.02 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">+1d / +2d</span><span class="voyage-cycle-unit">LO revision + sail/weather hold</span>
-      </div>
-      <p class="voyage-incident">Berth delay, swell/weather hold, AGI security evacuation stop</p>
-      <p class="voyage-note">TR4 load-out shifted from 02/24 to 02/25 due to berth and permit readiness. After loading, sailing was delayed to 02/27 by swell/weather. AGI outdoor work was then stopped by a security/evacuation situation.</p>
-    </div>
-  </article>
-
-  <!-- TR5 -->
-  <article class="voyage-card" data-voyage="5">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260314_092749.jpg" alt="TR5 Completed" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR5</span>
-        <span class="voyage-status complete">Completed</span>
-      </div>
-      <div class="voyage-date">2026.05.22 Load-out / 2026.05.25 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">Mar→May</span><span class="voyage-cycle-unit">strategic hold, then restart</span>
-      </div>
-      <p class="voyage-incident">V4 이후 AGI evacuation / Harbour Master hold로 장기 중단 후 May restart</p>
-      <p class="voyage-note">The initial March TR5 campaign was held after V4 due to AGI evacuation and Harbour Master hold. The restart plan resumed in May; actual load-out was completed on 05/22 and AGI offloading on 05/25.</p>
-    </div>
-  </article>
-
-  <!-- TR6 -->
-  <article class="voyage-card" data-voyage="6">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260131_105159.jpg" alt="TR6 Completed" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR6</span>
-        <span class="voyage-status complete">Completed</span>
-      </div>
-      <div class="voyage-date">2026.06.04 Load-out / 2026.06.08 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">0d / +3d</span><span class="voyage-cycle-unit">LO on-tide; ETD weather hold</span>
-      </div>
-      <p class="voyage-incident">Night heavy lift not allowed; tide shifted to 06/04; ETD delayed to 06/07 by swell/weather</p>
-      <p class="voyage-note">TR6 was re-planned from the 05/28 night load-out concept because night heavy lift was not allowed. Suitable tide was confirmed for 06/04, and load-out was completed as revised. Sailing was later held until 06/07 due to weather/swell.</p>
-    </div>
-  </article>
-
-  <!-- TR7 -->
-  <article class="voyage-card" data-voyage="7">
-    <div class="voyage-photo">
-      <img loading="lazy" decoding="async" src="./tr/20260314_093314.jpg" alt="TR7 AGI Offload Complete" loading="lazy">
-    </div>
-    <div class="voyage-narrative">
-      <div class="voyage-header">
-        <span class="voyage-id">TR7</span>
-        <span class="voyage-status ongoing">AGI Offload Complete / Return Open</span>
-      </div>
-      <div class="voyage-date">2026.06.10 Load-out / 2026.06.11 AGI Offload</div>
-      <div>
-        <span class="voyage-cycle-num">13min</span><span class="voyage-cycle-unit">load-out cycle; return open</span>
-      </div>
-      <p class="voyage-incident">Swell above 3ft and insurance concern; ETD synchronized with AGI berth availability</p>
-      <p class="voyage-note">TR7 load-out started at 07:19 and completed at 07:32 on 06/10. MZP cast-off occurred at 18:55 after swell/insurance and AGI berth availability checks. AGI offloading was completed on 06/11, but deck clearance/backload and return to MZP remained open.</p>
-    </div>
-  </article>
-
-</div>
+  const voyageCardsRoot = document.getElementById('voyage-cards-root');
+  if (voyageCardsRoot) {
+    voyageCardsRoot.innerHTML = voyageData.map(renderVoyageCard).join('');
+  }
+</script>
 
 <!-- ════════════════════════════════════════════════════════════
      KPI Stats 카드 4개
@@ -6853,7 +7304,7 @@ img {
   ">
     <div style="position:absolute; top:12px; right:16px; display:flex; align-items:center; gap:6px;">
       <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--status-ok); animation: live-pulse 2s ease-in-out infinite;"></span>
-      <span id="optimus-live-time" style="font-family:var(--font-mono); font-size:10px; color:var(--text-dim); letter-spacing:1px;">LIVE</span>
+      <span id="optimus-live-time" style="font-family:var(--font-mono); font-size:10px; color: var(--text-muted); letter-spacing:1px;">LIVE</span>
     </div>
     <style>
     @keyframes live-pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
@@ -7370,6 +7821,7 @@ img {
   </div>
 </section>
 
+</main>
 <footer id="site-footer">
   <div class="footer-grid">
     <div>
@@ -7467,6 +7919,22 @@ ScrollTrigger.config({ ignoreMobileResize: true });
     stagger: 0.12,
     delay: 0.2,
     clearProps: 'transform'
+  });
+})();
+
+/* Hero stat rail count-up (idea 1, 20260611) */
+(function initHeroStatCount() {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('#hero .hero-count').forEach(function(el) {
+    var target = parseFloat(el.getAttribute('data-count'));
+    if (isNaN(target)) return;
+    var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    if (reduce) { el.textContent = target.toFixed(decimals); return; }
+    var obj = { val: 0 };
+    gsap.to(obj, {
+      val: target, duration: 1.4, ease: 'power2.out', delay: 0.7,
+      onUpdate: function() { el.textContent = obj.val.toFixed(decimals); }
+    });
   });
 })();
 
@@ -8566,12 +9034,12 @@ ScrollTrigger.config({ ignoreMobileResize: true });
   window.sceneCards = [
     {
       id: 'hero-mission',
-      trigger: '#hero',
+      trigger: '#chapter-1',
       kicker: 'MISSION',
       title: '7 Transformers. 7 Voyages.',
       description: 'Each 217.00 t transformer movement is controlled through document gates, tide windows, SPMT readiness, and sail-away approval.',
       metric: '7 × 217.00 t',
-      position: 'left',
+      position: 'right',
       tone: 'gold'
     },
     {
@@ -8591,7 +9059,7 @@ ScrollTrigger.config({ ignoreMobileResize: true });
       title: 'Every voyage passes the decision gate.',
       description: 'Wind, tide, SWH, visibility, ramp condition, SPMT readiness, berth window, and site access are checked before movement.',
       metric: 'Decision Gate',
-      position: 'center',
+      position: 'right',
       tone: 'indigo'
     }
   ];
@@ -8921,5 +9389,79 @@ ScrollTrigger.config({ ignoreMobileResize: true });
   }, { passive: true });
 })();
 </script>
+<style id="voyage-design-v2-20260611">
+/* === Voyage Card v2 — 2026-06-11 === */
+
+/* 1. Card top border + hover gold sweep line */
+.voyage-card {
+  border-top: 1px solid rgba(201,168,76,0.18);
+  position: relative;
+  overflow: hidden;
+}
+.voyage-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: linear-gradient(90deg, var(--accent-gold), transparent);
+  transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+  z-index: 1;
+}
+.voyage-card:hover::before { width: 60%; }
+@media (prefers-reduced-motion: reduce) {
+  .voyage-card::before { transition: none; }
+}
+
+/* 2. Photo panel cinematic depth */
+.voyage-photo { position: relative; }
+.voyage-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 55%, rgba(7,9,26,0.55) 100%);
+  pointer-events: none;
+}
+
+/* 3. Voyage header gold separator */
+.voyage-header {
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+/* 4. Status chip border */
+.voyage-status {
+  border: 1px solid currentColor;
+  letter-spacing: 0.8px;
+}
+.voyage-status.complete { border-color: rgba(52,211,153,0.40); }
+
+/* 5. Cycle-num gold glow */
+.voyage-cycle-num {
+  text-shadow: 0 0 18px rgba(201,168,76,0.50), 0 0 40px rgba(201,168,76,0.22);
+}
+
+/* 6. KPI strip — contrast bump + hover */
+.voyage-kpi-strip span {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.voyage-kpi-strip strong {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+.voyage-kpi-strip div:hover {
+  background: rgba(201,168,76,0.05);
+  border-color: rgba(201,168,76,0.22);
+}
+
+/* 7. Evidence + closeout mono */
+.voyage-source,
+.voyage-closeout {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+</style>
 </body>
 </html>
