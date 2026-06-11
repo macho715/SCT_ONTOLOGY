@@ -1,0 +1,18 @@
+# Large media (track assets/video explicitly)
+*.mp4
+!assets/video/*.mp4
+*.zip
+*.pdf
+*.pptx
+*.docx
+
+# Dev artifacts
+*.py
+*.pyc
+__pycache__/
+
+# System
+.DS_Store
+Thumbs.db
+*.log
+.claude/

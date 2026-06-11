@@ -1,0 +1,17 @@
+# Backup files
+*.bak
+*.bak2
+
+# Local dev only
+serve.bat
+
+# Source/working files
+*.md
+patches/
+docs/
+.agents/
+skills-lock.json
+TASTE_CONFIG.md
+
+# Build artifacts
+index.html.bak

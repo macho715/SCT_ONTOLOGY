@@ -1,0 +1,113 @@
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@
+-    <source src="https://drive.google.com/uc?export=download&id=16UMDmChhfT-VZci_MRqA41FLxkz0YWAM" type="video/mp4">
++    <source src="assets/video/route-corridor.mp4" type="video/mp4">
+@@
+-  var sceneCards = [
+-    {
+-      id: 'mission-01',
+-      trigger: '#hero',
+-      kicker: 'MISSION',
+-      title: '7 Transformers. 7 Voyages. One Controlled Corridor.',
+-      description: 'A single-unit heavy RoRo operation from MZP to AGI, executed 7 times over 47 days using LCT Bushra and SPMT.',
+-      metric: '7 × 217.00 t',
+-      position: 'left',
+-      tone: 'gold'
+-    },
+-    {
+-      id: 'weight-01',
+-      trigger: '#chapter-1',
+-      kicker: 'CARGO',
+-      title: 'Each Unit Defines the Operation.',
+-      description: 'At 217.00 t per transformer, every movement depends on controlled ramp, deck, tide, and SPMT readiness. Weight is not the constraint — sequence is.',
+-      metric: '217.00 t / unit',
+-      position: 'right',
+-      tone: 'cyan'
+-    },
+-    {
+-      id: 'voyage-01',
+-      trigger: '#chapter-2',
+-      kicker: 'VOYAGE',
+-      title: 'Repeatable Only After the First Safe Cycle.',
+-      description: 'Each trip follows the same operating logic: MZP load-out, sea transit, AGI load-in, jack-down, skid, final positioning.',
+-      metric: '7 trips executed',
+-      position: 'left',
+-      tone: 'gold'
+-    },
+-    {
+-      id: 'route-01',
+-      trigger: '#route-map-hero',
+-      kicker: 'ROUTE',
+-      title: 'MZP to AGI — A Controlled Logistics Corridor.',
+-      description: 'Marine transit corridor — MZP to AGI. Every voyage follows the same corridor with tide, weather, and SPMT constraints verified before departure.',
+-      metric: 'Distance: TBC — pending MS',
+-      position: 'right',
+-      tone: 'cyan'
+-    },
+-    {
+-      id: 'gate-01',
+-      trigger: '#chapter-3',
+-      kicker: 'GO / NO-GO',
+-      title: 'Every Voyage Must Pass the Decision Gate.',
+-      description: 'Wind ≤ 20 kt, tide ≥ 2.00 m (MOC conditional), SWH ≤ 0.6 m, visibility ≥ 55 m — all criteria must be met before load-out commences.',
+-      metric: 'GO / HOLD / NO-GO',
+-      position: 'center',
+-      tone: 'indigo'
+-    },
+-    {
+-      id: 'proof-01',
+-      trigger: '#chapter-4',
+-      kicker: 'EVIDENCE',
+-      title: 'Completion Is Proven by Sequence, Not Statement.',
+-      description: 'TR1–TR4 executed and closed. TR5–TR7 suspended pending insurance cover reinstatement. Voyage evidence covers 4 completed cycles.',
+-      metric: '4 / 7 complete',
+-      position: 'left',
+-      tone: 'gold'
+-    },
+-    {
+-      id: 'lessons-01',
+-      trigger: '#evidence-wall',
+-      kicker: 'DOCTRINE',
+-      title: 'Seven Voyages. Seven Verified Lessons.',
+-      description: 'Single-unit cycles eliminate ballast error. Parallel SPMT deployment shortens turnaround. MOC approvals must be voyage-specific. Tide window governs all decisions.',
+-      metric: '7 doctrine points',
+-      position: 'right',
+-      tone: 'indigo'
+-    }
+-  ];
++  window.sceneCards = [
++    {
++      id: 'hero-mission',
++      trigger: '#hero',
++      kicker: 'MISSION',
++      title: '7 Transformers. 7 Voyages.',
++      description: 'Each 217.00 t transformer movement is controlled through document gates, tide windows, SPMT readiness, and sail-away approval.',
++      metric: '7 × 217.00 t',
++      position: 'left',
++      tone: 'gold'
++    },
++    {
++      id: 'route-corridor',
++      trigger: '#route-map-hero',
++      kicker: 'CORRIDOR',
++      title: 'MZP to AGI marine corridor.',
++      description: 'The route section operates as a visual control layer for vessel movement, route risk, and completion evidence.',
++      metric: 'Distance: source confirmation required',
++      position: 'right',
++      tone: 'cyan'
++    },
++    {
++      id: 'go-no-go-gate',
++      trigger: '#chapter-3',
++      kicker: 'GO / NO-GO',
++      title: 'Every voyage passes the decision gate.',
++      description: 'Wind, tide, SWH, visibility, ramp condition, SPMT readiness, berth window, and site access are checked before movement.',
++      metric: 'Decision Gate',
++      position: 'center',
++      tone: 'indigo'
++    }
++  ];
++
++  var sceneCards = window.sceneCards;
