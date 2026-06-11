@@ -31,7 +31,7 @@ jobs:
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Post PR Comment
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: |
             🚀 Vercel Preview deployed!
